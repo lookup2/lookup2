@@ -6,11 +6,9 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set UPDATED 2000-1-1
+@set UPDATED 2000-6-17
 @set EDITION 2.0
 @set VERSION 2.0
-
-@set HOMEPAGE http://lookup.sourceforge.net/
 
 @ifinfo
 @dircategory The Emacs editor and associated tools
@@ -20,7 +18,7 @@
 
 This file documents Lookup, a search interface.
 
-Copyright @copyright{} 1997,1998,1999,2000 Keisuke Nishida
+Copyright @copyright{} 1997-2000 Nishida Keisuke
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -47,7 +45,7 @@ approved by the Free Software Foundation.
 @titlepage
 @title Lookup User's Manual
 @subtitle for Lookup @value{VERSION}
-@author Keisuke Nishida
+@author Nishida Keisuke
 
 @page
 @vskip 0pt plus 1filll
@@ -55,7 +53,7 @@ Edition @value{EDITION} @*
 Updated for Lookup @value{VERSION} @*
 @value{UPDATED} @*
 
-Copyright @copyright{} 1997,1998,1999,2000 Keisuke Nishida
+Copyright @copyright{} 1997-2000 Nishida Keisuke
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -74,60 +72,31 @@ approved by the Free Software Foundation.
 
 @contents
 
-@node Top, What is Lookup, (dir), (dir)
+@node Top, Getting Started, (dir), (dir)
 @top Lookup User's Manual
 
-Lookup is an integrated search interface with electronic dictionaries
-for the Emacs text editor.  You can use various kinds of dictionaries,
-such as CD-ROM books and online dictionaries, in an efficient and
-effective manner.
+Lookup $B$O(B Emacs $B%(%G%#%?$GMxMQ$G$-$k<-=q8!:w%$%s%?!<%U%'!<%9$G$9!#;THN$N(B
+CD-ROM $B<-=q$d%M%C%H%o!<%/$N<-=q%5!<%P$r;O$a!"MM!9$J>pJs8;$+$i4JC1$JA`:n(B
+$B$H@_Dj$G<-=q8!:w$,9T$J$($^$9!#(B
 
-This manual corresponds to Lookup @value{VERSION}.
+$B$3$N%^%K%e%"%k$O(B Lookup @value{VERSION} $B$K$D$$$F@bL@$7$^$9!#(B
 
 @menu
-* What is Lookup::              Welcome to the Lookup world!
-* How to Install::              What Emacs you can use.
-* Quick Start::                 
-* Dictionary Preparation::      
-* Getting Started::             
-* Advanced Features::           
-* Customization::               
-* Getting Information::         
-* Dictionary Types::            
-* Search Agents::               
-* Mode Details::                
-* Concept Index::               
-* Command Index::               
-* Variable Index::              
+* Getting Started::             $B2?$O$H$b$"$l;H$C$F$_$k(B
+* Dictionary Setup::            $B<-=q$N=`Hw$r@0$($k(B
+* How to Lookup::               $B$=$l$G$O8!:w$7$F$_$h$&(B
+* Advanced Features::           $B$h$j9bEY$J;H$$J}(B
+* Customization::               $B<+J,9%$_$K%+%9%?%^%$%:(B
+* Information::                 $B99$J$k>pJs$rF@$k$K$O(B
+* Search Agents::               $B8!:w%(!<%8%'%s%H0lMw(B
+* Concept Index::               $B%3%s%;%W%H0lMw(B
+* Command Index::               $B%3%^%s%I0lMw(B
+* Variable Index::              $BJQ?t0lMw(B
 
 @detailmenu
  --- The Detailed Node Listing ---
 
-What is Lookup?
-
-* Features::                    Lookup $B$NFCD'(B
-* Environment::                 $BF0:n4D6-(B
-* Copying::                     $BCx:n8"$K$D$$$F(B
-
-How to Install
-
-* Required Environment::        
-* Installation Methods::        
-
-Required Environment
-
-* GNU Emacs::                   
-* XEmacs::                      
-* Mule::                        
-* NTEmacs::                     
-* Meadow::                      
-
-Installation Methods
-
-* install.el::                  The way to complete installation within Emacs.
-* Makefile::                    
-
-Quick Start
+Getting Started
 
 * Quick Prepare::               
 * Quick Setup::                 
@@ -136,7 +105,7 @@ Quick Start
 * Quick Search::                
 * Quick View::                  
 
-Dictionary Preparation
+Dictionary Setup
 
 * Free Dictionary::             Using free distributed dictionaries.      
 * CD-ROM Dictionary::           Using CD-ROM dictionaries on the market.  
@@ -167,9 +136,8 @@ Miscellaneous Dictionary
 * ndspell agent::               $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
 * ndcookie agent::              $B:#F|$N1?@*$r%A%'%C%/$9$k(B
 
-Getting Started
+$B$=$l$G$O8!:w$7$F$_$h$&(B
 
-* Fundamental Structure::       
 * Setup Dictionary::            $B<-=q$N=`Hw$r@0$($k(B
 * Setup Agent::                 $B<-=q$K9g$o$;$F@_Dj$9$k(B
 * Setup Command::               $B?7$7$$8!:w%3%^%s%I$r:n$k(B
@@ -227,9 +195,6 @@ Customization
 
 * Customize General::           $B0lHLE*$J%+%9%?%^%$%:(B
 * Customize Option::            $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
-* Customize Contents::          $B%(%s%H%jK\J8$N%+%9%?%^%$%:(B
-* Supplement Package::          $BJd=u%Q%C%1!<%8$r:n$k(B
-* Customize Example::           $B>\:Y$J@_DjNc(B
 
 $B0lHLE*$J%+%9%?%^%$%:(B
 
@@ -240,29 +205,6 @@ Customization
 
 * Agent Options::               $B%(!<%8%'%s%H!&%*%W%7%g%s0lMw(B
 * Dictionary Options::          $B<-=q%*%W%7%g%s0lMw(B
-
-$B%(%s%H%jK\J8$N%+%9%?%^%$%:(B
-
-* Reference Pattern::           $B%j%U%!%l%s%9$N@_Dj(B
-* Gaiji Table::                 $B30;zCV$-49$($N@_Dj(B
-* Format Contents::             $B%F%-%9%H$N@07A(B
-
-Getting Information
-
-* How To Get::                  
-* Dictionary Links::            $BEE;R<-=q4XO"%j%s%/(B
-* Mailing Lists::               
-* Bug Report::                  
-* Troubleshooting::             
-
-Dictionary Types
-
-* Setup SDIC::                  SDIC $B%U%)!<%^%C%H(B
-* Setup dictd::                 dictd $B%U%)!<%^%C%H(B
-* Setup cookie::                cookie $B%U%!%$%k(B
-* Setup CD-ROM::                $B3F<o(B CD-ROM $B<-=q(B
-* Setup NDTP::                  NDTP $B<-=q%5!<%P(B
-* Setup DICT::                  DICT $B<-=q%5!<%P(B
 
 $B8!:w%(!<%8%'%s%H0lMw(B
 
@@ -328,220 +270,11 @@ ndcookie
 * ndcookie setup::              ndcookie $B$N@_Dj(B
 * ndcookie dictionary::         ndcookie $B$N<-=q(B
 
-$B3F%b!<%I$K$D$$$F$N>\:Y(B
-
-* Select Mode::                 Select $B%b!<%I(B
-* Entry Mode::                  Entry $B%b!<%I(B
-* Content Mode::                Content $B%b!<%I(B
-
-Select $B%b!<%I(B
-
-* Select Mode Details::         Select $B%b!<%I$N>\:Y(B
-* Select Mode Commands::        Select $B%b!<%I$N%3%^%s%I0lMw(B
-
-Entry $B%b!<%I(B
-
-* Entry Mode Details::          Entry $B%b!<%I$N>\:Y(B
-* Entry Mode Commands::         Entry $B%b!<%I$N%3%^%s%I0lMw(B
-
-Content $B%b!<%I(B
-
-* Content Mode Details::        Content $B%b!<%I$N>\:Y(B
-* Content Mode Commands::       Content $B%b!<%I$N%3%^%s%I0lMw(B
-
 @end detailmenu
 @end menu
 
-@node What is Lookup, How to Install, Top, Top
-@chapter What is Lookup?
-
-@quotation
-When I bought a CD-ROM dictionary, I couldn't use it within Emacs.@*
-$B8!:w%=%U%H$NB8:_$OCN$C$F$$$?$,!"$&$^$/F0$+$J$+$C$?!#(B@*
-$B$=$l$J$i(B Emacs Lisp $B$NN}=,$r7s$M$F!"<+:n$7$h$&$H9M$($?!#(B@*
-NDTPD $B$NB8:_$rCN$C$F!"$3$l$J$i$$$1$k$H3+H/$r%9%?!<%H$7$?!#(B@*
-@end quotation
-
-@menu
-* Features::                    Lookup $B$NFCD'(B
-* Environment::                 $BF0:n4D6-(B
-* Copying::                     $BCx:n8"$K$D$$$F(B
-@end menu
-
-@node Features, Environment, What is Lookup, What is Lookup
-@section Features
-
-Lookup $B$N4pK\E*$J8!:w%9%?%$%k$O!"F|:"$h$/MQ$$$k<-=q$r$^$H$a$FMQ0U$7$F$*(B
-$B$-!"$=$3$+$i0l5$$KL\E*$N8l$r8+IU$1=P$9$3$H$G$9!#>/$7$G$b8!:w$N$?$a$NO+NO(B
-$B$r8:$i$;$k$h$&!"B?$/$N9)IW$r9T$J$C$F$$$^$9!#(B
-
-@itemize @bullet
-@item
-$BJ#?t$N<-=q$+$i0lEY$K8!:w$r9T$J$$$^$9!#:G=i$KMxMQ$7$?$$<-=q$rA4$FEPO?$7$F(B
-$B$*$/$3$H$G!"8!:w7k2L$,$^$H$a$FI=<($5$l$^$9!#8!:w$OIaDL!"==J,9bB.$K9T$J$o(B
-$B$l$k$N$G!"$$$A$$$AL\E*$N<-=q$r@Z$jBX$($k$h$j$b8zN(E*$G$9!#(B
-
-@item
-$BMM!9$J<oN`$N<-=q$r07$($^$9!#;THN$N(B CD-ROM $B<-=q$K8B$i$:!"%M%C%H%o!<%/>e$N(B
-$B<-=q%5!<%P$d!"%U%j!<$KG[I[$5$l$F$$$kMQ8l=8$J$I!"B?$/$N>pJs8;$+$i$=$N0c$$(B
-$B$r5$$K$9$k$3$H$J$/8!:w$,9T$J$($^$9!#(B(@pxref{Setup Agent})
-
-@item
-$BL\E*$4$H$K!"<-=q$N$^$H$^$j$rJ,$1$F8!:w$,9T$J$($^$9!#Nc$($P!"1Q8l3X=,MQ$K(B
-$B1QOB!&OB1Q<-E5$N%0%k!<%W!"%K%e!<%95-;v$rFI$`$?$a$K8=BeMQ8l=8!&%3%s%T%e!<(B
-$B%?MQ8l=8$N%0%k!<%W!"$H$$$C$?6q9g$K$^$H$a$F$*$-!"$=$l$>$l$K8DJL$N8!:w%3%^(B
-$B%s%I$r3d$jEv$F$k$3$H$,2DG=$G$9!#(B(@pxref{Setup Command})
-
-@item
-CD-ROM $B<-=q$J$I$K4^$^$l$k30;z$b$=$N$^$^I=<(=PMh$^$9!#30;zCV$-49$($N$?$a(B
-$B$KDI2C$N@_Dj$r9T$J$&$3$H$J$/!"<-=q$r$=$N$^$^MxMQ=PMh$^$9!#5U$KCV$-49$(J8(B
-$B;zNs$r;XDj$9$k$3$H$G!"=hM}$r9bB.2=$9$k$h$&$J$3$H$b2DG=$G$9!#(B
-(@pxref{Setup Gaiji})
-
-@item
-$B%9%Z%k%A%'%C%/$N$?$a$N;EAH$_$rHw$($F$$$^$9!#1QC18l$NJ#?t7A$d!"DV$j$K8m$j(B
-$B$,$"$k>l9g$K$G$b!"E,@Z$JC18l$r?dB,$7$F!"<+F0E*$K:F8!:w$r9T$J$&$h$&$K@_Dj(B
-$B$9$k$3$H$,=PMh$^$9!#(B(@pxref{Setup Query Expansion})
-
-@item
-$B<-=q$r$h$j2wE,$K;H$($k$h$&9T$J$C$?%+%9%?%^%$%:$r!"FCDj$N=q<0$G%U%!%$%k$K(B
-$B$^$H$a$k$3$H$G!"@_DjMQ%Q%C%1!<%8$H$7$FB>$N?M$H$b6&M-=PMh$k$h$&$K$J$j$^$9!#(B
-$B$b$74{$K<j;}$A$N<-=qMQ$N%Q%C%1!<%8$,$"$l$P!"$=$l$rMQ$$$k$3$H$G<-=q$r$$$C(B
-$B$=$&;H$$$d$9$/$9$k$3$H$,=PMh$k$G$7$g$&!#(B(@pxref{Setup Package})
-@end itemize
-
-@node Environment, Copying, Features, What is Lookup
-@section Environment
-
-Looup supports officially the following Emacs' family:
-
-@table @asis
-@item GNU Emacs 19.28 or later
-Lookup is mainly being developed on the latest version of GNU Emacs.
-Every feature of Lookup is supposed to work properly on GNU Emacs 20 or
-later.  Lookup can also be used on GNU Emacs 19.28 to 19.34, but parts
-of the features do not work.  @xref{Attention for Emacsen} for details.
-
-@item XEmacs 20.4 or later
-Lookup should work well on XEmacs 20 or later.  If you are using XEmacs
-21 or later, you can use its cute packaging system for Lookup.
-@xref{Binary Package}. Lookup will have been developed mainly on XEmacs
-in the near future.
-
-@item Mule 2.3
-Lookup somehow works on Mule 2.3 (based on GNU Emacs 19.28 or 19.34),
-even though there are several problems.  @xref{Attention for Emacsen}
-first if you would like to use Lookup on Mule.
-@end table
-
-Furthermore, you can also use Lookup on the appropriate ported version
-of those Emacsen, such as NTEmacs or Meadow (GNU Emacs 20 for Microsoft
-Windows), which work on other operating systems than UNIX.  Note that
-they may cause some troubles because of the instability of those systems
-or the incompleteness of those ports.  @xref{Attention for Emacsen},
-which is always your friend.
-
-If you found any problems that are mentioned neither in this guide nor
-in other documents, please let us know them.  We are pleased to find
-them out, and will try to solve them or to put
-
-@node Copying,  , Environment, What is Lookup
-@section Copying
-
-Lookup is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-Lookup is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with Lookup; if not, write to the Free Software Foundation,
-Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-Lookup $B$NCx:n8"$O(B Lookup $B3+H/%A!<%`$K$"$j$^$9!#$3$l$OM-;V$K$h$k3+H/?X$N(B
-$B=8$^$j$G!"(BLookup $B$NG[I[>r7oEy$N7hDj$O$=$N4V$N9g0U$K$h$j9T$J$o$l$^$9!#Ld(B
-$B$$9g$o$;Ey$O(B @email{lookup-ja@@ring.gr.jp} $B$^$G$*4j$$$7$^$9!#(B
-
-@node How to Install, Quick Start, What is Lookup, Top
-@chapter How to Install
-
-@menu
-* Required Environment::        
-* Installation Methods::        
-@end menu
-
-@node Required Environment, Installation Methods, How to Install, How to Install
-@section Required Environment
-
-@menu
-* GNU Emacs::                   
-* XEmacs::                      
-* Mule::                        
-* NTEmacs::                     
-* Meadow::                      
-@end menu
-
-@node GNU Emacs, XEmacs, Required Environment, Required Environment
-@subsection GNU Emacs
-
-@node XEmacs, Mule, GNU Emacs, Required Environment
-@subsection XEmacs
-
-If you are using XEmacs 21.0 or later, you can install lookup by using
-the feature of a binary package.  Run Just type like this:
-
-This is the best way to install Lookup for XEmacs 21.x users.  Just get
-the Lookup binary package (i.e., lookup-x.xx-pkg.tar.gz), and extract it
-into your package directory like this:
-
-  % cd ~/.xemacs/packages
-  % tar xfz lookup-x.xx-pkg.tar.gz
-
-You can build a binary package from this source archive.  Just type
-`make binkit' at the top directory of the archive.
-
-@node Mule, NTEmacs, XEmacs, Required Environment
-@subsection Mule
-
-@node NTEmacs, Meadow, Mule, Required Environment
-@subsection NTEmacs
-
-@node Meadow,  , NTEmacs, Required Environment
-@subsection Meadow
-
-@node Installation Methods,  , Required Environment, How to Install
-@section Installation Methods
-
-@menu
-* install.el::                  The way to complete installation within Emacs.
-* Makefile::                    
-@end menu
-
-@node install.el, Makefile, Installation Methods, Installation Methods
-@subsection install.el
-
-You can install Lookup by using the Lookup's special installer, which
-can be executed in the following two ways:
-
-You can call the special installer for Lookup directly in your Emacs:
-
-  1. Run Emacs and open the top directory of the archive by Dired.
-  2. Type `L' at the line of the file `install.el' and answer yes.
-  3. Input your elisp directory and your info directory.
-
-You can also run this installer from shell:
-
-  % emacs -batch -l install.el ~/emacs/lisp/lookup ~/emacs/info
-
-@node Makefile,  , install.el, Installation Methods
-@subsection Makefile
-
-@node Quick Start, Dictionary Preparation, How to Install, Top
-@chapter Quick Start
+@node Getting Started, Dictionary Setup, Top, Top
+@chapter Getting Started
 
 @menu
 * Quick Prepare::               
@@ -552,7 +285,7 @@ You can also run this installer from shell:
 * Quick View::                  
 @end menu
 
-@node Quick Prepare, Quick Setup, Quick Start, Quick Start
+@node Quick Prepare, Quick Setup, Getting Started, Getting Started
 @section $B<-=q$N=`Hw(B
 
 $B$^$:!"2?$O$J$/$H$b<-=q$,I,MW$G$9!#$H$O$$$($?$V$s!"$3$N%W%m%0%i%`$r;H$*$&(B
@@ -568,7 +301,7 @@ You can also run this installer from shell:
 Lookup $B$r<j$C<h$jAa$/;n$9$?$a$N:`NA$H$7$F!"(BEmacs $B$KImB0$N(B Zippy $B%U%!%$%k(B
 $B$r>R2p$7$F$*$-$^$7$g$&!#(B
 
-@node Quick Setup, Quick Example, Quick Prepare, Quick Start
+@node Quick Setup, Quick Example, Quick Prepare, Getting Started
 @section $B@_Dj$9$Y$-$3$H(B
 
 @cindex $B8!:w%(!<%8%'%s%H(B
@@ -629,13 +362,7 @@ cookie $B%U%!%$%k$+$i8!:w(B (@pxref{ndcookie})
 (setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
 @end lisp
 
-$B$"$k$$$O!"(BZippy $B%U%!%$%k$K?4L%$+$l$k$=$3$N$"$J$?$O!"<!$N0l9T$G(B OK $B$G$9(B!
-
-@lisp
-(setq lookup-search-agents '((ndcookie "yow.lines")))
-@end lisp
-
-@node Quick Example, Quick Startup, Quick Setup, Quick Start
+@node Quick Example, Quick Startup, Quick Setup, Getting Started
 @section $B4JC1$J@_DjNc(B
 
 $B$5$"!"<-=q$N@_Dj$O=*$o$j$^$7$?!#$7$+$7<B:]$K$O!"4IM}<T$NJ}$,FCJL$K@_Dj$r(B
@@ -717,7 +444,7 @@ are designed to be defined in @file{~/.lookup}.
 
 [ mention about supplement file ]
 
-@node Quick Startup, Quick Search, Quick Example, Quick Start
+@node Quick Startup, Quick Search, Quick Example, Getting Started
 @section $B5/F0$9$k$K$O(B
 
 $B$*BT$?$;$7$^$7$?!#$=$l$G$O(B Lookup $B$rF0$+$7$F$$$-$^$7$g$&!#$^$:<j;O$a$K(B
@@ -794,7 +521,7 @@ Type `m' to select, `u' to unselect, `?' for help.
 $B85$N:n6H$KLa$k$3$H$,=PMh$^$9!#$5$"!"$=$l$G$O<-=q$N3NG'$O$3$NJU$K$7$F!"<!(B
 $B$N%9%F%C%W$K?J$_$^$7$g$&!#(B
 
-@node Quick Search, Quick View, Quick Startup, Quick Start
+@node Quick Search, Quick View, Quick Startup, Getting Started
 @section $B8!:w$7$F$_$h$&(B
 
 $B$$$h$$$h8!:w$r9T$J$$$^$9!#:G$bBeI=E*$J8!:w%3%^%s%I$H$7$F!"(B@kbd{M-x
@@ -860,7 +587,7 @@ lookup-region} $B$H(B @kbd{M-x lookup-pattern} $B$NFs$D$,$"$j$^$9!#$=$l$>$l(
 $B$"$j$^$9$,!">\$7$/$O8e$[$I@bL@$7$^$9!#$3$3$G$O$b$&>/$7!"8!:w7k2L$N8+J}$K(B
 $B$D$$$FOC$r?J$a$F$$$-$^$9!#(B
 
-@node Quick View,  , Quick Search, Quick Start
+@node Quick View,  , Quick Search, Getting Started
 @section $B7k2L$r8+$F$$$/(B
 
 $B0J2<!"(BEntry $B%P%C%U%!$G$h$/MQ$$$i$l$k%3%^%s%I$K$D$$$F@bL@$7$^$9!#%-!<A`:n(B
@@ -928,8 +655,8 @@ OK $B$G$9!#(B@kbd{h} $B$rO"BG$9$l$P!"(BEntry $B%P%C%U%!$H(B Content $B%P%
 $B$K$O!">l9g$K$h$C$FLr$KN)$D$$$/$D$+$N%3%^%s%I$,B>$K$bMQ0U$5$l$F$$$^$9!#(B
 $B<!>O0J9_$G!"$=$l$i$r4^$`(B Lookup $B$N40A4$J5!G=$K$D$$$F@bL@$7$^$9!#(B
 
-@node Dictionary Preparation, Getting Started, Quick Start, Top
-@chapter Dictionary Preparation
+@node Dictionary Setup, How to Lookup, Getting Started, Top
+@chapter Dictionary Setup
 
 You need to make your dictionaries available from Lookup before you can
 start using them.  This chapter describes briefly how to install
@@ -945,7 +672,7 @@ more details later on. (@xref{Search Agents} and @ref{Dictionary Types}.)
 * Miscellaneous Dictionary::    Using spell checker, fortune cookies, ...
 @end menu
 
-@node Free Dictionary, CD-ROM Dictionary, Dictionary Preparation, Dictionary Preparation
+@node Free Dictionary, CD-ROM Dictionary, Dictionary Setup, Dictionary Setup
 @section Free Dictionary
 
 Lookup encourages free dictionaries being distributed on the Internet.
@@ -1075,7 +802,7 @@ DICT $B%5!<%P$NN)$A>e$2$K$D$$$F$O!"(B@ref{DICT server} $B$r;2>H$7$F2<$5$$!#(
 free implementation of generating dictionaries compatible with EPWING.
 @xref{EPWING dictionary}.
 
-@node CD-ROM Dictionary, Network Dictionary, Free Dictionary, Dictionary Preparation
+@node CD-ROM Dictionary, Network Dictionary, Free Dictionary, Dictionary Setup
 @section CD-ROM Dictionary
 
 Lookup $B$G$OB?$/$N;THN$N(B CD-ROM $B<-=q$rMxMQ$9$k$3$H$,=PMh$^$9!#MxMQ2DG=$J(B
@@ -1199,7 +926,7 @@ XEmacs $B$N>l9g(B:
 $B5U$K!"30;z$rI=<($5$;$?$/$J$$>l9g$K$O!"JQ?t(B @code{lookup-enable-gaiji} $B$r(B 
 @code{nil} $B$K@_Dj$7$F2<$5$$!#$3$l$O%G%U%)%k%H$G(B @code{t} $B$H$J$C$F$$$^$9!#(B
 
-@node Network Dictionary, Miscellaneous Dictionary, CD-ROM Dictionary, Dictionary Preparation
+@node Network Dictionary, Miscellaneous Dictionary, CD-ROM Dictionary, Dictionary Setup
 @section $B%M%C%H%o!<%/<-=q$rMxMQ$9$k(B
 
 $BEE;R<-=q$r%M%C%H%o!<%/$G6&M-$7$FMxMQ$7$?$$>l9g$O!"<-=q%5!<%P$rN)$A>e$2$F(B
@@ -1259,7 +986,7 @@ dictd $B$,8x3+$5$l$F$$$^$9!#ImB0$N%I%-%e%a%s%H$r;2>H$7$F!"%$%s%9%H!<%k!"(B
 (setq lookup-search-agents '((ndict "dict.org")))
 @end example
 
-@node Miscellaneous Dictionary,  , Network Dictionary, Dictionary Preparation
+@node Miscellaneous Dictionary,  , Network Dictionary, Dictionary Setup
 @section Miscellaneous Dictionary
 
 Lookup $B$G$OB>$K$b!"<!$N$h$&$JFC<l$J8!:w%(!<%8%'%s%H$,I8=`$GMxMQ2DG=$G$9!#(B
@@ -1333,8 +1060,8 @@ ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(B
 (setq lookup-search-agents '((ndcookie "yow.lines")))
 @end lisp
 
-@node Getting Started, Advanced Features, Dictionary Preparation, Top
-@chapter Getting Started
+@node How to Lookup, Advanced Features, Dictionary Setup, Top
+@chapter $B$=$l$G$O8!:w$7$F$_$h$&(B
 
 $B$3$N>O$G$O!"(BLookup $B$N%$%s%9%H!<%k8e$K9T$J$o$J$1$l$P$J$i$J$$@_Dj9`L\$K$D(B
 $B$$$F@bL@$7$^$9!#%W%m%0%i%`$N%$%s%9%H!<%k$K$D$$$F$O!"(BLookup $BG[I[J*$KImB0(B
@@ -1342,7 +1069,6 @@ ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(B
 $B$O!"(B@ref{Customization} $B$r;2>H$7$F2<$5$$!#(B
 
 @menu
-* Fundamental Structure::       
 * Setup Dictionary::            $B<-=q$N=`Hw$r@0$($k(B
 * Setup Agent::                 $B<-=q$K9g$o$;$F@_Dj$9$k(B
 * Setup Command::               $B?7$7$$8!:w%3%^%s%I$r:n$k(B
@@ -1352,77 +1078,13 @@ ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(B
 * Setup Functions::             $B%;%C%H%"%C%W4X?t0lMw(B
 @end menu
 
-@node Fundamental Structure, Setup Dictionary, Getting Started, Getting Started
-@section Fundamental Structure
-
-Lookup can access to various types of dictionaries, which means that
-Lookup has several interfaces with dictionaries.  The interface which
-actually interacts with dictinaries is called a @dfn{search agent} in
-Lookup.  A search agent can treat more than one dictionary; for example,
-there are usually several dictionaries in one dictionary server, which
-is accessed by one search agent of Lookup.
-
-A search agent provides the feature of accessing a set of dictionaries
-correctly, while the appearance of each dictionary is regularized by a
-corresponding @dfn{supplement file}, which is a suite of customizations
-for each dictionary.  A supplement file is not indispensable for
-searching dictionaries properly, but useful to utilize every feature of
-Lookup for each dictionary.  The following figure is a rough image of
-the structure:
-
-@example
-Lookup
-  +- Agent 1
-  |    +- Dictionary 1 + Supplement 1
-  |    +- Dictionary 2 + Supplement 2
-  |    +- Dictionary 3 + Supplement 3
-  +- Agent 2
-  |    +- Dictionary 4
-  |    +- Dictionary 5
-  +- Agent 3
-       +- Dictionary 6
-@end example
-
-From the point of view of users, on the other hand, it is important to
-be able to use the only dictionaries which the user want to use.  A
-@dfn{search module} provides this feature; you can choose your favorite
-dictionaries and make groups of dictionaries, which will be used for
-searching at once.  You can make several modules at once, and change
-them on search time.
-
-Each dictionary has its own @dfn{search methods}, which is strategies to
-find entries such as match exactly.  This offen depend on the search
-agent of each dictionary, so you need to carefully understand which
-dictionary has what methods at first.  You can select and change methods
-on search time.
-
-@example
-User
-  +- Module 1
-  |    +- Dictionary 1 + Methods A
-  |    +- Dictionary 2 + Methods A
-  |    +- Dictionary 4 + Methods B
-  |    +- Dictionary 6 + Methods C
-  +- Module 2
-       +- Dictionary 3 + Methods A
-       +- Dictionary 5 + Methods B
-       +- Dictionary 6 + Methods C
-@end example
-
-All you have to do to use Lookup is to prepare your favorite
-dictionaries, to decide what agent you have to use, to figure out what
-methods you can use for each dictionary, and to arrange dictionaries
-into groups if you want.  It depends on users what is is the best
-combination to use dictionary efficientry.  Try to correct dictionaries
-and find your way.
-
-@node Setup Dictionary, Setup Agent, Fundamental Structure, Getting Started
+@node Setup Dictionary, Setup Agent, How to Lookup, How to Lookup
 @section $B<-=q$N=`Hw$r@0$($k(B
 
 Lookup $B$G$O!"0J2<$N<-=q$NMxMQ$r%5%]!<%H$7$F$$$^$9!#<+J,$NMxMQ$7$?$$<-=q(B
 $B$r3NG'$7!"$=$l$>$l$N2<=`Hw$r@0$($F2<$5$$!#(B
 
-@node Setup Agent, Setup Command, Setup Dictionary, Getting Started
+@node Setup Agent, Setup Command, Setup Dictionary, How to Lookup
 @section $B<-=q$K9g$o$;$F@_Dj$9$k(B
 
 @menu
@@ -1692,14 +1354,14 @@ Lookup $B$G$OMM!9$J<oN`$N<-=q$r07$$$^$9$,!"3F%(!<%8%'%s%H$G$OBP1~$7$-$l$J(B
 $B<j;}$A$N<-=q$N%Q%C%1!<%8$,B8:_$7$J$$>l9g!"$=$l$r<+J,$G:n$k$3$H$b=PMh$^$9!#(B
 (@pxref{Supplement Package})
 
-@node Setup Command, Setup Others, Setup Agent, Getting Started
+@node Setup Command, Setup Others, Setup Agent, How to Lookup
 @section $B?7$7$$8!:w%3%^%s%I$r:n$k(B
 
 $B4{B8$N%=!<%9$r;29M$K$7$F$/$@$5$$!#$b$7J,$+$i$J$$$3$H$,$"$l$P!"(B
 $B%a%$%j%s%0%j%9%H(B ( @email{lookup-ja@@ring.gr.jp} ) 
 $B$K<ALd$7$F$_$k$H$h$$$+$b$7$l$^$;$s!#(B
 
-@node Setup Others, Setup Example, Setup Command, Getting Started
+@node Setup Others, Setup Example, Setup Command, How to Lookup
 @section $B$=$NB>$N<g$J@_Dj9`L\(B
 
 @menu
@@ -1864,7 +1526,7 @@ Lookup $B$N%9%Z%k%A%'%C%/5!G=$O!"8!:w%(!<%8%'%s%H(B `ndspell' $B$H$7$F<B8=$5$
 (lookup-set-dictionary-option "agent:DICT" ':expand-filter 'lookup-kanji-filter)
 @end lisp
 
-@node Setup Example, Setup Variables, Setup Others, Getting Started
+@node Setup Example, Setup Variables, Setup Others, How to Lookup
 @section $B=i4|2=%U%!%$%k$N@_DjNc(B
 
 @vindex lookup-init-file
@@ -2016,7 +1678,7 @@ Lookup $B$N@_Dj$r%5%$%H$G6&M-$9$k$N$G$"$l$P!"(B@file{site-start.el} $B%U%!%$%
   )
 @end lisp
 
-@node Setup Variables, Setup Functions, Setup Example, Getting Started
+@node Setup Variables, Setup Functions, Setup Example, How to Lookup
 @section $B%;%C%H%"%C%WJQ?t0lMw(B
 
 @table @asis
@@ -2071,7 +1733,7 @@ cdr $B$K$O%*%W%7%g%s$N%j%9%H$r;XDj$9$k!#(B
 $BJd=u%Q%C%1!<%8$,<}$a$i$l$k%G%#%l%/%H%j!#(B
 @end table
 
-@node Setup Functions,  , Setup Variables, Getting Started
+@node Setup Functions,  , Setup Variables, How to Lookup
 @section $B%;%C%H%"%C%W4X?t0lMw(B
 
 @table @asis
@@ -2096,7 +1758,7 @@ cdr $B$K$O%*%W%7%g%s$N%j%9%H$r;XDj$9$k!#(B
 @code{lookup-dictionary-options-alist} $B$NCM$r=q$-49$($k!#(B
 @end table
 
-@node Advanced Features, Customization, Getting Started, Top
+@node Advanced Features, Customization, How to Lookup, Top
 @chapter Advanced Features
 
 $B$3$N>O$G$O!"(BLookup $B$G8!:w$r9T$J$&J}K!$K$D$$$F>\$7$/@bL@$7$^$9!#$^$?!"(B
@@ -2623,21 +2285,12 @@ Entry $B%P%C%U%!(B(@pxref{Entry Mode})$B$G(B @kbd{S} $B$H$9$k$3$H$G!"(BSel
 $B$"$j$^$9!#A4J88!:w$O40N;$^$G$KHs>o$K;~4V$,3]$+$k>l9g$,$"$k$N$GCm0U$7$F2<(B
 $B$5$$!#(B(@pxref{Search Methods})
 
-@node Customization, Getting Information, Advanced Features, Top
+@node Customization, Information, Advanced Features, Top
 @chapter Customization
-
-$B$3$N>O$G$O!"(BLookup $B$r8D?M$N9%$_$K1~$8$FD4@a$9$k$?$a$NJ}K!$K$D$$$F@bL@$7(B
-$B$^$9!#$^$?!"<-=qKh$N0lHLE*$J%+%9%?%^%:$r$^$H$a$F@_Dj%U%!%$%k=8$H$7$FG[I[(B
-$B$9$kJ}K!$K$D$$$F$b@bL@$7$^$9!#(B
-
-[ $B$3$N>O$O$^$@@0HwESCf$G$9(B ]
 
 @menu
 * Customize General::           $B0lHLE*$J%+%9%?%^%$%:(B
 * Customize Option::            $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
-* Customize Contents::          $B%(%s%H%jK\J8$N%+%9%?%^%$%:(B
-* Supplement Package::          $BJd=u%Q%C%1!<%8$r:n$k(B
-* Customize Example::           $B>\:Y$J@_DjNc(B
 @end menu
 
 @node Customize General, Customize Option, Customization, Customization
@@ -2755,7 +2408,7 @@ Mule $B$rMxMQ$7$F$$$k$J$I!"(BCustom $B$,%$%s%9%H!<%k$5$l$F$J$$>l9g$K$O!"(BLo
 $B%U%'%$%9$r2<@~IU$-$K$9$k!#(B
 @end table
 
-@node Customize Option, Customize Contents, Customize General, Customization
+@node Customize Option,  , Customize General, Customization
 @section $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
 
 @menu
@@ -2862,670 +2515,22 @@ adjust $B4X?t$N%j%9%H!#(B(@pxref{Format Contents})
 $B%(!<%8%'%s%H$K$h$C$F$O!"$3$l0J30$K$bFCJL$J<-=q%*%W%7%g%s$,MxMQ=PMh$k>l9g(B
 $B$,$"$j$^$9!#$=$l$>$l$N%(!<%8%'%s%H$N@bL@$r;2>H$7$F2<$5$$!#(B
 
-@node Customize Contents, Supplement Package, Customize Option, Customization
-@section $B%(%s%H%jK\J8$N%+%9%?%^%$%:(B
+@node Information, Search Agents, Customization, Top
+@appendix $B99$J$k>pJs$rF@$k$K$O(B
 
-@menu
-* Reference Pattern::           $B%j%U%!%l%s%9$N@_Dj(B
-* Gaiji Table::                 $B30;zCV$-49$($N@_Dj(B
-* Format Contents::             $B%F%-%9%H$N@07A(B
-@end menu
+@itemize
+@item $B%[!<%`%Z!<%8(B
 
-@node Reference Pattern, Gaiji Table, Customize Contents, Customize Contents
-@subsection $B%j%U%!%l%s%9$N@_Dj(B
+@url{http://lookup.sourceforge.net}
 
-$B%j%U%!%l%s%9$N=q<0$O$7$P$7$P<-=q$K$h$C$F0[$J$k$N$G!"(BLookup $B$N%G%U%)%k%H(B
-$B$N@_Dj$@$1$G$O$I$&$7$F$bBP1~$7@Z$l$^$;$s!#(BEntry $B%P%C%U%!$G(B @kbd{t} $B$r(B
-$B2!$9$H!"K\J8@07AA0$N%*%j%8%J%k$NFbMF$r8+$k$3$H$,=PMh$k$N$G!"$=$NFbMF$r(B
-$B3NG'$7$F$_$F2<$5$$!#(B
+@item $B%a!<%j%s%0%j%9%H(B
 
-$B$b$7%G%U%)%k%H$G@8@.$5$l$k%j%s%/$KITK~$,$"$k>l9g!"<-=q%*%W%7%g%s(B
-@code{:reference-pattern} $B$K$h$j%+%9%?%^%$%:$9$k$3$H$,2DG=$G$9!#(B
-$B@_Dj$9$Y$-CM$O<!$NDL$j$G$9!#(B
-
-@lisp
-(@var{regexp} @var{link} @var{heading} @var{code})
-@end lisp
-
-@var{regexp} $B$K$O!"K\J8$N%j%U%!%l%s%9ItJ,$K%^%C%A$9$k@55,I=8=$r;XDj$7$^(B
-$B$9!#Nc$($P!"%j%U%!%l%s%9$,<!$N$h$&$J%Q%?!<%s$r$7$F$$$k$H$o$+$C$F$$$k>l9g!"(B
-
-@example
-@samp{<gaiji:za123>heading<a456:789>}
-@end example
-@noindent
-@var{regexp} $B$O<!$N$h$&$K=PMh$k$G$7$g$&!#(B
-@footnote{XEmacs $B$G$J$i$b$C$HC1=c$K(B
-@code{"<gaiji:za123>.+?<[0-9a-f:]+>"} $B$H$9$k$3$H$,=PMh$^$9!#(B}
-
-@lisp
-"<gaiji:za123>[^<\n]+<[0-9a-f:]+>"
-@end lisp
-
-@var{link}, @var{heading}, @var{code} $B$K$O$=$l$>$l!"%j%s%/$H$J$kJ8;zNs!"(B
-$B%j%U%!%l%s%9$N8+=P$78l!"5Z$S$=$N%3!<%IHV9f$r;XDj$7$^$9!#:#$N>l9g!"(B
-$B%j%s%/$O(B @samp{<gaiji:za123>heading}$B!"8+=P$78l$O(B @samp{heading}$B!"(B
-$B%3!<%IHV9f$O(B @samp{a456:789} $B$H$9$l$P$h$$$G$7$g$&!#$3$l$K$O(B @var{regexp}
-$B$N%^%C%AFbMF$rMxMQ$7$F!"<!$N$h$&$K@_Dj$9$k$3$H$,=PMh$^$9!#(B
-
-@lisp
-("\\(<gaiji:za123>\\([^<\n]+\\)\\)<\\([0-9a-f:]+\\)>"
- (match-string 1) (match-string 2) (match-string 3))
-@end lisp
-
-$B$3$N$h$&$K(B @code{link}, @var{heading}, @var{code} $B$K$OJ8;zNs$rJV$9G$0U$N(B
-$B<0$rMQ$$$k$3$H$,2DG=$G$9$,!">e$N$h$&$K(B @code{match-string} $B$G%^%C%AFbMF(B
-$B$rC1=c$K<h$j=P$9$@$1$N>l9g!"FCJL$K>JN,$7$FHV9f$r;XDj$9$k$@$1$G$h$$$h$&$K(B
-$B$J$C$F$$$^$9!#(B
-
-@lisp
-("\\(<gaiji:za123>\\([^<\n]+\\)\\)<\\([0-9a-f:]+\\)>" 1 2 3)
-@end lisp
-
-$B$^$?!"30;zCV$-49$($OJL$N%9%F%C%W$G9T$J$o$l$k$?$a!"$3$N;~E@$G$O$I$&$3$&(B
-$B$9$kI,MW$O$"$j$^$;$s!#8+=P$78l$K30;z$,4^$^$l$k>l9g$K$b!"$=$l$r$=$N$^$^(B
-$BJV$9$h$&$K@_Dj$7$F2<$5$$!#E57?E*$K$O<!$N$h$&$J%Q%?!<%s$r$h$/8+$^$9!#(B
-@footnote{XEmacs $B$G$J$i$d$O$jC1=c$K(B
-@code{("\\($B"*(B\\(.+?\\)\\)<\\([0-9a-f:]+\\)>" 1 2 3)} $B$G(B OK $B$G$9!#(B}
-
-@lisp
-("\\($B"*(B\\(\\([^<\n]\\|<gaiji:[^>]>\\)+\\)\\)<\\([0-9a-f:]+\\)>" 1 2 4)
-@end lisp
-
-$B<+J,$N<-=q$K9g$o$;$?E,@Z$J%Q%?!<%s$r:n$i$l$?J}$O!"%a!<%j%s%0%j%9%H$K$G$b(B
-$B>pJs$rD:$1$^$9$H9,$$$G$9!#(B
-
-@node Gaiji Table, Format Contents, Reference Pattern, Customize Contents
-@subsection $B30;zCV$-49$($N@_Dj(B
-
-$B<-=q%*%W%7%g%s(B @code{:gaiji-table} $B$K$h$j!"<-=q$N30;z$NCV$-49$(%F!<%V%k$r(B
-$B@_Dj$9$k$3$H$,=PMh$^$9!#(B
-
-@cindex $B30;z%F!<%V%k(B
-@findex lookup-new-gaiji-table
-$B30;zCV$-49$($H$O!"30;zI=<($N:]$K<-=q$KMQ0U$5$l$F$$$k30;z$rMQ$$$k$3$H$r$;(B
-$B$:$K!"$"$i$+$8$aDj5A$7$F$*$$$?@_Dj$K=>$C$F$=$l$NCV49J8;zNs$rMxMQ$9$k$3$H(B
-$B$r8@$$$^$9!#$3$N$?$a$NJQ49I=$r(B @dfn{$B30;z%F!<%V%k(B} $B$H8F$S!"4X?t(B
-@code{lookup-new-gaiji-table} $B$K$h$j@8@.$7$^$9!#(B
-
-$B$3$l$O<!$N$h$&$J=q<0$r<h$j$^$9!#(B
-
-@lisp
-(lookup-new-gaiji-table
- '((@var{code1} @var{glyph1} [@var{alternate1}])
-   (@var{code2} @var{glyph2} [@var{alternate2}])
-    ...))
-@end lisp
-
-@var{code} $B$O<-=q$K$*$1$k30;z%3!<%I$G!"$3$l$O%(%s%H%jK\J8$N@07A=hM}$r(B 
-OFF $B$K$9$k$3$H$G3NG'=PMh$^$9!#(B@var{glyph} $B$K$OJ8;zNs!"$^$?$OI>2A2DG=$J<0(B
-$B$r;XDj$7!"$=$NCM$,30;z$NCV49J8;zNs$H$7$FMxMQ$5$l$^$9!#(B@var{alternate} $B$O(B
-$B>JN,2DG=$G!"30;z$NBeBXJ8;zNs$r;XDj$7$^$9!#$3$l$O(B@var{glyph} $B$H0c$C$F!"(B
-$B0lHLE*$KMxMQ$5$l$kJ8;z%;%C%H$G$J$1$l$P$J$j$^$;$s!#(B
-
-@var{glyph} $B$H(B @var{alternate} $B$H$N0c$$$O!"$=$l$,8+$?L\$r=E;k$9$k$+MxJX(B
-$B@-$r=E;k$9$k$+$K$"$j$^$9!#(B@var{glyph} $B$K$O%"%/%;%s%HJ8;z$J$I$r4^$`J8;zNs(B
-$B$r;XDj$9$k$3$H$G8+$?L\$rNI$/$9$k$3$H$,=PMh$^$9$,!"$=$N>l9g!"8!:w$d%3%T!<(B
-$B$N$?$a$NMxJX@-$,5>@7$K$J$j$^$9!#$=$N$?$a!"I=<($N$?$a$K$O(B@var{glyph} $B$rMQ(B
-$B$$!"MxJX@-$r=E;k$9$k>u67$G$O(B @var{alternate} $B$rMQ$$$k$H$$$&;H$$J,$1$,9T(B
-$B$J$o$l$^$9!#(B
-
-@node Format Contents,  , Gaiji Table, Customize Contents
-@subsection $B%F%-%9%H$N@07A(B
-
-@cindex arrange
-@cindex adjust
-$B%(%s%H%jFbMF$N@07A=hM}$O!"Fs$D$N%9%F%C%W$G9T$J$o$l$^$9!#0l$D$O(B
-@dfn{arrange} $B$H8F$S!"<g$K<-=q$+$iF@$i$l$?FbMF$K<j$r2C$($^$9!#$b$&0l$D$O(B
-@dfn{adjust} $B$H8F$S!"$3$A$i$O8+$?L\$ND4@a$r<g$H$7$^$9!#Fs$D$NK\<AE*$J0c(B
-$B$$$O!"$=$N7k2L$,%-%c%C%7%e$5$l$k$+$I$&$+$K$"$j$^$9!#(B
-
-$BFbMF$,(B arrange $B$5$l$?7k2L$O%-%c%C%7%e$K;D$j!"<!2s$NI=<($+$i$O$=$l$K<j$r(B
-$B2C$($i$l$^$;$s!#BP$7$F(B adjust $B$OI=<($r9T$J$&EY$KKh2s<B9T$5$l$^$9!#$=$N$?(B
-$B$a(B fill-lines $B$N$h$&$JBg3]$+$j$J0lEY$-$j$N=$@5$O(B arrange $B$G9T$J$$!"%j%U%!(B
-$B%l%s%9$N?'$rJQ$($k$h$&$JKh2s%A%'%C%/$NI,MW$J$b$N$O(B adjust $B$G9T$J$&$N$,8~(B
-$B$$$F$$$^$9!#(B
-
-$B<-=q$N(B arrange $B4X?t$H(B adjust $B4X?t$O!"$I$A$i$b%G%U%)%k%H$N=hM}$,%(!<%8%'(B
-$B%s%H$GDj5A$5$l$F$$$^$9!#$7$+$7$=$l$i$OIT==J,$J$3$H$,B?$$$?$a!"<-=qKh$K(B
-$B%*%W%7%g%s$K$h$C$F$3$l$i$rJQ99$9$k$3$H$,=PMh$^$9!#(B
-
-arrange $B4X?t$r@_Dj$9$k$?$a$N<-=q%*%W%7%g%s$O(B @code{:arranges}$B!"(Badjust $B4X?t(B
-$B$O(B @code{:adjusts} $B$G$9!#$3$l$i$K$O$=$l$>$l4X?t$N%j%9%H$r@_Dj$7$^$9!#(B
-
-arrange $B4X?t$b(B adjust $B4X?t$b!"8F$S=P$5$l$k%?%$%_%s%0$,0c$&$@$1$G!"FbItE*(B
-$B$K$OF1$8$b$N$G$9!#$I$A$i$b0l$D$N0z?t$r<u$1<h$j!"$=$NCM$OL5;k$5$l$^$9!#0z(B
-$B?t$O(B entry $B%G!<%?%?%$%W$N%*%V%8%'%/%H$G!"8F$S=P$5$l$?$H$-$N(B
-current-buffer $B$O%(%s%H%jFbMF$NA^F~$5$l$?(B Content $B%P%C%U%!!"$=$N%]%$%s%H(B
-$B$O%P%C%U%!$N@hF,$K$J$C$F$$$^$9!#(B
-
-$B4X?tFb$G$O(B current-buffer $B$rJQ99$7$F$O$J$j$^$;$s$,!"%]%$%s%H$H(B
-restriction $B$O<+M3$KJQ$($F$b9=$$$^$;$s!#$=$l$i$O<!$N4X?t8F$S=P$7$G$^$?85(B
-$B$KLa$j$^$9!#$?$@$7!":G8e$N(B adjust $B4X?t$,<B9T$9$k%]%$%s%H0\F0$K$O0UL#$,$"(B
-$B$j$^$9!#(BContent $B%P%C%U%!$O!":G8e$N%]%$%s%H$,8+$($k$h$&$KI=<($5$l$^$9!#=>$C(B
-$B$F(B adjust $B4X?t$N:G8e$K$O!"%P%C%U%!$N@hF,$X$N0\F0$@$1$r9T$J$&4X?t$r@_$1$F(B
-$B$*$/$N$,IaDL$G$9!#(B
-
-$B$3$l$i$N4X?t$r=q$/$K$O!"$"$kDxEY(B Lookup $B$NFbIt9=B$$K$D$$$F$NCN<1$,I,MW$K(B
-$B$J$k$+$b$7$l$^$;$s!#(BLookup $B$,MQ$$$k%G!<%?%?%$%W$K$D$$$F$O!"%U%!%$%k(B
-@file{lookup-types.el} $B$r;2>H$7$F2<$5$$!#I8=`$N(B arrange $B4X?t!"(Badjust $B4X(B
-$B?t$K$D$$$F$O!"%U%!%$%k(B @file{lookup-vse.el} $B$r;2>H$7$F2<$5$$!#(B
-
-@node Supplement Package, Customize Example, Customize Contents, Customization
-@section $BJd=u%Q%C%1!<%8$r:n$k(B
-@cindex $BJd=u%Q%C%1!<%8(B
-
-$BA0=R$N(B arrange $B4X?t$d30;zCV$-49$(%F!<%V%k$J$I$O!"8D?M$N9%$_$r1[$($FB>?M(B
-$B$N$?$a$K$bM-MQ$J>l9g$,B?$$$N$G!"$=$l$i$N@_Dj$r$^$H$a$FJd=u%Q%C%1!<%8$r:n(B
-$B$k$3$H$,=PMh$^$9!#(B(@pxref{Setup Package})
-
-$BJd=u%Q%C%1!<%8$H$O<B:]$K$O!"A0=R$7$?%(!<%8%'%s%H!&%*%W%7%g%s$d<-=q%*%W%7%g(B
-$B%s$r@_Dj$7$F$$$k$@$1$N$b$N$G$9$,!"$=$N@_Dj$K$O@lMQ$N$d$jJ}$,MQ0U$5$l$F$$(B
-$B$^$9!#%Q%C%1!<%8$N=q$-J}$K$D$$$F$O!"%U%!%$%k(B @file{lookup-package.el} $B$N(B
-$B@hF,$K5-=R$,$"$k$N$G!"$=$A$i$r;2>H$7$F2<$5$$!#(B
-
-$B%Q%C%1!<%8$r$"$kDxEY<+F0E*!&BPOCE*$K@8@.$9$k%D!<%k$b0JA0$O$"$j$^$7$?$,!"(B
-$B:#$G$OF0$$$F$$$^$;$s!#=q$-D>$9$3$H$K6=L#$N$"$kJ}$$$i$7$^$7$?$i!"%a!<%j%s(B
-$B%0%j%9%H$NJ}$^$GO"Mm2<$5$$!#(B(@pxref{How To Get})
-
-$B$b$7;THN$N<-=qMQ$NJd=u%Q%C%1!<%8$r:n$i$l$^$7$?$i!"%a!<%j%s%0%j%9%H$KO"Mm(B
-$B2<$5$$!#(BLookup $B$N%[!<%`%Z!<%8$KEPO?$5$;$FD:$-$^$9!#(B
-
-@node Customize Example,  , Supplement Package, Customization
-@section $B>\:Y$J@_DjNc(B
-
-[ $B$3$N@a$O$^$@@0HwESCf$G$9(B ]
-
-@node Getting Information, Dictionary Types, Customization, Top
-@appendix Getting Information
-
-$B$3$3$G$O(B Lookup $B$H4XO"$N$"$k>pJs$K$D$$$F$^$H$a$F>R2p$7$^$9!#(B
-
-$B$3$l$+$i99$K(B Lookup $B$rCN$m$&$H$9$k?M$N$?$a$K!"$$$/$D$+$NLrN)$D>pJs8;$r(B
-$B$^$H$a$F>R2p$7$F$*$-$^$9!#(B
-
-@menu
-* How To Get::                  
-* Dictionary Links::            $BEE;R<-=q4XO"%j%s%/(B
-* Mailing Lists::               
-* Bug Report::                  
-* Troubleshooting::             
-@end menu
-
-@node How To Get, Dictionary Links, Getting Information, Getting Information
-@section $B:G?7>pJs$r<j$KF~$l$k(B
-
-Lookup $B$O(B Ring Server $B$N%*!<%W%s%i%\$G3+H/$5$l$F$$$^$9!#<!$N$H$3$m$+$i(B
-$BF~<j2DG=$G$9!#(B
-
-@table @asis
-@item Lookup
-@url{http://openlab.ring.gr.jp/lookup/}
-@end table
-
-Lookup $B$K4X$9$k>pJs8r49$O!"@lMQ$N%a!<%j%s%0%j%9%H$K$F9T$o$l$F$$$^$9!#(B
-$B;22C$r4uK>$9$kJ}$O!"(B@email{lookup-ja-request@@ring.gr.jp} $B08$F$K!"K\J8$K(B
-subscribe $B$H=q$$$?%a!<%k$rAw$C$F2<$5$$!#(B
-
-Lookup $B$O!"(Blookup-ja@@ring.gr.jp $B%a%$%j%s%0%j%9%H$NM-;V(B 
-(lookup-ja@@ring.gr.jp)$B$,4IM}$7$F$$$^$9!#(BLookup $B$K4X$9$kLd$$(B
-$B9g$o$;$O$3$A$i$^$G$*4j$$$7$^$9!#(B
-
-@node Dictionary Links, Mailing Lists, How To Get, Getting Information
-@section $BEE;R<-=q4XO"%j%s%/(B
-
-@table @asis
-@item $BEE;R%V%C%/$N9->l(B (@url{http://www.ebxa.gr.jp})
-$BEE;R%V%C%/5,3J$N8x<0>pJs%Z!<%8$G$9!#5,3J$N@bL@$d@=IJ>R2p$J$I$,$"$j$^$9!#(B
-@item EPWING $B%3%s%=!<%7%"%`(B (@url{http://www.epwing.or.jp})
-EPWING $B5,Ls$N8x<0>pJs%Z!<%8$G$9!#5,Ls$N@bL@$d@=IJ>R2p$J$I$,$"$j$^$9!#(B
-@item EB $B%i%$%V%i%j(B (@url{http://www.sra.co.jp/people/m-kasahr/eb/})
-$BEE;R%V%C%/$d(B EPWING $B5,Ls$KBP1~$7$?8!:wMQ%i%$%V%i%j$G$9!#>e5-$N(B eblook
-$B$d(B NDTPD $B$O$3$l$rMQ$$$F8!:w$7$F$k$?$a!"(BLookup $B$N(B CD-ROM $B8!:w$O$[$H$s$I(B
-$B$3$N%i%$%V%i%j$K0MB8$7$F$$$^$9!#(B
-@item DICT $B%W%m%8%'%/%H(B (@url{http://www.dict.org})
-$B%$%s%?!<%M%C%H$N<-=q8!:w%W%m%H%3%k(B DICT(RFC 2229) $B$J$I$r3+H/$7$F$$$k(B
-$B%W%m%8%'%/%H$G$9!#<-=q%5!<%P(B dictd $B$d!"$=$l$GMQ$$$k$3$H$N=PMh$k(B
-$B%U%j!<$J<-=q$J$I$,G[I[$5$l$F$$$^$9!#(B
-@item $BEE;R<-=q%*!<%W%s%i%\(B (@url{http://openlab.ring.gr.jp/edict/})
-$BEE;R<-=q4X78$N>pJs8r49$d3+H/$rL\E*$H$7$?%[!<%`%Z!<%8$G$9!#(B
-EB $B%i%$%V%i%j$,BP1~$7$F$J$$$$$/$D$+$N(B CD-ROM $B<-=q$+$i8!:w$r9T$J$&$?$a$N(B
-$B%=%U%H$J$I$,G[I[$5$l$F$$$^$9!#(B
-@end table
-
-@node Mailing Lists, Bug Report, Dictionary Links, Getting Information
-@section $B%a!<%j%s%0%j%9%H(B
-
-@table @asis
-@item lookup ML (@url{http://openlab.ring.gr.jp/lookup/ml.html})
-Lookup $B$K$D$$$F>pJs8r49$r9T$J$&$?$a$N%a!<%j%s%0%j%9%H$G$9!#1Q8lHG$H(B
-$BF|K\8lHG$H$,$"$j$^$9!#(BLookup $B$N:G?7>pJs$O!"$3$N%a!<%j%s%0%j%9%H$G(B
-$BF@$k$3$H$,=PMh$^$9!#(B
-@item edict ML (@url{http://openlab.ring.gr.jp/edict/})
-$BEE;R<-=q0lHL$K$D$$$F>pJs8r49$r9T$J$&$?$a$N%a!<%j%s%0%j%9%H$G$9!#(B
-$B<-=q$r9XF~$9$k>e$G$N%N%&%O%&$d!"%U%j!<$J8!:w%D!<%k$K$D$$$F$N(B
-$BOCBj$J$I$,=P$F$$$^$9!#(B
-@item ndtpd ML (@url{http://www.sra.co.jp/people/m-kasahr/ndtpd/ml-ja.html})
-$B<-=q%5!<%P(B NDTPD $B$N%a!<%j%s%0%j%9%H$G$9!#;THN$N(B CD-ROM $B<-=q$r(B
-$BMxMQ$9$k$?$a$N>pJs$,$d$j$H$j$5$l$^$9!#$3$N%=%U%H%&%'%"$K4^$^$l$k(B
-EB $B%i%$%V%i%j$O(B Lookup $B$N(B CD-ROM $B8!:w$N$+$J$a$H$J$C$F$$$k$N$G!"(B
-CD-ROM $B<-=q$rMxMQ$5$l$kJ}$O$3$A$i$K$b;22C$5$l$k$3$H$r$*4+$a$7$^$9!#(B
-@end table
-
-@node Bug Report, Troubleshooting, Mailing Lists, Getting Information
-@section $B%P%0$r8+$D$1$?$i(B
-
-@node Troubleshooting,  , Bug Report, Getting Information
-@section $B%H%i%V%k%7%e!<%F%#%s%0(B
-
-$B$$$/$D$+$N%H%i%V%k$X$NBP=hK!$,!"(BLookup $BG[I[J*$K4^$^$l$k%U%!%$%k(B FAQ $B$K(B
-$B$^$H$a$F$"$k$N$G!"$=$A$i$r;2>H$7$F2<$5$$!#$=$l$G$bITL@$J>l9g$O!"(B
-$B%a!<%j%s%0%j%9%H$J$I$G<ALd$7$F2<$5$$!#(B
-
-@node Dictionary Types, Search Agents, Getting Information, Top
-@appendix Dictionary Types
-
-@menu
-* Setup SDIC::                  SDIC $B%U%)!<%^%C%H(B
-* Setup dictd::                 dictd $B%U%)!<%^%C%H(B
-* Setup cookie::                cookie $B%U%!%$%k(B
-* Setup CD-ROM::                $B3F<o(B CD-ROM $B<-=q(B
-* Setup NDTP::                  NDTP $B<-=q%5!<%P(B
-* Setup DICT::                  DICT $B<-=q%5!<%P(B
-@end menu
-
-@node Setup SDIC, Setup dictd, Dictionary Types, Dictionary Types
-@section SDIC $B%U%)!<%^%C%H(B
-
-@cindex SDIC $B%U%)!<%^%C%H(B
-@dfn{SDIC $B%U%)!<%^%C%H(B} $B$H$O!"(BEmacs $B$G;H$($k4J0W8!:w%=%U%H(B SDIC
-@footnote{@url{http://pine.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/}}
-$B$G:NMQ$5$l$F$$$k9T;X8~$N<-=q7A<0$G$9!#(BLookup $B$G$O(B ndic $B%(!<%8%'%s%H$K(B
-$B$h$j8!:w$,9T$J$($^$9!#(B(@pxref{ndic})
-
-@subheading SDIC $B%U%)!<%^%C%H$NFCD'(B
-
-@itemize @bullet
-@item
-$BC10l%U%!%$%k!"0l9T0l%(%s%H%j$N4J7i$J9=@.!#(B
-@item
-grep $B0l$D$G9bB.$J8!:w$,2DG=!#(B
-@item
-$B$$$/$D$+$N%U%j!<<-=q$,F~<j2DG=!#(B
+@email{lookup-ja-subscribe@@ring.gr.jp} $B$K(B subscribe $B$H=q$$$?%a!<%k$r(B
+$BAw$C$F2<$5$$!#(B
 @end itemize
 
-@subheading SDIC $B%U%)!<%^%C%H$N35MW(B
-
-SDIC $B<-=q$O(B @file{.sdic} $B$r3HD%;R$H$9$kC10l$N%U%!%$%k$+$i$J$j!"(B
-$B<!$N$h$&$JFbMF$K$J$C$F$$$^$9!#(B
-
-@example
-@cartouche
-<H>Foo</H><K>foo</K>This is first entry.
-<H>Bar Baz</H><K>bar</K><K>baz</K>This is second entry.
-...
-@end cartouche
-@end example
-
-@code{<H>} @dots{} @code{</H>} $B$H$J$C$F$$$kItJ,$,%(%s%H%j$N8+=P$7!"(B
-@code{<K>} @dots{} @code{</K>} $B$H$J$C$F$$$kItJ,$,8!:w$KMQ$$$i$l$k(B
-$B%-!<%o!<%I!":G8e$NItJ,$,@bL@FbMF$G$9!#8!:w$O<!$N$h$&$K$7$F9T$J$o$l$^$9!#(B
-
-@table @code
-@item grep <K>word</K> dict.sdic
-$B40A40lCW8!:w(B
-@item grep <K>word dict.sdic
-$BA0J}0lCW8!:w(B
-@item grep word</K> dict.sdic
-$B8eJ}0lCW8!:w(B
-@item grep word dict.sdic
-$BA4J88!:w(B
-@end table
-
-$B$h$j>\:Y$J@bL@$O!"(BSDIC $B$KImB0$N;EMM=q$r;2>H$7$F2<$5$$!#(B
-
-@subheading SDIC $B<-=q$NMxMQ(B
-
-$B<-=q%U%!%$%k$rE,Ev$J%G%#%l%/%H%j$KMQ0U$7!"(Bndic $B%(!<%8%'%s%H$r@_Dj$7$F2<(B
-$B$5$$!#(B
-
-@node Setup dictd, Setup cookie, Setup SDIC, Dictionary Types
-@section dictd $B%U%)!<%^%C%H(B
-
-@cindex dictd $B%U%)!<%^%C%H(B
-@dfn{dictd $B%U%)!<%^%C%H(B} $B$H$O!"(BDICT $B%W%m%8%'%/%H(B
-@footnote{@url{http://www.dict.org}} $B$GG[I[$5$l$F$$$k<-=q%5!<%P(B 
-@code{dictd} $B$GMQ$$$i$l$F$$$kHf3SE*C1=c$J<-=q7A<0$G$9!#(B
-Lookup $B$G$O(B ndic $B5Z$S(B ndict $B%(!<%8%'%s%H$K$h$j8!:w$,9T$J$($^$9!#(B
-(@pxref{ndic}, @pxref{ndict})
-
-@subheading dictd $B%U%)!<%^%C%H$NFCD'(B
-
-@itemize @bullet
-@item
-$B%$%s%G%C%/%9%U%!%$%k$HK\J8%U%!%$%k$,J,N%!#(B
-@item
-$B%W%l!<%s%F%-%9%H$K$h$k<-=qFbMF$N5-=R!#(B
-@item
-$B$$$/$D$+$N%U%j!<<-=q$,F~<j2DG=!#(B
-@end itemize
-
-@subheading dictd $B%U%)!<%^%C%H$N35MW(B
-
-dictd $B<-=q$O(B @file{.index} $B$r3HD%;R$H$9$k%$%s%G%C%/%9%U%!%$%k$H!"(B
-@file{.dict} $B$r3HD%;R$H$9$kK\J8%U%!%$%k$+$i$J$j!"$=$l$>$l<!$N$h$&$J(B
-$BFbMF$K$J$C$F$$$^$9!#(B
-
-@example
-@file{file.index}
-@cartouche
-foo     A2      w
-bar     Bc      Ab
-...
-@end cartouche
-@end example
-
-@example
-@file{file.dict}
-@cartouche
-foo
-
-  Here is explanation of foo.
-
-bar
-
-  Here is explanation of bar.
-
-...
-@end cartouche
-@end example
-
-$BK\J8%U%!%$%k$O$3$N$h$&$KC1$J$k%W%l!<%s%F%-%9%H$G$"$j!"%$%s%G%C%/%9%U%!%$(B
-$B%k$N3F9T$K$=$l$>$l$N%(%s%H%j$N>pJs$,JB$Y$i$l$^$9!#=g$K!":G=i$N%3%i%`$,8+(B
-$B=P$78l!"FsHVL\$,K\J8$N3+;O0LCV!";0HVL\$,K\J8$ND9$5$rI=$o$7$^$9!#3F%3%i%`(B
-$B$O%?%V$G6h@Z$i$l!"FsHVL\!";0HVL\$NCM$O(B base64 $B$G%(%s%3!<%I$5$l$F$$$^$9!#(B
-
-$B8!:w;~$O$^$:%$%s%G%C%/%9%U%!%$%k$+$iL\E*$N8+=P$78l$,8+IU$1=P$5$l!"$=$&$7(B
-$B$FF@$i$l$?>pJs$+$i8zN(E*$KK\J8$,<h$j=P$5$l$^$9!#(B
-
-$B$h$j>\:Y$J@bL@$O!"(B@code{dictd} $B$N%^%K%e%"%k%Z!<%8$r;2>H$7$F2<$5$$!#(B
-
-@subheading dictd $B<-=q$NMxMQ(B
-
-dictd $B<-=q$O!"(Bndic $B5Z$S(B ndict $B%(!<%8%'%s%H$+$i8!:w$9$k$3$H$,2DG=$G$9!#(B
-ndict $B%(!<%8%'%s%H$rMQ$$$kJ}$,$h$j9bB.$J8!:w$,2DG=$G$9$,!"%5!<%P$N@_Dj$,(B
-$BI,MW$J$V$s$$$/$i$+<j4V$,3]$+$j$^$9!#(Bdictd $B$N@_Dj$K$D$$$F$O!"(B
-@ref{Setup DICT} $B$r;2>H$7$F2<$5$$!#(B
-
-ndic $B%(!<%8%'%s%H$G$"$l$P@_Dj$O:G>.8B$G:Q$_$^$9$,!"(Bndic $B$O:G=i$K%$%s%G%C(B
-$B%/%9$rA4$FFI$_9~$`$?$a!"Hf3SE*B?$/$N%a%b%j$rI,MW$H$9$k$3$H$KCm0U$7$F2<$5(B
-$B$$!#>/$J$/$H$bMxMQ$9$k%$%s%G%C%/%9%U%!%$%k$h$j$b==J,Bg$-$J%a%b%j$NM>M5$N(B
-$B$"$k$3$H$,I,MW$G$9!#(B
-
-ndic $B%(!<%8%'%s%H$rMQ$$$k>l9g!"%$%s%G%C%/%9%U%!%$%k$HK\J8%U%!%$%k$NN>J}(B
-$B$r$=$m$($F!"E,Ev$J%G%#%l%/%H%j$KCV$$$F2<$5$$!#K\J8%U%!%$%k$O(B 
-@code{dictd} $BG[I[J*$K4^$^$l$k(B @code{dictzip} $B%3%^%s%I$G05=L$7$F$*$$$F$b(B
-$B9=$$$^$;$s!#$3$l$O<!$N$h$&$K<B9T$7$^$9!#(B
-
-@example
-% dictzip file.dict
-@end example
-
-@node Setup cookie, Setup CD-ROM, Setup dictd, Dictionary Types
-@section cookie $B%U%!%$%k(B
-
-@cindex cookie $B%U%!%$%k(B
-@dfn{cookie $B%U%!%$%k(B} $B$H$O!"(B@code{fortune} $B%W%m%0%i%`$J$I$GMQ$$$i$l$k(B
-fortune cookie @footnote{$BC;$+$$%8%g!<%/$d3J8@$J$I$r=8$a$?$b$N$G!"(BUNIX
-$B$G$OEAE}E*$K%m%0%$%s;~$K$3$l$r%i%s%@%`$GI=<($9$k$h$&$K$J$C$F$$$k!#(B}
-$B$r=8$a$?%U%!%$%k$G$9!#(BLookup $B$G$O(B ndcookie $B%(!<%8%'%s%H$K$h$jMxMQ$9$k(B
-$B$3$H$,=PMh$^$9!#(B(@pxref{ndcookie})
-
-@subheading cookie $B%U%!%$%k$NFCD'(B
-
-@itemize @bullet
-@item
-@code{fortune} $B%W%m%0%i%`$J$I$GMxMQ$5$l$F$$$k!#(B
-@item
-$B8!:w$K$O8~$$$F$$$J$$!#$$$:$l$+$NJ8$r%i%s%@%`$K<h$j=P$9$N$,IaDL!#(B
-@end itemize
-
-@subheading cookie $B%U%!%$%k$N35MW(B
-
-cookie $B%U%!%$%k$O(B @file{.lines} $B$r3HD%;R$H$9$kC10l$N%U%!%$%k$+$i$J$j!"(B
-$B<!$N$h$&$JFbMF$K$J$C$F$$$^$9!#(B
-
-@example
-@cartouche
-Cookie file example
-^@@
-This is first sentence.^@@
-This is second sentence.^@@
-@end cartouche
-@end example
-
-$B$3$3$G(B @samp{^@@} $B$H$"$k$N$O(B ASCII $B%3!<%I(B 0 $B$NJ8;z$G$9!#%U%!%$%k$N@hF,$+(B
-$B$i:G=i$N(B @samp{^@@} $B$^$G$,%3%a%s%H$H$J$j!"B3$/9T$+$i<!$N(B @samp{^@@} $B$^$G(B
-$B$,0l$D$N(B cookie $B$H$J$C$F$$$^$9!#(B
-
-@subheading cookie $B%U%!%$%k$NMxMQ(B
-
-$B%U%!%$%k$rE,Ev$J%G%#%l%/%H%j$KMQ0U$7!"(Bndcookie $B$N@_Dj$r9T$J$C$F2<$5$$!#(B
-
-@node Setup CD-ROM, Setup NDTP, Setup cookie, Dictionary Types
-@section $B3F<o(B CD-ROM $B<-=q(B
-
-@cindex $BEE;R%V%C%/(B
-@cindex EPWING $B5,Ls(B
-$BF|K\$G;THN$5$l$F$$$k(B
-
-$BEE;R%V%C%/!&(BEPWING $B5,Ls(B
-
-[ $B$3$N>O$O$^$@@0HwESCf$G$9(B ]
-
-@ignore
-@cindex dictd $B%U%)!<%^%C%H(B
-@dfn{dictd $B%U%)!<%^%C%H(B} $B$H$O!"(BDICT $B%W%m%8%'%/%H(B
-@footnote{@url{http://www.dict.org}} $B$GG[I[$5$l$F$$$k<-=q%5!<%P(B 
-@code{dictd} $B$GMQ$$$i$l$F$$$kHf3SE*C1=c$J<-=q7A<0$G$9!#(B
-Lookup $B$G$O(B ndic $B5Z$S(B ndict $B%(!<%8%'%s%H$K$h$j8!:w$,9T$J$($^$9!#(B
-(@pxref{ndic}, @pxref{ndict})
-
-@subheading dictd $B%U%)!<%^%C%H$NFCD'(B
-
-@itemize @bullet
-@item
-$B%$%s%G%C%/%9%U%!%$%k$HK\J8%U%!%$%k$,J,N%!#(B
-@item
-$B%W%l!<%s%F%-%9%H$K$h$k<-=qFbMF$N5-=R!#(B
-@item
-$B$$$/$D$+$N%U%j!<<-=q$,F~<j2DG=!#(B
-@end itemize
-
-@subheading dictd $B%U%)!<%^%C%H$N35MW(B
-
-dictd $B<-=q$O(B @file{.index} $B$r3HD%;R$H$9$k%$%s%G%C%/%9%U%!%$%k$H!"(B
-@file{.dict} $B$r3HD%;R$H$9$kK\J8%U%!%$%k$+$i$J$j!"$=$l$>$l<!$N$h$&$J(B
-$BFbMF$K$J$C$F$$$^$9!#(B
-
-$BK\J8%U%!%$%k$O$3$N$h$&$KC1$J$k%W%l!<%s%F%-%9%H$G$"$j!"%$%s%G%C%/%9%U%!%$(B
-$B%k$N3F9T$K$=$l$>$l$N%(%s%H%j$N>pJs$,JB$Y$i$l$^$9!#=g$K!":G=i$N%3%i%`$,8+(B
-$B=P$78l!"FsHVL\$,K\J8$N3+;O0LCV!";0HVL\$,K\J8$ND9$5$rI=$o$7$^$9!#3F%3%i%`(B
-$B$O%?%V$G6h@Z$i$l!"FsHVL\!";0HVL\$NCM$O(B base64 $B$G%(%s%3!<%I$5$l$F$$$^$9!#(B
-
-$B8!:w;~$O$^$:%$%s%G%C%/%9%U%!%$%k$+$iL\E*$N8+=P$78l$,8+IU$1=P$5$l!"$=$&$7(B
-$B$FF@$i$l$?>pJs$+$i8zN(E*$KK\J8$,<h$j=P$5$l$^$9!#(B
-
-$B$h$j>\:Y$J@bL@$O!"(B@code{dictd} $B$N%^%K%e%"%k%Z!<%8$r;2>H$7$F2<$5$$!#(B
-
-@subheading dictd $B<-=q$N=`Hw(B
-
-$B%$%s%G%C%/%9%U%!%$%k$HK\J8%U%!%$%k$r$=$m$($F!"E,Ev$J%G%#%l%/%H%j$KCV$$$F(B
-$B$*$/$@$1$G$9!#K\J8%U%!%$%k$O!"(B@code{dictd} $B$NG[I[J*$K4^$^$l$k(B 
-@code{dictzip} $B%3%^%s%I$K$h$j05=L$9$k$3$H$b2DG=$G$9!#$3$l$O<!$N$h$&$K(B
-$B<B9T$9$k$@$1$G$9!#(B
-
-@example
-% dictzip file.dict
-@end example
-
-@subheading dictd $B<-=q$NMxMQ(B
-
-dictd $B<-=q$O!"(Bndic $B5Z$S(B ndict $B%(!<%8%'%s%H$+$i8!:w$9$k$3$H$,2DG=$G$9!#(B
-ndict $B%(!<%8%'%s%H$rMQ$$$kJ}$,$h$j9bB.$J8!:w$,2DG=$G$9$,!"%5!<%P$N@_Dj$,(B
-$BI,MW$J$?$a$K$$$/$i$+<j4V$,3]$+$j$^$9!#5U$K(B ndic $B%(!<%8%'%s%H$O!":G=i$K%$(B
-$B%s%G%C%/%9%U%!%$%k$rA4$FFI$_9~$`$?$a$KHf3SE*B?$/$N%a%b%j$rI,MW$H$7$^$9!#(B
-$B$h$j<+J,$KET9g$N$h$$J}$rA*Br$7$F2<$5$$!#(B
-
-
-honmon $B$G$O$J$/(B catalogs
-
-    $B<-=q$r>.$5$/$9$k$3$H$,L\E*$G$"$l$P!"$^$:(B epwutil $B$H$$$&$b$N$rMxMQ$9(B
-    $B$k$3$H$G!"2hA|$J$I$NBg$-$J%G!<%?$r:o=|$7$F!"<-=q$r%9%j%`$K$9$k$3$H$,(B
-    $B=PMh$^$9!#<-=q$K$b$h$j$^$9$,!"$3$l$G(B 25$B!A(B100% $BDxEY$NBg$-$5$K$J$j$^$9!#(B
-    $B<!$N$H$3$m$G<j$KF~$j$^$9!#(B
-
-      http://openlab.ring.gr.jp/edict/
-
-    $B<!$K!"<-=q8!:w$N$?$a$K(B eblook $B$"$k$$$O(B NDTPD $B$rMQ$$$k$J$i$P!"(BEB $B%i%$(B
-    $B%V%i%j$KImB0$N(B ebzip $B%3%^%s%I$rMQ$$$k$3$H$G<-=q$r05=L$9$k$3$H$,2DG=(B
-    $B$G$9!#$3$l$G99$K(B 50$B!A(B30% $BDxEY$NBg$-$5$K$J$j$^$9!#(B
-
-    $B$3$NN>J}$rAH$_9g$o$;$k$3$H$G!"<-=q$K$h$C$F$O85$N(B 1/10 $BDxEY$NBg$-$5$K(B
-    $B$^$G:o8:=PMh$^$9!#(B
-@end ignore
-
-@node Setup NDTP, Setup DICT, Setup CD-ROM, Dictionary Types
-@section NDTP $B<-=q%5!<%P(B
-
-@cindex NDTP
-@dfn{NDTP} $B$H$O!"%M%C%H%o!<%/$G(B CD-ROM $B<-=q$r6&M-$9$k$?$a$K:n$i$l$?8!:w(B
-$BMQ%W%m%H%3%k$G$9!#(BLookup $B$G$O(B ndtp $B%(!<%8%'%s%H$K$h$j(B NDTP $B%5!<%P$H$d$j(B
-$B$H$j$9$k$3$H$,=PMh$^$9!#(B(@pxref{ndtp})
-
-@subheading NDTP $B$NFCD'(B
-
-@itemize @bullet
-@item
-$BF|K\$N;THN(B CD-ROM $B<-=q$K:,:9$7$?FbMF!#(B
-@item
-$BNI$/$b0-$/$b!"$$$$$+$2$s$J@_7W!#(B
-@item
-$B2?EY$+3HD%$5$l!":#$G$O30;z>pJs$b07$($k$h$&$K$J$C$F$$$k!#(B
-@end itemize
-
-@subheading NDTP $B$N35MW(B
-
-@sc{ndtp} (Network Dictionary Transport Protocol) $B$O(B dserver
-@footnote{ftp://ftp.pu-toyama.ac.jp/pub/misc/} $B$H$$$&8!:w%=%U%H%&%'%"$N(B
-$BCf$GFH<+$KDj5A$5$l$?$b$N$G!"4J7i$J%3%^%s%IBN7O$r;}$D%F%-%9%H%Y!<%9$N(B
-$B%W%m%H%3%k$G$9!#<!$N$h$&$J1~Ez$K$J$j$^$9!#(B
-
-@example
-@cartouche
-   % @b{telnet localhost ndtp}
-   Trying 127.0.0.1...
-   Connected to localhost.
-   Escape character is '^]'.
-C> @b{Akei}
-S> $A
-C> @b{t}
-S> 1       $B9q8l<-E5(B        KOKUGO  0       0       900
-S> 2       $B1QOB<-E5(B        EIWA    0       0       900
-S> 3       $BOB1Q<-E5(B        WAEI    0       0       900
-S> $*
-C> @b{L1}
-S> $*
-C> @b{Patest}
-S> $0
-S> $B%F%9%H(B
-S> 668c:73e
-S> $$
-C> @b{S668c:73e}
-S> $1
-S> $B%F%9%H(B
-S> [$BL>(B] 1. $B;n83(B....
-S> $$
-C> @b{Q}
-   Connection closed by foreign host.
-   % 
-@end cartouche
-@end example
-
-@subheading NDTP $B%5!<%P$N@_Dj(B
-
-[ $B$3$N@a$O$^$@@0HwESCf$G$9(B ]
-
-@node Setup DICT,  , Setup NDTP, Dictionary Types
-@section DICT $B<-=q%5!<%P(B
-
-@cindex DICT $B%W%m%H%3%k(B
-@dfn{DICT} $B$H$O!"(B@sc{rfc 2229} $B$H$7$FDj5A$5$l$F$$$k<-=q8!:wMQ%W%m%H%3%k(B
-$B$G$9!#(BLookup $B$G$O(B ndict $B%(!<%8%'%s%H$K$h$j(B DICT $B%5!<%P$H$d$j$H$j$9$k$3$H(B
-$B$,=PMh$^$9!#(B(@pxref{ndict})
-
-@subheading DICT $B$NFCD'(B
-
-@itemize @bullet
-@item
-@sc{rfc} $B$H$7$FL@3N$KDj5A!#(B
-@item
-$BJ8;z%3!<%I$O(B @sc{utf-8}(Unicode)$B!#(B
-@end itemize
-
-@subheading DICT $B$N35MW(B
-
-@example
-@cartouche
-   % @b{telnet localhost dict}
-   Trying 127.0.0.1...
-   Connected to localhost.
-   Escape character is '^]'.
-S> 220 localhost dictd 1.4.8/rf <auth.mime> <27831.860032493@@localhost>
-C> @b{CLIENT ndict}
-S> 250 ok
-C> @b{SHOW DB}
-S> 110 3 databases present
-S> jargon "Jargon File (4.0.0/24 July 1996)"
-S> foldoc "The Free On-line Dictionary of Computing (15Feb98)"
-S> vera "Virtual Entity of Relevant Acronyms (1.4a)"
-S> .
-S> 250 ok
-C> @b{MATCH * exact "test"}
-S> 152 1 matches found
-S> jargon "test"
-S> .
-S> 250 ok [d/m/c = 0/1/27; 0.000r 0.000u 0.000s]
-C> @b{DEFINE jargon "test"}
-S> 150 1 definitions retrieved
-S> 151 "test" jargon "Jargon File (4.0.0/24 July 1996)"
-S> test /n./  1. Real users bashing on a prototype long enough to
-S>    get thoroughly acquainted with it, with careful monitoring and
-S>    followup of the results.  2. Some bored random user trying a couple
-S>    of the simpler features with a developer looking over his or her
-S>    shoulder, ready to pounce on mistakes.  Judging by the quality of
-S>    most software, the second definition is far more prevalent.  See
-S>    also @{demo@}.
-S>
-S>
-S> .
-S> 250 ok [d/m/c = 1/0/11; 0.033r 0.000u 0.009s]
-C> @b{QUIT}
-S> 221 bye [d/m/c = 0/0/0; 179.328r 0.000u 0.011s]
-   Connection closed by foreign host.
-   % 
-@end cartouche
-@end example
-
-@subheading DICT $B%5!<%P$N@_Dj(B
-
-[ $B$3$N@a$O$^$@@0HwESCf$G$9(B ]
-
-@node Search Agents, Mode Details, Dictionary Types, Top
+@node Search Agents, Concept Index, Information, Top
 @appendix $B8!:w%(!<%8%'%s%H0lMw(B
-
-$B$3$N>O$G$O!"(BLookup $B$GMxMQ$G$-$k8!:w%(!<%8%'%s%H$K$D$$$F!"$=$l$rMxMQ$9$k(B
-$B$?$a$K9T$J$o$J$1$l$P$J$i$J$$=`Hw$d@_Dj9`L\$K$D$$$F>\:Y$K@bL@$7$^$9!#(B
 
 @menu
 * ndic::                        $B%U%j!<<-=q$+$i8!:w$9$k(B
@@ -4201,436 +3206,7 @@ ndcookie $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
 
 $BA4$F$N8!:wJ}<0$,M-8z$H$J$j$^$9!#(B(@pxref{Search Methods})
 
-@node Mode Details, Concept Index, Search Agents, Top
-@appendix $B3F%b!<%I$K$D$$$F$N>\:Y(B
-
-$B$3$N>O$G$O!"(BLookup $B$N3F%b!<%I$G$NA4$F$N@_Dj!&A`:n$K$D$$$F@bL@$7$^$9!#(B
-
-@menu
-* Select Mode::                 Select $B%b!<%I(B
-* Entry Mode::                  Entry $B%b!<%I(B
-* Content Mode::                Content $B%b!<%I(B
-@end menu
-
-@node Select Mode, Entry Mode, Mode Details, Mode Details
-@section Select $B%b!<%I(B
-
-Select $B%b!<%I$G$O!"MxMQ2DG=$J<-=q$N0lMw$rI=<($7!"<B:]$KMxMQ$9$k<-=q$NA*(B
-$BBr>uBV$r@Z$jBX$($k$3$H$,=PMh$^$9!#$^$?!"$=$l$>$l$N<-=q$K8GM-$N>pJs$rF@$k(B
-$B$3$H$b=PMh$^$9!#(B
-
-@menu
-* Select Mode Details::         Select $B%b!<%I$N>\:Y(B
-* Select Mode Commands::        Select $B%b!<%I$N%3%^%s%I0lMw(B
-@end menu
-
-@node Select Mode Details, Select Mode Commands, Select Mode, Select Mode
-@subsection Select $B%b!<%I$N>\:Y(B
-
-@findex lookup-select-mode
-@vindex lookup-select-mode-map
-@vindex lookup-select-mode-hook
-$B:G=i$K(B @kbd{M-x lookup} $B$r<B9T$9$k$+!"8!:w<B9T8e$K(B Entry $B%P%C%U%!$G(B 
-@kbd{S} $B$r2!$9$H!"<-=q0lMw%P%C%U%!$,I=<($5$l!"(BSelect $B%b!<%I(B
-(@code{lookup-select-mode})$B$KF~$j$^$9!#%-!<%^%C%W$O(B
-@code{lookup-select-mode-map} $B$G!":G=i$K(B @code{lookup-select-mode-hook} 
-$B$,8F$P$l$^$9!#(B
-
-$B0lMw$N(B @samp{%}$B!"(B@samp{Identifier}$B!"(B@samp{Title} $B$H$"$k%3%i%`$K$O!"$=$l(B
-$B$>$l<-=q$NA*Br>uBV!"<-=q(BID$B!"<-=q$N%?%$%H%k$,I=<($5$l$^$9!#(B
-@ref{Quick Startup} $B$r;2>H$7$F2<$5$$!#(B
-
-@samp{Methods} $B$H$"$k%3%i%`$K$O!"<-=q$,BP1~$7$F$$$k8!:wJ}<0$,<($5$l$^$9!#(B
-$B$3$3$KJB$s$G$$$k5-9f$NNs$O!"0lJ8;z$,$=$l$>$l0l$D$N8!:wJ}<0$rI=$o$7$F$$$^(B
-$B$9!#3F5-9f$H8!:wJ}<0$NBP1~$K$D$$$F$O!"(B@ref{Search Methods} $B$r;2>H$7$F2<(B
-$B$5$$!#(B
-
-$B$3$N%P%C%U%!$G$N6qBNE*$JA`:n$K$D$$$F$O!"(B
-@ref{Specify Dictionary} $B$r;2>H$7$F2<$5$$!#(B
-
-@node Select Mode Commands,  , Select Mode Details, Select Mode
-@subsection Select $B%b!<%I$N%3%^%s%I0lMw(B
-
-@table @kbd
-@item @key{SPC}
-@itemx n
-@itemx M-x lookup-select-next-line
-@findex lookup-select-next-line
-$B<!$N9T$K?J$`!#(B
-
-@item p
-@itemx M-x lookup-select-previous-line
-@findex lookup-select-previous-line
-$BA0$N9T$KLa$k!#(B
-
-@item m
-@itemx M-x lookup-select-do-select
-@findex lookup-select-do-select
-$B%]%$%s%H9T$N<-=q$rA*Br$9$k!#(B
-
-@item u
-@itemx M-x lookup-select-do-unselect
-@findex lookup-select-do-unselect
-$B%]%$%s%H9T$N<-=q$rHsA*Br$K$9$k!#(B
-
-@item M-x lookup-select-toggle-selected
-@findex lookup-select-toggle-selected
-$B%]%$%s%H9T$N<-=q$NA*Br>uBV$r%H%0%k$9$k!#(B
-
-@item a
-@itemx M-x lookup-select-do-select-all
-@findex lookup-select-do-select-all
-$BA4$F$N<-=q$rA*Br$9$k!#(B
-
-@item @key{RET}
-@itemx M-x lookup-select-do-select-only
-@findex lookup-select-do-select-only
-$B%]%$%s%H9T$N<-=q$N$_$rA*Br$9$k!#(B
-
-@item d
-@itemx M-x lookup-select-mark-disable
-@findex lookup-select-mark-disable
-$B%]%$%s%H9T$N<-=q$KL58z2=$N%^!<%/$rIU$1$k!#(B
-
-@item x
-@itemx M-x lookup-select-do-execute
-@findex lookup-select-do-execute
-$BL58z2=$r<B9T$9$k!#(B
-
-@item M
-@itemx M-x lookup-select-menu
-@findex lookup-select-menu
-$B<-=q$,%a%K%e!<$KBP1~$7$F$$$k>l9g!"$=$l$r;2>H$9$k!#(B
-
-@item f
-@itemx M-x lookup-select-search-pattern
-@findex lookup-select-search-pattern
-$BA*Br$5$l$?<-=q$+$i8!:w$r9T$J$&!#(B
-
-@item /
-@itemx M-x lookup-select-text-search
-@findex lookup-select-text-search
-$B%]%$%s%H9T$N<-=q$+$iA4J88!:w$r9T$J$&!#(B
-
-@item g
-@itemx M-x lookup-select-update
-@findex lookup-select-update
-$B8=:_$N8!:w%b%8%e!<%k$r=i4|2=$7D>$9!#(B
-$B$?$@$7!"@_Dj%U%!%$%k$G@_Dj$rJQ99$7$?>l9g!"$=$l$rH?1G$5$;$k$K$O(B
-@kbd{M-x lookup-restart} $B$rMQ$$$kI,MW$,$"$k!#(B
-
-@item q
-@itemx M-x lookup-quit
-$B<-=qA*Br%P%C%U%!$rH4$1$k!#(B
-
-@item Q
-@itemx M-x lookup-exit
-Lookup $B$r=*N;$9$k!#(B
-
-@item R
-@itemx M-x lookup-restart
-Lookup $B$r:F5/F0$9$k!#(B
-
-@item ?
-@itemx M-x lookup-select-help
-@findex lookup-select-help
-Select $B%b!<%I$N4J0W%X%k%W$rI=<($9$k!#(B
-@end table
-
-@node Entry Mode, Content Mode, Select Mode, Mode Details
-@section Entry $B%b!<%I(B
-
-Entry $B%b!<%I$G$O!"8!:w$N7k2L8+IU$+$C$?%(%s%H%j$r0lMw$7!"$=$l$i$r=g$K;2>H(B
-$B$7$F$$$/$3$H$,=PMh$^$9!#(B
-
-@menu
-* Entry Mode Details::          Entry $B%b!<%I$N>\:Y(B
-* Entry Mode Commands::         Entry $B%b!<%I$N%3%^%s%I0lMw(B
-@end menu
-
-@node Entry Mode Details, Entry Mode Commands, Entry Mode, Entry Mode
-@subsection Entry $B%b!<%I$N>\:Y(B
-
-@findex lookup-entry-mode
-@vindex lookup-entry-mode-map
-@vindex lookup-entry-mode-hook
-$B3F<o$N8!:w%3%^%s%I(B(@pxref{Search Commands})$B$r<B9T$9$k$H!"(BEntry $B%P%C%U%!(B
-$B$,I=<($5$l!"(BEntry $B%b!<%I(B(@code{lookup-entry-mode})$B$KF~$j$^$9!#%-!<%^%C%W(B
-$B$O(B @code{lookup-entry-mode-map} $B$G!":G=i$K(B @code{lookup-entry-mode-hook} 
-$B$,8F$P$l$^$9!#(B
-
-$B%P%C%U%!$K$O%(%s%H%j$N0lMw$,I=<($5$l!"<-=q$N%?%$%H%k$H%(%s%H%j$N8+=P$7$,(B
-$BJB$S$^$9!#%b!<%I%i%$%s$O<!$N$h$&$K$J$j$^$9!#(B
-
-@example
-----------------------------------------------------------------
--E:%*  Lookup: *Entry* @{*:word@} [2]      (Entry Abbrev)--L1--C20
-----------------------------------------------------------------
-@end example
-
-$B$3$3$G%V%l!<%9(B($BBg3g8L(B)$B$K64$^$l$?ItJ,$O!"$I$N$h$&$J8!:w$,9T$J$o$l$?$+$r(B
-$B<($7$F$$$^$9!#%3%m%s(B(@samp{:})$B$NA0$N0lJ8;z$O8!:wJ}<0$rI=$o$7$F$*$j!"(B
-$B$=$N8e$N(B @samp{word} $B$H$J$C$F$$$k$N$,8!:w8l$G$9!#8!:wJ}<0$K$D$$$F$O(B
-@ref{Search Methods} $B$r;2>H$7$F2<$5$$!#8e$KB3$/%V%i%1%C%H(B($B3Q3g8L(B)$B$H(B
-$B?t;z$O!"8+IU$+$C$?%(%s%H%j$N?t$G$9!#(B
-
-$B$3$N%P%C%U%!$G$N6qBNE*$JA`:n$K$D$$$F$O!"(B
-@ref{See Result} $B;2>H$7$F2<$5$$!#(B
-
-@node Entry Mode Commands,  , Entry Mode Details, Entry Mode
-@subsection Entry $B%b!<%I$N%3%^%s%I0lMw(B
-
-@table @kbd
-@item M-x lookup-entry-display-content
-@findex lookup-entry-display-content
-$B%]%$%s%H9T$N%(%s%H%j$NK\J8$rI=<($9$k!#(B
-Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
-$B%*!<%W%s$9$k!#%(%s%H%j$,%j%U%!%l%s%9$N>l9g$K$O!"$=$l$r;2>H$9$k!#(B
-
-@item @key{mouse-2}
-@item @code{lookup-entry-mouse-follow}
-@findex lookup-entry-mouse-follow
-$B%^%&%9$G%/%j%C%/$7$?%(%s%H%j$NK\J8$rI=<($9$k!#(B
-
-@item @key{SPC}
-@itemx M-x lookup-entry-next-page
-@findex lookup-entry-next-page
-$B%(%s%H%jK\J8$NI=<($r0l%Z!<%8?J$a$k!#(B
-$B%P%C%U%!$N=*$o$j$^$GC#$7$?$i!"<!$N%(%s%H%j$K0\F0$9$k!#(B
-
-@item @key{DEL}
-@itemx M-x lookup-entry-previous-page
-@findex lookup-entry-previous-page
-$B%(%s%H%jK\J8$NI=<($r0l%Z!<%8La$9!#(B
-$B%P%C%U%!$N;O$a$^$GC#$7$?$i!"A0$N%(%s%H%j$K0\F0$9$k!#(B
-
-@item @key{RET}
-@itemx M-x lookup-entry-scroll-up-content
-@findex lookup-entry-scroll-up-content
-$B%(%s%H%jK\J8$r%W%l%U%#%9%/$N9T?t$@$1%9%/%m!<%k!&%"%C%W$9$k!#(B
-
-@item M-x lookup-entry-scroll-down-content
-@findex lookup-entry-scroll-down-content
-$B%(%s%H%jK\J8$r%W%l%U%#%9%/$N9T?t$@$1%9%/%m!<%k!&%@%&%s$9$k!#(B
-
-@item <
-@itemx M-x lookup-entry-beginning-of-content
-@findex lookup-entry-beginning-of-content
-$B%(%s%H%jK\J8$NI=<($r@hF,$^$GLa$9!#(B
-
-@item >
-@itemx M-x lookup-entry-end-of-content
-@findex lookup-entry-end-of-content
-$B%(%s%H%jK\J8$NI=<($rKvHx$^$G?J$a$k!#(B
-
-@item n
-@itemx M-x lookup-entry-next-entry
-@findex lookup-entry-next-entry
-$B<!$N%(%s%H%j$rI=<($9$k!#%W%l%U%#%/%9$N?t$@$1?J$`!#(B
-
-@item p
-@itemx M-x lookup-entry-previous-entry
-@findex lookup-entry-previous-entry
-$BA0$N%(%s%H%j$rI=<($9$k!#%W%l%U%#%/%9$N?t$@$1La$k!#(B
-
-@item M-n
-@itemx M-x lookup-entry-history-next
-@findex lookup-entry-history-next
-$B8!:wMzNr$r<!$K?J$`!#%W%l%U%#%9%/$N?t$@$1?J$`!#(B
-
-@item M-p
-@itemx M-x lookup-entry-history-previous
-@findex lookup-entry-history-previous
-$B8!:wMzNr$rA0$KLa$k!#%W%l%U%#%9%/$N?t$@$1La$k!#(B
-
-@item i
-@itemx M-x lookup-entry-info
-@findex lookup-entry-info
-$B%(%s%H%j$N>pJs$r=PNO$9$k!#(B
-
-@item o
-@itemx M-x lookup-entry-open
-@findex lookup-entry-open
-$B%(%s%H%jK\J8$r2hLL0lGU$KI=<($9$k!#(B
-
-@item O
-@itemx M-x lookup-entry-open-other
-@findex lookup-entry-open-other
-$B%(%s%H%jK\J8$rJL%W%m%0%i%`$GI=<($9$k!#(B
-
-@item v
-@itemx M-x lookup-entry-overview-mode
-@findex lookup-entry-overview-mode
-Overview $B%b!<%I$KF~$k!#(B
-Cotent $B%P%C%U%!$,%/%m!<%:$5$l!"(B@kbd{n} $B$H(B @kbd{p} $B$,C1$K%]%$%s%H0\F0$@$1$r(B
-$B9T$J$&$h$&$K$J$k!#(B
-
-@item t
-@itemx M-x lookup-entry-toggle-format
-@findex lookup-entry-toggle-format
-$B%(%s%H%jK\J8$N@07A=hM}$r%H%0%k$9$k!#(B
-
-@item s
-@itemx M-x lookup-entry-isearch-content
-@findex lookup-entry-isearch-content
-Content $B%P%C%U%!$G(B isearch-forward $B$r<B9T$9$k!#(B
-
-@item w
-@itemx M-x lookup-entry-cite-content
-@findex lookup-entry-cite-content
-$B%(%s%H%jK\J8$r%-%k%j%s%0$KJ]B8$9$k!#(B
-$BJQ?t(B @code{lookup-cite-style} $B$b$7$/$O<-=q%*%W%7%g%s(B @code{:cite-style}
-$B$K$h$j0zMQ$N%9%?%$%k$r;XDj2DG=!#(B@kbd{M-x lookup-content-cite-region} $B$b;2>H!#(B
-
-@item f
-@itemx M-x lookup-entry-search-pattern
-@findex lookup-entry-search-pattern
-$B%_%K%P%C%U%!$+$i8!:w<0$rF~NO$7$F8!:w$9$k!#(B
-
-@item L
-@itemx M-x lookup-entry-list-references
-@findex lookup-entry-list-references
-$B%(%s%H%jK\J8$K4^$^$l$k%j%U%!%l%s%9$r0lMw$9$k!#(B
-
-@item S
-@itemx M-x lookup-select-dictionary
-$B<-=qA*Br%P%C%U%!$K@Z$j49$($k!#(B
-
-@item r
-@itemx M-x lookup-entry-start-window
-@findex lookup-entry-start-window
-$B8!:w$r3+;O$7$?%&%#%s%I%&$K0\F0$9$k!#(B
-
-@item h
-@itemx M-x lookup-entry-content-window
-@findex lookup-entry-content-window
-Content $B%P%C%U%!$K0\F0$9$k!#(B
-
-@item g
-@itemx M-x lookup-entry-update
-@findex lookup-entry-update
-$B:#2s$HF1$88!:w8l$G!"%(%s%H%j$r:F8!:w$9$k!#(B
-
-@item M-x lookup-entry-update-content
-@findex lookup-entry-update-content
-$B%(%s%H%jK\J8$r:FI=<($9$k!#@07A=hM}$bA4$F$d$jD>$5$l$k!#(B
-
-@item q
-@itemx M-x lookup-quit
-Entry $B%P%C%U%!$rH4$1$k!#(B
-
-@item Q
-@itemx M-x lookup-exit
-Lookup $B$r=*N;$9$k!#(B
-
-@item R
-@itemx M-x lookup-restart
-Lookup $B$r:F5/F0$9$k!#(B
-
-@item ?
-@itemx M-x lookup-entry-help
-@findex lookup-entry-help
-Entry $B%b!<%I$N4J0W%X%k%W$rI=<($9$k!#(B
-@end table
-
-@node Content Mode,  , Entry Mode, Mode Details
-@section Content $B%b!<%I(B
-
-Content $B%b!<%I$G$O!"%(%s%H%j$NK\J8$rI=<($7!"FbMF$r;2>H$9$k$3$H$,=PMh$^$9!#(B
-
-@menu
-* Content Mode Details::        Content $B%b!<%I$N>\:Y(B
-* Content Mode Commands::       Content $B%b!<%I$N%3%^%s%I0lMw(B
-@end menu
-
-@node Content Mode Details, Content Mode Commands, Content Mode, Content Mode
-@subsection Content $B%b!<%I$N>\:Y(B
-
-@findex lookup-content-mode
-@vindex lookup-content-mode-map
-@vindex lookup-content-mode-hook
-Entry $B%P%C%U%!$GK\J8$rI=<($9$k$h$&A`:n$9$k$H(B Content $B%P%C%U%!$,8=$l!"(B
-Content $B%b!<%I(B(@code{lookup-content-mode})$B$KF~$j$^$9!#%-!<%^%C%W$O(B
-@code{lookup-content-mode-map} $B$G!":G=i$K(B 
-@code{lookup-content-mode-hook} $B$,8F$P$l$^$9!#(B
-
-$B%P%C%U%!$K$O%(%s%H%j$NK\J8$,I=<($5$l!"8+=P$7$,%b!<%I%i%$%s$K<($5$l$^$9!#(B
-
-$B$3$N%P%C%U%!$KBP$9$k<g$JA`:n$O(B Entry $B%P%C%U%!$+$i9T$J$&$3$H$,=PMh$k$N$G!"(B
-$BD>@\$3$N%b!<%I$rMxMQ$9$k$3$H$O$"$^$j$"$j$^$;$s!#6qBNE*$JA`:n$K$D$$$F$O!"(B
-@ref{See Result} $B;2>H$7$F2<$5$$!#(B
-
-@node Content Mode Commands,  , Content Mode Details, Content Mode
-@subsection Content $B%b!<%I$N%3%^%s%I0lMw(B
-
-@table @kbd
-@item @key{SPC}
-@itemx M-x scroll-up
-$B%P%C%U%!$r%9%/%m!<%k!&%"%C%W$9$k!#(B
-
-@item @key{DEL}
-@itemx M-x scroll-down
-$B%P%C%U%!$r%9%/%m!<%k!&%@%&%s$9$k!#(B
-
-@item <
-@itemx M-x beginning-of-buffer
-$B%P%C%U%!$N@hF,$K0\F0$9$k!#(B
-
-@item >
-@itemx M-x end-of-buffer
-$B%P%C%U%!$NKvHx$K0\F0$9$k!#(B
-
-@item @key{TAB}
-@itemx M-x lookup-content-next-link
-@findex lookup-content-next-link
-$B<!$N%j%s%/$K0\F0$9$k!#(B
-
-@item @key{RET}
-@itemx M-x lookup-content-follow-link
-@findex lookup-content-follow-link
-$B%]%$%s%H0LCV$N%j%s%/$r;2>H$9$k!#(B
-
-@item @key{mouse-2}
-@itemx @code{lookup-content-mouse-follow}
-@findex lookup-content-mouse-follow
-$B%^%&%9$G%/%j%C%/$7$?%j%s%/$r;2>H$9$k!#(B
-
-@item t
-@itemx M-x lookup-content-toggle-format
-@findex lookup-content-toggle-format
-$BK\J8$N@07A=hM}$r%H%0%k$9$k!#(B
-
-@item w
-@itemx M-x lookup-content-cite-region
-@findex lookup-content-cite-region
-$B%j!<%8%g%s$NFbMF$r%-%k%j%s%0$KJ]B8$9$k!#(B
-$B$=$N:]!"JQ?t(B @code{lookup-cite-header} $B$^$?$O<-=q%*%W%7%g%s(B @code{:cite-header}
-$B$K$h$j0zMQ;~$N%X%C%@$r!"JQ?t(B @code{lookup-cite-prefix} $B$^$?$O<-=q%*%W%7%g%s(B
-@code{:cite-prefix} $B$K$h$j0zMQ;~$N%W%l%U%#%/%9$r;XDj$9$k$3$H$,=PMh$k!#(B
-@footnote{$B8=:_!"(B@code{:cite-style} $B$K$OL$BP1~(B}
-
-@item h
-@itemx M-x lookup-content-entry-window
-@findex lookup-content-entry-window
-Entry $B%P%C%U%!$K0\F0$9$k!#(B
-
-@item g
-@itemx M-x lookup-content-update
-@findex lookup-content-update
-$B%-%c%C%7%e$rMQ$$$:$KK\J8$rFI$_D>$9!#(B
-
-@item q
-@itemx M-x lookup-content-leave
-@findex lookup-content-leave
-Content $B%P%C%U%!$rH4$1$k!#(B
-
-@item ?
-@itemx M-x lookup-content-help
-@findex lookup-content-help
-Content $B%b!<%I$N4J0W%X%k%W$rI=<($9$k!#(B
-@end table
-
-@node Concept Index, Command Index, Mode Details, Top
+@node Concept Index, Command Index, Search Agents, Top
 @unnumbered Concept Index
 @printindex cp
 

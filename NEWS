@@ -1,0 +1,52 @@
+							-*- outline -*-
+
+* インストール
+
+lisp/*.el を適当なディレクトリにコピー。必要ならバイトコンパイル。
+
+* 設定方法
+
+** ~/.emacs
+
+(define-key ctl-x-map "l" 'lookup)
+(define-key ctl-x-map "y" 'lookup-region)
+(define-key ctl-x-map "\C-y" 'lookup-pattern)
+
+(add-to-list 'load-path "/home/kei/emacs/lookup/lisp")
+(load "lookup-autoloads")
+
+** ~/.lookup
+
+(setq lookup-search-agents
+      '((ndeb "/usr/local/dict/epwing")
+	(ndsrd "/usr/local/dict/srd")
+	(ndspell)))
+
+(setq lookup-complement-directory "/home/kei/emacs/lookup/comp")
+;; 補助ファイルの読み込みは自動で行なわれる。(comp/loaddef.el を参照)
+
+(lookup-set-dictionary-options "ndeb:/usr/local/dict/epwing/CHUJITEN"
+  :transformer 'lookup-stemming-search)
+
+* モジュール生成
+
+1. キャッシュファイルを有効にする。
+
+  (setq lookup-cache-file "~/.lookup-cache")
+
+2. Select mode で `C'.
+
+3. モジュールをリネーム/削除するには、キャッシュファイルを直接編集。
+
+* 特定モジュールを利用するコマンド生成
+
+** ~/.emacs
+
+(define-key mode-specific-map "\C-y" 'lookup-japanese)
+(autoload 'lookup-japanese "lookup" nil t)
+
+** ~/.lookup
+
+(defun lookup-japanese (pattern)
+  (interactive (list (lookup-input-pattern)))
+  (lookup-pattern pattern (lookup-get-module "japanese")))

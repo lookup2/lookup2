@@ -18,12 +18,6 @@
 ;;; Code:
 
 (require 'lookup)
-
-;;
-;; $Id: oxford.el,v 1.3 2000/06/17 16:55:03 knishida Exp $
-;;
-
-(require 'lookup)
 (require 'decode-iso10646)
 (require 'gte)
 
