@@ -513,10 +513,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 	    ;; Sometimes stemming generates duplicate entries with different
 	    ;; headings.  Let's remove them.
 	    (unless (eq (lookup-entry-substance entry) last-entry)
-	      (setq dict (lookup-entry-dictionary entry))
-	      (setq heading (lookup-entry-heading entry))
-	      (setq entries (cons (lookup-new-entry 'slink dict entry heading)
-				  entries))
+	      (setq entries (cons (lookup-new-slink entry) entries))
 	      (setq last-entry (lookup-entry-substance entry))))
 	  (lookup-dictionary-search dictionary query))))
      (cdr (nreverse (stem-english string))))
