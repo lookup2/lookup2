@@ -232,7 +232,7 @@
    ((string-match 
      "&c\\([0-7]\\):\\([0-9a-fA-F][0-9a-fA-F]\\)\\([0-9a-fA-F][0-9a-fA-F]\\)"
      code)
-    (vector (intern (concat "cns" (match-string 1 code)))
+    (vector (intern (concat "chinese-cns11643-" (match-string 1 code)))
 	    (string-to-int (match-string 2 code) 16)
 	    (string-to-int (match-string 3 code) 16)))))
 

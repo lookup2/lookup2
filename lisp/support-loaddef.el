@@ -27,6 +27,7 @@
 	("RIKA\\'" . "support-rika")
 	("COMP\\'" . "support-comp")
 	("OXFORD\\'" . "support-oxford")
+        ("ndsrd:" . "support-srd")
 	("SRD-FPW\\'" . "support-srd-fpw")
 	("foldoc" . "support-foldoc")
 	("jargon" . "support-jargon")
