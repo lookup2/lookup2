@@ -11,7 +11,7 @@
      )
     ("Links"
      ("edict"		"/edict/")
-     ("eblook"		"/lookup/eblook/")
+     ("eblook"		"/edict/eblook/")
      ("NDTPD"		"http://www.sra.co.jp/people/m-kasahr/ndtpd/")
      ("FreePWING"	"http://www.sra.co.jp/people/m-kasahr/freepwing/")
      ("DICT Project"	"http://www.dict.org/")

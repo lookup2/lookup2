@@ -2,7 +2,7 @@
 
 (define title "Lookup - a Search Interface")
 (define title-logo "/lookup/images/title.png")
-(define updated "$Date: 2001/03/24 22:11:01 $")
+(define updated "$Date: 2001/07/10 04:59:07 $")
 
 (define lookup-stable
   ##(a #:href "http://download.sourceforge.net/lookup/lookup-1.3.tar.gz"
@@ -22,7 +22,7 @@
 
    ##(h1 "Latest Release")
    ##(unless
-     ##(li "Stable version: " lookup-stable ", " ##(a #:href "eblook/" "eblook-1.3"))
+     ##(li "Stable version: " lookup-stable ", " ##(a #:href "/edict/eblook/" "eblook-1.3"))
      ##(li "Unstable version: " lookup-unstable)
      ##(li "Contribution: "
 	  ##(a #:href "http://www.aist-nara.ac.jp/~masata-y/autolookup/index.html" "Auto Lookup") ", "
