@@ -19,9 +19,9 @@ clean::
 install:: all
 	rsync -avL -e ssh --delete $(EXCLUDE) \
 	  . $(USER)@openlab.ring.gr.jp:/circus/openlab/lookup
-	ssh -l $(USER) openlab.ring.gr.jp chmod -R g+w /circus/openlab/lookup
 
 %.html:
 	guile -s $< | nkf -j > $@ || rm $@
+	chmod g+w $@
 
 index.html: index.scm menu.scm news.scm

@@ -7,3 +7,4 @@ clean::
 
 %.html: %.scm ../menu.scm ../subpage.scm
 	guile -s $< | nkf -j > $@ || rm $@
+	chmod g+w $@
