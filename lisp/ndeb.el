@@ -109,7 +109,7 @@
 ;; CODE    - entry specific code (e.g. "2c00:340") by eblook `search' command
 ;; HEADING - given by eblook `search' command
 
-(defun ndeb-new-entry (type code heading)
+(defun ndeb-new-entry (type code &optional heading)
   (lookup-new-entry type ndeb-current-dictionary code heading))
 
 ;;;
