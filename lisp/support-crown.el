@@ -1,4 +1,4 @@
-;;; oxford.el --- suport file for "Crown French/German-Japanese Dictionary"
+;;; support-crown.el --- suport file for "Crown French/German-Japanese Dictionary"
 ;; Copyright (C) 2000 KAWABATA Taichi <kawabata@sourceforge.net>
 
 ;; This program is free software; you can redistribute it and/or
@@ -136,10 +136,10 @@
       ("ha229" "&#x00DF;&#x0308;")
       ("ha22a" "&#x00C4;")
       ("ha22b" "&#x00DA;")
-      ;; ?? 文脈不明
+      ;; ?? unknown context
       ("ha22c" "|")
       ("ha22d" "&#x0250;&#x0306;")
-      ;; ?? 0xa228との関係不明
+      ;; ?? related to ha228 ??
       ("ha22e" "&#x00DC;")
       ;; caron or breve?
       ("ha22f" "&#x01D2;")
