@@ -18,19 +18,19 @@
 ;;; Code:
 
 (setq lookup-complement-autoload-alist
-      '(("IWAKOKU\\'" . "iwakoku.el")
-	("CHUJITEN\\'" . "chujiten.el")
-	("CHIEZO\\'" . "chiezo.el")
-	("MYPAEDIA\\'" . "mypaedia.el")
-	("GENIUS\\'" . "genius.el")
-	("COLLOC\\'" . "colloc.el")
-	("RIKA\\'" . "rika.el")
-	("COMP\\'" . "comp.el")
-	("OXFORD\\'" . "oxford.el")
-	("foldoc" . "foldoc.el")
-	("jargon" . "jargon.el")
-	("vera" . "vera.el")
-	("rfc1983" . "rfc1983.el")
-	("csrd\\'" . "srd.el")))
+      '(("IWAKOKU\\'" . "iwakoku")
+	("CHUJITEN\\'" . "chujiten")
+	("CHIEZO\\'" . "chiezo")
+	("MYPAEDIA\\'" . "mypaedia")
+	("GENIUS\\'" . "genius")
+	("COLLOC\\'" . "colloc")
+	("RIKA\\'" . "rika")
+	("COMP\\'" . "comp")
+	("OXFORD\\'" . "oxford")
+	("foldoc" . "foldoc")
+	("jargon" . "jargon")
+	("vera" . "vera")
+	("rfc1983" . "rfc1983")
+	("csrd\\'" . "srd")))
 
 ;;; loaddef.el ends here
