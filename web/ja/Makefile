@@ -1,6 +1,8 @@
 TARGETS = index.html
 SUBDIRS = info lists howto
 
+USER = knishida
+
 EXCLUDE = --exclude=CVS --exclude='Makefile*' --exclude='*.scm'
 
 all: $(TARGETS)
@@ -16,7 +18,8 @@ clean::
 
 install:: all
 	rsync -avL -e ssh --delete $(EXCLUDE) \
-	  . knishida@openlab.ring.gr.jp:/circus/openlab/lookup
+	  . $(USER)@openlab.ring.gr.jp:/circus/openlab/lookup
+	ssh -l $(USER) openlab.ring.gr.jp chmod -R g+w /circus/openlab/lookup
 
 %.html:
 	guile -s $< | nkf -j > $@ || rm $@
