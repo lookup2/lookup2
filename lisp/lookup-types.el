@@ -538,6 +538,11 @@ internal caches."
 	(lookup-entry-code entry)
       entry)))
 
+(defun lookup-new-slink (entry)
+  (setq entry (lookup-entry-substance entry))
+  (lookup-new-entry 'slink (lookup-entry-dictionary entry)
+		    entry (lookup-entry-heading entry)))
+
 (defun lookup-entry-ref (entry key)
   (lookup-dictionary-ref (lookup-entry-dictionary entry) key))
 
