@@ -2,4 +2,3 @@
 
 aclocal
 automake -a
-autoconf
