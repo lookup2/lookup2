@@ -100,7 +100,7 @@
 	 (module (lookup-current-module))
 	 (self (lookup-entry-dictionary entry))
 	 (word (lookup-entry-get-property entry 'search-word))
-	 (query (lookup-new-query 'exact word))
+	 (query (lookup-new-query 'default word))
 	 prio entries search-found)
     (lookup-proceeding-message nil)
     (setq entries
@@ -109,19 +109,14 @@
 		    (when (and (not (eq dict self))
 			       (cond ((eq prio t) t)
 				     ((eq prio 'secondary) (not search-found))
-				     ((eq prio 'supplement) search-found))
-			       (memq 'exact (lookup-dictionary-methods dict)))
+				     ((eq prio 'supplement) search-found)))
 		      (lookup-proceeding-message
 		       (format "by %s..." (lookup-dictionary-title dict)))
 		      (setq entries (lookup-dictionary-search dict query))
 		      (if entries (setq search-found t))
 		      entries))
 		  (lookup-module-dictionaries module)))
-    (setq entries
-	  (mapcar (lambda (entry)
-		    (lookup-new-entry 'slink (lookup-entry-dictionary entry)
-				      entry (lookup-entry-heading entry)))
-		  (apply 'append entries)))
+    (setq entries (mapcar 'lookup-new-slink (apply 'append entries)))
     (lookup-proceeding-message t)
     entries))
 
