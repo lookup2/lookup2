@@ -1,16 +1,18 @@
-;;; index.scm
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+        "http://www.w3.org/TR/REC-html40/strict.dtd">
+<HTML>
+<HEAD>
+  <TITLE>Lookup - a Search Interface</TITLE>
+</HEAD>
 
-(use-modules (text markup html))
-
-(define title "Lookup - a Search Interface")
-
-(print-html
- (table
-  (tr #:valign "bottom"
-   (td (img "/images/title.png" #:alt "Lookup"))
-   (td "Language:"
-       (href "English" "http://lookup.sourceforge.net/") ","
-       (href "Japanese" "http://openlab.ring.gr.jp/lookup/index.html.ja"))))
+<BODY BGCOLOR="white">
+<table>
+ <tr valign="bottom">
+  <td><img src="/images/title.png" alt="Lookup"></td>
+  <td>Language: <a href="http://lookup.sourceforge.net/">English</a>,
+      <a href="http://openlab.ring.gr.jp/lookup/index.html.ja">Japanese</a></td>
+ </tr>
+</table>
 
 <!-- header.html -->
 
@@ -30,7 +32,7 @@ effective manner.</p>
 </ul>
 <HR>
 <ADDRESS>
-Last modified: $Date: 2000/11/19 23:59:52 $<BR>
+Last modified: $Date: 2001/12/23 19:09:28 $<BR>
 </ADDRESS>
 
 <hr>
