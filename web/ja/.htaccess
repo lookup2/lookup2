@@ -1,0 +1,4 @@
+Redirect permanent /lookup/index-j.html http://openlab.ring.gr.jp/lookup/
+Redirect permanent /lookup/index.html.ja http://openlab.ring.gr.jp/lookup/
+Redirect permanent /lookup/index.html.en http://lookup.sourceforge.net/
+Redirect permanent /lookup/DIST/composite-char-patch http://openlab.ring.gr.jp/lookup/DIST/patch/mule-2.3-composite-char.patch
