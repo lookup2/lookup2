@@ -163,8 +163,7 @@
       ;; set methods and method-table
       (let* ((method-table (lookup-assq-get table 'methods))
              (methods (mapcar 'car method-table)))
-	(setf (lookup-agent-option agent :method-table) method-table)
-        (setf (lookup-agent-option agent :methods) methods)))
+	(setf (lookup-agent-option agent :method-table) method-table)))
     ;; get dictionary list
     (ndict-process-require "SHOW DB"
       (lambda (process)
@@ -179,7 +178,8 @@
 
 (put 'ndict :methods 'ndict-methods)
 (defun ndict-methods (dictionary)
-  (lookup-agent-option (lookup-dictionary-agent dictionary) :methods))
+  (let ((agent (lookup-dictionary-agent dictionary)))
+    (mapcar 'car (ndict-agent-method-table agent))))
 
 (put 'ndict :clear 'ndict-clear)
 (defun ndict-clear (agent)
