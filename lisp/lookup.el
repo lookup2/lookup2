@@ -27,7 +27,7 @@
 (require 'lookup-vars)
 (require 'lookup-types)
 
-(defconst lookup-version "1.99.0"
+(defconst lookup-version "1.99.1"
   "The version numbers of Lookup.")
 
 
