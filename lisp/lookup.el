@@ -501,19 +501,26 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-stemming-search (dictionary query)
   (let* ((string (downcase (lookup-query-string query)))
 	 (query (lookup-new-query 'exact string))
-	 dict heading)
-    (append
-     (lookup-dictionary-search dictionary query)
-     (apply 'nconc
-	    (mapcar (lambda (string)
-		      (when (> (length string) 3)
-			(lookup-query-set-string query string)
-			(mapcar (lambda (entry)
-				  (setq dict (lookup-entry-dictionary entry))
-				  (setq heading (lookup-entry-heading entry))
-				  (lookup-new-entry 'slink dict entry heading))
-				(lookup-dictionary-search dictionary query))))
-		    (cdr (nreverse (stem-english string))))))))
+	 entries dict heading last-entry)
+    (setq entries (reverse (lookup-dictionary-search dictionary query)))
+    (setq last-entry (lookup-entry-substance (car entries)))
+    (lookup-foreach
+     (lambda (string)
+       (when (> (length string) 3)
+	 (lookup-query-set-string query string)
+	 (lookup-foreach
+	  (lambda (entry)
+	    ;; Sometimes stemming generates duplicate entries with different
+	    ;; headings.  Let's remove them.
+	    (unless (eq (lookup-entry-substance entry) last-entry)
+	      (setq dict (lookup-entry-dictionary entry))
+	      (setq heading (lookup-entry-heading entry))
+	      (setq entries (cons (lookup-new-entry 'slink dict entry heading)
+				  entries))
+	      (setq last-entry (lookup-entry-substance entry))))
+	  (lookup-dictionary-search dictionary query))))
+     (cdr (nreverse (stem-english string))))
+    (nreverse entries)))
 
 
 ;;;;;;;;;;;;;;;;;;;;
