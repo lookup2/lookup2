@@ -1,0 +1,20 @@
+Lookup NEWS						-*- outline -*-
+
+* GNU Emacs 21 & XEmacs 21 のみサポート。
+
+古いバージョンの Emacs では動作しない。
+
+* 初期化ファイルの変更。
+
+`lookup-init-directory' で、初期化ファイルのディレクトリを指定する。
+デフォルトでは ~/.lookup/
+
+`lookup-init-file' で、Lookup の初期化ファイルを指定する。
+デフォルトでは ~/.lookup/init.el
+
+`lookup-cache-file' で、Lookup のキャッシュファイルを指定する。
+デフォルトでは ~/.lookup/cache.el
+
+* 外字サポートが標準で有効となった。
+
+* 補助ファイルは自動的に読み込まれるようになった。

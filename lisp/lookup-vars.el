@@ -22,8 +22,6 @@
 
 ;;; Code:
 
-(require 'lookup-utils)
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
 ;;;;;;;;;;;;;;;;;;;;
@@ -48,11 +46,6 @@
 (defcustom lookup-init-file (expand-file-name "init.el" lookup-init-directory)
   "*Lookup initialization file."
   :type 'file
-  :group 'lookup-setup-variables)
-
-(defcustom lookup-data-directory (expand-file-name "etc" lookup-init-directory)
-  "*Lookup data directory."
-  :type 'directory
   :group 'lookup-setup-variables)
 
 (defcustom lookup-support-autoload-alist nil
@@ -115,8 +108,8 @@ Dictionary option `cite-prefix' overrides this variable."
 
 (defcustom lookup-process-coding-system
   (if (memq system-type '(ms-dos windows-nt OS/2 emx))
-      (lookup-coding-system 'sjis-dos)
-    (lookup-coding-system 'euc-jp))
+      'sjis-dos
+    'euc-jp)
   "*Default coding system for external processes."
   :type 'symbol
   :group 'lookup-general-options)
@@ -233,7 +226,8 @@ Dictionary option `cite-prefix' overrides this variable."
   "Cache control."
   :group 'lookup)
 
-(defcustom lookup-cache-file (expand-file-name "cache.el" lookup-init-directory)
+(defcustom lookup-cache-file
+  (expand-file-name "cache.el" lookup-init-directory)
   "*Lookup disk cache file."
   :type 'file
   :group 'lookup-cache)

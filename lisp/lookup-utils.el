@@ -23,6 +23,7 @@
 ;;; Code:
 
 (require 'cl)
+(require 'lookup-vars)
 
 (defun lookup-point-bol ()
   (save-excursion (beginning-of-line) (point)))
@@ -127,10 +128,6 @@
 		   (concat prompt " (default " default "): ")
 		 (concat prompt ": "))
 	       init history default inherit))
-
-(defun lookup-coding-system (charset)
-  (require 'mcharset)
-  (mime-charset-to-coding-system charset))
 
 (put 'lookup-with-coding-system 'lisp-indent-function 1)
 (defmacro lookup-with-coding-system (coding &rest body)

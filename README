@@ -4,83 +4,47 @@ Lookup $B$O(B Emacs $B$G;H$($k<-=q8!:w%=%U%H$G$9!#(BCD-ROM $B<-=q$d<-=q%5!<
 $B%$%s%9%H!<%k(B
 ------------
 
-
-
-How to Install
---------------
-
   % ./configure --with-emacs=emacs \
-                --with-lispdir=/your/home/emacs/lisp/lookup \
+                --with-lispdir=/your/home/emacs/lisp \
                 --infodir=/your/home/emacs/info
   % make install
 
-How To Use
-----------
+$BC1$K(B configure && make install $B$H$9$k$H!"(BEmacs $B$N(B site-lisp $B%G%#%l%/%H%j(B
+(i.e., /usr/local/share/emacs/site-lisp) $B$N2<$K(B lookup $B$H$$$&%G%#%l%/%H(B
+$B%j$,:n$i$l!"$=$3$K%U%!%$%k$,%3%T!<$5$l$^$9!#(B
+
+[ XXX: GNU Emacs 21.0.91 $B$K$O%P%0$,$"$k$h$&$G!"%P%$%H%3%s%Q%$%k$9$k$H(B
+  $B@5>o$KF0:n$7$^$;$s(B ]
+
+$B;H$$J}(B
+------
+
+~/.emacs.el $B$K!"Nc$($P<!$N$h$&$K=q$$$F2<$5$$!#(B
+
+  (define-key ctl-x-map "l" 'lookup)
+  (define-key ctl-x-map "y" 'lookup-region)
+  (define-key ctl-x-map "\C-y" 'lookup-pattern)
 
   (load "lookup-autoloads")
-  (setq lookup-search-agents '((ndtp "dserver") (ndspell)))
+  (setq lookup-search-agents
+        '((ndtp "dserver")
+          (ndeb "/usr/local/dict/epwing")
+          (ndspell)))
 
-M-x lookup $B$G(B Lookup $B$r5/F0$7$^$9!#;O$a$KMxMQ$G$-$k<-=q$,0lMw$5$l$^$9!#(B
-M-x lookup-region $B$G!"%j!<%8%g%s$NJ8;zNs$r8!:w$7$^$9!#(BM-x lookup-pattern 
-$B$K$h$j!"%_%K%P%C%U%!$+$i8!:w8l$rF~NO$G$-$^$9!#$h$j>\$7$/$O!"ImB0$N%^%K%e(B
-$B%"%k$r;2>H$7$F2<$5$$!#(B
+M-x lookup $B$G(B Lookup $B$r5/F0$7$^$9!#(BM-x lookup-region $B$G!"A*BrHO0O$NJ8;z(B
+$BNs$r8!:w$7$^$9!#(BM-x lookup-pattern $B$G!"8!:w8l$rF~NO$7$F8!:w$7$^$9!#>\$7(B
+$B$/$O!"ImB0$N%^%K%e%"%k$r;2>H$7$F2<$5$$!#(B
 
-How To Get
-----------
+$B%+%9%?%^%$%:(B
+------------
+
+~/.lookup/init.el $B$G(B Lookup $B$N@_Dj$r$^$H$a$F9T$J$&$3$H$,=PMh$^$9!#(B
+
+$B:G?7>pJs(B
+--------
 
   http://openlab.ring.gr.jp/lookup/
 
 Lookup $B$K4X$9$k>pJs8r49$O!"@lMQ$N%a!<%j%s%0%j%9%H$K$F9T$o$l$F$$$^$9!#(B
 $B;22C$r4uK>$9$kJ}$O!"(B`lookup-ja-request@ring.gr.jp' $B08$F$K!"K\J8$K(B
 subscribe $B$H=q$$$?%a!<%k$rAw$C$F2<$5$$!#(B
-
-* $B%$%s%9%H!<%k(B
-
-lisp/*.el $B$rE,Ev$J%G%#%l%/%H%j$K%3%T!<!#I,MW$J$i%P%$%H%3%s%Q%$%k!#(B
-
-* $B@_DjJ}K!(B
-
-** ~/.emacs
-
-(define-key ctl-x-map "l" 'lookup)
-(define-key ctl-x-map "y" 'lookup-region)
-(define-key ctl-x-map "\C-y" 'lookup-pattern)
-
-(add-to-list 'load-path "/home/kei/emacs/lookup/lisp")
-(load "lookup-autoloads")
-
-** ~/.lookup
-
-(setq lookup-search-agents
-      '((ndeb "/usr/local/dict/epwing")
-	(ndsrd "/usr/local/dict/srd")
-	(ndspell)))
-
-(setq lookup-complement-directory "/home/kei/emacs/lookup/comp")
-;; $BJd=u%U%!%$%k$NFI$_9~$_$O<+F0$G9T$J$o$l$k!#(B(comp/loaddef.el $B$r;2>H(B)
-
-(lookup-set-dictionary-options "ndeb:/usr/local/dict/epwing/CHUJITEN"
-  :transformer 'lookup-stemming-search)
-
-* $B%b%8%e!<%k@8@.(B
-
-1. $B%-%c%C%7%e%U%!%$%k$rM-8z$K$9$k!#(B
-
-  (setq lookup-cache-file "~/.lookup-cache")
-
-2. Select mode $B$G(B `C'.
-
-3. $B%b%8%e!<%k$r%j%M!<%`(B/$B:o=|$9$k$K$O!"%-%c%C%7%e%U%!%$%k$rD>@\JT=8!#(B
-
-* $BFCDj%b%8%e!<%k$rMxMQ$9$k%3%^%s%I@8@.(B
-
-** ~/.emacs
-
-(define-key mode-specific-map "\C-y" 'lookup-japanese)
-(autoload 'lookup-japanese "lookup" nil t)
-
-** ~/.lookup
-
-(defun lookup-japanese (pattern)
-  (interactive (list (lookup-input-pattern)))
-  (lookup-pattern pattern (lookup-get-module "japanese")))
