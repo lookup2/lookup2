@@ -290,7 +290,8 @@
 
 (defun lookup-dictionary-default-method (dictionary)
   (lookup-dictionary-get dictionary 'default-method
-    (lambda () (or (lookup-dictionary-option dictionary :default-method)
+    (lambda () (or (lookup-dictionary-transformer dictionary)
+		   (lookup-dictionary-option dictionary :default-method)
 		   lookup-default-method))))
 
 (defun lookup-dictionary-methods (dictionary)
@@ -384,12 +385,14 @@
   (let* ((string (downcase (lookup-query-string query)))
 	 (query (lookup-new-query 'exact string))
 	 entries dict heading last-entry)
-    (if (setq entries (reverse (lookup-dictionary-search-internal dictionary query)))
+    (if (setq entries (reverse (lookup-dictionary-search-internal
+				dictionary query 'lookup-regular-search)))
 	(setq last-entry (lookup-entry-substance (car entries))))
     (dolist (string (cdr (nreverse (stem-english string))))
       (when (> (length string) 3)
-	(lookup-query-set-string query string)
-	(dolist (entry (lookup-dictionary-search-internal dictionary query))
+	(setf (lookup-query-string query) string)
+	(dolist (entry (lookup-dictionary-search-internal
+			dictionary query 'lookup-regular-search))
 	  ;; Sometimes stemming creates duplicate entries with different
 	  ;; headings.  Let's remove them.
 	  (unless (eq (lookup-entry-substance entry) last-entry)
