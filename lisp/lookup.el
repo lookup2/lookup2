@@ -473,23 +473,13 @@ Otherwise, this is the same with \\[lookup-previous-history]."
       (error "Query should be one line"))
   (let ((query (if lookup-search-method
 		   (lookup-new-query lookup-search-method pattern)
-		 (lookup-parse-pattern pattern)))
-	(original-module module)
-	valid-dictionary)
+		 (lookup-parse-pattern pattern))))
     (if (string= (lookup-query-string query) "")
 	(error "Invalid query pattern"))
     (when (or (not (eq (lookup-query-method query) 'text))
 	      (eq lookup-search-method 'text)
 	      (y-or-n-p "Are you sure to search text? "))
-      (while module
-	(condition-case error
-	    (progn
-	      (lookup-search-session module query)
-	      (setq module nil))
-	  (lookup-error
-	   (setq module (lookup-nth-module 1 module))
-	   (if (eq module original-module)
-	       (error "No entry"))))))))
+      (lookup-search-session module query))))
 
 (defun lookup-stemming-search (dictionary query)
   (let* ((string (downcase (lookup-query-string query)))
