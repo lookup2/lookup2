@@ -49,10 +49,10 @@ With prefix arg, you can choose which module you use."
   (setq module (or module (if lookup-last-session
 			      (lookup-session-module lookup-last-session)
 			    (lookup-default-module))))
-  (let* ((history (lookup-module-history module))
-	 (position (lookup-history-position history)))
+  (let ((position (lookup-history-position lookup-search-history)))
     (if (> position 0)
-	(lookup-session-display (lookup-history-ref history position))
+	(lookup-session-display (lookup-history-ref lookup-search-history
+						    position))
       (lookup-select-session module))))
 
 (defun lookup-kill ()
@@ -75,6 +75,7 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
   (load lookup-init-file t)
   (if lookup-cache-file (lookup-restore-cache lookup-cache-file))
   (run-hooks 'lookup-load-hook)
+  (setq lookup-search-history (lookup-new-history))
   (lookup-init-gaiji-functions)
   (lookup-init-complement-autoload))
 
@@ -244,8 +245,8 @@ See `lookup-secondary' for details."
   (setq lookup-global-map (make-sparse-keymap))
   (define-key lookup-global-map "\en" 'lookup-next-history)
   (define-key lookup-global-map "\ep" 'lookup-previous-history)
-  (define-key lookup-global-map "\es" 'lookup-isearch-history-forward)
-  (define-key lookup-global-map "\er" 'lookup-isearch-history-backward)
+;  (define-key lookup-global-map "\es" 'lookup-isearch-history-forward)
+;  (define-key lookup-global-map "\er" 'lookup-isearch-history-backward)
   (define-key lookup-global-map "\ef" 'lookup-forward-module)
   (define-key lookup-global-map "\eb" 'lookup-backward-module)
   (define-key lookup-global-map "B" 'lookup-list-bookmarks)
@@ -285,7 +286,12 @@ See `lookup-secondary' for details."
   (interactive "p")
   (let ((module (lookup-nth-module arg (or (lookup-current-module)
 					   (lookup-default-module)))))
-    (lookup module)
+    (if (eq major-mode 'lookup-select-mode)
+	(lookup-select-session module)
+      (let ((query (lookup-session-query (lookup-current-session))))
+	(if (not (eq (lookup-query-method query) 'reference))
+	    (lookup-search-session module query)
+	  (error "Error"))))
     (princ (lookup-module-name module))))
 
 (defun lookup-backward-module (&optional arg)
@@ -294,9 +300,8 @@ See `lookup-secondary' for details."
 
 (defun lookup-next-history (&optional arg)
   (interactive "p")
-  (let* ((history (lookup-module-history (lookup-current-module)))
-	 (length (lookup-history-length history))
-	 (position (lookup-history-position history)))
+  (let ((length (lookup-history-length lookup-search-history))
+	(position (lookup-history-position lookup-search-history)))
     (setq arg (or arg 1))
     (cond
      ((= length 0) (error "No session in the history"))
@@ -306,8 +311,8 @@ See `lookup-secondary' for details."
     (setq position (if (< position 1) 1
 		     (if (> position length) length
 		       position)))
-    (lookup-history-set-position history position)
-    (lookup-session-display (lookup-history-ref history))
+    (lookup-history-set-position lookup-search-history position)
+    (lookup-session-display (lookup-history-ref lookup-search-history))
     (princ position)))
 
 (defun lookup-previous-history (&optional arg)
@@ -396,8 +401,7 @@ to back to Lookup."
 If this is the first session, this is the same with \\[lookup-suspend].
 Otherwise, this is the same with \\[lookup-previous-history]."
   (interactive)
-  (if (> (lookup-history-position
-	  (lookup-module-history (lookup-current-module))) 1)
+  (if (> (lookup-history-position lookup-search-history) 1)
       (lookup-previous-history)
     (lookup-suspend)))
 
@@ -534,13 +538,12 @@ Otherwise, this is the same with \\[lookup-previous-history]."
        (setq lookup-current-session lookup-last-session))))
 
 (defun lookup-open-session (session)
-  (let* ((history (lookup-module-history (lookup-session-module session)))
-	 (position (lookup-history-position history)))
+  (let ((position (lookup-history-position lookup-search-history)))
     (if (and (> position 0)
-	     (lookup-compare-session session (lookup-history-ref history)))
-	(lookup-history-set-position history (1- position)))
+	     (lookup-compare-session session (lookup-history-ref lookup-search-history)))
+	(lookup-history-set-position lookup-search-history (1- position)))
     (lookup-session-display session)
-    (lookup-history-push history session)))
+    (lookup-history-push lookup-search-history session)))
 
 (defun lookup-default-module ()
   (let ((name (or (lookup-assq-get lookup-mode-module-alist major-mode)

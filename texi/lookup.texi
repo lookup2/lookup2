@@ -77,9 +77,10 @@ approved by the Free Software Foundation.
 @node Top, What is Lookup, (dir), (dir)
 @top Lookup User's Manual
 
-Lookup is a search interface with electronic dictionaries for the Emacs
-text editor.  You can use various kinds of dictionaries, such as CD-ROM
-books or online dictionaries, by simple operations.
+Lookup is an integrated search interface with electronic dictionaries
+for the Emacs text editor.  You can use various kinds of dictionaries,
+such as CD-ROM books and online dictionaries, in an efficient and
+effective manner.
 
 This manual corresponds to Lookup @value{VERSION}.
 

@@ -214,7 +214,7 @@
 
 (lookup-defstruct module (name)
   :id-format 'name
-  :with-properties '(dictionaries history bookmarks priority-alist))
+  :with-properties '(dictionaries bookmarks priority-alist))
 
 (defun lookup-new-module (name &rest dicts)
   (let ((module (lookup-make-module name)) dict prio)
@@ -234,7 +234,6 @@
 		    dict)
 		  dicts))
     (lookup-module-set-dictionaries module dicts)
-    (lookup-module-set-history module (lookup-new-history))
     (if lookup-cache-file (lookup-restore-module-attributes module))
     module))
 

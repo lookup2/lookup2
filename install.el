@@ -136,7 +136,7 @@
 (save-current-buffer
   (let ((load-path (cons nil load-path))
 	(byte-compile-warnings nil)
-	(lookup-byte-compiling t))
+	(lookup-byte-compile t))
     (mapcar 'load install-elisp-files)
     (mapcar 'byte-compile-file install-elisp-files)))
 (if (not noninteractive) (insert "done\n"))

@@ -1,71 +1,52 @@
-		      Lookup - a Search Interface
-		   http://openlab.ring.gr.jp/lookup/
+							-*- outline -*-
 
-Lookup is a search interface with electronic dictionaries for the Emacs
-text editor.  You can use various kinds of dictionaries, such as CD-ROM
-books and online dictionaries, by simple operations.
+* インストール
 
-How To Install =========================================================
+lisp/*.el を適当なディレクトリにコピー。必要ならバイトコンパイル。
 
-There are two ways to install Lookup.  If you are using XEmacs 21.0 or
-later, you can install a binary package of Lookup.  Or else, you can use
-the special installer for Lookup.
+* 設定方法
 
-Using Binary Package
---------------------
+** ~/.emacs
 
-This is the best way to install Lookup for XEmacs 21.x users.  Just get
-the Lookup binary package (i.e., lookup-x.xx-pkg.tar.gz), and extract it
-into your package directory like this:
+(define-key ctl-x-map "l" 'lookup)
+(define-key ctl-x-map "y" 'lookup-region)
+(define-key ctl-x-map "\C-y" 'lookup-pattern)
 
-  % cd ~/.xemacs/packages
-  % tar xfz lookup-x.xx-pkg.tar.gz
+(add-to-list 'load-path "/home/kei/emacs/lookup/lisp")
+(load "lookup-autoloads")
 
-You can build a binary package from this source archive.  Just type
-`make binkit' at the top directory of the archive.
+** ~/.lookup
 
-Using Quick Installer
----------------------
+(setq lookup-search-agents
+      '((ndeb "/usr/local/dict/epwing")
+	(ndsrd "/usr/local/dict/srd")
+	(ndspell)))
 
-You can call the special installer for Lookup directly in your Emacs:
+(setq lookup-complement-directory "/home/kei/emacs/lookup/comp")
+;; 補助ファイルの読み込みは自動で行なわれる。(comp/loaddef.el を参照)
 
-  1. Run Emacs and open the top directory of the archive by Dired.
-  2. Type `L' at the line of the file `install.el' and answer yes.
-  3. Input your elisp directory and your info directory.
+(lookup-set-dictionary-options "ndeb:/usr/local/dict/epwing/CHUJITEN"
+  :transformer 'lookup-stemming-search)
 
-You can also run this installer from shell:
+* モジュール生成
 
-  % emacs -batch -l install.el ~/emacs/lisp/lookup ~/emacs/info
+1. キャッシュファイルを有効にする。
 
-How To Use =============================================================
+  (setq lookup-cache-file "~/.lookup-cache")
 
-You need to prepare your dictionaries before using Lookup.  This should
-not be so difficult, but may require some more works from you.  To get
-started Lookup, see the Lookup User's Guide (lookup-guide.info), which
-is also available via WWW:
+2. Select mode で `C'.
 
-  http://openlab.ring.gr.jp/lookup/guide/
+3. モジュールをリネーム/削除するには、キャッシュファイルを直接編集。
 
-For expert users, the complete Lookup User's Manual (lookup.info) is
-also available.  This can be found at:
+* 特定モジュールを利用するコマンド生成
 
-  http://openlab.ring.gr.jp/lookup/manual/
+** ~/.emacs
 
-How To Get =============================================================
+(define-key mode-specific-map "\C-y" 'lookup-japanese)
+(autoload 'lookup-japanese "lookup" nil t)
 
-Lookup is being developed at an OpenLab in the Ring Server project.
+** ~/.lookup
 
-  http://openlab.ring.gr.jp/lookup/
-
-The up-to-date version of Lookup is available via anonymous CVS.
-See the file etc/ANONCVS for details.
-
-  % cvs -d :pserver:guest@openlab.ring.gr.jp:/circus/cvsroot login
-  CVS password: guest
-  % cvs -d :pserver:guest@openlab.ring.gr.jp:/circus/cvsroot co lookup
-
-You can also get the latest information from the Lookup mailing list.
-To subscribe it, mail to `lookup-request@ring.gr.jp' with the string
-"subscribe" in the body of your message.
-
-Enjoy Lookup!
+(defun lookup-japanese (pattern)
+  (interactive (list (lookup-input-pattern)))
+  (lookup-pattern pattern (lookup-get-module "japanese")))

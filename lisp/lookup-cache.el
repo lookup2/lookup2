@@ -162,11 +162,6 @@
 	 (let ((marks (mapcar 'lookup-entry-id
 			      (lookup-module-bookmarks (cdr pair)))))
 	   (if marks (lookup-assq-set 'alist 'bookmarks marks))))
-;        (when lookup-cache-history
-; 	 (let ((history (mapcar 'lookup-dump-module-attributes--session
-; 				(lookup-history-stack
-; 				 (lookup-module-history module)))))
-; 	   (lookup-assq-set 'alist 'history history)))
        (lookup-assoc-set 'lookup-module-attributes (car pair) alist)))
    lookup-module-alist)
   (lookup-dump-list 'lookup-module-attributes 3))

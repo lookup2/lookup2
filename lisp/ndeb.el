@@ -294,10 +294,10 @@
     (with-current-buffer buffer
       (save-excursion
 	(goto-char (point-min))
-	(if (search-forward "Warning: invalid book directory")
+	(if (search-forward "Warning: invalid book directory" nil t)
 	    (error "Invalid dictionary directory: %s" directory))
 	(goto-char (point-min))
-	(if (search-forward "Warning: invalid appendix directory")
+	(if (search-forward "Warning: invalid appendix directory" nil t)
 	    (error "Invalid appendix directory: %s" appendix))))
     process))
 

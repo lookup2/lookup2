@@ -125,7 +125,8 @@ FILE is a complement file name."
   :type 'boolean
   :group 'lookup-general-options)
 
-(defcustom lookup-use-kakasi nil
+(defcustom lookup-use-kakasi (or (locate-library "kakasi" nil exec-path)
+				 (locate-library "kakasi.exe" nil exec-path))
   "*Non-nil を指定すると、いくつかの局面で KAKASI が利用される。
 これは現在、具体的には日本語のデフォルトの検索語の切り出しに用いている。"
   :type 'boolean
@@ -252,17 +253,20 @@ nil を指定すると情報を保存しない。"
   :group 'lookup)
 
 (defface lookup-heading-1-face
-  '((t (:bold t :foreground "SlateBlue")))
+    '((((class color) (background light)) (:foreground "SlateBlue" :bold t))
+      (((class color) (background dark)) (:foreground "LightBlue" :bold t)))
   "Level 1 heading face."
   :group 'lookup-faces)
 
 (defface lookup-heading-2-face
-  '((t (:bold t :foreground "Red")))
+  '((((class color) (background light)) (:foreground "Red" :bold t))
+    (((class color) (background dark)) (:foreground "Pink" :bold t)))
   "Level 2 heading face."
   :group 'lookup-faces)
 
 (defface lookup-heading-3-face
-  '((t (:bold t :foreground "Orange")))
+  '((((class color) (background light)) (:foreground "Orange" :bold t))
+    (((class color) (background dark)) (:foreground "LightSalmon" :bold t)))
   "Level 3 heading face."
   :group 'lookup-faces)
 
@@ -277,17 +281,20 @@ nil を指定すると情報を保存しない。"
   :group 'lookup-faces)
 
 (defface lookup-heading-low-face
-  '((t (:foreground "Grey")))
+  '((((class color) (background light)) (:foreground "Grey" :bold t))
+    (((class color) (background dark)) (:foreground "LightGrey" :bold t)))
   "Low level heading face."
   :group 'lookup-faces)
 
 (defface lookup-reference-face
-  '((t (:underline t :foreground "Blue")))
+  '((((class color) (background light)) (:foreground "Blue" :bold t))
+    (((class color) (background dark)) (:foreground "Cyan" :bold t)))
   "Face used to highlight reference."
   :group 'lookup-faces)
 
 (defface lookup-refered-face
-  '((t (:underline t :foreground "DarkViolet")))
+  '((((class color) (background light)) (:foreground "DarkViolet" :bold t))
+    (((class color) (background dark)) (:foreground "Plum" :bold t)))
   "Face used to highlight refered reference."
   :group 'lookup-faces)
 
@@ -362,6 +369,7 @@ This hook will run just after loading `lookup-init-file' and
 (defvar lookup-current-session nil)
 (defvar lookup-last-session nil)
 (defvar lookup-record-table nil)
+(defvar lookup-search-history nil)
 
 (defvar lookup-mode-help nil)
 (make-variable-buffer-local 'lookup-mode-help)

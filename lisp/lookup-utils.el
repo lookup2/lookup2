@@ -309,9 +309,11 @@ window に設定した状態で BODY を実行する。"
 (defun lookup-current-word-general ()
   ;; `lookup-current-word' の内部関数。
   ;; syntax が "w" である文字の連なりを単語として切り出す。
-  (buffer-substring-no-properties
-   (progn (skip-syntax-backward "w") (point))
-   (progn (skip-syntax-forward "w") (point))))
+  (if (fboundp 'thing-at-point)
+      (thing-at-point 'word)
+    (buffer-substring-no-properties
+     (progn (skip-syntax-backward "w") (point))
+     (progn (skip-syntax-forward "w") (point)))))
 
 (defun lookup-current-word-ascii ()
   ;; `lookup-current-word' の内部関数。

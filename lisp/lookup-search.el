@@ -97,7 +97,7 @@
 	(set-buffer-modified-p nil))
       ;; set mode line
       (setq lookup-summary-line-module
-	    (lookup-module-name (lookup-current-module)))
+	    (lookup-module-name (lookup-session-module session)))
       (setq lookup-summary-line-pattern (lookup-query-pattern query))
       (setq lookup-summary-line-number (number-to-string (length entries)))
       ;; display buffer
@@ -312,8 +312,6 @@
   ;; redo
   (define-key lookup-summary-mode-map "g" (make-sparse-keymap))
   (define-key lookup-summary-mode-map "gg" 'lookup-summary-redo)
-  (define-key lookup-summary-mode-map "gf" 'lookup-summary-redo-forward-module)
-  (define-key lookup-summary-mode-map "gb" 'lookup-summary-redo-backward-module)
   (define-key lookup-summary-mode-map "g=" 'lookup-summary-redo-exactly)
   (define-key lookup-summary-mode-map "g@" 'lookup-summary-redo-keyword)
   (define-key lookup-summary-mode-map "g>" 'lookup-summary-redo-prefix)
@@ -660,18 +658,6 @@ See also `lookup-content-cite-region'."
 	(let ((lookup-force-update t))
 	  (lookup-search-session (or module (lookup-current-module)) query))
       (error "This session cannot be updated"))))
-
-(defun lookup-summary-redo-forward-module (&optional arg)
-  (interactive "p")
-  (let ((module (lookup-nth-module arg (lookup-current-module)))
-	(query (lookup-session-query (lookup-current-session))))
-    (if (not (eq (lookup-query-method query) 'reference))
-	(lookup-search-session module query)
-      (error "Error"))))
-
-(defun lookup-summary-redo-backward-module (&optional arg)
-  (interactive "p")
-  (lookup-summary-redo-forward-module (- arg)))
 
 (defun lookup-summary-redo-exactly ()
   (interactive)

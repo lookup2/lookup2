@@ -1,6 +1,6 @@
 some memos						-*- outline -*-
 
-* lookup-use-gaiji doesn't work.
+* (setq lookup-use-gaiji nil) doesn't work.
 
 * reset automark-mode after restart lookup.
 
@@ -9,6 +9,3 @@ when moving history, dont change last-session.
 it will cause a problem in lookup-search-pattern.
 
 * incremental history search by M-r and M-s.
-
-* ndcookie
-** Lookup tips
