@@ -328,6 +328,7 @@
   (define-key lookup-summary-mode-map "7" 'lookup-summary-redo-nth-dictionary)
   (define-key lookup-summary-mode-map "8" 'lookup-summary-redo-nth-dictionary)
   (define-key lookup-summary-mode-map "9" 'lookup-summary-redo-nth-dictionary)
+  (define-key lookup-summary-mode-map "0" 'lookup-summary-redo-all-dictionary)
   )
 
 (defvar lookup-summary-mode-hook nil)
@@ -707,6 +708,14 @@ which indicates the number of the dictionary."
     (if dict
 	(lookup-search-session module query)
       (error "No dictionary on the number: %s" (this-command-keys)))))
+
+(defun lookup-summary-redo-all-dictionary ()
+  "Search again by using all dictionary in the current module."
+  (interactive)
+  (let* ((module (lookup-current-module))
+	 (lookup-valid-dictionaries (lookup-module-dictionaries module))
+	 (query (lookup-session-query (lookup-current-session))))
+    (lookup-search-session module query)))
 
 (defun lookup-summary-update-content ()
   "エントリ本文を再表示する。整形処理も全てやり直される。"
