@@ -62,11 +62,7 @@
 ;; ndtp-process - NDTP connection related with agent
 ;; ndtp-dict    - last used dictionary
 
-(defun 'ndtp-agent-server (agent)
-  (let ((server (lookup-agent-location agnet)))
-    (if (string-match "\\`//\\([^/]*\\)" server)
-	(match-string 1)
-      (error "Invalid agent ID" (lookup-agent-id agent)))))
+(defalias 'ndtp-agent-server 'lookup-agent-location)
 
 (defun ndtp-agent-service (agent)
   (or (lookup-agent-option agent ':port)
@@ -241,8 +237,9 @@
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(if (re-search-forward (format "^$=%s$" code) nil t)
-	    (buffer-substring (point) (or (search-forward "$=" nil t)
-					  (point-max))))))))
+	    (vector 'xbm
+		    (buffer-substring (point) (or (search-forward "$=" nil t)
+						  (point-max)))))))))
 
 (put 'ndtp ':content 'ndtp-entry-content)
 (defun ndtp-entry-content (entry)
