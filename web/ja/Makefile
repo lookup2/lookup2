@@ -1,5 +1,5 @@
 TARGETS = index.html
-SUBDIRS = info lists manual guide howto
+SUBDIRS = info lists howto
 
 EXCLUDE = --exclude=CVS --exclude='Makefile*' --exclude='*.scm'
 
