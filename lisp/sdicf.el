@@ -1,5 +1,5 @@
 ;;; sdicf.el --- Search library for SDIC format dictionary
-;;; $Id: sdicf.el,v 1.1 2000/01/29 01:15:19 knishida Exp $
+;;; $Id: sdicf.el,v 1.2 2000/11/19 23:59:51 knishida Exp $
 
 ;; Copyright (C) 1999 TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
@@ -73,6 +73,9 @@
 (defvar sdicf-array-command (sdicf-find-program "array" "array.exe")
   "*Executable file name of array")
 
+(defvar sdicf-sass-command (sdicf-find-program "sass" "sass.exe")
+  "*Executable file name of sass")
+
 (defvar sdicf-default-coding-system
   (if (>= emacs-major-version 20)
       (if (featurep 'mule)
@@ -105,7 +108,8 @@
 (defconst sdicf-version "0.9" "Version number of sdicf.el")
 
 (defconst sdicf-strategy-alist
-  '((array sdicf-array-available sdicf-array-init sdicf-array-quit sdicf-array-search)
+  '((sass sdicf-sass-available sdicf-sass-init sdicf-sass-quit sdicf-sass-search)
+	(array sdicf-array-available sdicf-array-init sdicf-array-quit sdicf-array-search)
     (grep sdicf-grep-available sdicf-grep-init sdicf-grep-quit sdicf-grep-search)
     (direct sdicf-direct-available sdicf-direct-init sdicf-direct-quit sdicf-direct-search))
   "利用できる strategy の連想配列
@@ -311,6 +315,46 @@ sdicf-egrep-command で指定されたコマンドを使う。"
 			(list "-e" pattern (sdicf-get-filename sdic)))
 	     (if case (list "-i" pattern (sdicf-get-filename sdic))
 	       (list "-e" pattern (sdicf-get-filename sdic)))))
+    (goto-char (point-min))
+    (let (entries)
+      (while (not (eobp)) (sdicf-search-internal))
+      (nreverse entries))))
+
+
+;;; Strategy `sass'
+
+(defun sdicf-sass-available (sdic)
+  (and (or (file-readable-p (sdicf-get-filename sdic))
+	   (signal 'sdicf-missing-file (list (sdicf-get-filename sdic))))
+       (or (file-readable-p (concat (sdicf-get-filename sdic) ".ary"))
+	   (signal 'sdicf-missing-file (list (concat (sdicf-get-filename sdic) ".ary"))))
+       (or (and (stringp sdicf-sass-command)
+		(file-executable-p sdicf-sass-command))
+	   (signal 'sdicf-missing-executable '(sass)))))
+
+(defalias 'sdicf-sass-init 'sdicf-common-init)
+
+(defalias 'sdicf-sass-quit 'sdicf-common-quit)
+
+(defun sdicf-sass-search (sdic pattern &optional case regexp) "\
+sass を使って検索を行う
+
+見つかったエントリのリストを返す。CASE が nil ならば、大文字小文字の違
+いを区別して検索する。REGEXP が nil ならば sdicf-fgrep-command で指定
+されたコマンドを使って検索する。REGEXP が Non-nil ならば 
+sdicf-egrep-command で指定されたコマンドを使う。"
+  (sdicf-sass-init sdic)
+  (save-excursion
+    (set-buffer (sdicf-get-buffer sdic))
+    (delete-region (point-min) (point-max))
+    (apply 'sdicf-call-process
+	   sdicf-sass-command
+	   (sdicf-get-coding-system sdic)
+	   nil t nil
+	   (if regexp (if case (list "-i" "-r" pattern (sdicf-get-filename sdic))
+			(list "-r" pattern (sdicf-get-filename sdic)))
+	     (if case (list "-i" pattern (sdicf-get-filename sdic))
+	       (list "-r" pattern (sdicf-get-filename sdic)))))
     (goto-char (point-min))
     (let (entries)
       (while (not (eobp)) (sdicf-search-internal))

@@ -52,40 +52,40 @@
 ;;; types
 ;;;
 
-(put 'ndsrd ':methods '(exact prefix suffix substring wildcard keyword))
-(put 'ndsrd ':reference-pattern '("→\\([A-Z]*\\)" 0 1 lookup-dynamic-search))
-(put 'ndsrd ':stemmer 'stem-english)
+(put 'ndsrd :methods '(exact prefix suffix substring wildcard keyword))
+(put 'ndsrd :reference-pattern '("→\\([A-Z]*\\)" 0 1 lookup-dynamic-search))
+(put 'ndsrd :stemmer 'stem-english)
 
 
 ;;;
 ;;; Interface functions
 ;;;
 
-(put 'ndsrd ':list 'ndsrd-list)
+(put 'ndsrd :list 'ndsrd-list)
 (defun ndsrd-list (agent)
   (list (lookup-new-dictionary agent ndsrd-program-name)))
 
-(put 'ndsrd ':title ndsrd-dictionary-title)
+(put 'ndsrd :title ndsrd-dictionary-title)
 
-(put 'ndsrd ':search 'ndsrd-dictionary-search)
+(put 'ndsrd :search 'ndsrd-dictionary-search)
 (defun ndsrd-dictionary-search (dictionary query)
   (with-current-buffer (get-buffer-create " *ndsrd*")
     (goto-char (point-max))
-    (let ((opts (lookup-dictionary-get-property dictionary 'ndsrd-opts)))
+    (let ((opts (lookup-get-property dictionary 'ndsrd-opts)))
       (unless opts
 	(let* ((agent (lookup-dictionary-agent dictionary))
 	       (dir (expand-file-name (lookup-agent-location agent)))
-	       (gai (lookup-agent-option agent ':gai))
-	       (fmt (lookup-agent-option agent ':fmt)))
+	       (gai (lookup-agent-option agent :gai))
+	       (fmt (lookup-agent-option agent :fmt)))
 	  (setq opts '("-a"))
 	  (if gai (setq opts (cons (concat "-g" (expand-file-name gai)) opts)))
 	  (if fmt (setq opts (cons (concat "-f" (expand-file-name fmt)) opts)))
 	  (setq opts (cons (concat "-d" dir) opts))
-	  (lookup-dictionary-put-property dictionary 'ndsrd-opts opts)))
+	  (lookup-put-property dictionary 'ndsrd-opts opts)))
       (setq opts (append opts (if (eq (lookup-query-method query) 'keyword)
 				  (list "-i" (lookup-query-string query))
 				(list (lookup-query-to-wildcard query)))))
-      (if lookup-debug-mode
+      (if lookup-enable-debug
 	  (insert "> " ndsrd-program-name " " (mapconcat 'eval opts " ") "\n"))
       (goto-char
        (prog1 (point)
@@ -100,16 +100,15 @@
 	(if (re-search-forward "^□" nil 0)
 	    (goto-char (match-beginning 0)))
 	(setq entry (lookup-new-entry 'regular dictionary heading heading))
-	(lookup-entry-put-property entry 'ndsrd-content
-				   (buffer-substring start (point)))
+	(lookup-put-property entry 'ndsrd-content
+			     (buffer-substring start (point)))
 	(setq entries (cons entry entries)))
-      (if (not lookup-debug-mode) (kill-buffer (current-buffer)))
+      (if (not lookup-enable-debug) (kill-buffer (current-buffer)))
       (nreverse entries))))
 
-(put 'ndsrd ':content 'ndsrd-entry-content)
+(put 'ndsrd :content 'ndsrd-entry-content)
 (defun ndsrd-entry-content (entry)
-  (or (lookup-entry-get-property entry 'ndsrd-content)
-      "(forgot)"))
+  (or (lookup-get-property entry 'ndsrd-content) "(forgot)"))
 
 (provide 'ndsrd)
 

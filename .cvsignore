@@ -1,10 +1,8 @@
-Makefile
-Makefile.in
-aclocal.m4
+.cvsignore
 config.log
 config.cache
 config.status
 configure
-missing
-mkinstalldirs
-install-sh
+Makefile
+Makefile.in
+aclocal.m4

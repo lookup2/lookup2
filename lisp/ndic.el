@@ -42,7 +42,7 @@
 ;;; types
 ;;;
 
-(put 'ndic ':arrange-table '((fill . lookup-arrange-nofill)))
+(put 'ndic :arrange-table '((fill . lookup-arrange-nofill)))
 
 ;; ndic agent:
 ;;
@@ -69,16 +69,16 @@
 	  ((string-match "\\.dict\\(\\.dz\\)?\\'" file)
 	   (setq type 'dictd object (ndic-dictd-init dictionary file)))
 	  (t (error "Invalid dictionary type: %s" file)))
-    (lookup-dictionary-put-property dictionary 'ndic-type type)
-    (lookup-dictionary-put-property dictionary 'ndic-object object)))
+    (lookup-put-property dictionary 'ndic-type type)
+    (lookup-put-property dictionary 'ndic-object object)))
 
 (defun ndic-dictionary-type (dictionary)
-  (or (lookup-dictionary-get-property dictionary 'ndic-type)
+  (or (lookup-get-property dictionary 'ndic-type)
       (progn (ndic-dictionary-init dictionary)
-	     (lookup-dictionary-get-property dictionary 'ndic-type))))
+	     (lookup-get-property dictionary 'ndic-type))))
 
 (defun ndic-dictionary-object (dictionary)
-  (lookup-dictionary-get-property dictionary 'ndic-object))
+  (lookup-get-property dictionary 'ndic-object))
 
 ;; ndic entry:
 ;;
@@ -94,13 +94,13 @@
 (defconst ndic-dictionary-regexp
   "\\.\\(sdic\\(\\.\\(gz\\|bz2\\)\\)?\\|dict\\(\\.dz\\)?\\)\\'")
 
-(put 'ndic ':list 'ndic-list)
+(put 'ndic :list 'ndic-list)
 (defun ndic-list (agent)
   (mapcar (lambda (name) (lookup-new-dictionary agent name))
 	  (directory-files (expand-file-name (lookup-agent-location agent))
 			   nil ndic-dictionary-regexp)))
 
-(put 'ndic ':title 'ndic-dictionary-title)
+(put 'ndic :title 'ndic-dictionary-title)
 (defun ndic-dictionary-title (dictionary)
   (let ((type (ndic-dictionary-type dictionary)))
     (cond ((eq type 'sdic) (ndic-sdic-title dictionary))
@@ -109,26 +109,26 @@
 (defconst ndic-sdic-methods lookup-search-methods)
 (defconst ndic-dictd-methods (delq 'text lookup-search-methods))
 
-(put 'ndic ':methods 'ndic-dictionary-methods)
+(put 'ndic :methods 'ndic-dictionary-methods)
 (defun ndic-dictionary-methods (dictionary)
   (let ((type (ndic-dictionary-type dictionary)))
     (cond ((eq type 'sdic) ndic-sdic-methods)
 	  ((eq type 'dictd) ndic-dictd-methods))))
 
-(put 'ndic ':search 'ndic-dictionary-search)
+(put 'ndic :search 'ndic-dictionary-search)
 (defun ndic-dictionary-search (dictionary query)
   (let ((type (ndic-dictionary-type dictionary)))
     (cond ((eq type 'sdic) (ndic-sdic-search dictionary query))
 	  ((eq type 'dictd) (ndic-dictd-search dictionary query)))))
 
-(put 'ndic ':clear 'ndic-dictionary-clear)
+(put 'ndic :clear 'ndic-dictionary-clear)
 (defun ndic-dictionary-clear (dictionary)
   (let ((type (ndic-dictionary-type dictionary))
 	(obj (ndic-dictionary-object dictionary)))
     (cond ((eq type 'sdic) (sdicf-close obj))
 	  ((eq type 'dictd) (kill-buffer obj)))))
 
-(put 'ndic ':content 'ndic-entry-content)
+(put 'ndic :content 'ndic-entry-content)
 (defun ndic-entry-content (entry)
   (let ((type (ndic-dictionary-type (lookup-entry-dictionary entry))))
     (cond ((eq type 'sdic) (ndic-sdic-content entry))
@@ -176,7 +176,7 @@
     (with-current-buffer buffer (insert-file-contents index))
     (unless (file-exists-p index)
       (error "No .index file for `%s'" index))
-    (lookup-dictionary-put-property dictionary 'ndic-dict file)
+    (lookup-put-property dictionary 'ndic-dict file)
     buffer))
 
 (defun ndic-dictd-title (dictionary)
@@ -204,7 +204,7 @@
       (with-current-buffer (ndic-dictionary-object dictionary)
 	(goto-char (point-min))
 	(while (re-search-forward regexp nil t)
-	  (setq string (buffer-substring (progn (beginning-of-line) (point))
+	  (setq string (buffer-substring (lookup-point-bol)
 					 (1- (search-forward "\t"))))
 	  (when (looking-at "\\([^\t]+\\)\t\\(.*\\)")
 	    (setq code (concat (match-string 1) ":" (match-string 2)))
@@ -215,7 +215,7 @@
 
 (defun ndic-dictd-content (entry)
   (let ((code (lookup-entry-code (lookup-entry-substance entry)))
-	(dict (lookup-dictionary-get-property
+	(dict (lookup-get-property
 	       (lookup-entry-dictionary entry) 'ndic-dict)))
     (string-match ":" code)
     (setq code (cons (substring code 0 (match-beginning 0))

@@ -1,5 +1,5 @@
-(set! %load-path (cons ".." %load-path))
-(use-modules (htmlgen))
+(set! %load-path (cons "/home/kei/share/guile" %load-path))
+(use-modules (text markup html))
 
 (define title "Lookup - a Search Interface")
 
@@ -8,9 +8,30 @@
 
 (define news
   '(
+    ("ndic sass support" "2000-11-11"
+     ("Yoishiro Okabe さんにより、ndic で sass をサポートするための"
+      (href "パッチ" "contrib/sdicf.el.sass.patch")
+      "が公開されました。"))
+
+    ("Auto Lookup リリース" "2000-10-13"
+     ((href "Auto Lookup"
+	    "http://www.aist-nara.ac.jp/~masata-y/autolookup/index.html")
+      "は、Lookup を使ってカーソル下の英単語を自動的に調べてミニバッファに"
+      "結果を表示してくれるプログラムです。"))
+
+    ("FreePWING による JIS X 4081 版各種辞書" "2000-09-01"
+     ((href "FreePWING 辞書の配布ページ"
+	    "http://openlab.ring.gr.jp/edict/fpw/")
+      "が電子辞書オープンラボに作成されました。"))
+
+    ("srd-fpw 1.1.1" "2000-08-25"
+     ((href "srd-fpw" "http://openlab.ring.gr.jp/edict/srd-fpw/")
+      "とは、小学館『ランダムハウス英語辞典』を EPWING 形式に変換するための"
+      "スクリプトです。"))
+
     ("機能限定版「新英和・和英中辞典」" "2000-07-12"
      ("DeAGOSTINI『PC Success』第 24 号(1324円)の付録として、"
-      "研究社「新英和・和英中辞典」の機能限定版が付いているようです。"
+      "研究社「新英和・和英中辞典」の機能限定版が付いているそうです。"
       "後方一致検索が出来ませんが、Lookup でも利用出来るようです。"))
 
     ("mypaedia-fpw 1.4.1" "2000-07-14"
@@ -30,11 +51,6 @@
       "とは、フリーな通信用語集"
       "『" (href "通信用語の基礎知識" "http://www.wdic.org/") "』を"
       "EPWING 形式に変換するためのスクリプトです。"))
-
-    ("srd-fpw 1.0.8" "2000-06-21"
-     ((href "srd-fpw" "http://openlab.ring.gr.jp/edict/srd-fpw/")
-      "とは、小学館『ランダムハウス英語辞典』を EPWING 形式に変換するための"
-      "スクリプトです。"))
 
     ("Unix で使える電子辞書情報" "2000-05-09"
      ((href "電子辞書オープンラボ" "http://openlab.ring.gr.jp/edict/") "から、"
@@ -61,20 +77,24 @@
        "に加わって下さい。"))
 
    (h1 "Latest Release")
-   (ul (li "Stable version:" lookup-stable ", " (href "eblook-1.3" "eblook/"))
-       (li "Unstable version:" lookup-unstable))
+   (ul (li "Stable version: " lookup-stable ", " (href "eblook-1.3" "eblook/"))
+       (li "Unstable version: " lookup-unstable)
+       (li "Contribution: "
+	   (href "Auto Lookup" "http://www.aist-nara.ac.jp/~masata-y/autolookup/index.html") ", "
+	   (href "sass patch" "contrib/sdicf.el.sass.patch")))
 
    (h1 "Dictionary News")
    (ul (map-append (lambda (data)
 		     (let ((title (car data))
 			   (date (cadr data))
-			   (info (map-append eval (caddr data))))
+			   (info (map-append (lambda (x) (eval x (current-module)))
+					     (caddr data))))
 		       (li (p (font #:color "#3366cc" (b title))
 			      " (" date ")" (br info)))))
 		   news))
    (hr)
    (address
-    "Last modified: $Date: 2000/07/16 20:51:23 $"
+    "Last modified: $Date: 2000/11/19 23:59:52 $"
     "<br>Copyright (C) 2000 Keisuke Nishida &lt;knishida@ring.gr.jp&gt;"
     "<br>Graphics (C) 2000 Sumiya Sakoda")
    (p (href (img "http://www2.valinux.com/adserver.phtml?f_s=468x60&f_p=478"
@@ -84,7 +104,7 @@
 
 (load "menu.scm")
 
-(html
+(print-html
  (table
   (tr #:valign "bottom"
    (td (img "/lookup/images/title.png" #:alt "Lookup"))

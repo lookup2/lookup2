@@ -65,22 +65,22 @@
 ;;; types
 ;;;
 
-(put 'ndspell ':methods '(exact prefix suffix substring wildcard regexp))
-(put 'ndspell ':priority 'secondary)
+(put 'ndspell :methods '(exact prefix suffix substring wildcard regexp))
+(put 'ndspell :priority 'secondary)
 
 ;;;
 ;;; Interface functions
 ;;;
 
-(put 'ndspell ':list 'ndspell-list)
+(put 'ndspell :list 'ndspell-list)
 (defun ndspell-list (agent)
   (list (lookup-new-dictionary agent ndspell-ispell-program)))
 
-(put 'ndspell ':title ndspell-dictionary-title)
+(put 'ndspell :title ndspell-dictionary-title)
 
-(put 'ndspell ':kill 'ndspell-kill-process)
+(put 'ndspell :kill 'ndspell-kill-process)
 
-(put 'ndspell ':search 'ndspell-dictionary-search)
+(put 'ndspell :search 'ndspell-dictionary-search)
 (defun ndspell-dictionary-search (dictionary query)
   (let ((string (lookup-query-string query)))
     (when (or (not (fboundp 'find-charset-string))
@@ -88,37 +88,35 @@
 	      (not (find-charset-string string)))
       (mapcar (lambda (word)
 		(let ((entry (lookup-new-entry 'dynamic dictionary word)))
-		  (lookup-entry-put-property entry 'search-word word)
+		  (lookup-put-property entry 'search-word word)
 		  entry))
 	      (if (eq (lookup-query-method query) 'exact)
 		  (ndspell-check-spelling string)
 		(ndspell-search-spelling (lookup-query-to-regexp query)))))))
 
-(put 'ndspell ':dynamic 'ndspell-dynamic-search)
+(put 'ndspell :dynamic 'ndspell-dynamic-search)
 (defun ndspell-dynamic-search (entry)
-  (let* ((lookup-proceeding-message "Rechecking")
-	 (module (lookup-current-module))
-	 (self (lookup-entry-dictionary entry))
-	 (word (lookup-entry-get-property entry 'search-word))
-	 (query (lookup-new-query 'default word))
-	 prio entries search-found)
-    (lookup-proceeding-message nil)
-    (setq entries
-	  (mapcar (lambda (dict)
-		    (setq prio (lookup-module-dictionary-priority module dict))
-		    (when (and (not (eq dict self))
-			       (cond ((eq prio t) t)
-				     ((eq prio 'secondary) (not search-found))
-				     ((eq prio 'supplement) search-found)))
-		      (lookup-proceeding-message
-		       (format "by %s..." (lookup-dictionary-title dict)))
-		      (setq entries (lookup-dictionary-search dict query))
-		      (if entries (setq search-found t))
-		      entries))
-		  (lookup-module-dictionaries module)))
-    (setq entries (mapcar 'lookup-new-slink (apply 'append entries)))
-    (lookup-proceeding-message t)
-    entries))
+  (lookup-with-message "Rechecking"
+    (let* ((module (lookup-current-module))
+	   (self (lookup-entry-dictionary entry))
+	   (word (lookup-get-property entry 'search-word))
+	   (query (lookup-new-query 'default word))
+	   prio entries search-found)
+      (setq entries
+	    (mapcar (lambda (dict)
+		      (setq prio (lookup-module-dictionary-priority module dict))
+		      (when (and (not (eq dict self))
+				 (cond ((eq prio t) t)
+				       ((eq prio 'secondary) (not search-found))
+				       ((eq prio 'supplement) search-found)))
+			(lookup-message
+			 (format "by %s..." (lookup-dictionary-title dict)))
+			(setq entries (lookup-dictionary-search dict query))
+			(if entries (setq search-found t))
+			entries))
+		    (lookup-module-dictionaries module)))
+      (setq entries (mapcar 'lookup-new-slink (apply 'append entries)))
+      entries)))
 
 
 ;;;

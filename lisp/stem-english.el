@@ -1,5 +1,5 @@
 ;;; stem.el ---- routines for stemming
-;;; $Id: stem-english.el,v 1.1 2000/01/29 01:15:19 knishida Exp $
+;;; $Id: stem-english.el,v 1.2 2000/11/19 23:59:51 knishida Exp $
 
 ;;; Author: Tsuchiya Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: stemming
@@ -914,10 +914,10 @@
 			     '(stem:step1 stem:step2 stem:step3 stem:step4 stem:step5))))
 		       'string<))))))
 
-
-(defun stem-english (str) "\
-活用語尾を取り除く関数
-与えられた語の元の語として可能性のある語の文字列長の昇順のリストを返す"
+;;;###autoload
+(defun stem-english (str)
+;;  "活用語尾を取り除く関数
+;; 与えられた語の元の語として可能性のある語の文字列長の昇順のリストを返す"
   (sort (stem:stripping-suffix str)
 	(function (lambda (a b) (< (length a) (length b))))))
 

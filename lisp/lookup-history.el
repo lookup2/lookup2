@@ -34,7 +34,7 @@
 
 ;;;###autoload
 (defun lookup-history-display (module)
-  (with-current-buffer (lookup-open-buffer (lookup-history-buffer))
+  (with-current-buffer (lookup-get-buffer " *Search History*")
     (lookup-history-mode)
     (let* ((inhibit-read-only t)
 	   (list (reverse (lookup-history-stack lookup-search-history)))
@@ -46,7 +46,7 @@
 	(setq num (1+ num) session (car list)
 	      type (lookup-session-type session))
 	(cond
-	 ((eq type 'lookup-search-session)
+	 ((eq type 'lookup-search-query)
 	  (insert "{" (lookup-query-pattern (lookup-session-query session)) "}"
 		  (format " [%d]" (length (lookup-session-entries session))))
 	  (let ((entries (lookup-session-entries session))
@@ -97,7 +97,7 @@
   (setq major-mode 'lookup-history-mode)
   (setq mode-name "History")
   (setq mode-line-buffer-identification '("Lookup:%12b"))
-  (setq lookup-mode-help lookup-history-mode-help)
+  (setq lookup-help-message lookup-history-mode-help)
   (setq buffer-read-only t)
   (setq truncate-lines t)
   (use-local-map lookup-history-mode-map)
@@ -112,7 +112,7 @@
   (beginning-of-line)
   (when (looking-at " *\\([0-9]+\\)")
     (let ((position (string-to-int (match-string 1))))
-      (lookup-history-set-position lookup-search-history position)
+      (setf (lookup-history-position lookup-search-history) position)
       (lookup-session-display (lookup-history-ref lookup-search-history))
       (princ position))))
 

@@ -24,24 +24,24 @@
 
 (require 'lookup)
 
-(put 'ndtut ':methods '(exact))
-(put 'ndtut ':arrange-table '((structure . nil)))
+(put 'ndtut :methods '(exact))
+(put 'ndtut :arrange-table '((structure . nil)))
 
-(put 'ndtut ':list 'ndtut-list)
+(put 'ndtut :list 'ndtut-list)
 (defun ndtut-list (agent)
   (list (lookup-new-dictionary agent "tutorial")))
 
-(put 'ndtut ':search 'ndtut-dictionary-search)
+(put 'ndtut :search 'ndtut-dictionary-search)
 (defun ndtut-dictionary-search (dictionary query)
   (list (lookup-new-entry 'regular dictionary "")))
 
-(put 'ndtut ':heading 'ndtut-entry-heading)
+(put 'ndtut :heading 'ndtut-entry-heading)
 (defun ndtut-entry-heading (entry)
-  "Congratulations!")
+  "Welcome to Lookup!")
 
-(put 'ndtut ':content 'ndtut-entry-content)
+(put 'ndtut :content 'ndtut-entry-content)
 (defun ndtut-entry-content (entry)
-  "Welcome to the Lookup world!
+  "Welcome to Lookup!
 
 This is Lookup tutorial program.")
 

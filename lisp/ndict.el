@@ -49,7 +49,7 @@
 ;;; types
 ;;;
 
-(put 'ndict ':arrange-table '((fill . lookup-arrange-nofill)))
+(put 'ndict :arrange-table '((fill . lookup-arrange-nofill)))
 
 ;; ndict agent:
 ;;
@@ -71,19 +71,19 @@
 (defalias 'ndict-agent-server 'lookup-agent-location)
 
 (defun ndict-agent-service (agent)
-  (or (lookup-agent-option agent ':port)
-      (lookup-agent-option agent ':service)
+  (or (lookup-agent-option agent :port)
+      (lookup-agent-option agent :service)
       "dict"))
 
 (defun ndict-agent-coding (agent)
-  (or (lookup-agent-option agent ':coding)
+  (or (lookup-agent-option agent :coding)
       ndict-process-coding-system))
 
 (defun ndict-agent-auth (agent)
-  (lookup-agent-option agent ':auth))
+  (lookup-agent-option agent :auth))
 
 (defun ndict-agent-method-table (agent)
-  (lookup-agent-option agent ':method-table))
+  (lookup-agent-option agent :method-table))
 
 ;; ndict dictionary:
 ;;
@@ -107,18 +107,18 @@
 
 (put 'ndict-with-agent 'lisp-indent-function 1)
 (defmacro ndict-with-agent (agent &rest body)
-  (` (let ((ndict-current-agent (, agent))
-	   (ndict-current-process (ndict-agent-process (, agent))))
-       (,@ body))))
+  `(let ((ndict-current-agent ,agent)
+	   (ndict-current-process (ndict-agent-process ,agent)))
+     ,@body))
 
 (put 'ndict-with-dictionary 'lisp-indent-function 1)
 (defmacro ndict-with-dictionary (dictionary &rest body)
-  (` (ndict-with-agent (lookup-dictionary-agent (, dictionary))
-       (let ((ndict-current-dictionary (, dictionary)))
-	 (,@ body)))))
+  `(ndict-with-agent (lookup-dictionary-agent ,dictionary)
+     (let ((ndict-current-dictionary ,dictionary))
+       ,@body)))
 
 (defun ndict-agent-process (agent)
-  (let ((process (lookup-agent-get-property agent 'ndict-process)))
+  (let ((process (lookup-get-property agent 'ndict-process)))
     (unless (and process (eq (process-status process) 'open))
       (if process (lookup-process-kill process))
       (setq process (ndict-process-open (ndict-agent-server agent)
@@ -132,11 +132,11 @@
 	(ndict-process-require (concat "CLIENT ndict " ndict-version))
 	(when auth
 	  (ndict-process-require (concat "AUTH" (car auth) (cdr auth)))))
-      (lookup-agent-put-property agent 'ndict-process process))
+      (lookup-put-property agent 'ndict-process process))
     process))
 
 (defun ndict-agent-kill-process (agent)
-  (let ((process (lookup-agent-get-property agent 'ndict-process)))
+  (let ((process (lookup-get-property agent 'ndict-process)))
     (when process
       (if (eq (process-status process) 'open)
 	  (process-send-string process "QUIT\n"))
@@ -147,21 +147,20 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndict ':list 'ndict-list)
+(put 'ndict :list 'ndict-list)
 (defun ndict-list (agent)
   (ndict-with-agent agent
     ;; get server information
     (let* ((server (ndict-process-require "SHOW SERVER"
 		     (lambda (process)
 		       (forward-line)
-		       (buffer-substring (point) (progn (end-of-line)
-							(point))))))
+		       (buffer-substring (point) (lookup-point-eol)))))
 	   (system (if (string-match "^dictd " server) 'dictd t))
 	   (table (lookup-assq-get ndict-system-info-alist system)))
       ;; set methods and method-table
       (let ((methods (lookup-assq-get table 'methods)))
-	(lookup-agent-set-default agent ':methods (mapcar 'car methods))
-	(lookup-agent-set-default agent ':method-table methods)))
+	(lookup-agent-set-default agent :methods (mapcar 'car methods))
+	(lookup-agent-set-default agent :method-table methods)))
     ;; get dictionary list
     (ndict-process-require "SHOW DB"
       (lambda (process)
@@ -174,11 +173,11 @@
 	      (setq dicts (cons (ndict-make-dictionary name title) dicts)))
 	    dicts))))))
 
-(put 'ndict ':clear 'ndict-clear)
+(put 'ndict :clear 'ndict-clear)
 (defun ndict-clear (agent)
   (ndict-agent-kill-process agent))
 
-(put 'ndict ':search 'ndict-dictionary-search)
+(put 'ndict :search 'ndict-dictionary-search)
 (defun ndict-dictionary-search (dictionary query)
   (ndict-with-dictionary dictionary
     (let* ((method (lookup-query-method query))
@@ -204,7 +203,7 @@
 					entries))))
 	      entries))))))))
 
-(put 'ndict ':content 'ndict-entry-content)
+(put 'ndict :content 'ndict-entry-content)
 (defun ndict-entry-content (entry)
   (ndict-with-dictionary (lookup-entry-dictionary entry)
     (let ((db (lookup-dictionary-name ndict-current-dictionary))
@@ -222,7 +221,7 @@
 ;;;
 
 (defun ndict-process-open (server service)
-  (lookup-proceeding-message (format "connecting to %s..." server))
+  (lookup-message (format "connecting to %s..." server))
   (let* ((buffer (lookup-open-process-buffer " *ndict*"))
 	 (process (open-network-stream "ndict" buffer server service)))
     (accept-process-output process)

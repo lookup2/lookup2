@@ -39,10 +39,10 @@
 ;;; types
 ;;;
 
-(put 'ndtp ':methods '(exact prefix suffix))
-(put 'ndtp ':gaiji-regexp "<\\(\\(&..?\\|gaiji\\):[^>]*\\)>")
-(put 'ndtp ':replace-alist '(("→□\\(#0001\\|<gaiji:z0001>\\)?" . "")))
-(put 'ndtp ':reference-pattern
+(put 'ndtp :methods '(exact prefix suffix))
+(put 'ndtp :gaiji-regexp "<\\(\\(&..?\\|gaiji\\):[^>]*\\)>")
+(put 'ndtp :replace-alist '(("→□\\(#0001\\|<gaiji:z0001>\\)?" . "")))
+(put 'ndtp :reference-pattern
      '("\\(→\\(\\([^<\n]\\|<gaiji:[^>]*>\\)+\\)\\)?<\\([0-9a-f:]+\\)>"
        (or (match-string 1) "(->link)")
        (or (match-string 2) (match-string 4)) 4))
@@ -65,16 +65,16 @@
 (defalias 'ndtp-agent-server 'lookup-agent-location)
 
 (defun ndtp-agent-service (agent)
-  (or (lookup-agent-option agent ':port)
-      (lookup-agent-option agent ':service)
+  (or (lookup-agent-option agent :port)
+      (lookup-agent-option agent :service)
       "ndtp"))
 
 (defun ndtp-agent-account (agent)
-  (or (lookup-agent-option agent ':account)
+  (or (lookup-agent-option agent :account)
       (concat (user-login-name) "@" (system-name))))
 
 (defun ndtp-agent-coding (agent)
-  (or (lookup-agent-option agent ':coding)
+  (or (lookup-agent-option agent :coding)
       ndtp-process-coding-system))
 
 ;; ndtp dictionary:
@@ -89,7 +89,7 @@
 ;; ndtp-gaiji - cache buffer for gaiji datas or `disable' if no support
 
 (defun ndtp-dictionary-coding (dictionary)
-  (or (lookup-dictionary-option dictionary ':coding t)
+  (or (lookup-dictionary-option dictionary :coding t)
       ndtp-process-coding-system))
 
 ;; ndtp entry:
@@ -106,30 +106,31 @@
 
 (put 'ndtp-with-agent 'lisp-indent-function 1)
 (defmacro ndtp-with-agent (agent &rest body)
-  (` (let ((ndtp-current-agent (, agent))
-	   (ndtp-current-process (ndtp-agent-process (, agent))))
-       (,@ body))))
+  `(let ((ndtp-current-agent ,agent)
+	 (ndtp-current-process (ndtp-agent-process ,agent)))
+     ,@body))
 
 (put 'ndtp-with-dictionary 'lisp-indent-function 1)
 (defmacro ndtp-with-dictionary (dictionary &rest body)
-  (` (ndtp-with-agent (lookup-dictionary-agent (, dictionary))
-       (let ((ndtp-current-dictionary (, dictionary)))
-	 (unless (eq (, dictionary)
-		     (lookup-agent-get-property ndtp-current-agent 'ndtp-dict))
+  `(let ((dictionary ,dictionary))
+     (ndtp-with-agent (lookup-dictionary-agent dictionary)
+       (let ((ndtp-current-dictionary dictionary))
+	 (unless (eq dictionary
+		     (lookup-get-property ndtp-current-agent 'ndtp-dict))
 	   ;; 必要なときだけ辞書を select する。
 	   ;; 外部プロセスとやりとりするよりこの方が高速だろうし、
 	   ;; デバッグのときバッファがごちゃごちゃするのはうざったい。
-	   (ndtp-require-select (, dictionary))
-	   (lookup-agent-put-property ndtp-current-agent 'ndtp-dict
-				      (, dictionary))
+	   (ndtp-require-select dictionary)
+	   (lookup-put-property ndtp-current-agent 'ndtp-dict
+				dictionary)
 	   ;; 辞書毎に文字コードを設定する。
-	   (let ((code (ndtp-dictionary-coding (, dictionary))))
+	   (let ((code (ndtp-dictionary-coding dictionary)))
 	     (when code
 	       (set-process-coding-system ndtp-current-process code code))))
-	 (,@ body)))))
+	 ,@body))))
 
 (defun ndtp-agent-process (agent)
-  (let ((process (lookup-agent-get-property agent 'ndtp-process)))
+  (let ((process (lookup-get-property agent 'ndtp-process)))
     (unless (and process (eq (process-status process) 'open))
       (if process (lookup-process-kill process))
       (setq process (ndtp-process-open (ndtp-agent-server agent)
@@ -141,17 +142,17 @@
       ;; サーバへの接続毎に行なう必要のある処理。
       (let ((ndtp-current-process process))
 	(ndtp-process-require (concat "A" (ndtp-agent-account agent)) "\n"))
-      (lookup-agent-put-property agent 'ndtp-process process)
-      (lookup-agent-put-property agent 'ndtp-dict nil))
+      (lookup-put-property agent 'ndtp-process process)
+      (lookup-put-property agent 'ndtp-dict nil))
     process))
 
 (defun ndtp-agent-kill-process (agent)
-  (let ((process (lookup-agent-get-property agent 'ndtp-process)))
+  (let ((process (lookup-get-property agent 'ndtp-process)))
     (when process
       (if (eq (process-status process) 'open)
 	  (process-send-string process "Q\n"))
       (lookup-process-kill process)
-      (lookup-agent-put-property agent 'ndtp-process nil))))
+      (lookup-put-property agent 'ndtp-process nil))))
 
 
 ;;;
@@ -164,7 +165,7 @@
       (concat "^ *" num _ "\\(" title "\\)" _ "\\(" name "\\)" _
 	      num _ num _ num "[ \t]*$"))))
 
-(put 'ndtp ':list 'ndtp-list)
+(put 'ndtp :list 'ndtp-list)
 (defun ndtp-list (agent)
   (ndtp-with-agent agent
     (ndtp-process-require "t" "^$\\*\n"
@@ -175,9 +176,9 @@
 						     (match-string 2)) dicts)))
 	  (nreverse dicts))))))
 
-(put 'ndtp ':kill 'ndtp-agent-kill-process)
+(put 'ndtp :kill 'ndtp-agent-kill-process)
 
-(put 'ndtp ':search 'ndtp-dictionary-search)
+(put 'ndtp :search 'ndtp-dictionary-search)
 (defun ndtp-dictionary-search (dictionary query)
   (let ((method (lookup-query-method query))
 	(string (lookup-query-string query)))
@@ -213,7 +214,7 @@
 		(setq heading nil)))
 	    (nreverse entries)))))))
 
-(put 'ndtp ':gaiji 'ndtp-dictionary-gaiji)
+(put 'ndtp :gaiji 'ndtp-dictionary-gaiji)
 (defun ndtp-dictionary-gaiji (dictionary code)
   (cond
    ((string-match "gaiji:\\([0-9a-z]+\\)" code)
@@ -228,11 +229,11 @@
     (vector (intern (concat "cns" (match-string 1 code)))
 	    (string-to-int (match-string 2 code) 16)))))
 
-(put 'ndtp ':font 'ndtp-dictionary-font)
+(put 'ndtp :font 'ndtp-dictionary-font)
 (defun ndtp-dictionary-font (dictionary code)
   (string-match "gaiji:\\([0-9a-z]+\\)" code)
   (setq code (match-string 1 code))
-  (let ((buffer (lookup-dictionary-get-property dictionary 'ndtp-gaiji)))
+  (let ((buffer (lookup-get-property dictionary 'ndtp-gaiji)))
     (when buffer
       (with-current-buffer buffer
 	(goto-char (point-min))
@@ -241,7 +242,7 @@
 		    (buffer-substring (point) (or (search-forward "$=" nil t)
 						  (point-max)))))))))
 
-(put 'ndtp ':content 'ndtp-entry-content)
+(put 'ndtp :content 'ndtp-entry-content)
 (defun ndtp-entry-content (entry)
   (ndtp-with-dictionary (lookup-entry-dictionary entry)
     (let ((command (concat "S" (lookup-entry-code entry))))
@@ -256,9 +257,8 @@
   (ndtp-process-require (concat "L" (lookup-dictionary-name dictionary)) "\n")
   (and
    lookup-enable-gaiji
-   (lookup-gaiji-glyph-possible-p)
    (ndtp-process-require "XL16" "^$.\n")
-   (let ((buffer (lookup-dictionary-get-property dictionary 'ndtp-gaiji)))
+   (let ((buffer (lookup-get-property dictionary 'ndtp-gaiji)))
      (unless buffer
        (if (not (string-match "16" (ndtp-process-require "XI" "^$[$N?]\n")))
 	   (setq buffer 'disable)
@@ -268,14 +268,14 @@
 	 (ndtp-process-require "XL16" "^$.\n")
 	 (with-current-buffer buffer
 	   (insert (ndtp-process-require "XB" "^$$\n"))))
-       (lookup-dictionary-put-property dictionary 'ndtp-gaiji buffer)))))
+       (lookup-put-property dictionary 'ndtp-gaiji buffer)))))
 
 ;;;
 ;;; ndtp process
 ;;;
 
 (defun ndtp-process-open (server service)
-  (lookup-proceeding-message (format "connecting to %s..." server))
+  (lookup-message (format "connecting to %s..." server))
   (let* ((buffer (lookup-open-process-buffer (concat " *ndtp+" server "*")))
 	 (process (open-network-stream "ndtp" buffer server service)))
     (process-kill-without-query process)

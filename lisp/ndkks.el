@@ -70,26 +70,26 @@
     (defconst ndkks-valid-charsets (list lc-jp))
   (defconst ndkks-valid-charsets '(japanese-jisx0208)))
 
-(put 'ndkks ':methods '(exact))
+(put 'ndkks :methods '(exact))
 
 ;;;
 ;;; Interface functions
 ;;;
 
-(put 'ndkks ':list 'ndkks-list)
+(put 'ndkks :list 'ndkks-list)
 (defun ndkks-list (agent)
   (unless (featurep 'mule)
     (error "ndkks requires `mule' feauture."))
   (call-process ndkks-program-name nil 0)	; check KAKASI exists
   (list (lookup-new-dictionary agent ndkks-program-name)))
 
-(put 'ndkks ':title ndkks-dictionary-title)
+(put 'ndkks :title ndkks-dictionary-title)
 
-(put 'ndkks ':clear 'ndkks-clear)
+(put 'ndkks :clear 'ndkks-clear)
 (defun ndkks-clear (agent)
   (ndkks-process-kill))
 
-(put 'ndkks ':search 'ndkks-dictionary-search)
+(put 'ndkks :search 'ndkks-dictionary-search)
 (defun ndkks-dictionary-search (dictionary query)
   (let ((string (lookup-query-string query)))
     (and
@@ -104,7 +104,7 @@
      (string-match "[^あ-んア-ンーＡ-Ｚａ-ｚ]" string)
      (list (lookup-new-entry 'regular dictionary string)))))
 
-(put 'ndkks ':content 'ndkks-entry-content)
+(put 'ndkks :content 'ndkks-entry-content)
 (defun ndkks-entry-content (entry)
   (let ((string (lookup-entry-code entry)))
     (mapconcat (lambda (element)

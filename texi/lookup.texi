@@ -6,8 +6,8 @@
 @setchapternewpage odd
 @c %**end of header
 
-@set UPDATED 2000-6-17
-@set EDITION 2.0
+@set UPDATED 2000-07-07
+@set EDITION 1.99.0
 @set VERSION 2.0
 
 @ifinfo

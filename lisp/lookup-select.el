@@ -1,4 +1,4 @@
-;;; lookup-module.el --- Lookup Module Management
+;;; lookup-select.el --- Lookup select mode
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -24,41 +24,22 @@
 
 (require 'lookup)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;  Lookup Select Session
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;;;
-;;; Construct Buffer
-;;;
-
-(put 'lookup-select-session 'display 'lookup-select-session-display)
+(defconst lookup-select-priority-marks
+  '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 
 ;;;###autoload
-(defun lookup-select-session (module)
-  (lookup-start-session 'lookup-select-session module))
-
-(defun lookup-select-session-display (session)
-  (with-current-buffer (lookup-open-buffer (lookup-select-buffer))
+(defun lookup-select-dictionaries (module)
+  (interactive (list (lookup-current-module)))
+  (with-current-buffer (lookup-get-buffer " *Dictionary List*")
     (lookup-select-mode)
-    (lookup-select-session-insert (lookup-session-module session))
+    (lookup-select-build-buffer module)
     (setq buffer-undo-list nil)
     (buffer-enable-undo)
     (set-buffer-modified-p nil)
     (lookup-select-goto-first)
     (lookup-pop-to-buffer (current-buffer))))
 
-(defun lookup-select-session-update ()
-  (let ((line 0))
-    (while (not (bobp)) (forward-line -1) (setq line (1+ line)))
-    (lookup-select-session-insert (lookup-current-module))
-    (goto-char (point-min))
-    (forward-line line)))
-
-(defconst lookup-select-priority-marks
-  '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
-
-(defun lookup-select-session-insert (module)
+(defun lookup-select-build-buffer (module)
   (let ((inhibit-read-only t))
     (erase-buffer)
     (insert "Tyep `m' to select, `u' to unselect, `q' to leave, "
@@ -76,9 +57,15 @@
 			(lookup-dictionary-title dict)
 			(concat (mapcar (lambda (pair)
 					  (if (memq (car pair) methods)
-					      (cdr pair) ?.))
+					      (cdr pair)
+					    ?.))
 					lookup-search-method-marks)))))
 	      (lookup-module-dictionaries module))))))
+
+(defun lookup-select-update-buffer ()
+  (let ((line (lookup-current-line)))
+    (lookup-select-build-buffer (lookup-current-module))
+    (goto-line line)))
 
 ;;;
 ;;; Select Mode
@@ -122,14 +109,14 @@ Search Methods:
   (define-key lookup-select-mode-map "M" 'lookup-select-dictionary-menu)
   (define-key lookup-select-mode-map "F" 'lookup-select-dictionary-search)
   ;; dictionary management
+  (define-key lookup-select-mode-map "a" 'lookup-select-add-dictionary)
   (define-key lookup-select-mode-map "\ey" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-k" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-y" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-x\C-t" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map [?\C-/] 'lookup-select-wrap-command)
-  (define-key lookup-select-mode-map "a" 'lookup-select-add-dictionary)
   ;; general commands
-  (define-key lookup-select-mode-map "C" 'lookup-create-module)
+  (define-key lookup-select-mode-map "^" 'lookup-list-modules)
   (define-key lookup-select-mode-map "g" 'lookup-select-update)
   (define-key lookup-select-mode-map "q" 'lookup-leave)
   )
@@ -145,8 +132,9 @@ Search Methods:
   (kill-all-local-variables)
   (setq major-mode 'lookup-select-mode)
   (setq mode-name "Select")
-  (setq mode-line-buffer-identification '("Lookup:%12b"))
-  (setq lookup-mode-help lookup-select-mode-help)
+  (setq mode-line-buffer-identification
+	'("Lookup:%12b <" (lookup-module-name (lookup-current-module)) ">"))
+  (setq lookup-help-message lookup-select-mode-help)
   (setq buffer-read-only t)
   (setq truncate-lines t)
   (use-local-map lookup-select-mode-map)
@@ -185,9 +173,10 @@ have found some entries, which means this dictionary cannot appear alone."
   (lookup-select-dictionary-set-priority 'supplement))
 
 (defun lookup-select-dictionary-set-priority (value)
-  (let ((d (lookup-select-this-dictionary)))
-    (when d
-      (lookup-module-dictionary-set-priority (lookup-current-module) d value)
+  (let ((dict (lookup-select-this-dictionary)))
+    (when dict
+      (setf (lookup-module-dictionary-priority (lookup-current-module) dict)
+	    value)
       (lookup-select-set-mark
        (lookup-assq-get lookup-select-priority-marks value)))))
 
@@ -221,8 +210,20 @@ other dictionaries."
 		(format "Look up by `%s'" (lookup-dictionary-title dict))
 		nil 'lookup-input-history))
        (error "No dictionary at the current line"))))
-  (let ((lookup-valid-dictionaries (list (lookup-select-this-dictionary))))
+  (let ((lookup-search-dictionaries (list (lookup-select-this-dictionary))))
     (lookup-search-pattern (lookup-current-module) pattern)))
+
+(defun lookup-select-add-dictionary (dictionary)
+  "Add a dictionary into the current module."
+  (interactive (list (lookup-input-dictionary)))
+  (let* ((module (lookup-current-module))
+	 (dict (lookup-select-this-dictionary))
+	 (dicts (lookup-module-dictionaries module)))
+    (if (eq dict (car dicts))
+	(setf (lookup-module-dictionaries module) (cons dictionary dicts))
+      (while (not (eq dict (cadr dicts))) (setq dicts (cdr dicts)))
+      (setcdr dicts (cons dictionary (cdr dicts)))))
+  (lookup-select-update-buffer))
 
 (defun lookup-select-wrap-command (arg)
   "Call the corresponding global command with keys and reset dictionaries.
@@ -243,26 +244,14 @@ will be used instead of the usual `kill-ring'."
     (setq lookup-select-kill-ring kill-ring)
     (lookup-select-reset-dictionaries)))
 
-(defun lookup-select-add-dictionary (dictionary)
-  "Add a dictionary into the current module."
-  (interactive (list (lookup-input-dictionary)))
-  (let* ((module (lookup-current-module))
-	 (dict (lookup-select-this-dictionary))
-	 (dicts (lookup-module-dictionaries module)))
-    (if (eq dict (car dicts))
-	(lookup-module-set-dictionaries module (cons dictionary dicts))
-      (while (not (eq dict (cadr dicts))) (setq dicts (cdr dicts)))
-      (setcdr dicts (cons dictionary (cdr dicts)))))
-  (lookup-select-session-update))
-
 (defun lookup-select-update ()
   (interactive)
   (let* ((module (lookup-current-module))
 	 (message (format "Updating %s..." (lookup-module-name module))))
     (message message)
-    (lookup-foreach (lambda (dict) (lookup-dictionary-setplist dict nil))
-		    (lookup-module-dictionaries module))
-    (lookup-select-session-update)
+    ;; (dolist (dict (lookup-module-dictionaries module))
+    ;;   (lookup-dictionary-setplist dict nil))
+    (lookup-select-update-buffer)
     (message (concat message "done"))))
 
 ;;;
@@ -294,15 +283,15 @@ will be used instead of the usual `kill-ring'."
   "Reset the current module dictionaries with their priorities."
   (save-excursion
     (lookup-select-goto-first)
-    (let ((module (lookup-current-module)) dict dicts prio)
+    (let ((module (lookup-current-module)) dict dicts)
       (while (setq dict (lookup-select-this-dictionary))
-	(setq prio (car (rassq (char-after (point))
-			       lookup-select-priority-marks)))
-	(lookup-module-dictionary-set-priority module dict prio)
+	(setf (lookup-module-dictionary-priority module dict)
+	      (car (rassq (char-after (point))
+			  lookup-select-priority-marks)))
 	(setq dicts (cons dict dicts))
 	(forward-line))
-      (lookup-module-set-dictionaries module (nreverse dicts)))))
+      (setf (lookup-module-dictionaries module) (nreverse dicts)))))
 
-(provide 'lookup-module)
+(provide 'lookup-select)
 
-;;; lookup-module.el ends here
+;;; lookup-select.el ends here

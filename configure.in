@@ -4,4 +4,4 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AM_PATH_LISPDIR
 
-AC_OUTPUT(Makefile lisp/Makefile texi/Makefile comp/Makefile)
+AC_OUTPUT(Makefile lisp/Makefile texi/Makefile)

@@ -1,7 +1,5 @@
 some memos						-*- outline -*-
 
-* (setq lookup-use-gaiji nil) doesn't work.
-
 * reset automark-mode after restart lookup.
 
 * distinguish last-session and current-session.
