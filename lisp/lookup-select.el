@@ -185,7 +185,7 @@ have found some entries, which means this dictionary cannot appear alone."
   (lookup-select-dictionary-set-priority 'supplement))
 
 (defun lookup-select-dictionary-set-priority (value)
-  (let ((d (lookup-select-line-dictionary)))
+  (let ((d (lookup-select-this-dictionary)))
     (when d
       (lookup-module-dictionary-set-priority (lookup-current-module) d value)
       (lookup-select-set-mark
@@ -194,7 +194,7 @@ have found some entries, which means this dictionary cannot appear alone."
 (defun lookup-select-dictionary-info ()
   (interactive)
   (lookup-display-menu (lookup-current-module)
-		       (lookup-select-line-dictionary)))
+		       (lookup-select-this-dictionary)))
 
 (defun lookup-select-dictionary-menu ()
   (interactive)
@@ -215,13 +215,13 @@ have found some entries, which means this dictionary cannot appear alone."
 Only the dictionary at point will be used regardless of states of
 other dictionaries."
   (interactive
-   (let ((dict (lookup-select-line-dictionary)))
+   (let ((dict (lookup-select-this-dictionary)))
      (if dict
 	 (list (lookup-read-string
 		(format "Look up by `%s'" (lookup-dictionary-title dict))
 		nil 'lookup-input-history))
        (error "No dictionary at the current line"))))
-  (let ((lookup-valid-dictionaries (list (lookup-select-line-dictionary))))
+  (let ((lookup-valid-dictionaries (list (lookup-select-this-dictionary))))
     (lookup-search-pattern (lookup-current-module) pattern)))
 
 (defun lookup-select-wrap-command (arg)
@@ -247,7 +247,7 @@ will be used instead of the usual `kill-ring'."
   "Add a dictionary into the current module."
   (interactive (list (lookup-input-dictionary)))
   (let* ((module (lookup-current-module))
-	 (dict (lookup-select-line-dictionary))
+	 (dict (lookup-select-this-dictionary))
 	 (dicts (lookup-module-dictionaries module)))
     (if (eq dict (car dicts))
 	(lookup-module-set-dictionaries module (cons dictionary dicts))
@@ -282,7 +282,7 @@ will be used instead of the usual `kill-ring'."
     (insert-char mark 1))
   (forward-line))
 
-(defun lookup-select-line-dictionary ()
+(defun lookup-select-this-dictionary ()
   "Return the current line dictionary or nil."
   (save-excursion
     (beginning-of-line)
@@ -295,7 +295,7 @@ will be used instead of the usual `kill-ring'."
   (save-excursion
     (lookup-select-goto-first)
     (let ((module (lookup-current-module)) dict dicts prio)
-      (while (setq dict (lookup-select-line-dictionary))
+      (while (setq dict (lookup-select-this-dictionary))
 	(setq prio (car (rassq (char-after (point))
 			       lookup-select-priority-marks)))
 	(lookup-module-dictionary-set-priority module dict prio)
