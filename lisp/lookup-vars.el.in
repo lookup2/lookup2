@@ -59,6 +59,14 @@ If this variable is nil, complement files will be searched from `load-path'."
   :type 'directory
   :group 'lookup-setup-variables)
 
+(defcustom lookup-complement-autoload-alist nil
+  "*Alist of the load definition of complement files.
+The value of this variable should look like ((REGEXP . FILE) ...),
+where REGEXP is the pattern matching with a dictionary ID, and
+FILE is a complement file name."
+  :type '(repeat (cons (string :tag "regexp") (string :tag "file")))
+  :group 'lookup-setup-variables)
+
 (defcustom lookup-mode-module-alist nil
   "*"
   :type '(repeat (cons (symbol :tag "mode") (string :tag "module")))
