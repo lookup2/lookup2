@@ -12,7 +12,7 @@
 
 (load "menu.scm")
 
-(html
+(print-html
  (table
   (tr #:valign "botton"
    (td (img "/lookup/images/title-mini.png" #:alt "Lookup"))

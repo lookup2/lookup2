@@ -1,9 +1,8 @@
-(set! %load-path (cons "../.." %load-path))
-(use-modules (htmlgen))
+(load "../header.scm")
 
 (define name "OS/2 Bitmap")
 (define subtitle "OS/2 で bitmap-muleのフォントを使う方法")
-(define date "$Date: 2000/07/16 20:49:08 $")
+(define date "$Date: 2001/02/22 12:07:27 $")
 
 (define summary (p "by Masaru Nomiya &lt;nomiya@pp.iij4u.or.jp&gt;"))
 

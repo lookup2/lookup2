@@ -1,10 +1,9 @@
-(set! %load-path (cons "/home/kei/share/guile" %load-path))
-(use-modules (text markup html))
+(load "header.scm")
 
 (define title "Lookup - a Search Interface")
 
 (define lookup-stable (href "Lookup 1.3" "http://download.sourceforge.net/lookup/lookup-1.3.tar.gz"))
-(define lookup-unstable (href "Lookup 1.98" "DIST/beta/lookup-1.98.tar.gz"))
+(define lookup-unstable (href "Lookup 1.99.0" "DIST/beta/lookup-1.99.0.tar.gz"))
 
 (define news
   '(
@@ -63,18 +62,10 @@
 (define body
   (string-append
    (h1 "What is Lookup")
-   (indent
+   (quotation
     (p "Lookup は Emacs エディタで利用できる辞書検索インターフェースです。"
        "市販の CD-ROM 辞書やネットワークの辞書サーバを始め、"
-       "様々な情報源から簡単な操作と設定で辞書検索が行なえます。")
-
-    (p "Lookup をこれから使われるという方は"
-       (href "ユーザーズガイド" "guide/")
-       "を参照して下さい。より詳しい情報を得るには"
-       (href "ユーザーズマニュアル" "manual/")
-       "を参照して下さい。更なる質問や情報のためには"
-       (href "メーリングリスト" "lists/")
-       "に加わって下さい。"))
+       "様々な情報源から簡単な操作と設定で辞書検索が行なえます。"))
 
    (h1 "Latest Release")
    (ul (li "Stable version: " lookup-stable ", " (href "eblook-1.3" "eblook/"))
@@ -94,7 +85,7 @@
 		   news))
    (hr)
    (address
-    "Last modified: $Date: 2000/11/19 23:59:52 $"
+    "Last modified: $Date: 2001/02/22 12:07:27 $"
     "<br>Copyright (C) 2000 Keisuke Nishida &lt;knishida@ring.gr.jp&gt;"
     "<br>Graphics (C) 2000 Sumiya Sakoda")
    (p (href (img "http://www2.valinux.com/adserver.phtml?f_s=468x60&f_p=478"

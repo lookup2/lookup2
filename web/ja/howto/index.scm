@@ -1,9 +1,8 @@
-(set! %load-path (cons "../.." %load-path))
-(use-modules (htmlgen))
+(load "../header.scm")
 
 (define name "Howto")
 (define subtitle "Lookup Howto")
-(define date "$Date: 2000/07/16 20:49:08 $")
+(define date "$Date: 2001/02/22 12:07:27 $")
 
 (define summary
   (p "このページには、Lookup の設定等について雑多に並べています。"

@@ -10,12 +10,6 @@
     (item "Screenshot" "/lookup/info/screenshot.html")
     (item "Mailing Lists" "/lookup/lists/")
     )
-   (submenu "Documentation"
-    (item "User's Guide" "/lookup/guide/")
-    (item "User's Manual" "/lookup/manual/")
-    (item "Lookup Howto" "/lookup/howto/")
-    (item "Lookup TIPS" "/lookup/info/tips.html")
-    )
    (submenu "Development"
     (item "Project Summary" "http://sourceforge.net/projects/lookup")
     (item "CVS Repository" "http://sourceforge.net/cvs/?group_id=893")
@@ -37,10 +31,16 @@
     (item "Emacs/MacOS" "http://www.csis.hku.hk/~choi/emacs/")
     )
 
-   (p "This page is"
+   (p "Dictionary Links"
       (br (href (img "/lookup/images/banner.png"
 		     #:alt "Lookup" #:width 88 #:height 33 #:border 0)
-		"http://lookup.sourceforge.net/")))
+		"http://lookup.sourceforge.net/") "<br>"
+	  (href (img "http://www.sra.co.jp/people/m-kasahr/freepwing/freepwing_b.png"
+		     #:alt "FreePWING" #:width 88 #:height 31 #:border 0)
+		"http://www.sra.co.jp/people/m-kasahr/freepwing/") "<br>"
+	  (href (img "http://openlab.ring.gr.jp/edict/edict_b.png"
+		     #:alt "edict" #:width 88 #:height 31 #:border 0)
+		"http://openlab.ring.gr.jp/edict/")))
 
    (p "Hosted by"
       (br (href (img "/ringserver/buttons/RngSrvBtn.gif"

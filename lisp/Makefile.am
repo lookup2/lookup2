@@ -9,7 +9,7 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el \
 	support-rika.el support-comp.el support-jargon.el support-srd-fpw.el \
 	support-mypaedia.el support-srd.el support-nhd.el support-vera.el
 ELCFILES = $(SOURCES:.el=.elc)
-EXTRA_DIST = $(SOURCES) lookup-compile.el lookup-autoloads.el
+EXTRA_DIST = $(SOURCES) lookup-compile.el
 INSTALLFILES = $(SOURCES) $(ELCFILES) lookup-autoloads.el
 CLEANFILES = $(ELCFILES)
 MAINTAINERCLEANFILES = Makefile.in lookup-autoloads.el

@@ -1,9 +1,8 @@
-(set! %load-path (cons "../.." %load-path))
-(use-modules (htmlgen))
+(load "../header.scm")
 
 (define name "Related Links")
 (define subtitle "Lookup TIPS")
-(define date "$Date: 2000/07/16 20:49:08 $")
+(define date "$Date: 2001/02/22 12:07:27 $")
 
 (define summary (p "Lookup を使う上でお得な情報。"))
 
