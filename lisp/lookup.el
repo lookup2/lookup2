@@ -27,7 +27,7 @@
 (require 'lookup-vars)
 (require 'lookup-types)
 
-(defconst lookup-version "1.99.1"
+(defconst lookup-version "1.99.2k"
   "The version numbers of Lookup.")
 
 
@@ -96,10 +96,10 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 
 (unless lookup-global-map
   (setq lookup-global-map (make-sparse-keymap))
-  (define-key lookup-global-map "\en" 'lookup-next-history)
-  (define-key lookup-global-map "\ep" 'lookup-previous-history)
-  (define-key lookup-global-map "\ef" 'lookup-forward-module)
-  (define-key lookup-global-map "\eb" 'lookup-backward-module)
+  (define-key lookup-global-map "\C-\M-n" 'lookup-next-history)
+  (define-key lookup-global-map "\C-\M-p" 'lookup-previous-history)
+  (define-key lookup-global-map "\C-\M-f" 'lookup-forward-module)
+  (define-key lookup-global-map "\C-\M-b" 'lookup-backward-module)
   (define-key lookup-global-map "B" 'lookup-list-bookmarks)
   (define-key lookup-global-map "H" 'lookup-list-history)
   (define-key lookup-global-map "f" 'lookup-find-pattern)

@@ -46,7 +46,7 @@
 ;; If you want to modify this file by hand, follow this instruction:
 ;;
 ;;   1. M-x lookup-exit
-;;   2. Edit this file as you like.
+;;   2. Edit (or remove) this file as you like.
 ;;   3. M-x lookup-restart")
 
 (defun lookup-dump-cache (file)

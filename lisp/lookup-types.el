@@ -184,7 +184,7 @@
 	 (opts (lookup-assoc-get lookup-agent-option-alist
 				 (lookup-agent-id agent))))
     (while options
-      (plist-put opts (caar options) (cdar options) )
+      (setq opts (plist-put opts (caar options) (cadar options)))
       (setq options (cdr options)))
     (setf (lookup-agent-options agent) opts)
     (if lookup-cache-file (lookup-restore-agent-attributes agent))

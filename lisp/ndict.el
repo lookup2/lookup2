@@ -36,7 +36,7 @@
 (defvar ndict-match-exact nil)
 
 (defconst ndict-system-info-alist
-  '(;; dictd-1.4.x
+  '(;; dictd-1.4.x or later
     (dictd
      (methods . ((exact . "exact") (prefix . "prefix") (suffix . "suffix")
 		 (substring . "substring") (regexp . "re"))))
@@ -44,7 +44,7 @@
     (t
      (methods . ((exact . "exact") (prefix . "prefix"))))))
 
-(defconst ndict-process-coding-system 'utf-8)
+(defvar ndict-process-coding-system 'mule-utf-8)
 
 ;;;
 ;;; types
@@ -193,23 +193,23 @@
 	   (db (lookup-dictionary-name dictionary))
 	   (table (ndict-agent-method-table ndict-current-agent))
 	   (strategy (lookup-assq-get table method))
-	   (ndict-match-exact (if (eq method 'exact) (concat "^" string "$"))))
-       (when (or (not (fboundp 'find-charset-string))
- 		(equal (find-charset-string string) '(ascii))
- 		(equal (find-charset-string string) 'nil))
-      (ndict-process-require (format "MATCH %s %s '%s'" db strategy string)
-	(lambda (process)
-	  (when (looking-at "152")
-	    (forward-line)
-	    (narrow-to-region (point) (re-search-forward "^\\.$"))
-	    (let ((case-fold-search t) name heading entries)
-	      (while (re-search-backward "^[^ ]+ \\(.*\\)" nil t)
-		(setq name (match-string 1) heading (read name))
-		(if (or (not ndict-match-exact)
-			(string-match ndict-match-exact heading))
-		    (setq entries (cons (ndict-new-entry name heading)
-					entries))))
-	      entries))))))))
+	   (ndict-match-exact (if (eq method 'exact) (concat "^" string "$")))
+           (string-coding-systems (find-coding-systems-string string)))
+      (when (or (eq 'undecided (car string-coding-systems))
+                (memq (ndict-agent-coding ndict-current-agent) string-coding-systems))
+        (ndict-process-require (format "MATCH %s %s '%s'" db strategy string)
+          (lambda (process)
+            (when (looking-at "152")
+              (forward-line)
+              (narrow-to-region (point) (re-search-forward "^\\.$"))
+              (let ((case-fold-search t) name heading entries)
+                (while (re-search-backward "^[^ ]+ \\(.*\\)" nil t)
+                  (setq name (match-string 1) heading (read name))
+                  (if (or (not ndict-match-exact)
+                          (string-match ndict-match-exact heading))
+                      (setq entries (cons (ndict-new-entry name heading)
+                                          entries))))
+                entries))))))))
 
 (put 'ndict :content 'ndict-entry-content)
 (defun ndict-entry-content (entry)
@@ -230,7 +230,7 @@
 
 (defun ndict-process-open (server service)
   (lookup-message (format "connecting to %s..." server))
-  (let* ((buffer (lookup-open-process-buffer " *ndict*"))
+  (let* ((buffer (lookup-open-process-buffer (concat " *ndict+" server "*")))
 	 (process (open-network-stream "ndict" buffer server service)))
     (accept-process-output process)
     (process-kill-without-query process)
