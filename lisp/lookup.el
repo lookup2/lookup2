@@ -502,8 +502,8 @@ Otherwise, this is the same with \\[lookup-previous-history]."
   (let* ((string (downcase (lookup-query-string query)))
 	 (query (lookup-new-query 'exact string))
 	 entries dict heading last-entry)
-    (setq entries (reverse (lookup-dictionary-search dictionary query)))
-    (setq last-entry (lookup-entry-substance (car entries)))
+    (if (setq entries (reverse (lookup-dictionary-search dictionary query)))
+	(setq last-entry (lookup-entry-substance (car entries))))
     (lookup-foreach
      (lambda (string)
        (when (> (length string) 3)
