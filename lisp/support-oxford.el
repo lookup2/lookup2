@@ -1,4 +1,4 @@
-;;; oxford.el --- support file for "Oxford Dictionary/Thesaurus"
+;;; oxford.el --- suport file for "Oxford Dictionary/Thesaurus"
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -18,12 +18,12 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'suppport-generic)
+(require 'support-generic)
 
 (defvar ipaface 'default)
 
-(defconst oxford-gaiji-table
-  (lookup-new-gaiji-table
+(let 
+  ((encoded-oxford-gaiji-table
     '(
       ("h0f01" "=")
       ("h0f02" "=")
@@ -274,6 +274,16 @@
       ("h0ffd" "&#x00F4;")
       ("h0ffe" "&#x00F1;")
       ("h1001" "="))))
+  (defconst oxford-gaiji-table
+    (lookup-new-gaiji-table
+     (mapcar 
+      '(lambda (x)
+        (list
+         (if (eq lookup-support-agent 'ndtp)
+             (concat "gaiji:" (car x))
+           (car x))
+         (decode-character-string (cadr x))))
+      encoded-oxford-gaiji-table))))
 
 (defun oxford-arrange-structure (entry)
   (goto-char (point-min))
@@ -326,7 +336,7 @@
 
   (goto-char (point-min))
   (and
-   (search-forward (get-iso10646-str ?\x25A1) nil t)
+   (search-forward (char-to-string (lookup-ucs-char ?\x25A1)) nil t)
    (let ((p (point)))
      (backward-char 1)
      (insert "\n")
@@ -345,7 +355,7 @@
     (save-restriction
       (narrow-to-region
        (point-min)
-       (if (search-forward (get-iso10646-str ?\x25A1) nil t)
+       (if (search-forward (char-to-string (lookup-ucs-char ?\x25A1)) nil t)
 	   (point)
 	 (point-max)))
 
@@ -383,7 +393,7 @@
 ;;     (save-excursion
 ;;       (goto-char (match-beginning 0))
 ;;       (newline))))
-;; 
+
 (setq lookup-support-options
       (list ':title "Oxford Dictionary"
 	    ':coding 'iso-8859-1

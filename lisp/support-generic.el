@@ -18,7 +18,6 @@
 ;;; Code:
 
 (require 'lookup-utils)
-;;(require 'un-define) ;; You will need Mule-UCS installed.
 
 (defun range (from to)
   "Make the list of the integers of range FROM to TO."
@@ -31,7 +30,6 @@
                                   '(#x0346)
                                   (range #x034a #x034c)))
       
-
       (combining-ucs-below (nconc (range #x0316 #x0319)
                                   (range #x031c #x0333)
                                   (range #x0339 #x033c)
@@ -145,5 +143,12 @@ Character with non-nil reference-point property will be combined."
                                         (char-after from)))))
             (setq from (1+ from)))
           (setq from (1+ from)))))))
+
+(defun decode-character-string (string)
+  (with-temp-buffer
+    (insert string)
+    (decode-entity-reference-region (point-min) (point-max))
+    (combine-characters-region (point-min) (point-max))
+    (buffer-string)))
 
 (provide 'support-generic)

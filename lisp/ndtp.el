@@ -225,7 +225,15 @@
     (vector 'japanese-jisx0212 
             (+ 32 (string-to-int (match-string 1 code)))
             (+ 32 (string-to-int (match-string 2 code)))))
-   ((string-match "&g0:\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
+   ((string-match "&j3:\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
+    (vector 'japanese-jisx0213-1
+            (+ 32 (string-to-int (match-string 1 code)))
+            (+ 32 (string-to-int (match-string 2 code)))))
+   ((string-match "&j4:\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
+    (vector 'japanese-jisx0213-2
+            (+ 32 (string-to-int (match-string 1 code)))
+            (+ 32 (string-to-int (match-string 2 code)))))
+   ((string-match "&g0:\\(ffff\\)?\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
     (vector 'chinese-gb2312 
             (+ 32 (string-to-int (match-string 1 code)))
             (+ 32 (string-to-int (match-string 2 code)))))

@@ -22,6 +22,8 @@
 	("CHUJITEN\\'" . "support-chujiten")
 	("CHIEZO\\'" . "support-chiezo")
 	("MYPAEDIA\\'" . "support-mypaedia")
+        ("CROWN_FJ" . "support-crown")
+        ("CROWN_DJ" . "support-crown")
 	("GENIUS\\'" . "support-genius")
 	("COLLOC\\'" . "support-colloc")
 	("RIKA\\'" . "support-rika")
