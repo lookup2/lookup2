@@ -182,14 +182,12 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 
 (defun lookup-suspend ()
   "Close all Lookup windows temporary.
-The last states of windows will be recovered if the varialbe
-`lookup-save-configuration' is non-nil.  Type `\\[lookup]'
-to back to Lookup."
+Type `\\[lookup]' to back to Lookup."
   (interactive)
   (if (lookup-exclusive-frame-p)
       (delete-frame)
     (mapc 'lookup-hide-buffer lookup-buffer-list)
-    (when (and lookup-save-configuration lookup-window-configuration)
+    (when lookup-window-configuration
       (set-window-configuration lookup-window-configuration)
       (setq lookup-window-configuration nil))))
 
@@ -749,7 +747,8 @@ See `lookup-secondary' for details."
 	(set-window-buffer (select-window lookup-main-window) buffer)
 	(raise-frame (window-frame lookup-main-window)))
     (setq lookup-start-window (selected-window))
-    (setq lookup-window-configuration (current-window-configuration))
+    (if (> (length (window-list)) 1)
+	(setq lookup-window-configuration (current-window-configuration)))
     (funcall lookup-open-function buffer)
     (setq lookup-main-window (get-buffer-window buffer t)))
   (when (window-live-p lookup-sub-window)

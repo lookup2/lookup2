@@ -73,11 +73,6 @@ that matches a dictionary ID, and FILE is a support file name."
   :type 'symbol
   :group 'lookup-general-options)
 
-(defcustom lookup-save-configuration t
-  "*Non-nil means Lookup will save/restore the window configuration."
-  :type 'boolean
-  :group 'lookup-general-options)
-
 (defcustom lookup-initial-memorandum
   (lambda (entry)
     (format "Title: %s\nEntry: %s\nDate: %s\n\n"
