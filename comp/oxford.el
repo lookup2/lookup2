@@ -82,6 +82,7 @@
 	    ':coding 'iso-8859-1
 	    ':stop-code "0x1f090000"
 	    ':gaiji-table oxford-gaiji-table
-	    ':arrange-table '((structure . oxford-arrange-structure))))
+	    ':arrange-table '((structure . oxford-arrange-structure))
+	    ':transformer 'lookup-stemming-search))
 
 ;;; oxford.el ends here

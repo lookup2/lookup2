@@ -305,6 +305,7 @@
 (setq lookup-complement-options
       (list ':gaiji-table chujiten-gaiji-table
 	    ':reference-pattern 'chujiten-reference-pattern
-	    ':arrange-table chujiten-arrange-table))
+	    ':arrange-table chujiten-arrange-table
+	    ':transformer 'lookup-stemming-search))
 
 ;;; chujiten.el ends here

@@ -37,6 +37,7 @@
 
 (setq lookup-complement-options
       (list ':title "英和活用大辞典"
-	    ':arrange-table '((replace . colloc-arrange-first))))
+	    ':arrange-table '((replace . colloc-arrange-first))
+	    ':transformer 'lookup-stemming-search))
 
 ;;; colloc.el ends here
