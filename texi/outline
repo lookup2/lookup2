@@ -1,0 +1,136 @@
+Lookup User's Manual					-*- outline -*-
+
+* 1. What is Lookup             Welcome to the Lookup world!
+** Features::                   What you can do with Lookup.
+** Environment::                Which Emacs you can use.
+** Copying::                    Lookup is a GPL software.
+
+* 2. How to Install             
+** Required Environment         What you should know before start.
+*** GNU Emacs                   GNU Emacs 19.28 or later.
+*** XEmacs                      XEmacs 20.4 or later.
+*** Mule                        Mule 2.3 or later.
+*** NTEmacs                     NTEmacs 20.4 or later.
+*** Meadow                      Meadow 1.0 or later.
+** Installation Methods
+*** install.el
+*** Makefile
+
+* 3. Quick Start
+** Minimum Example              What you have to setup at least.
+** Dictionary List              How to get to know about your dictionaries.
+** Lookup Tutorial              Learning from the Lookup tutorial program.
+
+* 4. Dictionary Preparation
+** Free Dictionary
+*** SDIC Dictionary
+*** dictd Dictionary
+*** FreePWING Dictionary
+** CD-ROM Dictionary
+*** EPWING Dictionary
+*** Original Dictionary
+*** Gaiji Installation
+** Network Dictionary
+*** NDTP Server
+*** DICT Server
+** Miscellaneous Dictionary
+*** ndnmz agent
+*** ndkks agent
+*** ndspell agent
+*** ndcookie agent
+
+* 5. Getting Started
+** Setup Agents
+*** Setup Basics
+*** Setup Options
+** Setup Example
+*** ~/.emacs
+*** ~/.lookup
+*** site-start.el
+** Setup Dictionaries
+*** Startup Commands
+*** Select Dictionaries
+*** View Menus
+** How to Lookup
+*** Start Search
+*** View Entries
+*** View Contents
+*** Follow References
+*** Trace History
+
+* 6. Advanced Features
+** Additional Features
+*** Complement File
+*** Cache File
+*** Kanji Extraction
+** Transform Query
+*** Stemming
+*** Spell Checking
+*** Kanji Conversion
+** Search Method
+*** Search Commands
+*** Specify Dictionary
+*** Default Method
+*** Search Methods
+*** Redo Search
+** Search Result
+*** Bookmark
+*** Toggle Example
+*** Cite Contents
+*** Change Format
+** Search Module
+*** Create Module
+*** Utilize Module
+*** Create Command
+
+* 7. Customization
+** Customize General
+*** Customize Variables
+*** Customize Face
+*** Customize Search
+** Customize Option
+*** Agent Options
+*** Dictionary Options
+** Customize Contents
+*** Gaiji Table
+*** Reference Pattern
+*** Arrange Contents
+** Construct Complement
+
+* A. Getting Information
+** Homepage                     Getting the latest information from WWW.
+** Mailing Lists                Getting the latest information via E-mail.
+** Related Links                Other useful information sources.
+** Troubleshooting              How to deal with troubles.
+** Bug Report                   How to report problems.
+
+* B. Search Agents
+** ndtut                        Lookup tutorial program.
+** ndic                         Using free dictionaries.
+** ndeb                         Using CD-ROM dictionaries.
+** ndtp                         Using NDTP dictionary server.
+** ndict                        Using DICT dictionary server.
+** ndsrd                        Using Random House Dictionary.
+** ndnmz                        Using Namazu for text search.
+** ndkks                        Using KAKASI for Japanese words.
+** ndspell                      Using Ispell to check and search words.
+** ndcookie                     Using cookie file for fun.
+
+* C. Dictionary Types
+** SDIC                         The SDIC format.
+** dictd                        The format used by dictd.
+** cookie                       The cookie file format.
+** EB/EPWING                    The EB/EBG/EBXA/EPWING format.
+** NDTP                         The Network Dictionary Transport Protocol.
+** DICT                         The DICT internet dictionary protocol.
+
+* D. Mode Details
+** Select Mode                  The Select mode.
+** Summary Mode                 The Summary mode.
+** Content Mode                 The Content mode.
+** History Mode                 The History mode.
+
+* Glossary
+* Concept Index
+* Command Index
+* Variable Index

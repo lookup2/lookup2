@@ -1,0 +1,387 @@
+;;; lookup-vars.el --- Lookup variable list
+;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+
+;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Keywords: dictionary
+
+;; This file is part of Lookup.
+
+;; Lookup is free software; you can redistribute it and/or modify it
+;; under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2 of the License, or
+;; (at your option) any later version.
+
+;; Lookup is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with Lookup; if not, write to the Free Software Foundation,
+;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+;;; Code:
+
+(require 'evi)
+
+(defconst lookup-version "@VERSION@"
+  "The version numbers of Lookup.")
+
+;;;;;;;;;;;;;;;;;;;;
+;; Custom Variables
+;;;;;;;;;;;;;;;;;;;;
+
+(defgroup lookup nil
+  "Search interface with electronic dictionaries."
+  :group 'applications)
+
+;;;
+;;; Setup variables
+;;;
+
+(defgroup lookup-setup-variables nil
+  "Primary setup variables."
+  :group 'lookup)
+
+(defcustom lookup-init-file (concat "~" init-file-user "/.lookup")
+  "*User's initialization file for Lookup."
+  :type 'file
+  :group 'lookup-setup-variables)
+
+(defcustom lookup-data-directory data-directory
+  "*Lookup に関するプログラム以外のデータが収められるディレクトリ。"
+  :type 'directory
+  :group 'lookup-setup-variables)
+
+(defcustom lookup-complement-directory nil
+  "*Directory that complement files are put in.
+If this variable is nil, complement files will be searched from `load-path'."
+  :type 'directory
+  :group 'lookup-setup-variables)
+
+(defcustom lookup-mode-module-alist nil
+  "*"
+  :type '(repeat (cons (symbol :tag "mode") (string :tag "module")))
+  :group 'lookup-setup-variables)
+
+;;;
+;;; General options
+;;;
+
+(defgroup lookup-general-options nil
+  "General customizable variables."
+  :group 'lookup)
+
+(defcustom lookup-default-method 'exact
+  "*\\[lookup-pattern] で実行される標準の検索方式。
+変数 `lookup-search-methods' のいずれかの値を指定可能。"
+  :type 'symbol
+  :group 'lookup-general-options)
+
+(defcustom lookup-frame-alist
+  '((title . "Lookup") (menu-bar-lines . 0) (width . 48) (height . 32)
+    (lookup-fill-column . 45))
+  "*Lookup 専用フレームのパラメータのリスト。
+設定すべき値については、`default-frame-alist' を参照。"
+  :type '(repeat (cons :tag "Parameter"
+		       (symbol :tag "tag")
+		       (sexp :tag "value")))
+  :group 'lookup-general-options)
+
+(defcustom lookup-fill-column .9
+  "*エントリ内容を fill するときの桁数。
+小数を指定した場合は、ウィンドウの幅に対する割合として用いられる。"
+  :type 'number
+  :group 'lookup-general-options)
+
+(defcustom lookup-window-height 4
+  "*Entry バッファ等のウィンドウの高さ。
+小数を指定した場合は、Lookup 全体のウィンドウの高さに対する割合として
+用いられる。"
+  :type 'number
+  :group 'lookup-general-options)
+
+(defcustom lookup-save-configuration t
+  "*Non-nil を指定すると、Lookup を抜けたときにウィンドウ状態を回復する。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-use-unicode (featurep 'unicode)
+  "*Non-nil を指定すると、外字の表示等に Unicode を用いる。"
+  :type 'boolean
+  :group 'lookup-general-options)
+  
+
+(defcustom lookup-use-bitmap (featurep 'bitmap)
+  "*Non-nil を指定すると、bitmap-mule パッケージを利用した外字表示を行なう。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-use-kakasi nil
+  "*Non-nil を指定すると、いくつかの局面で KAKASI が利用される。
+これは現在、具体的には日本語のデフォルトの検索語の切り出しに用いている。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-enable-format t
+  "Non-nil を指定すると、テキストを整形して出力する。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-enable-gaiji t
+  "*Non-nil を指定すると、外字表示が有効となる。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-enable-example t
+  "*Non-nil を指定すると、例文表示が有効となる。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-enable-record nil
+  "*Non-nil enables keeping records for statstics."
+  :type 'boolean
+  :group 'lookup-cache)
+
+(defcustom lookup-max-hits 50
+  "*検索時に表示するエントリの最大数。
+0 を指定すると、見つかった全てのエントリを表示する。"
+  :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-max-text 0
+  "*検索時に表示するエントリ本文の最大長。
+0 を指定すると、全文を表示する。"
+  :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-max-history 80
+  "*検索履歴を保持する最大数。
+0 を指定すると無限に保持する。"
+  :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-head-width 24
+  "*Head width"
+  :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-initial-memorandum
+  (lambda (entry)
+    (format "Title: %s\nEntry: %s\nDate: %s\n\n"
+	    (lookup-dictionary-title (lookup-entry-dictionary entry))
+	    (lookup-entry-heading entry)
+	    (format-time-string "%a, %e %b %Y %T %z")))
+  "*initial memorandum."
+  :type 'function
+  :group 'lookup-general-options)
+
+(defcustom lookup-cite-header nil
+  "*エントリ本文を引用するときのヘッダ。
+コマンド `lookup-summary-cite-content' 及び `lookup-content-cite-region'
+により内容を取り込むとき、その先頭に指定した文字列が付け加えられる。
+文字列が \"%T\" を含む場合、辞書のタイトルに置き換えられる。
+辞書オプション `cite-header' が指定されている場合、そちらが優先される。"
+  :type 'string
+  :group 'lookup-general-options)
+
+(defcustom lookup-cite-prefix nil
+  "*エントリ本文を引用するときのプレフィクス。
+コマンド `lookup-summary-cite-content' 及び `lookup-content-cite-region'
+により内容を取り込むとき、各行の先頭に指定した文字列が付け加えられる。
+辞書オプション `cite-preifx' が指定されている場合、そちらが優先される。"
+  :type 'string
+  :group 'lookup-general-options)
+
+(defcustom lookup-gaiji-alternate "_"
+  "*外字の代替文字列として用いられるデフォルトの文字列。"
+  :type 'string
+  :group 'lookup-general-options)
+
+(defcustom lookup-process-coding-system
+  (when (featurep 'evi-mule)
+    (if (memq system-type '(ms-dos windows-nt OS/2 emx))
+	(evi-coding-system 'sjis-dos)
+      (evi-coding-system 'euc-jp)))
+  "*外部プロセスとのデフォルトの文字コード。"
+  :type 'symbol
+  :group 'lookup-general-options)
+
+(defcustom lookup-kakasi-coding-system lookup-process-coding-system
+  "*KAKASI の呼び出しに用いる文字コード。"
+  :type 'symbol
+  :group 'lookup-general-options)
+
+;;;
+;;; Search agents
+;;;
+
+(defgroup lookup-search-agents nil
+  "Search agents."
+  :group 'lookup)
+
+;;;
+;;; Caches
+;;;
+
+(defgroup lookup-cache nil
+  "Cache control."
+  :group 'lookup)
+
+(defcustom lookup-cache-file nil
+  "*Lookup のキャッシュファイル名。
+このファイルは Lookup 終了時に情報が書き込まれる。
+nil を指定すると情報を保存しない。"
+  :type 'file
+  :group 'lookup-cache)
+
+;;;
+;;; Faces
+;;;
+
+(defgroup lookup-faces nil
+  "Faces."
+  :group 'lookup)
+
+(defface lookup-heading-1-face
+  '((t (:bold t :foreground "SlateBlue")))
+  "Level 1 heading face."
+  :group 'lookup-faces)
+
+(defface lookup-heading-2-face
+  '((t (:bold t :foreground "Red")))
+  "Level 2 heading face."
+  :group 'lookup-faces)
+
+(defface lookup-heading-3-face
+  '((t (:bold t :foreground "Orange")))
+  "Level 3 heading face."
+  :group 'lookup-faces)
+
+(defface lookup-heading-4-face
+  '((t (:bold t)))
+  "Level 4 heading face."
+  :group 'lookup-faces)
+
+(defface lookup-heading-5-face
+  '((t nil))
+  "Level 5 heading face."
+  :group 'lookup-faces)
+
+(defface lookup-heading-low-face
+  '((t (:foreground "Grey")))
+  "Low level heading face."
+  :group 'lookup-faces)
+
+(defface lookup-reference-face
+  '((t (:underline t :foreground "Blue")))
+  "Face used to highlight reference."
+  :group 'lookup-faces)
+
+(defface lookup-refered-face
+  '((t (:underline t :foreground "DarkViolet")))
+  "Face used to highlight refered reference."
+  :group 'lookup-faces)
+
+
+;;;;;;;;;;;;;;;;;;;;
+;; Advanced Variables
+;;;;;;;;;;;;;;;;;;;;
+
+(defvar lookup-debug-mode nil
+  "*Non-nil enabes Lookup's debug features.")
+
+(defvar lookup-search-agents nil)
+
+(defvar lookup-search-modules nil)
+
+(defvar lookup-agent-option-alist nil)
+
+(defvar lookup-dictionary-option-alist nil)
+
+(defvar lookup-complement-alist nil)
+
+(defvar lookup-complement-agent nil
+  "Symbol indicating the search agent that a complement file applies to.
+This variable is automatically set when loading a complement file, and
+should be only refered in complement files.")
+
+(defvar lookup-complement-options nil
+  "Dictionary options defined in a complement file.
+This variable should be only set in complement files.")
+
+(defvar lookup-arrange-table
+  '((replace   . lookup-arrange-replaces)
+    (reference . lookup-arrange-references)
+    (gaiji     . lookup-arrange-gaijis)
+    (structure . lookup-arrange-structure)
+    (fill      . lookup-arrange-fill-lines)))
+
+(defvar lookup-load-hook nil
+  "*List of functions called after loading Lookup.
+This hook will run just after loading `lookup-init-file' and
+`lookup-cache-file'.")
+
+;;;
+;;; Command control
+;;;
+
+(defvar lookup-search-method nil
+  "検索方式を指定すると、入力をパースせずそれをそのまま用いる。")
+
+(defvar lookup-force-update nil
+  "Non-nil を指定すると、キャッシュを用いず強制的に再検索を行なう。")
+
+(defvar lookup-open-function 'lookup-other-window
+  "Lookup のウィンドウを表示するための標準の関数。
+次の三つのいずれかを指定可能。
+
+`lookup-full-screen'  - 検索結果を画面全体で表示する
+`lookup-other-window' - 検索結果を別のウィンドウで表示する
+`lookup-other-frame'  - 検索結果を別のフレームで表示する")
+
+
+;;;;;;;;;;;;;;;;;;;;
+;; Internal Variables
+;;;;;;;;;;;;;;;;;;;;
+
+(defvar lookup-agent-alist nil)
+(defvar lookup-module-alist nil)
+(defvar lookup-dictionary-alist nil)
+(defvar lookup-entry-table nil)
+(defvar lookup-default-module nil)
+(defvar lookup-buffer-list nil)
+(defvar lookup-current-session nil)
+(defvar lookup-last-session nil)
+(defvar lookup-record-table nil)
+
+(defvar lookup-mode-help nil)
+(make-variable-buffer-local 'lookup-mode-help)
+
+(defvar lookup-byte-compiling nil)
+(defvar lookup-dynamic-display nil)
+(defvar lookup-valid-dictionaries nil)
+(defvar lookup-proceeding-message nil)
+(defvar lookup-window-configuration nil)
+
+(defvar lookup-gaiji-compose-function nil)
+(defvar lookup-gaiji-paste-function nil)
+
+(defun lookup-init-gaiji-functions ()
+  (cond ((featurep 'xemacs)
+	 (setq lookup-gaiji-compose-function 'lookup-glyph-compose
+	       lookup-gaiji-paste-function 'lookup-glyph-paste))
+	(lookup-use-bitmap
+	 (setq lookup-gaiji-compose-function 'lookup-bitmap-compose
+	       lookup-gaiji-paste-function 'lookup-bitmap-paste))
+	(t
+	 (setq lookup-gaiji-compose-function nil
+	       lookup-gaiji-paste-function 'lookup-bitmap-paste))))
+
+(provide 'lookup-vars)
+
+;;; lookup-vars.el ends here
+
+;;; Local variables:
+;;; mode:emacs-lisp
+;;; End:
