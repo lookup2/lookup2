@@ -37,33 +37,39 @@
 	  (format "Looking up `%s'" (lookup-query-pattern query)))
 	 (lookup-dynamic-display t)
 	 (method (lookup-query-method query))
+	 (original-module module)
 	 search-found valid-dictionary priority entries)
     (lookup-proceeding-message nil)
     (lookup-start-session 'lookup-search-session module
-      (lookup-foreach
-       (lambda (dict)
-	 (setq priority (lookup-module-dictionary-priority module dict))
-	 (when (and (or lookup-valid-dictionaries
-			(cond ((eq priority t) t)
-			      ((eq priority 'secondary) (not search-found))
-			      ((eq priority 'supplement) search-found)))
-		    (or (eq method 'default)
-			(memq method (lookup-dictionary-methods dict))))
-	   (setq valid-dictionary t)
-	   (lookup-proceeding-message
-	    (format "by %s..." (lookup-dictionary-title dict)))
-	   (when (setq entries (lookup-dictionary-search dict query))
-	     (if search-found
-		 (lookup-search-session-append lookup-current-session entries)
-	       (setq search-found t)
-	       (lookup-session-set-query lookup-current-session query)
-	       (lookup-session-set-entries lookup-current-session entries)
-	       (lookup-session-set-dictionaries lookup-current-session
-						lookup-valid-dictionaries)
-	       (lookup-open-session lookup-current-session)))))
-       (or lookup-valid-dictionaries (lookup-module-dictionaries module)))
+      (while module
+	(lookup-foreach
+	 (lambda (dict)
+	   (setq priority (lookup-module-dictionary-priority module dict))
+	   (when (and (or lookup-valid-dictionaries
+			  (cond ((eq priority t) t)
+				((eq priority 'secondary) (not search-found))
+				((eq priority 'supplement) search-found)))
+		      (or (eq method 'default)
+			  (memq method (lookup-dictionary-methods dict))))
+	     (setq valid-dictionary t)
+	     (lookup-proceeding-message
+	      (format "by %s..." (lookup-dictionary-title dict)))
+	     (when (setq entries (lookup-dictionary-search dict query))
+	       (if search-found
+		   (lookup-search-session-append lookup-current-session
+						 entries)
+		 (setq search-found t)
+		 (lookup-session-set-query lookup-current-session query)
+		 (lookup-session-set-entries lookup-current-session entries)
+		 (lookup-session-set-dictionaries lookup-current-session
+						  lookup-valid-dictionaries)
+		 (lookup-open-session lookup-current-session)))))
+	 (or lookup-valid-dictionaries (lookup-module-dictionaries module)))
+	(if (or search-found (eq (setq module (lookup-nth-module 1 module))
+				 original-module))
+	    (setq module nil)))
       (if (not valid-dictionary)
-	  (signal 'lookup-no-valid-dictionary (list 'method)))
+	  (signal 'lookup-no-valid-dictionary (list method)))
       (if (not search-found)
 	  (signal 'lookup-no-entry-error (list (lookup-query-pattern query)))))
     (lookup-proceeding-message t)))
