@@ -22,11 +22,6 @@
 
 ;;; Code:
 
-(require 'evi)
-
-(defconst lookup-version "@VERSION@"
-  "The version numbers of Lookup.")
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
 ;;;;;;;;;;;;;;;;;;;;
@@ -119,14 +114,14 @@ FILE is a complement file name."
   :type 'boolean
   :group 'lookup-general-options)
   
-
-(defcustom lookup-use-bitmap (featurep 'bitmap)
+(defcustom lookup-use-bitmap (or (featurep 'bitmap)
+				 (locate-library "bitmap"))
   "*Non-nil を指定すると、bitmap-mule パッケージを利用した外字表示を行なう。"
   :type 'boolean
   :group 'lookup-general-options)
 
-(defcustom lookup-use-kakasi (or (locate-library "kakasi" nil exec-path)
-				 (locate-library "kakasi.exe" nil exec-path))
+(defcustom lookup-use-kakasi (or (locate-library "kakasi" t exec-path)
+				 (locate-library "kakasi.exe" t exec-path))
   "*Non-nil を指定すると、いくつかの局面で KAKASI が利用される。
 これは現在、具体的には日本語のデフォルトの検索語の切り出しに用いている。"
   :type 'boolean

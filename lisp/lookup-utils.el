@@ -22,8 +22,6 @@
 
 ;;; Code:
 
-(require 'evi)
-
 ;; alist by assq
 
 (defsubst lookup-assq-get (alist key)

@@ -1,4 +1,4 @@
-;;; lookup-select.el --- Lookup Select Session
+;;; lookup-module.el --- Lookup Module Management
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -303,6 +303,6 @@ will be used instead of the usual `kill-ring'."
 	(forward-line))
       (lookup-module-set-dictionaries module (nreverse dicts)))))
 
-(provide 'lookup-select)
+(provide 'lookup-module)
 
-;;; lookup-select.el ends here
+;;; lookup-module.el ends here

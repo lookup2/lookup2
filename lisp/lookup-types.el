@@ -22,7 +22,6 @@
 
 ;;; Code:
 
-(require 'evi)
 (require 'lookup-utils)
 (require 'lookup-vars)
 

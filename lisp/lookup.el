@@ -22,10 +22,12 @@
 
 ;;; Code:
 
-(require 'evi)
 (require 'lookup-vars)
 (require 'lookup-utils)
 (require 'lookup-types)
+
+(defconst lookup-version "1.99.0"
+  "The version numbers of Lookup.")
 
 
 ;;;;;;;;;;;;;;;;;;;;

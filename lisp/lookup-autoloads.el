@@ -36,7 +36,7 @@
 ;;;;;;  (14217 18484))
 ;;; Generated autoloads from lisp/lookup-select.el
 
-(autoload (quote lookup-select-session) "lookup-select" nil nil nil)
+(autoload (quote lookup-select-session) "lookup-module" nil nil nil)
 
 ;;;***
 
