@@ -18,14 +18,12 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'decode-iso10646)
-(require 'gte)
+(require 'lookup-utils)
 
 (defvar ipaface 'default)
 
 (defconst oxford-gaiji-table
   (lookup-new-gaiji-table
-   (gte
     '(
       ("h0f01" "=")
       ("h0f02" "=")
@@ -275,7 +273,7 @@
       ("h0ffc" "<&u:00EE>")
       ("h0ffd" "<&u:00F4>")
       ("h0ffe" "<&u:00F1>")
-      ("h1001" "=")))))
+      ("h1001" "="))))
 
 (defun oxford-arrange-structure (entry)
   (goto-char (point-min))

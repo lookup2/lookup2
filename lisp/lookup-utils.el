@@ -315,6 +315,19 @@
   (if (process-buffer process)
       (kill-buffer (process-buffer process))))
 
+;; lookup & iso-10646
+
+(unless (coding-system-p 'utf-8)
+  (define-coding-system-alias 'utf-8 'mule-utf-8))
+
+(defun get-iso10646-str (ucs)
+  (char-to-string
+   (if (functionp 'ucs-to-char)
+       (ucs-to-char ucs)
+     (if (functionp 'ucs-char)
+         (ucs-char ucs)
+       (decode-char 'ucs ucs)))))
+
 (provide 'lookup-utils)
 
 ;;; lookup-utils.el ends here

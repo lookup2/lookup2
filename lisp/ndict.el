@@ -42,8 +42,7 @@
     (t
      (methods . ((exact . "exact") (prefix . "prefix"))))))
 
-(defconst ndict-process-coding-system
-  (if (featurep 'evi-mule) (evi-coding-system 'euc-jp-dos)))
+(defconst ndict-process-coding-system 'euc-jp-dos)
 
 ;;;
 ;;; types
@@ -124,9 +123,8 @@
       (setq process (ndict-process-open (ndict-agent-server agent)
 					(ndict-agent-service agent)))
       ;; initial setup
-      (when (featurep 'evi-mule)
-	(let ((coding (ndict-agent-coding agent)))
-	  (set-process-coding-system process coding coding)))
+      (let ((coding (ndict-agent-coding agent)))
+        (set-process-coding-system process coding coding))
       (let ((ndict-current-process process)
 	    (auth (ndict-agent-auth agent)))
 	(ndict-process-require (concat "CLIENT ndict " ndict-version))

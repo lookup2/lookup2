@@ -18,8 +18,7 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'decode-iso10646)
-(require 'gte)
+(require 'lookup-utils)
 
 (defvar ipaface 'default)
 
@@ -638,8 +637,6 @@
 	 ("G9-fc" "<&u:00fc>")
 	 ("G9-fd" "<&u:00fd>")
 	 ("G9-ff" "<&u:00ff>"))))
-
-  (gte encoded-srd-gaiji-table)
 
   (defconst srd-gaiji-table
     (lookup-new-gaiji-table

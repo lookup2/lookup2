@@ -32,8 +32,8 @@
 (defvar ndtp-current-dictionary nil)
 (defvar ndtp-current-process nil)
 
-(defconst ndtp-process-coding-system
-  (if (featurep 'evi-mule) (evi-coding-system 'euc-jp)))
+(defconst ndtp-process-coding-system 'euc-jp)
+
 
 ;;;
 ;;; types
@@ -220,14 +220,21 @@
    ((string-match "gaiji:\\([0-9a-z]+\\)" code)
     (list (ndtp-dictionary-font dictionary code)))
    ((string-match "&u:\\([0-9a-f]+\\)" code)
-    (vector 'unicode (string-to-int (match-string 1 code) 16)))
-   ((string-match "&j2:\\([0-9]+\\)" code)
-    (vector 'jisx0212 (string-to-int (match-string 1 code))))
-   ((string-match "&g0:\\([0-9]+\\)" code)
-    (vector 'gb2312 (string-to-int (match-string 1 code))))
-   ((string-match "&c\\([0-7]\\):\\([0-9a-f]+\\)" code)
+    (vector 'ucs (string-to-int (match-string 1 code) 16)))
+   ((string-match "&j2:\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
+    (vector 'japanese-jisx0212 
+            (+ 32 (string-to-int (match-string 1 code)))
+            (+ 32 (string-to-int (match-string 2 code)))))
+   ((string-match "&g0:\\([0-9][0-9]\\)\\([0-9][0-9]\\)" code)
+    (vector 'chinese-gb2312 
+            (+ 32 (string-to-int (match-string 1 code)))
+            (+ 32 (string-to-int (match-string 2 code)))))
+   ((string-match 
+     "&c\\([0-7]\\):\\([0-9a-fA-F][0-9a-fA-F]\\)\\([0-9a-fA-F][0-9a-fA-F]\\)"
+     code)
     (vector (intern (concat "cns" (match-string 1 code)))
-	    (string-to-int (match-string 2 code) 16)))))
+	    (string-to-int (match-string 2 code) 16)
+	    (string-to-int (match-string 3 code) 16)))))
 
 (put 'ndtp :font 'ndtp-dictionary-font)
 (defun ndtp-dictionary-font (dictionary code)

@@ -70,6 +70,24 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 	     "Lookup debug disabled")))
 
 
+;;;;;;;;;;;;;;;;;;;;
+;; Internal Functions
+;;;;;;;;;;;;;;;;;;;;
+
+(defvar lookup-message nil)
+
+(put 'lookup-with-message 'lisp-indent-function 1)
+(defmacro lookup-with-message (msg &rest body)
+  `(let ((lookup-message ,msg))
+     (message "%s..." lookup-message)
+     (prog1 (progn ,@body)
+       (message "%s...done" lookup-message))))
+
+(defun lookup-message (msg)
+  (message "%s... (%s)" lookup-message msg))
+
+
+
 ;;;
 ;;; Global commands
 ;;;
@@ -642,7 +660,7 @@ See `lookup-secondary' for details."
 
 (defun lookup-current-module ()
   (let ((session (lookup-current-session)))
-    (if session (lookup-session-module session))))
+    (if session (lookup-session-module session) (lookup-default-module))))
 
 (defun lookup-default-module ()
   (let ((name (or (lookup-assq-get lookup-mode-module-alist major-mode)
@@ -782,23 +800,6 @@ See `lookup-secondary' for details."
 
 (defun lookup-exclusive-frame-p ()
   (string= (frame-parameter (selected-frame) 'name) "Lookup"))
-
-
-;;;;;;;;;;;;;;;;;;;;
-;; Internal Functions
-;;;;;;;;;;;;;;;;;;;;
-
-(defvar lookup-message nil)
-
-(put 'lookup-with-message 'lisp-indent-function 1)
-(defmacro lookup-with-message (msg &rest body)
-  `(let ((lookup-message ,msg))
-     (message "%s..." lookup-message)
-     (prog1 (progn ,@body)
-       (message "%s...done" lookup-message))))
-
-(defun lookup-message (msg)
-  (message "%s... (%s)" lookup-message msg))
 
 
 ;;;;;;;;;;;;;;;;;;;;

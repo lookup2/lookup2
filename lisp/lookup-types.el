@@ -595,6 +595,11 @@
     (setq alter (or alter lookup-gaiji-alternative)))
   (make-lookup-gaiji :glyph glyph :alter alter))
 
+(defun lookup-gaiji-concrete (spec)
+   (if (eq (elt spec 0) 'ucs)
+       (get-iso10646-str (elt spec 1))
+     (char-to-string (make-char (elt spec 0) (elt spec 1) (elt spec 2)))))
+
 (defun lookup-gaiji-insert (gaiji)
   (let ((glyph (lookup-gaiji-glyph gaiji))
 	(alter (lookup-gaiji-alter gaiji))
