@@ -1,0 +1,946 @@
+\input texinfo  @c -*-texinfo-*-
+@c %**start of header
+@setfilename lookup-guide.info
+@settitle Lookup User's Guide
+@footnotestyle end
+@setchapternewpage on
+@c %**end of header
+
+@set UPDATED 2000-2-12
+@set EDITION 1.2
+@set VERSION 1.2
+
+@ifinfo
+@dircategory The Emacs editor and associated tools
+@direntry
+* Lookup Guide: (lookup-guide). The Lookup User's Guide.
+@end direntry
+
+This file documents Lookup, a search interface.
+
+Copyright @copyright{} 1999 Keisuke Nishida
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+@ignore
+Permission is granted to process this file through TeX and print the
+results, provided the printed document carries a copying permission
+notice identical to this one except for the removal of this paragraph
+(this paragraph not being relevant to the printed manual).
+
+@end ignore
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+@end ifinfo
+
+@titlepage
+@title Lookup User's Guide
+@subtitle for Lookup @value{VERSION}
+@author Keisuke Nishida
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+Updated for Lookup @value{VERSION} @*
+@value{UPDATED} @*
+
+Copyright @copyright{} 1999 Keisuke Nishida
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+@end titlepage
+
+@contents
+
+@c #####################################################################
+@node Top, Preparation, (dir), (dir)
+@ifinfo
+@top Lookup User's Guide
+
+これは Lookup を利用するための最初のステップについてまとめた手引き書です。
+初心者にとって重要な情報をコンパクトにまとめてあるので、まずはここで概要
+を把握し、初期設定を整えて下さい。
+@end ifinfo
+
+@menu
+準備編
+
+* Free Dictionary::             フリー辞書を利用する
+* CD-ROM Dictionary::           CD-ROM 辞書を利用する
+* Network Dictionary::          ネットワーク辞書を利用する
+* Miscellaneous Dictionary::    その他の特殊な検索システム
+
+活用編
+
+* Setup Example::               基本的な設定例
+* Run Lookup::                  起動するには
+* Search Pattern::              検索してみよう
+* See Result::                  結果を見ていく
+
+情報編
+
+* Lookup Homepage::             ホームページの構成
+* Source of Information::       知っておくと嬉しい情報源
+* Attention for Emacsen::       各種 Emacs 毎の注意点
+@end menu
+
+@c *********************************************************************
+@node Preparation, Utilization, Top, Top
+@chapter 準備編
+
+ここでは Lookup で用いる辞書の準備項目について説明します。
+
+@menu
+* Free Dictionary::             フリー辞書を利用する
+* CD-ROM Dictionary::           CD-ROM 辞書を利用する
+* Network Dictionary::          ネットワーク辞書を利用する
+* Miscellaneous Dictionary::    その他の特殊な検索システム
+@end menu
+
+@c =====================================================================
+@node Free Dictionary, CD-ROM Dictionary, Preparation, Preparation
+@section フリー辞書を利用する
+
+Lookup ではネットワークで配布されているいくつかのフリーまたは無料の辞書を
+利用することが出来ます。そのような辞書の一覧が、
+@uref{http://openlab.ring.gr.jp/lookup/dicts/, 辞書データベース}
+のページにまとめられているので参照して下さい。
+
+Lookup が標準で対応しているフリー辞書の形式は、「SDIC フォーマット」と
+「dictd フォーマット」の二つです。利用する辞書に合わせて準備して下さい。
+
+@menu
+* SDIC format::                 SDIC フォーマット
+* dictd format::                dictd フォーマット
+@end menu
+
+@c ---------------------------------------------------------------------
+@node SDIC format, dictd format, Free Dictionary, Free Dictionary
+@subsection SDIC フォーマット
+
+@dfn{SDIC フォーマット} とは、Emacs で使えるシンプルな辞書検索ソフト
+@uref{http://pine.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html, SDIC}
+で採用されている行指向の辞書形式です。grep 一つで高速に検索を行なえるのが
+特徴です。
+
+@subsubheading SDIC 辞書の準備
+
+SDIC 辞書は @file{.sdic} を拡張子に持つ単一のファイルからなります。
+単純ゆえの柔軟性で、要求に応じて三つの検索方式が用意されています。
+
+@enumerate
+@item
+direct 方式
+
+辞書を Emacs のバッファに読み込んで、直接検索を行なう方式です。
+メモリを圧迫するなどのデメリットもありますが、Emacs 以外の外部コマンドを
+必要としないため Windows ユーザにも手軽に利用出来るという利点があります。
+
+@item
+grep 方式
+
+外部コマンドとして @code{fgrep} もしくは @code{grep} を用いて
+検索を行なう方式です。十分に高速で便利なため、通常はこれを利用します。
+
+@item
+array 方式
+
+外部コマンドとして @uref{http://cactus.aist-nara.ac.jp/lab/nlt/ss/, SUFARY}
+というソフトウェアを用いて検索を行なう方式です。
+これはあらかじめ特別なインデックスを生成することで検索を高速化します。
+5MB を超えるような大きなサイズの辞書を用いる場合には、こちらの利用が
+有効かもしれません。
+@end enumerate
+
+grep 方式を用いるには、外部コマンドとして @code{fgrep} もしくは
+@code{grep} を実行パスに置いて下さい。一般的な UNIX システムであれば
+標準で附属しています。array 方式を用いるには、SUFARY をインストールして
+@code{mkary} でインデックスを生成して下さい。
+
+辞書は好きなディレクトリに置いて構いません。direct 方式を用いる場合は、
+Emacs 19.34 以降なら辞書を @code{gzip} などで圧縮しておくことも出来ます。
+@file{~/.emacs} で @code{(auto-compression-mode t)} としておいて下さい。
+
+@subsubheading SDIC 辞書の利用
+
+SDIC 辞書は、Lookup の ndic エージェントで利用することが出来ます。
+辞書を置いたディレクトリを引数にして、例えば次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndic "/usr/local/dict")))
+@end lisp
+
+ディレクトリに含まれる全ての @file{.sdic} ファイルが辞書として認識されます。
+
+@c ---------------------------------------------------------------------
+@node dictd format,  , SDIC format, Free Dictionary
+@subsection dictd フォーマット
+
+@dfn{dictd フォーマット} とは、DICT プロトコル(@sc{RFC 2229})に対応した
+辞書サーバである @uref{http://www.dict.org, dictd} が独自に採用している
+辞書形式です。単純かつ十分に実用的なフォーマットです。
+
+@subsubheading dictd 辞書の準備
+
+dictd 辞書は、@file{.index} を拡張子に持つインデックス・ファイルと、
+@file{.dict} を拡張子に持つデータ・ファイルの二つからなります。
+両方のファイルを適当な同じディレクトリに置いて下さい。
+
+@file{.dict} ファイルは dictd に附属の @code{dictzip} というコマンドで
+圧縮することが出来ます。詳しくは dictd のマニュアルを参照して下さい。
+
+@subsubheading dictd 辞書の利用
+
+dictd 辞書は、Lookup の ndic もしくは ndict エージェントで利用することが
+出来ます。ndic では辞書の直接検索を行ない、ndict では DICT プロトコルを
+用いてサーバから検索を行ないます。ndic の方がお手軽ですが、ndict の方が
+より高速な検索が可能です。
+
+@enumerate
+@item
+ndic を用いる場合
+
+辞書を置いたディレクトリを引数にして、例えば次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndic "/usr/local/dict")))
+@end lisp
+
+ディレクトリに含まれる全ての @file{.index} ファイルが辞書として認識されます。
+先の SDIC 辞書と混在してあっても構いません。辞書を圧縮してある場合には、
+@code{dictzip} コマンドを実行パスの通ったディレクトリにインストールして
+おいて下さい。
+
+@item
+ndict を用いる場合
+
+あらかじめ DICT サーバを立ち上げておいて、次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndict "dict-server")))
+@end lisp
+
+DICT サーバの立ち上げについては、@ref{DICT server} を参照して下さい。
+@end enumerate
+
+@c =====================================================================
+@node CD-ROM Dictionary, Network Dictionary, Free Dictionary, Preparation
+@section CD-ROM 辞書を利用する
+
+Lookup では多くの市販の CD-ROM 辞書を利用することが出来ます。利用可能な
+辞書の一覧が、@uref{http://openlab.ring.gr.jp/lookup/dicts/, 辞書データベース}
+のページにまとめられているので参照して下さい。
+
+Lookup は標準で、電子ブックや EPWING 規約に準拠した CD-ROM 書籍の利用に
+対応しています。別配布の専用プログラムを用意することで、独自フォーマット
+の CD-ROM 辞書についても利用出来るものがあります。
+
+@menu
+* EPWING format::               電子ブック・EPWING
+* Original format::             独自フォーマット
+* Setup Gaiji::                 外字表示の設定
+@end menu
+
+@c ---------------------------------------------------------------------
+@node EPWING format, Original format, CD-ROM Dictionary, CD-ROM Dictionary
+@subsection 電子ブック・EPWING
+
+電子ブックや EPWING 規約は、日本で一般的な電子辞書の共通規格です。
+パッケージの外箱に書かれた「@sc{EBXA}」とか「@sc{EPWING}」といったロゴが
+目印です。(以下、まとめて EPWING 辞書と呼ぶ)
+
+@subsubheading EPWING 辞書の準備
+
+EPWING 辞書は CD-ROM から直接検索せずとも、あらかじめハードディスクに
+コピーしておくことで、より便利に高速に検索を行なえます。ディスク容量に
+余裕のある人は、認められた範囲内でコピーしておくといいでしょう。
+
+このとき、太田氏作の @uref{ftp://ftp.nerimadors.or.jp/pub/epwutil/, EPWUTIL}
+や、笠原氏作の @uref{http://www.sra.co.jp/people/m-kasahr/eb/, EB ライブラリ}
+に含まれる @code{ebzip} といったツールを用いることで、辞書のサイズを
+小さく収めることが可能です(1/2 〜 1/10 程度)。詳しくは、それぞれの
+プログラムに附属のドキュメントを参照して下さい。
+
+@subsubheading EPWING 辞書の利用
+
+EPWING 辞書は、Lookup の ndeb もしくは ndtp エージェントで利用することが
+出来ます。ndeb は個人での CD-ROM 辞書利用に向いており、ndtp はネットワークを
+介した辞書の共有に向いています。
+
+@enumerate
+@item
+ndeb を用いる場合
+
+検索を行なうための外部コマンドとして
+@uref{http://openlab.ring.gr.jp/lookup/eblook/, eblook} が必要です。
+あらかじめ入手してインストールしておいて下さい。
+
+もし外字を表示出来る環境にないか、外字を用いたくないという場合には、
+外字置き換え設定ファイルである
+@uref{http://www.sra.co.jp/people/m-kasahr/eb/, Appendix} も入手して下さい。
+
+Lookup の設定は、例えば次のようにして下さい。
+
+@lisp
+(setq lookup-search-agents '((ndeb "/cdrom" :appendix "/your/appendix")))
+@end lisp
+
+@item
+ndtp を用いる場合
+
+あらかじめ NDTP サーバを立ち上げておいて、次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndtp "dserver")))
+@end lisp
+
+NDTP サーバの立ち上げについては、@ref{NDTP server} を参照して下さい。
+@end enumerate
+
+@c ---------------------------------------------------------------------
+@node Original format, Setup Gaiji, EPWING format, CD-ROM Dictionary
+@subsection 独自フォーマット
+
+現在、小学館の「ランダムハウス英語辞典」から検索が行なえるようになって
+いますが、まだ開発段階にあります。興味のある方は、
+@uref{http://openlab.ring.gr.jp/edict/, 電子辞書オープンラボ}
+の edict ML で尋ねて下さい。
+
+@c ---------------------------------------------------------------------
+@node Setup Gaiji,  , Original format, CD-ROM Dictionary
+@subsection 外字表示の設定
+
+Lookup は CD-ROM 書籍などに含まれる外字の表示をサポートしています。
+外字を表示するには、それぞれの検索エージェントで適切な設定を行なった上で、
+Lookup を次のように設定して下さい。
+
+@enumerate
+@item
+GNU Emacs 及び Mule の場合:
+
+@url{http://openlab.ring.gr.jp/lookup/info/gaiji.html} を参考に
+bitmap-mule をインストールして下さい。次のいずれかの方法で準備が完了です。
+
+@enumerate
+@item
+Lookup の起動前に bitmap-mule をロードする。
+
+例えば @file{~/.emacs} に @code{(require 'bitmap)} と書いておいて下さい。
+
+@item
+初期化ファイルで @code{lookup-use-bitmap} を @code{t} にセットする。
+
+この場合、実際に外字を表示する際に bitmap-mule が読み込まれます。
+@end enumerate
+
+@item
+XEmacs の場合:
+
+特別な準備は必要ありません。Lookup は XEmacs の glyph の機能を利用して、
+外字を一種の画像として扱います。設定は自動で行なわれます。
+@end enumerate
+
+逆に、外字を表示させたくない場合には、変数 @code{lookup-enable-gaiji} を
+@code{nil} に設定して下さい。これはデフォルトで @code{t} となっています。
+
+@c =====================================================================
+@node Network Dictionary, Miscellaneous Dictionary, CD-ROM Dictionary, Preparation
+@section ネットワーク辞書を利用する
+
+電子辞書をネットワークで共有して利用したい場合は、辞書サーバを立ち上げて
+検索サービスを提供するのが一つの方法です。また、インターネットには自由に
+アクセス出来る辞書サーバも存在し、それらにアクセスすることも可能です。
+
+Lookup が対応している辞書サーバは、@dfn{NDTP サーバ} と
+@dfn{DICT サーバ} の二つです。ここではそれぞれについて、
+サーバの紹介と Lookup の設定について説明します。
+
+@menu
+* NDTP server::                 NDTP サーバ
+* DICT server::                 DICT サーバ
+@end menu
+
+@c ---------------------------------------------------------------------
+@node NDTP server, DICT server, Network Dictionary, Network Dictionary
+@subsection NDTP サーバ
+
+NDTP(Network Dictionary Transport Protocol)とは、主に日本で使われている、
+CD-ROM 辞書をネットワークで利用するための検索用プロトコルです。
+
+@subsubheading NDTP サーバの準備
+
+NDTP サーバとしては、現在
+@uref{http://www.sra.co.jp/people/m-kasahr/ndtpd/, NDTPD}
+が主に用いられています。附属のドキュメントを参照して、
+インストール、及び設定を行なって下さい。
+
+@table @asis
+@item NDPTD
+@end table
+
+@subsubheading NDTP サーバの利用
+
+例えば次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndtp "dserver")))
+@end lisp
+
+@c ---------------------------------------------------------------------
+@node DICT server,  , NDTP server, Network Dictionary
+@subsection DICT サーバ
+
+DICT とは、@sc{RFC 2229} で定義されている辞書検索のためのプロトコルです。
+
+@subsubheading DICT サーバの準備
+
+DICT サーバとして、@uref{http://www.dict.org, DICT プロジェクト} により 
+dictd が公開されています。附属のドキュメントを参照して、インストール、
+及び設定を行なって下さい。
+
+@subsubheading DICT サーバの利用
+
+例えば次のように設定して下さい。
+
+@example
+(setq lookup-search-agents '((ndict "dict.org")))
+@end example
+
+@c =====================================================================
+@node Miscellaneous Dictionary,  , Network Dictionary, Preparation
+@section その他の特殊な検索システム
+
+Lookup では他にも、次のような特殊な検索エージェントが標準で利用可能です。
+好みに応じて準備を整えて下さい。
+
+@menu
+* ndkks agent::                 日本語の読みを調べる
+* ndspell agent::               スペルチェックとスペル検索
+* ndcookie agent::              今日の運勢をチェックする
+@end menu
+
+@c ---------------------------------------------------------------------
+@node ndkks agent, ndspell agent, Miscellaneous Dictionary, Miscellaneous Dictionary
+@subsection 日本語の読みを調べる
+
+`ndkks' は、日本語の漢字の読みを調べるための検索エージェントです。漢字を
+含む検索語が指定された場合、漢字かな変換プログラム KAKASI を用いてその
+読みを調べます。
+
+漢字の含まれる検索語を指定した場合、漢字かな変換プログラム KAKASI を用い
+てその読みを調べて表示します。
+
+KAKASI は次のところから @file{kakasi-2.2.5.tar.gz}(本体ファイル)と
+@file{kakasidict.940620.gz}(辞書ファイル)の名称で入手可能です。
+
+@example
+@url{ftp://sunsite.sut.ac.jp/pub/asia-info/japanese-src/packages/}
+@end example
+
+次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndkks)))
+@end lisp
+
+@c ---------------------------------------------------------------------
+@node ndspell agent, ndcookie agent, ndkks agent, Miscellaneous Dictionary
+@subsection スペルチェックとスペル検索
+
+`ndspell' は、Lookup でスペルチェックを行なうための検索エージェントです。
+もし検索語を普通に検索して何も見付からなかった場合、スペルチェックを
+行なってからもう一度再検索を試みます。
+
+ndspell は外部コマンドとして Ispell と grep を利用しています。Ispell は
+対話型のスペルチェックコマンドで、grep は言わずと知れた UNIX ツールです。
+どちらも GNU の FTP サイトなどから入手可能です。
+
+@example
+@url{ftp://ftp.gnu.org/pub/GNU/}
+@end example
+
+このエージェントは単独では用いずに、他の辞書と組み合わせて、例えば
+次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndic "/usr/local/dict") (ndspell)))
+@end lisp
+
+@c ---------------------------------------------------------------------
+@node ndcookie agent,  , ndspell agent, Miscellaneous Dictionary
+@subsection 今日の運勢をチェックする
+
+`ndcookie' は、検索時に cookie ファイル(引用集)から一句抜き出して表示する
+ための検索エージェントです。@code{fortune} プログラムと同様の働きをします。
+
+利用出来るファイルの例としては、Emacs に附属の Zippy ファイルがあります。
+次のように設定して下さい。
+
+@lisp
+(setq lookup-search-agents '((ndcookie "yow.lines")))
+@end lisp
+
+@c *********************************************************************
+@node Utilization, Information, Preparation, Top
+@chapter 活用編
+
+ここでは Lookup で実際に辞書を用いて検索を行なう方法について説明します。
+
+@menu
+* Setup Example::               基本的な設定例
+* Run Lookup::                  起動するには
+* Search Pattern::              検索してみよう
+* See Result::                  結果を見ていく
+@end menu
+
+@c =====================================================================
+@node Setup Example, Run Lookup, Utilization, Utilization
+@section 基本的な設定例
+
+以上が終われば、@file{~/.emacs} ファイルに設定を書き込みます。基本的には
+変数 @code{lookup-search-agents} をセットするだけです。利用したい検索エー
+ジェントの数だけ、設定を並べることが出来ます。
+
+例えば、NDTP サーバがホスト @samp{dserver} で動いており、CD-ROM 辞書を
+@file{/cdrom} にマウントしているのであれば、設定は次のようになります。
+
+@lisp
+(setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
+@end lisp
+
+さあ、辞書の設定は終わりました。しかし実際には、管理者の方が特別に設定を
+行なってでもいない限り、他にもいくつかの設定が必要となります。実用上、
+@file{~/.emacs} には次のように書いておくとよいでしょう。
+
+@lisp
+;;;
+;;; Lookup Setup Example
+;;;
+
+;; オートロードの設定
+(autoload 'lookup "lookup" nil t)
+(autoload 'lookup-region "lookup" nil t)
+(autoload 'lookup-pattern "lookup" nil t)
+
+;; キーバインドの設定
+(define-key ctl-x-map "l" 'lookup)              ; C-x l - lookup
+(define-key ctl-x-map "y" 'lookup-region)       ; C-x y - lookup-region
+(define-key ctl-x-map "\C-y" 'lookup-pattern)   ; C-x C-y - lookup-pattern
+
+;; 検索エージェントの設定
+(setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
+@end lisp
+
+最初の段落では、Lookup の各コマンドを実行したとき、自動的にプログラムを
+読み込むように設定しています。もし Emacs 起動時に初期化を済ませてしまう
+ことがお好みなら、代わりに @code{(require 'lookup)} などと書いておけばよ
+いでしょう。
+
+二番目の段落では、コマンドを実行するためのキーバインドを定義しています。
+これは必須ではありませんが、上記のコマンドはよく用いるので、適当なキーに
+割り当てておくと便利です。各自で好みのキーにバインドして下さい。
+
+最後の段落では、利用する検索エージェントを設定しています。これは前節で説
+明した通りです。各自のものに合わせて設定して下さい。
+
+以上が終われば、式を評価するなり、Emacs を再起動するなりして、設定を有効
+にして下さい。
+
+@c =====================================================================
+@node Run Lookup, Search Pattern, Setup Example, Utilization
+@section 起動するには
+
+お待たせしました。それでは Lookup を動かしていきましょう。まず手始めに
+@kbd{M-x lookup} として、プログラムが起動することを確認して下さい。
+
+@example
+
+@kbd{M-x lookup @key{RET}} @result{}
+
+======== Lookup Windows ========================================
+----------------------------------------------------------------
+Type `m' to select, `u' to unselect, `?' for help.
+
+% Identifier          Title                Method
+- ----------          -----                ------
+* ndtp+dserver:KOKUGO 国語辞典             =<>
+* ndeb+/cdrom:EIWA    英和辞典             =<>
+* ndeb+/cdrom:WAEI    和英辞典             =<>
+
+
+
+
+
+----------------------------------------------------------------
+-J:%*  Lookup: *Dictionary List*      (Select Abbrev)--L5--C0--A
+----------------------------------------------------------------
+================================================================
+
+@end example
+
+上のような画面が表示されましたか? もしエラーが起こったり、あるいは一覧が
+表示されないようなら、辞書やプログラムの設定に失敗しているかもしれません。
+問題点を確認して、もう一度やり直してみて下さい。よくあるミスなら FAQ に
+情報があるかもしれませんし、わからないことがあればメールで尋ねてもらって
+も一向に構いません。
+
+@cindex 辞書一覧バッファ
+このとき表示されるバッファを @dfn{辞書一覧バッファ} と呼びます。上の例で
+は、「国語辞典」「英和辞典」「和英辞典」の三つの辞書が使えるようになって
+います。以下、これらの辞書を例に説明していきます。
+
+行頭に @samp{*}(アスタリスク)のマークが付いているのは、その辞書を検索に
+用いるものとして、辞書が選択されているということを表わしています。上の場
+合、三つ全ての辞書から一度に検索が行なわれるという意味になります。通常、
+最初は利用出来る全ての辞書が選択状態になっています。
+
+@cindex 辞書名
+@cindex 辞書ID
+@cindex エージェントID
+@samp{Identifier} とあるコラムには、辞書を特定するための名称が表示されて
+います。これは利用している検索エージェント(@var{agent})と、辞書の所在
+(@var{location})、及び辞書名(@var{name})とを組み合わせて、
+@samp{@var{agent+location:name}} という形で表わされます。本書ではこれを
+@dfn{辞書ID} と呼び、@samp{@var{name}} で表わされる @dfn{辞書名} とは区
+別します。また同様に、@samp{@var{agent+location}} の部分は @dfn{エージェ
+ントID} と呼びます。
+
+@samp{Title} とあるコラムには、辞書のタイトルが表示されます。これは検索
+結果の出力などに、普段用いられるものです。オプション設定により自由に変更
+することも可能ですから、後で見やすいものに変えておきましょう。
+
+最後の @samp{Methods} とあるコラムには、辞書が対応している検索方式が示さ
+れています。これは各種検索方式がそれぞれ一つの記号で表わされており、上の
+場合はどの辞書も「前方一致検索」「後方一致検索」「完全一致検索」に対応し
+ているという意味になります。詳しくは後ほど説明します。
+
+このバッファでは辞書の一覧を確認する以外にも、辞書の選択状態を切り替える
+などいくつかの操作が可能となっています。試しに @kbd{?} を押してみて下さ
+い。別のバッファにコマンドの一覧が表示されましたね? Lookup の各バッファ
+では、@kbd{?} キーを押すことで簡単なコマンド一覧が出るようになっているの
+で、ちょっと調べたいときにご利用下さい。
+
+どこでも使えるキー操作をもう一つ。@kbd{q} を押せば、そのバッファを抜けて
+元の作業に戻ることが出来ます。さあ、それでは辞書の確認はこの辺にして、次
+のステップに進みましょう。
+
+@c =====================================================================
+@node Search Pattern, See Result, Run Lookup, Utilization
+@section 検索してみよう
+
+いよいよ検索を行ないます。最も代表的な検索コマンドとして、@kbd{M-x
+lookup-region} と @kbd{M-x lookup-pattern} の二つがあります。それぞれ
+リージョンの内容、及びミニバッファからの入力を検索語に、検索を開始します。
+
+@example
+
+@kbd{M-x lookup-pattern @key{RET} test @key{RET}} @result{}
+
+======== Lookup Windows ========================================
+----------------------------------------------------------------
+国語辞典            @point{}テスト
+英和辞典            test
+
+
+----------------------------------------------------------------
+-J:%*  Lookup: *Entry* @{*:test@} [2]      (Entry Abbrev)--L1--C20
+----------------------------------------------------------------
+テスト
+[名] 1. 試験....
+
+
+
+
+----------------------------------------------------------------
+-J:%*  Lookup: *Content* @{テスト@}      (Content Abbrev)--L1--C0-
+----------------------------------------------------------------
+================================================================
+
+@end example
+
+@cindex Entry バッファ
+二つのバッファが表示されました。上側のバッファは @dfn{Entry バッファ} と
+言い、検索の結果見付かったエントリを一覧します。ここでは二つのエントリが
+表示されています。@point{} とあるのは、そこにポイントがあるという印です。
+つまり、現在一つ目の「テスト」というエントリが選択されています。
+
+@cindex Content バッファ
+下側のバッファは @dfn{Content バッファ} と言い、選択されているエントリの
+本文が表示されます。Entry バッファで @key{SPC} を押していけば、内容が次々
+と表示されます。
+
+上の例では @samp{test} という検索語で検索を行ないましたが、ここで入力を
+次のようにすることで、検索方式を様々に切り換えることが出来ます。
+
+@table @t
+@item word
+単語検索。標準の検索方法。
+@item word*
+前方一致検索。指定した文字列で始まる語を見付ける。
+@item *word
+後方一致検索。指定した文字列で終わる語を見付ける。
+@item *word*
+部分一致検索。指定した文字列を含んだ語を見付ける。
+@item 'word'
+完全一致検索。指定した文字列と一致する語を見付ける。
+@item @@word
+キーワード検索。指定した文字列をキーワードに持つエントリを見付ける。
+@end table
+
+ひとまずこれだけ覚えておけば十分でしょう。検索方式は他にもまだいくつか
+ありますが、詳しくは後ほど説明します。ここではもう少し、検索結果の見方に
+ついて話を進めていきます。
+
+@c =====================================================================
+@node See Result,  , Search Pattern, Utilization
+@section 結果を見ていく
+
+以下、Entry バッファでよく用いられるコマンドについて説明します。キー操作
+を忘れてしまったときには、@kbd{?} を押せば確認出来ます。
+
+@itemize @bullet
+@item
+本文のスクロール
+@table @kbd
+@item @key{SPC}
+一画面分、先に進む。
+@item @key{DEL}
+一画面分、前に戻る。
+@item <
+バッファの先頭へ戻る。
+@item >
+バッファの最後へ進む。
+@end table
+
+@item
+エントリの選択
+@table @kbd
+@item n
+次のエントリに移動。
+@item p
+前のエントリに移動。
+@item M-n
+検索履歴を次に進む。
+@item M-p
+検索履歴を前に戻る。
+@end table
+
+@item
+本文に対する操作
+@table @kbd
+@item s
+Content バッファで @code{isearch-forward} を実行。
+@item w
+Content バッファの内容をキルリングにセーブ。
+@item L
+リファレンスを一覧。
+@end table
+@end itemize
+
+@cindex Overview モード
+まだまだあります。見付かったエントリが多くて一覧が見辛いときには、
+@kbd{v} を押すことで @dfn{Overview モード} に入ります。
+Overview モードでは Content バッファがクローズされ、Entry バッファを
+広く見ることが出来ます。Overview モードを抜けるには、もう一度 @kbd{v}
+とするか、あるいは @key{SPC} を押して下さい。
+
+逆にエントリの本文を広く見たいときには、@kbd{o} が使えます。これは
+Lookup のウィンドウをフレーム一杯に広げ、一時的に表示領域を広く取ります。
+@kbd{q} でバッファを閉じれば、次からまた元に戻ります。
+
+一度バッファを閉じた後でも、もう一度 @kbd{M-x lookup} とすることで、最後
+に Lookup を抜けたときの状態が取り戻されます。@kbd{q} と @kbd{M-x lookup}
+を繰り返すことで、何度でも検索結果を見直すことが出来ます。
+
+検索結果を表示したまま最初のバッファに戻りたいときには、@kbd{r} を押せば
+OK です。@kbd{h} を連打すれば、Entry バッファと Content バッファの間を
+往復することも出来ます。
+
+これだけ覚えておけば、日常の作業は十分に行なえるでしょう。しかし Lookup
+には、場合によって役に立ついくつかのコマンドが他にも用意されています。
+次章以降で、それらを含む Lookup の完全な機能について説明します。
+
+さて、以上で Lookup を使うための短かいツアーも終了です。いかがでしょうか?
+Lookup はあなたの要望を満たしてくれそうですか? もし使っていて「もっとこ
+んな機能が欲しいぞ」とかいうことがありましたら、遠慮なくメールででも伝え
+て下さい。
+
+それでは、あなたのより快適な検索ライフを祈って。Happy Looking Up!
+
+@c *********************************************************************
+@node Information,  , Utilization, Top
+@chapter 情報編
+
+ここでは Lookup と関連のある情報についてまとめて紹介します。
+
+@menu
+* Lookup Homepage::             ホームページの構成
+* Source of Information::       知っておくと嬉しい情報源
+* Attention for Emacsen::       各種 Emacs 毎の注意点
+@end menu
+
+@c =====================================================================
+@node Lookup Homepage, Source of Information, Information, Information
+@section ホームページの構成
+
+@menu
+* General Information::         一般情報
+* User Information::            ユーザ情報
+* Developer Information::       開発者情報
+@end menu
+
+@c ---------------------------------------------------------------------
+@node General Information, User Information, Lookup Homepage, Lookup Homepage
+@subsection 一般情報
+
+@table @asis
+@item ダウンロードサイト一覧
+@item スクリーンショット
+@item メーリングリスト
+@item 全文検索
+@end table
+
+@c ---------------------------------------------------------------------
+@node User Information, Developer Information, General Information, Lookup Homepage
+@subsection ユーザ情報
+
+@table @asis
+@item ユーザーズガイド (@inforef{Top, Lookup User's Guide, lookup-guide})
+このガイドです。
+@item ユーザーズマニュアル (@inforef{Top, Lookup Manual, lookup})
+Lookup の設定と利用方法について完全に説明したマニュアルです。
+このガイドの次に読むべき情報源です。
+@item 辞書データベース (@url{http://openlab.ring.gr.jp/lookup/dicts/})
+Lookup で使える辞書の情報を集めたページです。フリーな辞書データや、
+辞書をより使いやすくするための設定ファイル集などがまとめられています。
+@item Lookup NEWS (@file{NEWS})
+Lookup のバージョンアップに伴なう主な変更点をまとめたファイルです。
+どこが変わったか確認し、必要であれば設定ファイルを更新して下さい。
+@item Lookup FAQ (@file{etc/FAQ})
+よくある質問とその回答のリストです。何か疑問に思うことがあるときには、
+まず最初にこれを見てみて下さい。
+@item Lookup PROBLEMS (@file{etc/PROBLEMS})
+既知の問題点のリストです。バグかな? と思う前に、
+既に知られた問題でないか確認してみて下さい。
+@end table
+
+@c ---------------------------------------------------------------------
+@node Developer Information,  , User Information, Lookup Homepage
+@subsection 開発者情報
+
+@table @asis
+@item Lookup TODO (@file{etc/TODO})
+これからやるべきことのリストです。
+@end table
+
+@c =====================================================================
+@node Source of Information, Attention for Emacsen, Lookup Homepage, Information
+@section 知っておくと嬉しい情報源
+
+これから更に Lookup を知ろうとする人のために、いくつかの役立つ情報源を
+まとめて紹介しておきます。
+
+@menu
+* Related Softwares::           関連ソフトウェア
+* Dictionary Links::            電子辞書関連リンク
+* Mailing Lists::               メーリングリスト
+@end menu
+
+@c ---------------------------------------------------------------------
+@node Related Softwares, Dictionary Links, Source of Information, Source of Information
+@subsection 関連ソフトウェア
+
+@table @asis
+@item SDIC (@url{http://pine.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html})
+フリーに配布されている英語辞書から手軽に検索を行なうことを目的とした
+elisp の検索ソフトウェアです。このソフトウェアで用いられている SDIC
+という辞書形式は、Lookup の ndic エージェントでも利用出来ます。
+@item eblook (@url{http://openlab.ring.gr.jp/lookup/eblook/})
+Lookup からの利用を想定して作られている CD-ROM 辞書検索コマンドです。
+検索のために EB ライブラリを利用しており、多くの電子ブックや EPWING
+規約に準拠した CD-ROM 辞書を扱うことが出来ます。
+@item NDTPD (@url{http://www.sra.co.jp/people/m-kasahr/ndtpd/})
+CD-ROM 辞書から検索を行なう辞書サーバです。NDTP という検索プロトコルを
+実装しており、EPWING などに準拠した市販の CD-ROM 書籍をネットワークで
+共有することが出来ます(辞書のライセンスは別途必要です)。
+@item DICT プロジェクト (@url{http://www.dict.org})
+インターネットの辞書検索プロトコル DICT(RFC 2229) などを開発している
+プロジェクトです。辞書サーバ dictd や、それで用いることの出来る
+フリーな辞書などが配布されています。
+@item Namazu (@url{http://openlab.ring.gr.jp/namazu/"})
+多数のファイルから高速に検索を行なうための全文検索エンジンです。
+メーリングリストなど大量の情報をあらかじめインデックス化しておくことで、
+目的の語を含んだファイルを即座に見付け出せます。
+@end table
+
+@c ---------------------------------------------------------------------
+@node Dictionary Links, Mailing Lists, Related Softwares, Source of Information
+@subsection 電子辞書関連リンク
+
+@table @asis
+@item 電子ブックの広場 (@url{http://www.ebxa.gr.jp})
+電子ブック規格の公式情報ページです。規格の説明や製品紹介などがあります。
+@item EPWING コンソーシアム (@url{http://www.epwing.or.jp})
+EPWING 規約の公式情報ページです。規約の説明や製品紹介などがあります。
+@item EB ライブラリ (@url{http://www.sra.co.jp/people/m-kasahr/eb/})
+電子ブックや EPWING 規約に対応した検索用ライブラリです。上記の eblook
+や NDTPD はこれを用いて検索してるため、Lookup の CD-ROM 検索はほとんど
+このライブラリに依存しています。
+@item 電子辞書オープンラボ (@url{http://openlab.ring.gr.jp/edict/})
+電子辞書関係の情報交換や開発を目的としたホームページです。
+EB ライブラリが対応してないいくつかの CD-ROM 辞書から検索を行なうための
+ソフトなどが配布されています。
+@end table
+
+@c ---------------------------------------------------------------------
+@node Mailing Lists,  , Dictionary Links, Source of Information
+@subsection メーリングリスト
+
+@table @asis
+@item lookup ML (@url{http://openlab.ring.gr.jp/lookup/ml.html})
+Lookup について情報交換を行なうためのメーリングリストです。英語版と
+日本語版とがあります。Lookup の最新情報は、このメーリングリストで
+得ることが出来ます。
+@item edict ML (@url{http://openlab.ring.gr.jp/edict/})
+電子辞書一般について情報交換を行なうためのメーリングリストです。
+辞書を購入する上でのノウハウや、フリーな検索ツールについての
+話題などが出ています。
+@item ndtpd ML (@url{http://www.sra.co.jp/people/m-kasahr/ndtpd/ml-ja.html})
+辞書サーバ NDTPD のメーリングリストです。市販の CD-ROM 辞書を
+利用するための情報がやりとりされます。このソフトウェアに含まれる
+EB ライブラリは Lookup の CD-ROM 検索のかなめとなっているので、
+CD-ROM 辞書を利用される方はこちらにも参加されることをお勧めします。
+@end table
+
+@c =====================================================================
+@node Attention for Emacsen,  , Source of Information, Information
+@section 各種 Emacs 毎の注意点
+
+Lookup PROBLEMS(@file{etc/PROBLEMS})を参照。
+
+@bye
+
+@c Local Variables:
+@c mode:outline-minor
+@c outline-regexp:"@\\(ch\\|sec\\|subs\\)"
+@c End:

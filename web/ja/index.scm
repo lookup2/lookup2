@@ -74,7 +74,7 @@
 		   news))
    (hr)
    (address
-    "Last modified: $Date: 2000/07/16 20:48:06 $"
+    "Last modified: $Date: 2000/07/16 20:51:23 $"
     "<br>Copyright (C) 2000 Keisuke Nishida &lt;knishida@ring.gr.jp&gt;"
     "<br>Graphics (C) 2000 Sumiya Sakoda")
    (p (href (img "http://www2.valinux.com/adserver.phtml?f_s=468x60&f_p=478"
@@ -86,7 +86,7 @@
 
 (html
  (table
-  (tr #:valign "botton"
+  (tr #:valign "bottom"
    (td (img "/lookup/images/title.png" #:alt "Lookup"))
    (td "Language:"
        (href "English" "http://lookup.sourceforge.net/")
