@@ -192,7 +192,7 @@
 	      (cons (point) (let ((window (get-buffer-window entry)))
 			      (if window (window-start window)))))
 	    (when (and content (with-current-buffer entry
-				 (lookup-summary-line-entry)))
+				 (lookup-summary-this-entry)))
 	      (with-current-buffer content
 		(cons (point) (let ((window (get-buffer-window content)))
 				(if window (window-start window))))))))))
@@ -372,7 +372,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 オープンする。エントリがリファレンスの場合には、それを参照する。"
   (interactive)
   (lookup-summary-goto-link)
-  (let ((entry (lookup-summary-line-entry)))
+  (let ((entry (lookup-summary-this-entry)))
     (when entry
       (setq lookup-summary-overview-mode nil)
       (lookup-content-display entry)
@@ -389,7 +389,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 バッファの終わりまで達したら、次のエントリに移動する。"
   (interactive)
   (cond
-   ((not (lookup-summary-line-entry)) nil)
+   ((not (lookup-summary-this-entry)) nil)
    ((not (lookup-summary-content-visible-p)) (lookup-summary-display-content))
    ((lookup-with-buffer-and-window (lookup-content-buffer)
       (not (pos-visible-in-window-p (point-max) (selected-window))))
@@ -401,7 +401,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 バッファの始めまで達したら、前のエントリに移動する。"
   (interactive)
   (cond
-   ((not (lookup-summary-line-entry)) (lookup-summary-previous-entry))
+   ((not (lookup-summary-this-entry)) (lookup-summary-previous-entry))
    ((not (lookup-summary-content-visible-p)) (lookup-summary-display-content))
    ((lookup-with-buffer-and-window (lookup-content-buffer)
       (not (pos-visible-in-window-p (point-min) (selected-window))))
@@ -469,7 +469,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 (defun lookup-summary-info ()
   "エントリの情報を出力する。"
   (interactive)
-  (let ((entry (lookup-summary-line-entry)))
+  (let ((entry (lookup-summary-this-entry)))
     (with-current-buffer (lookup-open-buffer "*Entry Information*")
       (help-mode)
       (let ((inhibit-read-only t)
@@ -495,7 +495,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 
 (defun lookup-summary-unmark ()
   (interactive)
-  (let ((entry (lookup-summary-line-entry)) memo)
+  (let ((entry (lookup-summary-this-entry)) memo)
     (when entry
       (when (or (not (stringp (lookup-entry-bookmark entry)))
 		(progn (setq memo (lookup-summary-memorandum-display))
@@ -511,7 +511,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 
 (defun lookup-summary-bookmark ()
   (interactive)
-  (let ((entry (lookup-summary-line-entry)) memo)
+  (let ((entry (lookup-summary-this-entry)) memo)
     (when entry
       (when (or (not (stringp (lookup-entry-bookmark entry)))
 		(progn (setq memo (lookup-summary-memorandum-display))
@@ -530,7 +530,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
       (message "Type `C-c C-c' to finish editing"))))
 
 (defun lookup-summary-memorandum-display ()
-  (let* ((entry (lookup-summary-line-entry))
+  (let* ((entry (lookup-summary-this-entry))
 	 (memo (lookup-entry-bookmark entry)))
     (with-current-buffer (lookup-open-buffer "*Entry Memorandum*")
       (erase-buffer)
@@ -556,7 +556,7 @@ Overview モードになっている場合にはそれを解除し、Content バッファを
 (defun lookup-summary-entry-open ()
   "エントリ本文を別プログラムで表示する。"
   (interactive)
-  (unless (lookup-entry-open (lookup-summary-line-entry))
+  (unless (lookup-entry-open (lookup-summary-this-entry))
     (error "This entry doesn't have a open command")))
 
 (defun lookup-summary-toggle-format ()
@@ -608,12 +608,12 @@ See also `lookup-content-cite-region'."
     (lookup-content-cite-region (point-max) (point-min)))
   (when (interactive-p)
     (message "Saved text for `%s'"
-	     (lookup-entry-heading (lookup-summary-line-entry)))))
+	     (lookup-entry-heading (lookup-summary-this-entry)))))
 
 (defun lookup-summary-dictionary-menu ()
   "辞書がメニューに対応している場合、それを参照する。"
   (interactive)
-  (let ((entry (lookup-summary-line-entry)))
+  (let ((entry (lookup-summary-this-entry)))
     (when entry
       (let ((menu (lookup-dictionary-menu (lookup-entry-dictionary entry))))
 	(if menu
@@ -629,7 +629,7 @@ See also `lookup-content-cite-region'."
     (lookup-summary-display-content))
   (let ((entries (lookup-content-collect-references)))
     (if entries
-	(let* ((heading (lookup-entry-heading (lookup-summary-line-entry)))
+	(let* ((heading (lookup-entry-heading (lookup-summary-this-entry)))
 	       (query (lookup-new-query 'reference heading)))
 	  (lookup-display-entries (lookup-current-module) query entries))
       (error "No valid reference in this entry"))))
@@ -717,7 +717,7 @@ which indicates the number of the dictionary."
     (if (setq p (next-single-property-change p 'lookup-entry))
 	(goto-char p))))
 
-(defun lookup-summary-line-entry ()
+(defun lookup-summary-this-entry ()
   (let ((entry (save-excursion
 		 (end-of-line)
 		 (if (not (eobp))
@@ -726,18 +726,18 @@ which indicates the number of the dictionary."
       (if (not (eq (lookup-entry-type entry) 'dynamic))
 	  (lookup-entry-substance entry)
 	(lookup-summary-expand-references entry)
-	(lookup-summary-line-entry)))))
+	(lookup-summary-this-entry)))))
 
 (defun lookup-summary-update-mark ()
   (let ((inhibit-read-only t))
     (save-excursion
       (beginning-of-line)
       (delete-char 1)
-      (lookup-search-session-insert-mark (lookup-summary-line-entry)))))
+      (lookup-search-session-insert-mark (lookup-summary-this-entry)))))
 
 (defun lookup-summary-content-visible-p ()
   (and (get-buffer-window (lookup-content-buffer))
-       (eq (lookup-summary-line-entry) (lookup-content-entry))))
+       (eq (lookup-summary-this-entry) (lookup-content-entry))))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
