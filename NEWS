@@ -23,11 +23,7 @@ lisp/*.el を適当なディレクトリにコピー。必要ならバイトコンパイル。
 	(ndspell)))
 
 (setq lookup-complement-directory "/home/kei/emacs/lookup/comp")
-(lookup-use-complement "ndeb:/usr/local/dict/epwing/IWAKOKU" "iwakoku")
-(lookup-use-complement "ndeb:/usr/local/dict/epwing/CHUJITEN" "chujiten")
-(lookup-use-complement "ndeb:/usr/local/dict/epwing/CHIEZO" "chiezo")
-(lookup-use-complement "ndeb:/usr/local/dict/epwing/MYPAEDIA" "mypaedia")
-(lookup-use-complement "ndsrd:/usr/local/dict/srd/csrd" "srd")
+;; 補助ファイルの読み込みは自動で行なわれる。(comp/loaddef.el を参照)
 
 (lookup-set-dictionary-options "ndeb:/usr/local/dict/epwing/CHUJITEN"
   :transformer 'lookup-stemming-search)
