@@ -124,19 +124,16 @@
 ;;;
 
 (defun ndspell-check-spelling (string)
-  (let* ((output (ndspell-process-require string))
-	 (check (cond
-		 ((string= output "") nil)		; empty
-		 ((eq (aref output 0) ?*) t)		; match
-		 ((eq (aref output 0) ?-) 'compound)	; compound
-		 ((eq (aref output 0) ?#) nil)		; no match
-		 ((string-match "^\\+ \\(.*\\)" output)	; root match
-		  (downcase (match-string 1 output)))
-		 ((string-match "^&[^:]*: " output)	; some candidates
-		  (lookup-split-string (substring output (match-end 0))
-				       "[,\n] ?")))))
-    (cond ((consp check) (nreverse check))
-	  ((stringp check) (list check)))))
+  (let ((output (ndspell-process-require string)))
+    (cond
+     ((string= output "") nil)			; empty
+     ((eq (aref output 0) ?*) nil)		; match
+     ((eq (aref output 0) ?-) nil)		; compound
+     ((eq (aref output 0) ?#) nil)		; no match
+     ((string-match "^\\+ \\(.*\\)" output)	; root match
+      (list (downcase (match-string 1 output))))
+     ((string-match "^&[^:]*: " output)		; some candidates
+      (lookup-split-string (substring output (match-end 0)) "[,\n] ?")))))
 
 (defun ndspell-search-spelling (regexp)
   (with-temp-buffer

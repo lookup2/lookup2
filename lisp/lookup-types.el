@@ -492,8 +492,10 @@
 	(end (progn (insert (lookup-entry-heading entry)) (point))))
     (add-text-properties start end (list 'mouse-face 'highlight
 					 'lookup-entry entry))
-    (lookup-map-over-property start end 'lookup-gaiji
-			      'lookup-gaiji-glyph-paste)))
+    (lookup-map-over-property
+     start end 'lookup-gaiji
+     (lambda (start end gaiji)
+       (lookup-gaiji-glyph-paste start end (lookup-gaiji-glyph gaiji))))))
 
 (defun lookup-entry-content (entry)
   (lookup-put-property (lookup-entry-substance entry) 'refered t)
