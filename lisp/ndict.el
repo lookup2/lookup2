@@ -160,9 +160,8 @@
 		       (buffer-substring (point) (lookup-point-eol)))))
 	   (system (if (string-match "^dictd " server) 'dictd t))
 	   (table (lookup-assq-get ndict-system-info-alist system)))
-      ;; set methods and method-table
-      (let* ((method-table (lookup-assq-get table 'methods))
-             (methods (mapcar 'car method-table)))
+      ;; set method-table
+      (let* ((method-table (lookup-assq-get table 'methods)))
 	(setf (lookup-agent-option agent :method-table) method-table)))
     ;; get dictionary list
     (ndict-process-require "SHOW DB"
