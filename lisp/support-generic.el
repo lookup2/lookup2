@@ -18,42 +18,39 @@
 ;;; Code:
 
 (require 'lookup-utils)
-(require 'jisx0213) ;; You will need Mule-UCS installed.
+;;(require 'un-define) ;; You will need Mule-UCS installed.
 
 (defun range (from to)
   "Make the list of the integers of range FROM to TO."
   (let (result) 
     (while (<= from to) (setq result (cons to result) to (1- to))) result))
 
-(defvar combining-ucs-above
-  (nconc (range #x0300 #x0315)
-         (range #x031a #x031b)
-         (range #x033d #x0344)
-         '(#x0346)
-         (range #x034a #x034c)))
+(let ((combining-ucs-above (nconc (range #x0300 #x0315)
+                                  (range #x031a #x031b)
+                                  (range #x033d #x0344)
+                                  '(#x0346)
+                                  (range #x034a #x034c)))
+      
 
-(defvar combining-ucs-below
-  (nconc (range #x0316 #x0319)
-         (range #x031c #x0333)
-         (range #x0339 #x033c)
-         '(#x0345)
-         (range #x0347 #x0349)
-         (range #x034d #x034e)))
+      (combining-ucs-below (nconc (range #x0316 #x0319)
+                                  (range #x031c #x0333)
+                                  (range #x0339 #x033c)
+                                  '(#x0345)
+                                  (range #x0347 #x0349)
+                                  (range #x034d #x034e)))
 
-(defvar combining-ucs-middle
-  (range #x0334 #x0338))
-
-(mapcar*
- (lambda (x)
-   (let ((ucslist (car x)) (refpoint (cdr x)))
-     (mapcar*
-      (lambda (y)
-        (put-char-code-property (lookup-ucs-char y)
-                                'reference-point refpoint))
-      (eval ucslist))))
- '((combining-ucs-above . (1 . 7))
-   (combining-ucs-below . (7 . 1))
-   (combining-ucs-middle . (10 . 10))))
+      (combining-ucs-middle (range #x0334 #x0338)))
+  (mapcar*
+   (lambda (x)
+     (let ((ucslist (car x)) (refpoint (cdr x)))
+       (mapcar*
+        (lambda (y)
+          (put-char-code-property (lookup-ucs-char y)
+                                  'reference-point refpoint))
+        (eval ucslist))))
+   '((combining-ucs-above . (1 . 7))
+     (combining-ucs-below . (7 . 1))
+     (combining-ucs-middle . (10 . 10)))))
 
 (defmacro entity-ref-search-replace (regexp body)
   "For entity-references described as REGEXP, do EXPR and replaces

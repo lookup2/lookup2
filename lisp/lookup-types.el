@@ -597,7 +597,7 @@
 
 (defun lookup-gaiji-concrete (spec)
    (if (eq (elt spec 0) 'ucs)
-       (char-to-string (lookup-ucs-to-char (elt spec 1)))
+       (char-to-string (lookup-ucs-char (elt spec 1)))
      (char-to-string (make-char (elt spec 0) (elt spec 1) (elt spec 2)))))
 
 (defun lookup-gaiji-insert (gaiji)

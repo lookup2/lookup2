@@ -18,7 +18,6 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'lookup-utils)
 (require 'support-generic)
 
 (defvar ipaface 'default)
