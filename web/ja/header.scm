@@ -1,2 +1,4 @@
-(set! %load-path (cons "/home/kei/share/guile" %load-path))
-(use-modules (text markup html))
+(load "tag.scm")
+(read-hash-extend #\# tag-read)
+
+(define (href url) ##(a #:href url url))

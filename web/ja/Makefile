@@ -18,5 +18,7 @@ install:: all
 	rsync -avL -e ssh --delete $(EXCLUDE) \
 	  . knishida@openlab.ring.gr.jp:/circus/openlab/lookup
 
-%.html: %.scm menu.scm
+%.html:
 	guile -s $< | nkf -j > $@ || rm $@
+
+index.html: index.scm menu.scm news.scm
