@@ -75,7 +75,24 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
   (load lookup-init-file t)
   (if lookup-cache-file (lookup-restore-cache lookup-cache-file))
   (run-hooks 'lookup-load-hook)
-  (lookup-init-gaiji-functions))
+  (lookup-init-gaiji-functions)
+  (lookup-init-complement-autoload))
+
+(defun lookup-init-complement-autoload ()
+  (if lookup-complement-directory
+      (load (expand-file-name "loaddef.el" lookup-complement-directory))
+    (load "loaddef.el"))
+  (lookup-foreach
+   (lambda (pair)
+     (let ((dicts (lookup-dictionary-alist)) dict)
+       (while dicts
+	 (if (string-match (car pair) (caar dicts))
+	     (setq dict (cdar dicts) dicts nil)
+	   (setq dicts (cdr dicts))))
+       (if dict
+	   (lookup-assoc-set 'lookup-complement-alist
+			     (lookup-dictionary-id dict) (cdr pair)))))
+   lookup-complement-autoload-alist))
 
 
 ;;;;;;;;;;;;;;;;;;;;
