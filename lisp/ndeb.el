@@ -291,6 +291,14 @@
 	 (process (apply 'start-process "ndeb" buffer ndeb-program-name args)))
     (process-kill-without-query process)
     (accept-process-output process)
+    (with-current-buffer buffer
+      (save-excursion
+	(goto-char (point-min))
+	(if (search-forward "Warning: invalid book directory")
+	    (error "Invalid dictionary directory: %s" directory))
+	(goto-char (point-min))
+	(if (search-forward "Warning: invalid appendix directory")
+	    (error "Invalid appendix directory: %s" appendix))))
     process))
 
 (put 'ndeb-process-require 'lisp-indent-function 1)
