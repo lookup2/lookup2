@@ -1,8 +1,14 @@
 STARTFONT 2.1
 COMMENT 
-COMMENT 92.12.01 created by Takahashi N. <ntakahas@etl.go.jp>
-COMMENT 94.09.14 modified by Takahashi N. <ntakahas@etl.go.jp>
+COMMENT 1992.12.01 created by Takahashi N. <ntakahas@etl.go.jp>
+COMMENT 1994.09.14 modified by Takahashi N. <ntakahas@etl.go.jp>
 COMMENT 2001.06.15 modified by Takahashi N. <ntakahas@m17n.org>
+COMMENT
+COMMENT This font, which is currently under the development, is
+COMMENT specifically attached to Lookup software, by courtesy of
+COMMENT Takahashi Naoto.  Do not re-distribute this font separated
+COMMENT from the Lookup software, as the proprietary issue of this 
+COMMENT font has not yet completely been resolved.
 FONT -m17n-mule-medium-r-normal--14-140-75-75-p-90-iso10646-1
 SIZE 14 75 75
 FONTBOUNDINGBOX 20 19 0 -3
