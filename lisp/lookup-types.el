@@ -198,6 +198,12 @@
   (or (plist-get (lookup-agent-options agent) key)
       (lookup-agent-ref agent key)))
 
+(defsetf lookup-agent-option lookup-agent-set-option)
+(defun lookup-agent-set-option (agent key value)
+  (let ((options (lookup-agent-options agent)))
+    (setq options (plist-put options key value))
+    (setf (lookup-agent-options agent) options)))
+
 (defun lookup-agent-command (agent command &rest args)
   (let ((func (lookup-agent-ref agent command)))
     (if (functionp func) (apply func agent args) func)))
@@ -278,6 +284,11 @@
     (lambda () (or (lookup-dictionary-option dictionary :title)
 		   (lookup-dictionary-command dictionary :title)
 		   (lookup-dictionary-name dictionary)))))
+(defsetf lookup-dictionary-title lookup-dictionary-set-title)
+(defun lookup-dictionary-set-title (dictionary title)
+  (let ((options (lookup-dictionary-options dictionary)))
+    (plist-put options :title title)
+    (setf (lookup-dictionary-options dictionary) options)))
 
 (defun lookup-dictionary-heading (dictionary)
   (lookup-dictionary-get dictionary 'heading

@@ -24,6 +24,8 @@
 
 (require 'lookup)
 
+(defconst ndict-version "1.0")
+
 ;;;
 ;;; Internal variables
 ;;;
@@ -42,7 +44,7 @@
     (t
      (methods . ((exact . "exact") (prefix . "prefix"))))))
 
-(defconst ndict-process-coding-system 'euc-jp-dos)
+(defconst ndict-process-coding-system 'utf-8)
 
 ;;;
 ;;; types
@@ -90,7 +92,10 @@
 ;; TITLE - given by server `SHOW DB' command
 
 (defun ndict-make-dictionary (name title)
-  (lookup-new-dictionary ndict-current-agent name title))
+  (let ((dictionary
+         (lookup-new-dictionary ndict-current-agent name)))
+    (setf (lookup-dictionary-title dictionary) title) ;; title))
+    dictionary))
 
 ;; ndict entry:
 ;;
@@ -156,9 +161,10 @@
 	   (system (if (string-match "^dictd " server) 'dictd t))
 	   (table (lookup-assq-get ndict-system-info-alist system)))
       ;; set methods and method-table
-      (let ((methods (lookup-assq-get table 'methods)))
-	(lookup-agent-set-default agent :methods (mapcar 'car methods))
-	(lookup-agent-set-default agent :method-table methods)))
+      (let* ((method-table (lookup-assq-get table 'methods))
+             (methods (mapcar 'car method-table)))
+	(setf (lookup-agent-option agent :method-table) method-table)
+        (setf (lookup-agent-option agent :methods) methods)))
     ;; get dictionary list
     (ndict-process-require "SHOW DB"
       (lambda (process)
@@ -170,6 +176,10 @@
 	      (setq name (match-string 1) title (read (match-string 2)))
 	      (setq dicts (cons (ndict-make-dictionary name title) dicts)))
 	    dicts))))))
+
+(put 'ndict :methods 'ndict-methods)
+(defun ndict-methods (dictionary)
+  (lookup-agent-option (lookup-dictionary-agent dictionary) :methods))
 
 (put 'ndict :clear 'ndict-clear)
 (defun ndict-clear (agent)
@@ -197,7 +207,7 @@
 		(setq name (match-string 1) heading (read name))
 		(if (or (not ndict-match-exact)
 			(string-match ndict-match-exact heading))
-		    (setq entries (cons (ndict-new-entry 'regular name heading)
+		    (setq entries (cons (ndict-new-entry name heading)
 					entries))))
 	      entries))))))))
 
