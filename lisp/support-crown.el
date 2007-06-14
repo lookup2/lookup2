@@ -18,7 +18,6 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'support-generic)
 
 (let 
   ((encoded-crown-gaiji-table
@@ -255,7 +254,7 @@
          (if (eq lookup-support-agent 'ndtp)
              (concat "gaiji:" (car x))
            (car x))
-         (decode-character-string (cadr x))))
+         (cadr x)))
       encoded-crown-gaiji-table))))
 
 (setq lookup-support-options

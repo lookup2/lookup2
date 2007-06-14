@@ -282,7 +282,7 @@
          (if (eq lookup-support-agent 'ndtp)
              (concat "gaiji:" (car x))
            (car x))
-         (decode-character-string (cadr x))))
+         (cadr x)))
       encoded-oxford-gaiji-table))))
 
 (defun oxford-arrange-structure (entry)
