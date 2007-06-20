@@ -7,4 +7,4 @@ clean::
 
 %.html: %.tpl.html
 	 ruby -p -e 'gsub(/<!-- (.+\.html) -->/) {|f| $$_ + open($$1).readline(nil)}'  $< > $@ || rm $@
-	chmod g+w $@
+	chmod go+r $@
