@@ -13,10 +13,12 @@ clean::
 	done
 
 install:: all
-	rsync -av -e ssh --delete --exclude=CVS \
-	  --exclude="*.tpl.html" --exclude='Makefile*' --exclude='*.in' \
-	  * kawabata@lookup.sourceforge.net:/home/groups/l/lo/lookup/htdocs
+	rsync -av -e ssh --delete --exclude=CVS --exclude='*~' \
+	  --exclude="header.html" --exclude='footer.html' --exclude='subpage.html' \
+	  --exclude="*.tpl.html" --exclude='Makefile*' --exclude='*.in' --exclude="*.scm" \
+	  * $(SF_USERNAME)@lookup.sourceforge.net:/home/groups/l/lo/lookup/htdocs
 #	(cd ja && $(MAKE) install)
 
 %.html: %.tpl.html
-	 ruby -p -e 'gsub("<!-- (.+\.html) -->") {|f| $$_ + open($$1).readline(nil)}'  $< > $@ || rm $@
+	 ruby -p -e 'gsub(/<!-- (.+\.html) -->/) {|f| $$_ + open($$1).readline(nil)}'  $< > $@ || rm $@
+	chmod g+w $@
