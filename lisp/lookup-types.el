@@ -134,8 +134,8 @@
 (defstruct lookup-module name dictionaries bookmarks priority-alist)
 
 (defun lookup-new-module (name &rest dict-specs)
-  "Create new Lookup Module from module NAME and DICT-SPECS.
-If DICT-SPECS is t, then module will be newly created."
+  ;; Create new Lookup Module from module NAME and DICT-SPECS.
+  ;; If DICT-SPECS is t, then new module will be created.
   (let ((module (make-lookup-module :name name)) dict-id dict dicts prio)
     (if (eq (car dict-specs) t)
 	(setq dict-specs (mapcar #'lookup-dictionary-id lookup-dictionary-list)))

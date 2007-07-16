@@ -214,6 +214,8 @@
   (define-key lookup-summary-mode-map ">" 'lookup-summary-end-of-content)
   (define-key lookup-summary-mode-map "n" 'lookup-summary-next-entry)
   (define-key lookup-summary-mode-map "p" 'lookup-summary-previous-entry)
+  (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-following-entry)
+  (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-preceding-entry)
   (define-key lookup-summary-mode-map
     (if (featurep 'xemacs) 'button2 [mouse-2]) 'lookup-summary-mouse-follow)
   ;; entry management

@@ -84,7 +84,7 @@
 
 (setq lookup-support-options
       (list :title "英和活用大辞典"
-	    :arrange-table '((replace . colloc-arrange-first))
+	    :arrange-table '((before-replace . colloc-arrange-first))
 	    :transformer 'lookup-stemming-search))
 
 ;;; colloc.el ends here

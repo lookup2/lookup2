@@ -356,7 +356,10 @@
 ;     ("ha362" . "ú̥")
 ;     ("ha363" . "þ")
 ;     ("ha369" . "Ń")
-     ("zb121" . "━"))))
+     ("zb121" . "━")
+     ("zb14f" . "æ̀")
+     ("zb150" . "ǽ")
+     ("zb155" . "æ"))))
 
 (setq lookup-support-options
       (list ':gaiji-table readers-plus-v2-gaiji-table))

@@ -50,10 +50,10 @@
      ("za25b" nil ",0H") ("za25c" nil ",0L"))))
 
 (defconst mypaedia-reference-regexp
-  (cond ((eq lookup-support-agent 'ndtp)
-	 "→\\(.*\\)<\\([0-9a-f:]+\\)>\n")
-	((eq lookup-support-agent 'ndeb)
-	 "<reference>→\\(.*\\)</reference=\\([0-9a-f:]+\\)>\n")))
+;  (cond ((eq lookup-support-agent 'ndtp)
+;	 "→\\(.*\\)<\\([0-9a-f:]+\\)>\n")
+;	((eq lookup-support-agent 'ndeb)
+	 "<reference>→\\(.*\\)</reference=\\([0-9a-f:]+\\)>\n");))
 
 (defun mypaedia-arrange-references (entry)
   ;; この辞書はリンクがテキストの最後にまとめられているのだが、

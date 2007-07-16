@@ -284,6 +284,7 @@
       encoded-oxford-gaiji-table))))
 
 (defun oxford-arrange-structure (entry)
+  (let ((inhibit-read-only t))
   (goto-char (point-min))
   (next-line 1)
   (and
@@ -291,11 +292,11 @@
    (insert "\n "))
 
   (goto-char (point-min))
-  (replace-string "</HEAD1><HEAD1>" "" nil)
+  (while (search-forward "</HEAD1><HEAD1>" nil t) (replace-match ""))
   (goto-char (point-min))  
-  (replace-string "</HEAD2><HEAD2>" "" nil)
+  (while (search-forward "</HEAD2><HEAD2>" nil t) (replace-match ""))
   (goto-char (point-min))  
-  (replace-string "</HEAD3><HEAD3>" "" nil)
+  (while (search-forward "</HEAD3><HEAD3>" nil t) (replace-match ""))
   (goto-char (point-min))
   (replace-string "</HEAD3>-<HEAD3>" "-" nil)
 
@@ -347,7 +348,6 @@
   (goto-char (point-min))
   (replace-string "</HEAD2> <HEAD3>" "" nil)
 
-
   (goto-char (point-min))
   (save-excursion
     (save-restriction
@@ -384,20 +384,14 @@
     (put-text-property (match-beginning 0)
 		       (match-end 0)
 		       'face ipaface))
-  )
-
-;; (defun oxford-arrange-structure (entry)
-;;   (while (re-search-forward "\\( \\([nv]\\|adj\\)\\.\\)\\|\\[[0-9]\\]" nil t)
-;;     (save-excursion
-;;       (goto-char (match-beginning 0))
-;;       (newline))))
+  ))
 
 (setq lookup-support-options
       (list :title "Oxford Dictionary"
 	    :coding 'iso-8859-1
 	    :stop-code "0x1f090000"
-	    :gaiji-table oxford-gaiji-table
-	    :arrange-table '((structure . oxford-arrange-structure))
+	    :gaiji-table   oxford-gaiji-table
+	    :arrange-table '((before-fill . oxford-arrange-structure))
 	    :transformer 'lookup-stemming-search))
 
 ;;; oxford.el ends here

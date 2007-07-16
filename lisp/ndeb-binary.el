@@ -2,7 +2,7 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.1 2007/07/16 04:06:03 kawabata Exp $
+;; Version: $Id: ndeb-binary.el,v 1.2 2007/07/16 14:53:19 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -415,52 +415,28 @@ corresponding eblook commands."
 	(command (apply 'format
 			(lookup-assq-ref 'ndeb-binary-extract-commands type)
 			(append (list target) params))))
-    (if (null (eq (lookup-agent-class (lookup-dictionary-agent dictionary))
-		  'ndebs))
-	(ndeb-with-dictionary dictionary
-	  (save-match-data
-	    ;; if the command still contains "%s", eblook will create the
-	    ;; output file.
-	    (if (string-match "%s" command)
-		(let (ret)
-		  (setq command (replace-match file t t command))
-		  (message command)
-		  (setq ret (ndeb-process-require command))
-		  (unless (string-match "^OK" ret)
-		    (when (string-match "[ \t\r\n]+$" ret)
-		      (setq ret (replace-match "" t t ret)))
-		    (error ret)))
-	      ;; otherwise write the eblook output to a temporary file.
-	      ;; TODO: how eblook returns an error in this case?
-	      (with-temp-buffer
-		(message command)
-		(buffer-disable-undo)
-		(set-buffer-file-coding-system 'raw-text)
-		(insert (ndeb-process-require command))
-		(let ((out (with-output-to-string (write-file file))))
-		  (lookup-proceeding-message out))))))
-      (ndebs-select-dictionary dictionary)
+    (ndeb-with-dictionary dictionary
       (save-match-data
-	;; if the command still contains "%s", eblook will create the
-	;; output file.
-	(if (string-match "%s" command)
-	    (let (ret)
-	      (setq command (replace-match file t t command))
-	      (message command)
-	      (setq ret (ndebs-require command))
-	      (unless (string-match "^OK" ret)
-		(when (string-match "[ \t\r\n]+$" ret)
-		  (setq ret (replace-match "" t t ret)))
-		(error ret)))
-	  ;; otherwise write the eblook output to a temporary file.
-	  ;; TODO: how eblook returns an error in this case?
-	  (with-temp-buffer
-	    (message command)
-	    (buffer-disable-undo)
-	    (set-buffer-file-coding-system 'raw-text)
-	    (insert (ndebs-require command))
-	    (let ((out (with-output-to-string (write-file file))))
-	      (lookup-proceeding-message out))))))))
+        ;; if the command still contains "%s", eblook will create the
+        ;; output file.
+        (if (string-match "%s" command)
+            (let (ret)
+              (setq command (replace-match file t t command))
+              (message command)
+              (setq ret (ndeb-process-require command))
+              (unless (string-match "^OK" ret)
+                (when (string-match "[ \t\r\n]+$" ret)
+                  (setq ret (replace-match "" t t ret)))
+                (error ret)))
+          ;; otherwise write the eblook output to a temporary file.
+          ;; TODO: how eblook returns an error in this case?
+          (with-temp-buffer
+            (message command)
+            (buffer-disable-undo)
+            (set-buffer-file-coding-system 'raw-text)
+            (insert (ndeb-process-require command))
+            (let ((out (with-output-to-string (write-file file))))
+              (lookup-proceeding-message out))))))))
 
 ;;;
 ;;; Functions for a link
@@ -744,14 +720,8 @@ Using this function with :snd-autoplay option is not recommendable."
     (let ((command (format "xbm %s %s %s" target width height))
 	  xbm glyph start)
       (lookup-proceeding-message command)
-      (setq xbm
-	    (if (null (eq (lookup-agent-class
-			   (lookup-dictionary-agent dictionary))
-			  'ndebs))
-		(ndeb-with-dictionary dictionary
-		  (ndeb-process-require command))
-	      (ndebs-select-dictionary dictionary)
-	      (ndebs-require command)))
+      (setq xbm (ndeb-with-dictionary dictionary
+                  (ndeb-process-require command)))
       (condition-case nil
 	  (setq glyph (funcall ndeb-binary-glyph-compose-function xbm))
 	(if (string-match "[ \t\r\n]+$" xbm)
