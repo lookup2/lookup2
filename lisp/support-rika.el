@@ -20,6 +20,6 @@
 (require 'lookup)
 
 (setq lookup-support-options
-      (list ':title "理化学英和辞典"))
+      (list :title "理化学英和辞典"))
 
 ;;; rika.el ends here

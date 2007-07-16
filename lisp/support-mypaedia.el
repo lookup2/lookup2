@@ -28,7 +28,7 @@
      ("ha137" ",Ad(B") ("ha138" ",AC(B") ("ha139" ",Ac(B") ("ha13a" ",AE(B") ("ha13b" ",Ae(B")
      ("ha13c" ",AF(B") ("ha13d" ",Af(B") ("ha154" ",Aj(B") ("ha157" ",AK(B") ("ha158" ",Ak(B")
      ("ha161" ",Am(B") ("ha162" ",AL(B") ("ha168" ",AO(B") ("ha169" ",Ao(B") ("ha16a" ",0!(B")
-     ("ha16b" ",0Z(B") ("ha16e" ",B#(B") ("ha17a" ",AS(B") ("ha17b" ",As(B") ("ha17c" ",AR(B")
+     ("ha16b" "l") ("ha16e" ",B#(B") ("ha17a" ",AS(B") ("ha17b" ",As(B") ("ha17c" ",AR(B")
      ("ha17d" ",Ar(B") ("ha222" ",AT(B") ("ha223" ",At(B") ("ha224" ",AV(B") ("ha225" ",Av(B")
      ("ha226" ",AU(B") ("ha227" ",Au(B") ("ha228" ",AX(B") ("ha229" ",Ax(B") ("ha22e" ",01(B")
      ("ha22f" ",00(B") ("ha242" ",Az(B") ("ha243" ",AY(B") ("ha244" ",Ay(B") ("ha247" ",A\(B")
@@ -41,7 +41,7 @@
      ("za137" nil ",Ad(B") ("za138" nil ",AC(B") ("za139" nil ",Ac(B") ("za13a" nil ",AE(B")
      ("za13b" nil ",Ae(B") ("za13c" nil ",AF(B") ("za13d" nil ",Af(B") ("za154" nil ",Aj(B")
      ("za157" nil ",AK(B") ("za158" nil ",Ak(B") ("za161" nil ",Am(B") ("za162" nil ",AL(B")
-     ("za168" nil ",AO(B") ("za169" nil ",Ao(B") ("za16a" nil ",0!(B") ("za16b" nil ",0Z(B")
+     ("za168" nil ",AO(B") ("za169" nil ",Ao(B") ("za16a" nil ",0!(B") ("za16b" nil "l")
      ("za16e" nil ",B#(B") ("za17a" nil ",AS(B") ("za17b" nil ",As(B") ("za17c" nil ",AR(B")
      ("za17d" nil ",Ar(B") ("za222" nil ",AT(B") ("za223" nil ",At(B") ("za224" nil ",AV(B")
      ("za225" nil ",Av(B") ("za226" nil ",AU(B") ("za227" nil ",Au(B") ("za228" nil ",AX(B")
@@ -72,7 +72,7 @@
       (lookup-set-link start end entry))))
 
 (setq lookup-support-options
-      (list ':gaiji-table mypaedia-gaiji-table
-	    ':arrange-table '((reference . mypaedia-arrange-references))))
+      (list :gaiji-table   mypaedia-gaiji-table
+	    :arrange-table '((before-reference mypaedia-arrange-references))))
 
 ;;; mypaedia.el ends here

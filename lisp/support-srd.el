@@ -470,7 +470,7 @@
 	 ("G6-5f" "瑋")
 	 ("G6-60" "剗")
 	 ("G6-61" "划")
-	 ("G6-62" "[金通]")
+	 ("G6-62" "𨫤")
 	 ("G6-63" "噶")
 	 ("G6-64" "螠")
 	 ("G6-65" "丢")
@@ -517,7 +517,7 @@
 	 ("G6-8f" "[審+郊+交]")
 	 ("G6-90" "鷴")
 	 ("G6-91" "翨")
-	 ("G6-92" "[木朔]")
+	 ("G6-92" "㮶")
 	 ("G6-93" "鍱")
 	 ("G6-94" "褲")
 	 ("G6-95" "苆")
@@ -661,9 +661,9 @@
   )
 
 (setq lookup-support-options
-      (list ':arrange-table '((structure . srd-arrange-structure))
-	    ':gaiji-regexp "<\\(G[0-9]-[0-9a-f][0-9a-f]\\)>"
-	    ':gaiji-table srd-gaiji-table
-	    ':transformer 'lookup-stemming-search))
+      (list :arrange-table '((structure . srd-arrange-structure))
+	    :gaiji-regexp  "<\\(G[0-9]-[0-9a-f][0-9a-f]\\)>"
+	    :gaiji-table   srd-gaiji-table
+	    :transformer   'lookup-stemming-search))
 
 ;;; srd.el ends here

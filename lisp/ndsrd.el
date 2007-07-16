@@ -61,13 +61,13 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndsrd :list 'ndsrd-list)
+(put 'ndsrd :list #'ndsrd-list)
 (defun ndsrd-list (agent)
   (list (lookup-new-dictionary agent ndsrd-program-name)))
 
 (put 'ndsrd :title ndsrd-dictionary-title)
 
-(put 'ndsrd :search 'ndsrd-dictionary-search)
+(put 'ndsrd :search #'ndsrd-dictionary-search)
 (defun ndsrd-dictionary-search (dictionary query)
   (with-current-buffer (get-buffer-create " *ndsrd*")
     (goto-char (point-max))
@@ -106,7 +106,7 @@
       (if (not lookup-enable-debug) (kill-buffer (current-buffer)))
       (nreverse entries))))
 
-(put 'ndsrd :content 'ndsrd-entry-content)
+(put 'ndsrd :content #'ndsrd-entry-content)
 (defun ndsrd-entry-content (entry)
   (or (lookup-get-property entry 'ndsrd-content) "(forgot)"))
 

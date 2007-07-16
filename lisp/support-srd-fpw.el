@@ -174,6 +174,6 @@
 	  (delete al srd-fpw-process-file-alist))))
 
 (setq lookup-support-options
-      (list ':arrange-table '((structure . srd-fpw-arrange-structure))))
+      (list :arrange-table '((structure . srd-fpw-arrange-structure))))
 
 ;;; srd-fpw.el ends here

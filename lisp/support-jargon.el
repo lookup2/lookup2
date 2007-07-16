@@ -28,8 +28,8 @@
       (lookup-make-region-heading (match-beginning 0) (match-end 0) 1)))
 
 (setq lookup-support-options
-      (list ':title "The Jargon File"
-	    ':reference-pattern jargon-reference-pattern
-	    ':arrange-table '((structure . jargon-arrange-structure))))
+      (list :title "The Jargon File"
+	    :reference-pattern jargon-reference-pattern
+	    :arrange-table '((structure . jargon-arrange-structure))))
 
 ;;; jargon.el ends here

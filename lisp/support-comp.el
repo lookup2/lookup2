@@ -20,6 +20,6 @@
 (require 'lookup)
 
 (setq lookup-support-options
-      (list ':title "英和コンピュータ用語辞典"))
+      (list :title "英和コンピュータ用語辞典"))
 
 ;;; comp.el ends here

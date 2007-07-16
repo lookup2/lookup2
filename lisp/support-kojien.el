@@ -5923,6 +5923,6 @@
       encoded-kojien-gaiji-table))))
 
 (setq lookup-support-options
-      (list ':gaiji-table kojien-gaiji-table))
+      (list :gaiji-table kojien-gaiji-table))
 
 ;;; support-crown.el ends here

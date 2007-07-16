@@ -127,6 +127,23 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'integer
   :group 'lookup-general-options)
 
+;; from 1.4.1
+(defcustom lookup-inline-image t
+  "t ならば (可能な場合に) 画像を表示する。"
+  :type 'boolean
+  :group 'lookup-general-options)
+
+(defcustom lookup-max-image-size 1048576
+  "検索時に表示する画像の最大サイズ (バイト)。
+デフォルトは 1MB。nil を指定すると、無制限になる。"
+  :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-reference-default-caption "参照"
+  "A string to be used when the caption of reference is empty."
+  :type 'string
+  :group 'lookup-general-options)
+
 ;;;
 ;;; View options
 ;;;
@@ -209,8 +226,20 @@ Dictionary option `cite-prefix' overrides this variable."
 ;;; Search agents
 ;;;
 
-(defgroup lookup-search-agents nil
-  "Search agents."
+(defcustom lookup-search-agents nil
+  "*検索エージェントの設定のリスト。
+リストの各要素は次の形式を取る:
+
+  (CLASS LOCATION [KEY1 VALUE1 [KEY2 VALUE2 [...]]])
+
+CLASS には、エージェントの種類をシンボルで指定する。
+LOCATION には、エージェントの所在を文字列で指定する。
+KEY 及び VALUE は省略可能で、エージェントに対するオプションを指定する。
+
+例: (setq lookup-search-agents
+          '((ndtp \"dserver\" :port 2010)
+            (ndeb \"/cdrom\" :enable (\"EIWA\")))))"
+  :type '(repeat (sexp :tag "agent"))	; type はちょっとややこしすぎ・・
   :group 'lookup)
 
 ;;;
@@ -286,7 +315,6 @@ Dictionary option `cite-prefix' overrides this variable."
 ;; Advanced Variables
 ;;;;;;;;;;;;;;;;;;;;
 
-(defvar lookup-search-agents nil)
 (defvar lookup-search-modules nil)
 (defvar lookup-agent-option-alist nil)
 (defvar lookup-dictionary-option-alist nil)
@@ -302,11 +330,20 @@ should be only refered in support files.")
 This variable should be only set in support files.")
 
 (defvar lookup-arrange-table
-  '((replace   . lookup-arrange-replaces)
-    (reference . lookup-arrange-references)
-    (gaiji     . lookup-arrange-gaijis)
-    (structure . lookup-arrange-structure)
-    (fill      . lookup-arrange-fill-lines)))
+  '((before-replace)
+    (replace          lookup-arrange-replaces)
+    (before-gaiji)
+    (gaiji            lookup-arrange-gaijis)
+    (before-reference)
+    (reference        lookup-arrange-references)
+    (before-structure)
+    (structure        lookup-arrange-structure)
+    (before-fill)
+    (fill             lookup-arrange-fill-lines)))
+
+;;;
+;:: Hooks
+;;;
 
 (defvar lookup-load-hook nil
   "*List of functions called after loading Lookup.

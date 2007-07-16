@@ -42,6 +42,7 @@
 (defun lookup-select-build-buffer (module)
   (let ((inhibit-read-only t))
     (erase-buffer)
+    (insert "Lookup (module: " (lookup-module-name module) ")\n")
     (insert "Tyep `m' to select, `u' to unselect, `q' to leave, "
 	    "`?' for help.\n\n")
     (lookup-table-insert
@@ -192,7 +193,8 @@ have found some entries, which means this dictionary cannot appear alone."
 	 entries)
     (while dicts
       (if (memq 'menu (lookup-dictionary-methods (car dicts)))
-	  (setq entries (cons (lookup-dictionary-menu (car dicts)) entries)))
+;	  (setq entries (cons (lookup-dictionary-menu (car dicts)) entries)))
+	  (setq entries (append (lookup-dictionary-menu (car dicts)) entries)))
       (setq dicts (cdr dicts)))
     (if entries
 	(let ((query (lookup-new-query 'reference "Menu")))

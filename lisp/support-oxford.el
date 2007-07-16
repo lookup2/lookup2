@@ -18,8 +18,6 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'support-generic)
-
 (defvar ipaface 'default)
 
 (let 
@@ -336,7 +334,7 @@
 
   (goto-char (point-min))
   (and
-   (search-forward (char-to-string (lookup-ucs-char ?\x25A1)) nil t)
+   (search-forward "□" nil t)
    (let ((p (point)))
      (backward-char 1)
      (insert "\n")
@@ -355,7 +353,7 @@
     (save-restriction
       (narrow-to-region
        (point-min)
-       (if (search-forward (char-to-string (lookup-ucs-char ?\x25A1)) nil t)
+       (if (search-forward "□" nil t)
 	   (point)
 	 (point-max)))
 
@@ -395,11 +393,11 @@
 ;;       (newline))))
 
 (setq lookup-support-options
-      (list ':title "Oxford Dictionary"
-	    ':coding 'iso-8859-1
-	    ':stop-code "0x1f090000"
-	    ':gaiji-table oxford-gaiji-table
-	    ':arrange-table '((structure . oxford-arrange-structure))
-	    ':transformer 'lookup-stemming-search))
+      (list :title "Oxford Dictionary"
+	    :coding 'iso-8859-1
+	    :stop-code "0x1f090000"
+	    :gaiji-table oxford-gaiji-table
+	    :arrange-table '((structure . oxford-arrange-structure))
+	    :transformer 'lookup-stemming-search))
 
 ;;; oxford.el ends here

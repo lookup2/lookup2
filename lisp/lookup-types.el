@@ -24,6 +24,7 @@
 
 (require 'lookup-utils)
 (require 'lookup-vars)
+(require 'stem-english)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Search Method
@@ -132,23 +133,24 @@
 
 (defstruct lookup-module name dictionaries bookmarks priority-alist)
 
-(defun lookup-new-module (name &rest dicts)
-  (let ((module (make-lookup-module :name name)) dict prio)
-    (if (eq (car dicts) t)
-	(setq dicts (mapcar 'lookup-dictionary-id lookup-dictionary-list)))
-    (setq dicts
-	  (mapcar (lambda (spec)
-		    (if (stringp spec)
-			(setq dict spec spec nil)
-		      (setq dict (car spec) spec (cdr spec)))
-		    (setq dict (lookup-get-dictionary dict))
-		    (setq prio (if (memq :priority spec)
-				   (plist-get spec :priority)
-				 (or (lookup-dictionary-ref dict :priority)
-				     t)))
-		    (lookup-module-dictionary-set-priority module dict prio)
-		    dict)
-		  dicts))
+(defun lookup-new-module (name &rest dict-specs)
+  "Create new Lookup Module from module NAME and DICT-SPECS.
+If DICT-SPECS is t, then module will be newly created."
+  (let ((module (make-lookup-module :name name)) dict-id dict dicts prio)
+    (if (eq (car dict-specs) t)
+	(setq dict-specs (mapcar #'lookup-dictionary-id lookup-dictionary-list)))
+    (dolist (dict-spec dict-specs)
+      (if (stringp dict-spec)
+          (setq dict-id   dict-spec
+                dict-spec nil)
+        (setq dict-id   (car dict-spec)
+              dict-spec (cdr dict-spec)))
+      (setq dict (lookup-get-dictionary dict-id))
+      (when dict
+        (setq prio (if (memq :priority dict-spec) (plist-get dict-spec :priority)
+                     (or (lookup-dictionary-ref dict :priority) t)))
+        (lookup-module-dictionary-set-priority module dict prio)
+        (setq dicts (append dicts (list dict)))))
     (setf (lookup-module-dictionaries module) dicts)
     (if lookup-cache-file (lookup-restore-module-attributes module))
     module))
@@ -279,6 +281,12 @@
       (if inherit
 	  (lookup-agent-option (lookup-dictionary-agent dictionary) key))))
 
+(defsetf lookup-dictionary-option lookup-dictionary-set-option)
+(defun lookup-dictionary-set-option (dictionary key value)
+  (let ((options (lookup-dictionary-options dictionary)))
+    (setq options (plist-put options key value))
+    (setf (lookup-dictionary-options dictionary) options)))
+
 (defun lookup-dictionary-title (dictionary)
   (lookup-dictionary-get dictionary 'title
     (lambda () (or (lookup-dictionary-option dictionary :title)
@@ -311,14 +319,18 @@
 
 (defun lookup-dictionary-arranges (dictionary)
   (lookup-dictionary-get dictionary 'arrange-table
+    ;; default arrange functions
     (lambda ()
-      (let* ((table1 (lookup-dictionary-option dictionary :arrange-table))
-	     (table2 (lookup-dictionary-ref dictionary :arrange-table)))
-	(mapcar (lambda (pair)
-		  (or (lookup-assq-get table1 (car pair))
-		      (lookup-assq-get table2 (car pair))
-		      (cdr pair)))
-		lookup-arrange-table)))))
+      (let* ((table1 (lookup-dictionary-option dictionary :arrange-table)) ; higher priority
+	     (table2 (lookup-dictionary-ref dictionary :arrange-table))    ; lower  priority
+             func funcs)
+	(dolist (entry lookup-arrange-table)
+          (setq func
+                (or (lookup-assq-get table1 (car entry))
+                    (lookup-assq-get table2 (car entry))
+                    (cdr entry)))
+          (if func (setq funcs (append funcs (if (listp func) func (list func))))))
+        funcs))))
 
 (defun lookup-dictionary-gaiji-table (dictionary)
   (lookup-dictionary-get dictionary 'gaiji-table
@@ -345,14 +357,12 @@
   (let* ((table (lookup-dictionary-gaiji-table dictionary))
 	 (gaiji (lookup-gaiji-table-ref table code)))
     (cond
-     ((lookup-gaiji-p gaiji) gaiji)
-     ((eq gaiji 'no-gaiji) nil)
+     ((lookup-gaiji-p gaiji) gaiji) ;; gaiji is in table.
+     ((eq gaiji 'no-gaiji) nil)     ;; gaiji is non-existent
      (t
       (let ((spec gaiji) glyph)
-	(unless spec
+	(unless spec                ;; gaiji is taken from the function
 	  (setq spec (lookup-dictionary-command dictionary :gaiji code)))
-	(when (vectorp spec)
-	  (setq spec (lookup-gaiji-concrete spec)))
 	(if (not spec)
 	    (setq gaiji 'no-gaiji)
 	  (if (stringp spec)
@@ -433,6 +443,10 @@
 
 (defstruct lookup-entry type dictionary code bookmark id)
 
+;; for compatibility with Lookup 1.4
+(defun lookup-make-entry (dictionary code heading)
+  (lookup-new-entry 'regular dictionary code heading))
+
 (defun lookup-new-entry (type dictionary code &optional heading)
   (let (entry)
     (cond
@@ -442,7 +456,7 @@
 	  (setq type 'link code entry)))
      ((or (eq type 'link) (eq type 'slink))
       (setq code (lookup-entry-substance code))))
-    (let ((id (apply 'concat (lookup-dictionary-id dictionary)
+    (let ((id (apply #'concat (lookup-dictionary-id dictionary)
 		     (cond ((eq type 'regular) (list "#" code))
 			   ((eq type 'dynamic) (list "?" code))
 			   (t (list "->" (lookup-entry-code code)))))))
@@ -509,18 +523,18 @@
        (lookup-gaiji-glyph-paste start end (lookup-gaiji-glyph gaiji))))))
 
 (defun lookup-entry-content (entry)
-  (lookup-put-property (lookup-entry-substance entry) 'refered t)
+  (lookup-put-property (lookup-entry-substance entry) 'referred t)
   (lookup-entry-command entry :content))
 
 (defun lookup-entry-references (entry)
   (or (lookup-get-property entry 'references)
       (let ((references (lookup-entry-command entry :dynamic)))
 	(lookup-put-property entry 'references references)
-	(lookup-put-property entry 'refered t)
+	(lookup-put-property entry 'referred t)
 	references)))
 
-(defun lookup-entry-refered-p (entry)
-  (lookup-get-property (lookup-entry-substance entry) 'refered))
+(defun lookup-entry-referred-p (entry)
+  (lookup-get-property (lookup-entry-substance entry) 'referred))
 
 (defun lookup-entry-open (entry)
   (lookup-entry-command entry :open))
@@ -594,6 +608,60 @@
     (lookup-history-ref history)))
 
 
+
+;;;;;;;;;;;;;;;;;;;;
+;; Image
+;;;;;;;;;;;;;;;;;;;;
+
+(defun lookup-inline-image-p (type)
+  "Returns non-nil if the image of type TYPE will be displayed under
+the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
+  (and lookup-inline-image
+       (display-images-p)
+       (image-type-available-p type)))
+  
+(defun lookup-glyph-compose (xbm)
+  (create-image xbm 'xbm t :ascent 'center))
+
+(defun lookup-glyph-paste (start end glyph)
+  (let* ((face (or (get-text-property start 'face)
+                   'default))
+         (fg (face-foreground face))
+         (bg (face-background face)))
+    (when fg (setq glyph (append glyph (list :foreground fg))))
+    (when bg (setq glyph (append glyph (list :background bg))))
+    (add-text-properties start end
+                         (list 'display glyph
+                               'intangible glyph
+                               'rear-nonsticky (list 'display)))))
+
+(defun lookup-glyph-insert (glyph &optional start end)
+  (if (and start end)
+      (progn
+        (setq glyph (append glyph (list :foreground "Black"
+                                        :background "White")))
+        (add-text-properties
+         start end (list 'display glyph
+                         'intangible glyph
+                         'rear-nonsticky (list 'display))))
+    (insert-image glyph)))
+
+(defun lookup-img-file-insert (file type &optional start end)
+  (when (or (not lookup-max-image-size)
+            (<= (nth 7 (file-attributes file)) lookup-max-image-size))
+    (unless (or (memq type image-types)
+                (null (memq type '(pgm ppm))))
+      (setq type 'pbm))
+    (let ((glyph (with-temp-buffer
+                   (insert-file-contents-literally file)
+                   (string-make-unibyte
+                    (buffer-substring-no-properties (point-min)
+                                                    (point-max))))))
+      (lookup-glyph-insert (create-image glyph type t :ascent 'center)
+                           start end))))
+
+
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Gaiji
 ;;;;;;;;;;;;;;;;;;;;
@@ -606,11 +674,6 @@
     (setq alter (or alter lookup-gaiji-alternative)))
   (make-lookup-gaiji :glyph glyph :alter alter))
 
-(defun lookup-gaiji-concrete (spec)
-   (if (eq (elt spec 0) 'ucs)
-       (char-to-string (lookup-ucs-char (elt spec 1)))
-     (char-to-string (make-char (elt spec 0) (elt spec 1) (elt spec 2)))))
-
 (defun lookup-gaiji-insert (gaiji)
   (let ((glyph (lookup-gaiji-glyph gaiji))
 	(alter (lookup-gaiji-alter gaiji))
@@ -620,52 +683,31 @@
 
 ;; gaiji glyph
 
-(cond
- ((featurep 'xemacs)
-  (defun lookup-gaiji-glyph-compose (spec)
-    (cond
-     ((stringp spec)
-      (make-glyph (vector 'string :data spec)))
-     ((eq (aref spec 0) 'compose)
-      (make-glyph (vector 'string :data (aref spec 1))))
-     ((eq (aref spec 0) 'xbm)
-      (make-glyph (vector 'xbm :data (lookup-decode-graph spec))))
-     (t (error "Invalid glyph spec: %S" spec))))
+(defun lookup-gaiji-glyph-compose (spec)
+  (cond
+   ((eq (aref spec 0) 'xbm)
+    (let (width height data)
+      (with-temp-buffer
+        (insert (aref spec 1))
+        (goto-char (point-min))
+        (if (re-search-forward "width[ \t]+\\([0-9]+\\)")
+            (setq width (string-to-int (match-string 1))))
+        (if (re-search-forward "height[ \t]+\\([0-9]+\\)")
+            (setq height (string-to-int (match-string 1))))
+        (while (re-search-forward "0x\\(..\\)" nil t)
+          (setq data (cons (string-to-int (match-string 1) 16) data)))
+        (setq data (concat (nreverse data))))
+      (if (fboundp 'string-make-unibyte)
+          (setq data (string-make-unibyte data)))
+      (list 'image :type 'xbm :ascent 'center
+            :width width :height height :data data)))
+   (t (error "Invalid glyph spec: %S" spec))))
 
-  (defun lookup-gaiji-glyph-paste (start end glyph)
-    (set-extent-property (extent-at start nil 'lookup-gaiji) 'invisible t)
-    (let (extent extents)
-      (while (setq extent (extent-at start nil nil extent 'at))
-	(if (eq (extent-start-position extent) (extent-end-position extent))
-	    (setq extents (cons extent extents))))
-      (while extents
-	(set-extent-endpoints (car extents) end end)
-	(setq extents (cdr extents)))
-      (set-extent-begin-glyph (make-extent end end) glyph))))
- (t
-  (defun lookup-gaiji-glyph-compose (spec)
-    (cond
-     ((eq (aref spec 0) 'xbm)
-      (let (width height data)
-	(with-temp-buffer
-	  (insert (aref spec 1))
-	  (goto-char (point-min))
-	  (if (re-search-forward "width[ \t]+\\([0-9]+\\)")
-	      (setq width (string-to-int (match-string 1))))
-	  (if (re-search-forward "height[ \t]+\\([0-9]+\\)")
-	      (setq height (string-to-int (match-string 1))))
-	  (while (re-search-forward "0x\\(..\\)" nil t)
-	    (setq data (cons (string-to-int (match-string 1) 16) data)))
-	  (setq data (concat (nreverse data))))
-	(list 'image :type 'xbm :ascent 'center
-	      :width width :height height :data data)))
-     (t (error "Invalid glyph spec: %S" spec))))
-
-  (defun lookup-gaiji-glyph-paste (start end glyph)
-    (add-text-properties start end
-			 (list 'display glyph
-			       'intangible glyph
-			       'rear-nonsticky (list 'display))))))
+(defun lookup-gaiji-glyph-paste (start end glyph)
+  (add-text-properties start end
+                       (list 'display glyph
+                             'intangible glyph
+                             'rear-nonsticky (list 'display))))
 
 ;; gaiji table
 

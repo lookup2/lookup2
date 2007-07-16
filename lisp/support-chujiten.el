@@ -30,7 +30,7 @@
      ("ha127" . "】")
      ("ha128" . "［")
      ("ha129" . "］")
-     ("ha12a" nil "~")
+     ("ha12a" . "~")
      ("ha12b" . "-")
      ("ha12c" . "-'")
      ("ha12d" . "-`")
@@ -106,12 +106,12 @@
      ("ha178" . "T`")
      ("ha179" . "U`")
      ("ha17a" . "V`")
-     ("ha17b" ",A`" "a")
-     ("ha17c" ",Ah" "e")
-     ("ha17d" ",Al" "i")
-     ("ha17e" ",Ar" "o")
-     ("ha221" ",Ay" "u")
-     ("ha222" "y`" "y")
+     ("ha17b" . ",A`")
+     ("ha17c" . ",Ah")
+     ("ha17d" . ",Al")
+     ("ha17e" . ",Ar")
+     ("ha221" . ",Ay")
+     ("ha222" . "y`")
      ("ha223" . ",0;(B")
      ("ha224" . ",0>(B")
      ("ha225" . ",0<(B")
@@ -225,7 +225,7 @@
    ((chujiten-eiwa-entry-p entry) chujiten-eiwa-reference-pattern)
    ((chujiten-waei-entry-p entry) chujiten-waei-reference-pattern)
    (t (lookup-dictionary-ref (lookup-entry-dictionary entry)
-			     ':reference-pattern))))
+			     :reference-pattern))))
 
 ;; arrange table
 
@@ -303,9 +303,9 @@
 ;; support options
 
 (setq lookup-support-options
-      (list ':gaiji-table chujiten-gaiji-table
-	    ':reference-pattern 'chujiten-reference-pattern
-	    ':arrange-table chujiten-arrange-table
-	    ':transformer 'lookup-stemming-search))
+      (list :gaiji-table chujiten-gaiji-table
+;;	    :reference-pattern 'chujiten-reference-pattern
+	    :arrange-table chujiten-arrange-table
+	    :transformer 'lookup-stemming-search))
 
 ;;; chujiten.el ends here

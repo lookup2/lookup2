@@ -30,8 +30,8 @@
       (search-forward "structures}") (replace-match "structure}")))))
 
 (setq lookup-support-options
-      (list ':title "FOLDOC"
-	    ':reference-pattern foldoc-reference-pattern
-	    ':arrange-table '((replace . foldoc-arrange-replace))))
+      (list :title "FOLDOC"
+	    :reference-pattern foldoc-reference-pattern
+	    :arrange-table '((replace . foldoc-arrange-replace))))
 
 ;;; foldoc.el ends here

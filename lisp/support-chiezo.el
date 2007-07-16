@@ -45,7 +45,7 @@
     (lookup-make-region-heading (match-beginning 0) (match-end 0) 2)))
 
 (setq lookup-support-options
-      (list ':gaiji-table chiezo-gaiji-table
-	    ':arrange-table chiezo-arrange-table))
+      (list :gaiji-table chiezo-gaiji-table
+	    :arrange-table chiezo-arrange-table))
 
 ;;; chiezo.el ends here

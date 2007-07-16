@@ -39,7 +39,7 @@
 (defvar lookup-content-mode-map nil
   "*Keymap for Lookup Content mode.")
 
-(unless lookup-content-mode-map
+(when (< (length lookup-content-mode-map) 2)
   (setq lookup-content-mode-map (make-sparse-keymap))
   (set-keymap-parent lookup-content-mode-map lookup-global-map)
   (define-key lookup-content-mode-map " " 'scroll-up)

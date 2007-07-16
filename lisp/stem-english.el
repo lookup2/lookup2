@@ -1,5 +1,5 @@
 ;;; stem.el ---- routines for stemming
-;;; $Id: stem-english.el,v 1.2 2000/11/19 23:59:51 knishida Exp $
+;;; $Id: stem-english.el,v 1.4 2007/07/16 14:53:19 kawabata Exp $
 
 ;;; Author: Tsuchiya Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: stemming
@@ -17,7 +17,7 @@
 
 ;; -*- Emacs-Lisp -*-
 
-(provide 'stem)
+(provide 'stem-english)
 
 (defvar stem:minimum-word-length 4 "Porter のアルゴリズムが適用できる最小語長")
 

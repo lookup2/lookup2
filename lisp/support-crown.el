@@ -258,6 +258,6 @@
       encoded-crown-gaiji-table))))
 
 (setq lookup-support-options
-      (list ':gaiji-table crown-gaiji-table))
+      (list :gaiji-table crown-gaiji-table))
 
 ;;; support-crown.el ends here

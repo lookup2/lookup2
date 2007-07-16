@@ -557,7 +557,8 @@ See also `lookup-content-cite-region'."
 	(if menu
 	    (lookup-display-entries (lookup-current-module)
 				    (lookup-new-query 'reference "Menu")
-				    (list menu))
+;				    (list menu))
+				    menu)
 	  (error "This dictionary doesn't have a menu"))))))
 
 (defun lookup-summary-list-references ()

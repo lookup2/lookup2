@@ -22,12 +22,14 @@
 
 ;;; Code:
 
+(load "lookup-autoloads")
+
 (require 'cl)
+(require 'lookup-types)
 (require 'lookup-utils)
 (require 'lookup-vars)
-(require 'lookup-types)
 
-(defconst lookup-version "1.99.2k"
+(defconst lookup-version "1.99.3"
   "The version numbers of Lookup.")
 
 
@@ -225,6 +227,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
   (interactive)
   (when (or (not (interactive-p))
 	    (yes-or-no-p "Are you sure to restart Lookup? "))
+    (setq lookup-property-table nil)
     (lookup-exit)
     (lookup-initialize)
     (lookup)))
@@ -559,7 +562,7 @@ See `lookup-secondary' for details."
   (lookup-map-over-property
    (point-min) (point-max) 'lookup-reference
    (lambda (start end entry)
-     (if (lookup-entry-refered-p entry)
+     (if (lookup-entry-referred-p entry)
 	 (put-text-property start end 'face 'lookup-refered-face)
        (put-text-property start end 'face 'lookup-reference-face)))))
 
@@ -839,14 +842,14 @@ See `lookup-secondary' for details."
     (load lookup-cache-file t)) 
   (setq lookup-search-history (lookup-new-history))
   (setq lookup-agent-list
-	(mapcar (lambda (spec) (apply 'lookup-new-agent spec))
+	(mapcar (lambda (spec) (apply #'lookup-new-agent spec))
 		(or lookup-search-agents
 		    (setq lookup-search-agents '((ndtut))))))
   (setq lookup-dictionary-list
 	(apply 'append
 	       (mapcar 'lookup-agent-dictionaries lookup-agent-list)))
   (setq lookup-module-list
-	(mapcar (lambda (spec) (apply 'lookup-new-module spec))
+	(mapcar (lambda (spec) (apply #'lookup-new-module spec))
 		(or lookup-search-modules '(("default" t)))))
   (lookup-init-support-autoload)
   (run-hooks 'lookup-load-hook)

@@ -24,12 +24,12 @@
     (let ((dictionary (lookup-entry-dictionary entry)) entry)
       (while (looking-at "[, ]*\\([^,)]+\\)")
 	(setq entry (lookup-new-entry 'dynamic dictionary (match-string 1)))
-	(lookup-entry-put-property entry ':dynamic 'lookup-dynamic-search)
+	(lookup-put-property entry :dynamic 'lookup-dynamic-search)
 	(lookup-set-link (match-beginning 1) (match-end 1) entry)
 	(goto-char (match-end 0))))))
 
 (setq lookup-support-options
-      (list ':title "V.E.R.A"
-	    ':arrange-table '((reference . vera-arrange-references))))
+      (list :title "V.E.R.A"
+	    :arrange-table '((reference . vera-arrange-references))))
 
 ;;; vera.el ends here

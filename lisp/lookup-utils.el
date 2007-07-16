@@ -315,14 +315,35 @@
   (if (process-buffer process)
       (kill-buffer (process-buffer process))))
 
-;; UCS character processing
 
-(defun lookup-ucs-char (ucs)
-  (if (functionp 'ucs-to-char)
-      (ucs-to-char ucs)
-    (if (functionp 'ucs-char)
-        (ucs-char ucs)
-      (decode-char 'ucs ucs))))
+
+
+
+(defun lookup-process-send (process string)
+  "PROCESS に対して STRING を送る。実行終了は待たない。返り値は不定。"
+  (let (temp-buffer)
+    (unless (process-buffer process)
+      (setq temp-buffer (lookup-temp-buffer))
+      (set-process-buffer process temp-buffer))
+    (with-current-buffer (process-buffer process)
+      (save-excursion
+	(save-restriction
+	  (widen)
+	  (goto-char (point-max))
+	  ;; 送信文字列をバッファに保持してから、プロセスに送信する。
+	  ;; これはデバッグ等のときに役立つ。
+	  (insert string)
+	  (process-send-string process string))))
+    ;; 一時バッファを用いた場合、kill-buffer する。
+    (when temp-buffer
+      (set-process-buffer process nil)
+      (kill-buffer temp-buffer))))
+
+
+
+
+
+
 
 (provide 'lookup-utils)
 

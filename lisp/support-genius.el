@@ -39,7 +39,7 @@
      ("ha13e" . ",Az(B")
      ("ha13f" . ",Ay(B")
      ("ha143" . ",0$(B")
-     ("ha149" . ",0E(B")
+     ("ha149" . "g")
      ("ha14a" . ",0U(B")
      ("ha14b" . ",03(B-")
      ("ha14c" . ",0I(B")
@@ -114,8 +114,8 @@
 	(setq n (1+ n))))))
 
 (setq lookup-support-options
-      (list ':gaiji-table genius-gaiji-table
-	    ':arrange-table '((structure . genius-arrange-structure))
-	    ':transformer 'lookup-stemming-search))
+      (list :gaiji-table genius-gaiji-table
+	    :arrange-table '((structure . genius-arrange-structure))
+	    :transformer 'lookup-stemming-search))
 
 ;;; genius.el ends here

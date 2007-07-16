@@ -51,7 +51,7 @@
 	(newline)))))
 
 (setq lookup-support-options
-      (list ':gaiji-table iwakoku-gaiji-table
-	    ':arrange-table iwakoku-arrange-table))
+      (list :gaiji-table iwakoku-gaiji-table
+	    :arrange-table iwakoku-arrange-table))
 
 ;;; iwakoku.el ends here
