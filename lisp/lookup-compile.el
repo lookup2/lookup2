@@ -10,8 +10,7 @@
   (let ((generated-autoload-file "lookup-autoloads.el")
 	(make-backup-files nil))
     (with-temp-buffer
-      (setq buffer-file-name generated-autoload-file)
       (mapc 'generate-file-autoloads command-line-args-left)
-      (save-buffer))))
+      (write-file generated-autoload-file))))
 
 ;;; lookup-compile.el ends here

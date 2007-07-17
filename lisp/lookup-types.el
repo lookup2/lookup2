@@ -652,11 +652,15 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
     (unless (or (memq type image-types)
                 (null (memq type '(pgm ppm))))
       (setq type 'pbm))
-    (let ((glyph (with-temp-buffer
-                   (insert-file-contents-literally file)
-                   (string-make-unibyte
-                    (buffer-substring-no-properties (point-min)
-                                                    (point-max))))))
+    (let ((glyph 
+           (with-temp-buffer
+             (insert-file-contents-literally file)
+             (if (fboundp 'string-make-unibyte)
+                 (string-make-unibyte
+                  (buffer-substring-no-properties (point-min)
+                                                  (point-max)))
+               (buffer-substring-no-properties (point-min)
+                                               (point-max))))))
       (lookup-glyph-insert (create-image glyph type t :ascent 'center)
                            start end))))
 
