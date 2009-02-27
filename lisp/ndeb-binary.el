@@ -2,7 +2,7 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.2 2007/07/16 14:53:19 kawabata Exp $
+;; Version: $Id: ndeb-binary.el,v 1.3 2009/02/27 18:13:36 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -547,7 +547,8 @@ corresponding eblook commands."
 		     (>= (car (cdr link)) (car pos))
 		     (>= (cdr (cdr link)) (cdr pos)))
 	    (let* ((entries
-		    (list (lookup-make-entry
+		    (list (lookup-new-entry
+                           'regular
 			   (lookup-entry-dictionary
 			    lookup-content-entry)
 			   (cdr (car links))

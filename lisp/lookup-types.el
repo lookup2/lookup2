@@ -186,8 +186,11 @@
 	 (opts (lookup-assoc-get lookup-agent-option-alist
 				 (lookup-agent-id agent))))
     (while options
-      (setq opts (plist-put opts (caar options) (cadar options)))
-      (setq options (cdr options)))
+      ; (setq opts (plist-put opts (caar options) (cadar options)))
+      (if (< (length options) 2)
+          (error "Agent option %s is incorrect!" options))
+      (setq opts (plist-put opts (car options) (cadr options)))
+      (setq options (cddr options)))
     (setf (lookup-agent-options agent) opts)
     (if lookup-cache-file (lookup-restore-agent-attributes agent))
     agent))
@@ -357,16 +360,16 @@
   (let* ((table (lookup-dictionary-gaiji-table dictionary))
 	 (gaiji (lookup-gaiji-table-ref table code)))
     (cond
-     ((lookup-gaiji-p gaiji) gaiji) ;; gaiji is in table.
-     ((eq gaiji 'no-gaiji) nil)     ;; gaiji is non-existent
+     ((lookup-gaiji-p gaiji) gaiji)
+     ((eq gaiji 'no-gaiji) nil)
      (t
       (let ((spec gaiji) glyph)
-	(unless spec                ;; gaiji is taken from the function
+	(unless spec
 	  (setq spec (lookup-dictionary-command dictionary :gaiji code)))
 	(if (not spec)
 	    (setq gaiji 'no-gaiji)
 	  (if (stringp spec)
-	      (setq gaiji (lookup-new-gaiji spec))
+	      (setq gaiji (lookup-new-gaiji spec spec))
 	    (setq glyph (or (car spec)
 			    (lookup-dictionary-command dictionary :font code)))
 	    (setq gaiji (lookup-new-gaiji glyph (cadr spec)))))
@@ -442,10 +445,6 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (defstruct lookup-entry type dictionary code bookmark id)
-
-;; for compatibility with Lookup 1.4
-(defun lookup-make-entry (dictionary code heading)
-  (lookup-new-entry 'regular dictionary code heading))
 
 (defun lookup-new-entry (type dictionary code &optional heading)
   (let (entry)
@@ -673,17 +672,20 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
 (defstruct lookup-gaiji glyph alter)
 
 (defun lookup-new-gaiji (glyph &optional alter)
-  (unless (stringp glyph)
-    (setq glyph (lookup-gaiji-glyph-compose glyph))
-    (setq alter (or alter lookup-gaiji-alternative)))
+  (unless (or (null glyph) (stringp glyph))
+    (setq glyph (lookup-gaiji-glyph-compose glyph)))
+  (setq alter (or alter lookup-gaiji-alternative))
   (make-lookup-gaiji :glyph glyph :alter alter))
 
 (defun lookup-gaiji-insert (gaiji)
   (let ((glyph (lookup-gaiji-glyph gaiji))
 	(alter (lookup-gaiji-alter gaiji))
 	(start (point)))
-    (insert (or alter glyph))
-    (if alter (put-text-property start (point) 'lookup-gaiji gaiji))))
+    (if (stringp glyph) 
+        (insert glyph)
+      (insert (or alter glyph))
+      (if alter
+          (put-text-property start (point) 'lookup-gaiji gaiji)))))
 
 ;; gaiji glyph
 
@@ -732,6 +734,12 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
       (lookup-gaiji-table-set table (caar spec) (cdar spec))
       (setq spec (cdr spec)))
     table))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Media
+;;;;;;;;;;;;;;;;;;;;
+
+(defstruct lookup-media type object disposition)
 
 (provide 'lookup-types)
 

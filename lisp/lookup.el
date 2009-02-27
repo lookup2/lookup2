@@ -50,9 +50,11 @@ With prefix argument, insert string at point."
   "Start Lookup and display the list of your dictionaries.
 If you have already started lookup, display the last status of buffers."
   (interactive)
-  (let ((session (lookup-history-ref lookup-search-history)))
+  (let ((session (and lookup-search-history
+                      (lookup-history-ref  lookup-search-history))))
     (if session
 	(lookup-session-display session)
+      (lookup-initialize)
       (lookup-select-dictionaries (lookup-default-module)))))
 
 (defun lookup-kill ()
@@ -211,6 +213,7 @@ Type `\\[lookup]' to back to Lookup."
 	(setq lookup-dictionary-list nil)
 	(setq lookup-entry-table nil)
 	(setq lookup-current-session nil)
+        (setq lookup-search-history nil)
 	(setq lookup-last-session nil)))))
 
 (defun lookup-leave ()
@@ -229,20 +232,27 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 	    (yes-or-no-p "Are you sure to restart Lookup? "))
     (setq lookup-property-table nil)
     (lookup-exit)
-    (lookup-initialize)
+    (if (and (interactive-p)
+             (file-exists-p lookup-cache-file)
+             (yes-or-no-p "Do you want to delete cache? "))
+        (delete-file lookup-cache-file)
+        (setq lookup-search-modules nil)
+        (setq lookup-agent-attributes nil)
+        (setq lookup-dictionary-attributes nil))
     (lookup)))
 
 (defun lookup-help ()
   (interactive)
+  (let ((lookup-help lookup-help-message))
   (with-current-buffer (lookup-get-buffer "*Lookup Help*")
     (help-mode)
     (let ((inhibit-read-only t))
       (erase-buffer)
-      (insert lookup-help-message))
+      (insert lookup-help))
     (goto-char (point-min))
     (if (window-live-p lookup-start-window)
 	(set-window-buffer lookup-start-window (current-buffer))
-      (display-buffer (current-buffer)))))
+      (display-buffer (current-buffer))))))
 
 
 ;;;
@@ -582,6 +592,7 @@ See `lookup-secondary' for details."
 	(setq gaiji (lookup-dictionary-gaiji dictionary (match-string 1)))
 	(when gaiji
 	  (delete-region start end)
+          (goto-char start)
 	  (lookup-gaiji-insert gaiji))))))
 
 (defun lookup-adjust-show-gaijis (entry)
@@ -671,8 +682,8 @@ See `lookup-secondary' for details."
 	    (error "No such module: %s" name))
       (car lookup-module-list))))
 
-(defun lookup-get-module (id)
-  (car (member-if (lambda (module) (equal (lookup-module-id module) id))
+(defun lookup-get-module (name)
+  (car (member-if (lambda (module) (equal (lookup-module-name module) name))
 		  lookup-module-list)))
 
 (defun lookup-get-agent (id)

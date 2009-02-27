@@ -38,7 +38,7 @@
   "Setup variables."
   :group 'lookup)
 
-(defcustom lookup-init-directory (concat "~" init-file-user "/.lookup")
+(defcustom lookup-init-directory (expand-file-name "~/.lookup")
   "*Lookup initialization directory."
   :type 'file
   :group 'lookup-setup-variables)
@@ -330,15 +330,11 @@ should be only refered in support files.")
 This variable should be only set in support files.")
 
 (defvar lookup-arrange-table
-  '((before-replace)
-    (replace          lookup-arrange-replaces)
-    (before-gaiji)
+  '((replace          lookup-arrange-replaces)
     (gaiji            lookup-arrange-gaijis)
-    (before-reference)
+    ;(reference        lookup-arrange-media)
     (reference        lookup-arrange-references)
-    (before-structure)
     (structure        lookup-arrange-structure)
-    (before-fill)
     (fill             lookup-arrange-fill-lines)))
 
 ;;;

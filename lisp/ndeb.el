@@ -69,6 +69,11 @@
 ;;; Interfaces
 ;;;
 
+;; lookup entry command
+(put 'ndeb :content   #'ndeb-entry-content)
+(put 'ndeb :following #'ndeb-entry-following)
+(put 'ndeb :preceding #'ndeb-entry-preceding)
+
 ;; lookup agent command
 (put 'ndeb :list      #'ndeb-list)
 (put 'ndeb :kill      #'ndeb-kill)
@@ -78,13 +83,42 @@
 (put 'ndeb :methods   #'ndeb-dictionary-methods)
 (put 'ndeb :menu      #'ndeb-dictionary-menu)
 (put 'ndeb :search    #'ndeb-dictionary-search)
+
+;; arrangements
+
+(put 'ndeb :arrange-table
+     '((replace   ndeb-arrange-xbm
+                  ndeb-arrange-bmp
+                  ndeb-arrange-jpeg
+                  ndeb-arrange-image-page
+                  ndeb-arrange-wave
+                  ndeb-arrange-mpeg
+                  ndeb-arrange-prev-next
+                  ndeb-arrange-snd-autoplay
+                  lookup-arrange-replaces)
+       (gaiji     ndeb-arrange-misc
+                  lookup-arrange-gaijis)
+       ;(media    lookup-arrange-media)              ; default
+       (reference ndeb-arrange-auto-jump-reference
+                  ndeb-arrange-paged-reference
+                  ndeb-arrange-squeezed-references
+                  lookup-arrange-references)
+       (structure lookup-arrange-structure)
+       (fill      ndeb-arrange-no-newline
+                  lookup-arrange-fill-lines)
+       ))
+
+;; lookup content-arrangement functions and options
+(put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
 (put 'ndeb :gaiji     #'ndeb-dictionary-gaiji)
+
+(put 'ndeb :media-pattern '())
+(put 'ndeb :media     #'ndeb-dictionary-media)
+
+(put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
+
 ;(put'ndeb :font      nil)
 
-;; lookup entry command
-(put 'ndeb :content   #'ndeb-entry-content)
-(put 'ndeb :following #'ndeb-entry-following)
-(put 'ndeb :preceding #'ndeb-entry-preceding)
 ;(put'ndeb :heading   nil)
 ;(put'ndeb :dynamic   nil)
 
@@ -93,28 +127,6 @@
 ;;;
 ;;; Dictionary Options
 ;;;
-
-;; Options used by lookup
-(put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
-(put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
-(put 'ndeb :arrange-table
-     '((replace   ndeb-arrange-xbm
-                  ndeb-arrange-bmp
-                  ndeb-arrange-jpeg
-                  ndeb-arrange-image-page
-                  ndeb-arrange-wave
-                  ndeb-arrange-mpeg
-                  ndeb-arrange-misc
-                  ndeb-arrange-prev-next
-                  ndeb-arrange-snd-autoplay)
-       (gaiji     lookup-arrange-gaijis)
-       (reference ndeb-arrange-auto-jump-reference
-                  ndeb-arrange-paged-reference
-                  ndeb-arrange-squeezed-references
-                  lookup-arrange-references)
-       (structure lookup-arrange-structure) ;; lookup-arrange-default-headings
-       (fill      ndeb-arrange-no-newline
-                  lookup-arrange-fill-lines)))
 
 ;; Options used by agent.
 (put 'ndeb :stop-code     nil)
@@ -217,6 +229,7 @@
 				 ndeb-process-coding-system)
       (process-kill-without-query ndeb-process)
       (with-current-buffer buffer
+        (set-buffer-multibyte t)
 	(catch 'started
 	  (while (accept-process-output ndeb-process 10)
 	    (save-excursion
@@ -329,7 +342,7 @@
 	(setq cmd (format "search \"%s\"" (ndeb-escape-query string)))))
       (ndeb-process-require cmd
         (lambda (process)
-	  (let (code heading dupchk entries)
+	  (let (code heading dupchk entry entries)
 	    (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)\t\\(.*\\)" nil t)
 	      (setq code (match-string 1) heading (match-string 2))
 	      ;; 同じエントリがあるかチェックする。
@@ -337,6 +350,12 @@
 	      (unless (member (cons code heading) dupchk)
 		(setq entries (cons (ndeb-new-entry 'regular code heading) entries))
 		(setq dupchk (cons (cons code heading) dupchk))))
+            (when (re-search-forward "<more point=\\([0-9]*\\)>" nil t)
+              (setq entry (ndeb-new-entry 'dynamic "more"))
+              (lookup-put-property entry 'ndeb-query query)
+              (lookup-put-property entry 'ndeb-offset
+                                   (string-to-int (match-string 1)))
+              (setq entries (cons entry entries)))
 	    (nreverse entries)))))))
 
 ;; <:gaiji>
