@@ -78,6 +78,7 @@
   (define-key lookup-modules-mode-map "\C-x\C-t" 'lookup-modules-wrap-command)
   (define-key lookup-modules-mode-map [?\C-/] 'lookup-modules-wrap-command)
   ;; general commands
+  (define-key lookup-modules-mode-map "v" 'lookup-modules-visit-module)
   (define-key lookup-modules-mode-map "g" 'lookup-modules-update)
   (define-key lookup-modules-mode-map "q" 'lookup-leave)
   )
@@ -88,7 +89,7 @@
 (defvar lookup-modules-kill-ring nil)
 
 (defun lookup-modules-mode ()
-  "\\{lookup-modules-mode-map}"
+  "\\{`lookup-modules-mode-map'}."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'lookup-modules-mode)
@@ -105,19 +106,19 @@
 ;;; Interactive Commands
 ;;;
 
-(defun lookup-create-module (name)
+(defun lookup-modules-create-module (name)
+  "Create new module with specified NAME."
   (interactive "sModule name: ")
+  (setq name (replace-regexp-in-string "[\x00-\x1f]" "" name))
+  (setq name (replace-regexp-in-string "[\t ]+$" "" name))
   (if (lookup-get-module name)
       (error "Module `%s' already exists" name))
-  (let* ((module (lookup-new-module name t))
-	 (alist (memq (memq (lookup-current-module) lookup-module-list)
-		      lookup-module-alist)))
-    (if alist
-	(setcdr alist (acons name module (cdr alist)))
-      (setq lookup-module-alist (nconc lookup-module-alist
-				       (list (cons name module)))))
-    (lookup module)
-    (princ name)))
+  (let ((module (lookup-new-module name t)))
+    (setq lookup-module-list (nconc lookup-module-list
+                                    (list module)))
+    (princ name)
+    (lookup-list-modules)
+    ))
 
 (defun lookup-modules-wrap-command (arg)
   "Call the corresponding global command with keys and reset dictionaries.
@@ -148,6 +149,10 @@ will be used instead of the usual `kill-ring'."
     (lookup-modules-update-buffer)
     (message (concat message "done"))))
 
+(defun lookup-modules-visit-module ()
+  (interactive)
+  (lookup-select-dictionaries (lookup-modules-this-module)))
+
 ;;;
 ;;; Internal functions
 ;;;
@@ -167,8 +172,9 @@ will be used instead of the usual `kill-ring'."
   (save-excursion
     (beginning-of-line)
     (goto-char (+ (point) 2))
-    (if (looking-at "[^ ]+")
-	(lookup-get-dictionary (match-string 0)))))
+    (let ((overlay (car (overlays-at (point)))))
+      (and overlay
+           (lookup-get-module (elt (overlay-get overlay 'lookup) 1))))))
 
 (provide 'lookup-modules)
 

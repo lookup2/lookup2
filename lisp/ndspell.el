@@ -133,7 +133,7 @@
      ((string-match "^\\+ \\(.*\\)" output)	; root match
       (list (downcase (match-string 1 output))))
      ((string-match "^&[^:]*: " output)		; some candidates
-      (lookup-split-string (substring output (match-end 0)) "[,\n] ?")))))
+      (split-string (substring output (match-end 0)) "[,\n] ?" t)))))
 
 (defun ndspell-search-spelling (regexp)
   (with-temp-buffer
@@ -145,18 +145,6 @@
 				(1- (point)) (progn (forward-line -1) (point)))
 			       candidates)))
       candidates)))
-
-(defun lookup-split-string (string &optional separators)
-  (let ((rexp (or separators "[ \f\t\n\r\v]+"))
-	(start 0) (list nil))
-    (while (string-match rexp string start)
-      (or (eq (match-beginning 0) 0)
-	  (setq list (cons (substring string start (match-beginning 0))
-			   list)))
-      (setq start (match-end 0)))
-    (or (eq start (length string))
-	(setq list (cons (substring string start) list)))
-    (nreverse list)))
 
 ;;;
 ;;; Ispell process

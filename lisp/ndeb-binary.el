@@ -2,7 +2,7 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.3 2009/02/27 18:13:36 kawabata Exp $
+;; Version: $Id: ndeb-binary.el,v 1.4 2009/03/07 17:34:07 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -66,7 +66,11 @@ how to invoke PROGRAM. Valid properties are:
 
   :disable-sentinel BOOLEAN
       If non-nil, do not use the process sentinel to delete the
-      temporary file used by PROGRAM."
+      temporary file used by PROGRAM.
+
+  :direct BOOLEAN
+      For mpeg only. If non-nil, do not make temporary file.
+      PROGRAM accesses original data."
   :type '(repeat
 	  (list
 	   (choice :tag "Type"
@@ -85,7 +89,10 @@ how to invoke PROGRAM. Valid properties are:
 		      (string :tag "Directory seperator" :value "/"))
 		(list :format "%v" :inline t
 		      (const :format "" :inline t (:disable-sentinel))
-		      (boolean :tag "Disable process sentinel")))))
+		      (boolean :tag "Disable process sentinel"))
+		(list :format "%v" :inline t
+		      (const :format "" :inline t (:direct))
+		      (boolean :tag "direct access to original file (mpeg only)")))))
   :get (lambda (symbol)
 	 (mapcar (lambda (elem)
 		   (let ((program (nth 1 elem)))
@@ -234,7 +241,11 @@ If nil no keystrokes are assigned."
 
 (defvar ndeb-binary-processes nil
   "A list of external processes started by executing a link.
-Each element looks like: (PROCESS-ID DICTIONARY-ID ENTRY-POSITION)")
+Each element looks like: (PROCESS-ID . FILENAME)")
+
+(defvar ndeb-binary-files nil
+  "A list of temporary files.
+Each element looks like: (FILENAME . LOCK-COUNT)")
 
 (put 'ndeb :xbm-regexp
      '("<img=mono:\\([0-9]+\\)x\\([0-9]+\\)>" . "</img=\\([^>]+\\)>"))
@@ -271,7 +282,7 @@ extract the target entry.")
 (defun ndeb-binary-temporary-subdirectory-initialize ()
   "Initialize temporary subdirectory for ndeb-binary."
   (setq ndeb-binary-temporary-subdirectory
-	(make-temp-name (ndeb-binary-expand-file-name
+	(make-temp-name (expand-file-name
 			 "nb" ndeb-binary-temporary-directory)))
   (make-directory ndeb-binary-temporary-subdirectory) ;; error if already exists
   (set-file-modes ndeb-binary-temporary-subdirectory 448) ;; octal 0700
@@ -348,57 +359,61 @@ command defined in `ndeb-binary-extract-commands'."
   "Return the binary link at POS."
   (get-text-property pos 'ndeb-binary))
 
-(defun ndeb-binary-expand-file-name (name &optional dir)
-  (let ((directory-sep-char ?/))
-    (expand-file-name name dir)))
-
-(defun ndeb-binary-bind-temporary-file (dictionary target type)
-  (let* ((files (lookup-dictionary-get-property dictionary 'binary-files))
-	 (file (assq target files))
-	 name lock)
+(defun ndeb-binary-bind-temporary-file (dictionary type target parameters)
+  (let* ((binaries (lookup-get-property dictionary 'binary-files))
+	 (id (cons type target))
+	 (file (lookup-assoc-ref 'binaries id)))
     (if file
-	(setq files (delq file files)
-	      name (nth 1 file)
-	      lock (1+ (nth 2 file)))
-      (setq name (ndeb-binary-make-temp-name type)
-	    lock 1))
-    (lookup-dictionary-put-property
-     dictionary 'binary-files (append files (list (list target name lock))))
-    name))
+	(setq ndeb-binary-files
+	      (lookup-assoc-set
+	       'ndeb-binary-files file
+	       (1+ (or (lookup-assoc-ref 'ndeb-binary-files file) 0))))
+      (setq file (ndeb-binary-make-temp-name type))
+      (lookup-put-property
+       dictionary 'binary-files (cons (cons id file) binaries))
+      (setq ndeb-binary-files
+	    (cons (cons file 1) ndeb-binary-files)))
+    (if (file-exists-p file)
+	(message (concat "Reusing " file))
+      (ndeb-binary-extract dictionary type target parameters file))
+    file))
 
 (defun ndeb-binary-make-temp-name (type)
   (let* ((suffix (lookup-assq-ref 'ndeb-binary-extensions type))
-	 (rest 10)
+	 (max-rest 10)
+	 (rest max-rest)
 	 name)
     (setq name (catch 'done
 		 (while (< 0 rest)
 		   (let ((file (make-temp-name
-				(ndeb-binary-expand-file-name
+				(expand-file-name
 				 "nb" ndeb-binary-temporary-subdirectory))))
 		     (when suffix
 		       (setq file (concat file "." suffix)))
-		     (unless (file-exists-p file)
+		     (unless (or (file-exists-p file)
+				 (lookup-assoc-ref 'ndeb-binary-files file))
 		       (throw 'done file)))
+		   (when (eq rest max-rest)
+		     (ndeb-binary-flush-tables))
 		   (setq rest (1- rest)))))
     (unless name
       (error "Unable to create unique filename"))
     name))
 
-(defun ndeb-binary-unbind-temporary-file (dictionary target)
-  (let* ((files (lookup-dictionary-get-property dictionary 'binary-files))
-	 (file (assq target files)))
-    (when file
-      (let ((name (nth 1 file))
-	    (lock (1- (nth 2 file))))
-	(setq files (delq file files))
-	(if (< lock 1)
-	    (condition-case nil
-		(progn
-		  (delete-file name)
-		  (message "Deleted %s" name))
-	      (error nil))
-	  (setq files (append files (list (list target name lock)))))
-	(lookup-dictionary-put-property dictionary 'binary-files files)))))
+(defun ndeb-binary-unbind-temporary-file (file)
+  (setq file (lookup-expand-file-name file))
+  (let ((lock (lookup-assoc-ref 'ndeb-binary-files file)))
+    (when lock
+      (if (>= lock 2)
+	  (setq ndeb-binary-files
+		(lookup-assoc-set 'ndeb-binary-files file (1- lock)))
+	(setq ndeb-binary-files
+	      (lookup-assoc-set 'ndeb-binary-files file 0))
+	(condition-case nil
+	    (progn
+	      (delete-file file)
+	      (message "Deleted %s" file))
+	  (error nil))))))
 
 (defun ndeb-binary-extract (dictionary type target params file)
   "Extract the binary into a file named FILE.
@@ -417,26 +432,26 @@ corresponding eblook commands."
 			(append (list target) params))))
     (ndeb-with-dictionary dictionary
       (save-match-data
-        ;; if the command still contains "%s", eblook will create the
-        ;; output file.
-        (if (string-match "%s" command)
-            (let (ret)
-              (setq command (replace-match file t t command))
-              (message command)
-              (setq ret (ndeb-process-require command))
-              (unless (string-match "^OK" ret)
-                (when (string-match "[ \t\r\n]+$" ret)
-                  (setq ret (replace-match "" t t ret)))
-                (error ret)))
-          ;; otherwise write the eblook output to a temporary file.
-          ;; TODO: how eblook returns an error in this case?
-          (with-temp-buffer
-            (message command)
-            (buffer-disable-undo)
-            (set-buffer-file-coding-system 'raw-text)
-            (insert (ndeb-process-require command))
-            (let ((out (with-output-to-string (write-file file))))
-              (lookup-proceeding-message out))))))))
+	;; if the command still contains "%s", eblook will create the
+	;; output file.
+	(if (string-match "%s" command)
+	    (let (ret)
+	      (setq command (replace-match file t t command))
+	      (message "%s" command)
+	      (setq ret (ndeb-process-require command))
+	      (unless (string-match "^OK" ret)
+		(when (string-match "[ \t\r\n]+$" ret)
+		  (setq ret (replace-match "" t t ret)))
+		(error ret)))
+	  ;; otherwise write the eblook output to a temporary file.
+	  ;; TODO: how eblook returns an error in this case?
+	  (with-temp-buffer
+	    (message "%s" command)
+	    (buffer-disable-undo)
+	    (set-buffer-file-coding-system 'raw-text)
+	    (insert (ndeb-process-require command))
+	    (let ((out (with-output-to-string (write-file file))))
+	      (message out))))))))
 
 ;;;
 ;;; Functions for a link
@@ -444,10 +459,11 @@ corresponding eblook commands."
 
 (defun ndeb-binary-process-sentinel (process event)
   (when (string-match "^\\(exited\\|finished\\)" event)
-    (let ((pi (assq (process-id process) ndeb-binary-processes)))
-      (ndeb-binary-unbind-temporary-file (lookup-get-dictionary (nth 1 pi))
-					 (nth 2 pi))
-      (setq ndeb-binary-processes (delq pi ndeb-binary-processes)))))
+    (let* ((pid (process-id process))
+	   (file (lookup-assq-ref 'ndeb-binary-processes pid)))
+      (ndeb-binary-unbind-temporary-file file)
+      (setq ndeb-binary-processes
+	    (lookup-assq-del ndeb-binary-processes pid)))))
 
 (defun ndeb-binary-follow-link ()
   "Play the binary at point."
@@ -456,61 +472,83 @@ corresponding eblook commands."
 	 (link (ndeb-binary-get-link (point)))
 	 (type (lookup-assq-ref 'link 'type))
 	 (target (lookup-assq-ref 'link 'target))
+	 (id (cons type target))
 	 (parameters (lookup-assq-ref 'link 'parameters))
-	 (program (lookup-assq-ref 'ndeb-binary-programs type)))
-    (cond
-     ((null program)
-      (call-interactively 'ndeb-binary-extract-link))
-     ((symbolp (car program))
-      (funcall (car program) dictionary target type parameters))
-     (t
-      (let ((case-fold-search nil)
-	    (lookup-proceeding-message "Playing binary")
-	    file)
-	(lookup-proceeding-message nil)
-	(setq 
-	 file (ndeb-binary-bind-temporary-file dictionary target type))
-	(if (file-exists-p file)
-	    (lookup-proceeding-message (concat "Reusing " file))
-	  (ndeb-binary-extract dictionary type target parameters file))
-	(condition-case err
-	    (let* ((params (car program))
-		   (program (cdr program))
-		   (sep (and (> (length program) 1)
-			     (plist-get program :directory-separator)))
-		   process)
-	      (if (stringp params)
-		  (setq params (list params)))
-	      (when sep
-		(save-match-data
-		  (while (string-match "/" file)
-		    (setq file (replace-match sep t t file)))))
-	      (setq params (append params (list file)))
-	      (princ (mapconcat 'identity params " "))
-	      (setq process (or (apply 'start-process
-				       "ndeb-binary"
-				       (get-buffer "*Messages*")
-				       (car params)
-				       (cdr params))
-				(error "Invalid process object")))
-	      (if (and (> (length program) 1)
-		       (plist-get program :disable-sentinel))
-		  (sit-for 3)
-		(setq ndeb-binary-processes
-		      (append ndeb-binary-processes
-			      (list (list (process-id process)
-					  (lookup-dictionary-id dictionary)
-					  target))))
-		(set-process-sentinel process 'ndeb-binary-process-sentinel))
-	      (lookup-proceeding-message t))
-	  (ndeb-binary-unbind-temporary-file dictionary target)
-	  (error (message "%s" err))))))))
+	 (program (lookup-assq-ref 'ndeb-binary-programs type))
+	 file)
+    (if (null program)
+	(call-interactively 'ndeb-binary-extract-link)
+      (if (or (null (and (eq type 'mpeg)
+			 (lookup-plist-get (cdr program) :direct)))
+	      (string-match "^ebnet://"
+			    (lookup-agent-location
+			     (lookup-dictionary-agent dictionary))))
+	  (setq file (ndeb-binary-bind-temporary-file
+		      dictionary type target parameters))
+	;; Get filename for MPEG playing without temporary file.
+	(let ((command (format "mpeg_path %s" target)))
+	  (setq file
+		(if (eq (lookup-agent-class
+			 (lookup-dictionary-agent dictionary))
+			'ndeb)
+		    (ndeb-with-dictionary dictionary
+		      (ndeb-process-require command))
+		  (ndebs-select-dictionary dictionary)
+		  (ndebs-require command))))
+	(if (string-match "\nOK\n" file)
+	    (progn
+	      (string-match "^.+$" file)
+	      ;; On Windows, eblook return BS separated filename.
+	      (setq file (lookup-expand-file-name (match-string 0 file))))
+	  (message "Error occuerd in mpeg_path command")
+	  (setq file (ndeb-binary-bind-temporary-file
+		      dictionary type target parameters))))
+      (cond
+       ((symbolp (car program))
+	(funcall (car program) dictionary type target parameters file))
+       (t
+	(let ((case-fold-search nil)
+	      (lookup-message "Playing binary"))
+          (lookup-with-message nil
+            (ndeb-binary-play-with-external
+             dictionary program type target parameters file))))))))
+
+(defun ndeb-binary-play-with-external
+  (dictionary program type target parameters file)
+  "Internal use. Play binary with external original mpeg movie file directly."
+  (let* ((params (car program))
+	 (program (cdr program))
+	 (sep (lookup-plist-get program :directory-separator))
+	 process)
+    (if (stringp params)
+	(setq params (list params)))
+    (when sep
+      (save-match-data
+	(while (string-match "/" file)
+	  (setq file (replace-match sep t t file)))))
+    (setq params (append params (list file)))
+    (princ (mapconcat 'identity params " "))
+    (condition-case err
+	(setq process (or (apply 'start-process
+				 "ndeb-binary"
+				 (get-buffer "*Messages*")
+				 (car params)
+				 (cdr params))
+			  (error "Invalid process object")))
+      (error (message "%s" err)))
+    (if (lookup-plist-get program :disable-sentinel)
+	(progn
+	  (sit-for 3)
+	  (ndeb-binary-unbind-temporary-file file))
+      (setq ndeb-binary-processes
+	    (cons (cons (process-id process) file) ndeb-binary-processes))
+      (set-process-sentinel process 'ndeb-binary-process-sentinel))))
 
 (defun ndeb-binary-follow-first-link (types &optional num)
   "Internal use. Call this function from beginning of buffer."
   (unless (listp types) (setq types (list types)))
   (unless (numberp num) (setq num 1))
-  (let (point sym)
+  (let (point)
     (catch 'loop
       (while
 	  (setq point (or (and (eq (point) (point-min))
@@ -518,14 +556,14 @@ corresponding eblook commands."
 			       (point-min))
 			  (next-single-property-change (point) 'ndeb-binary)))
 	(goto-char point)
-        (setq sym (ndeb-binary-get-link point))
-	(let ((type (lookup-assq-ref 'sym 'type)))
+	(let ((type (lookup-assq-get (ndeb-binary-get-link point) 'type)))
 	  (when (and (memq type types)
 		     (eq 0 (setq num (1- num)))
 		     (assq type ndeb-binary-programs))
 	    (ndeb-binary-follow-link)
 	    (throw 'loop t)))
-	(next-single-property-change (point) 'ndeb-binary)))))
+	(goto-char (or (next-single-property-change (point) 'ndeb-binary)
+		       (point-max)))))))
 
 (defun ndeb-binary-mouse-follow (event)
   "Play the binary you click on."
@@ -538,14 +576,16 @@ corresponding eblook commands."
   (mouse-set-point event)
   ;; Just for safe.
   (when (functionp 'posn-object-x-y)
-    (let ((links (get-text-property (point) 'ndeb-binary-image-page))
-	  (pos (posn-object-x-y (event-start event))))
+    (let* ((links (get-text-property (point) 'ndeb-binary-image-page))
+	   (pos (posn-object-x-y (event-start event)))
+	   (x (car pos))
+	   (y (cdr pos)))
       (while links
 	(let ((link (car (car links))))
-	  (when (and (<= (car (car link)) (car pos))
-		     (<= (cdr (car link)) (cdr pos))
-		     (>= (car (cdr link)) (car pos))
-		     (>= (cdr (cdr link)) (cdr pos)))
+	  (when (and (<= (caar link) x)
+		     (<= (cdar link) y)
+		     (>= (cadr link) x)
+		     (>= (cddr link) y))
 	    (let* ((entries
 		    (list (lookup-new-entry
                            'regular
@@ -570,7 +610,7 @@ FILE and confirm overwriting if necessary."
   (interactive
    (let ((ref (or (ndeb-binary-get-link (point))
 		  (error "No binary at point"))))
-     (list 'ref
+     (list ref
 	   (read-file-name (format "Save %s into file: "
 				   (lookup-assq-ref 'ref 'type)))
 	   t)))
@@ -585,16 +625,16 @@ FILE and confirm overwriting if necessary."
 		       (lookup-assq-ref 'link 'parameters)
 		       file))
 
-(defun ndeb-binary-play-with-mci (dictionary target type parameters)
+(defun ndeb-binary-play-with-mci (dictionary type target parameters file)
   "Play media link by MCI functions."
   (unless (functionp 'mw32-mci-send-string)
+    (ndeb-binary-unbind-temporary-file file)
     (error "This emacs does not support MCI functions"))
-  (let ((file (ndeb-binary-make-temp-name type))
-	device-id)
-    (ndeb-binary-extract dictionary type target parameters file)
+  (let (device-id)
     (setq device-id (mw32-mci-send-string
 		     (format "open \"%s\" alias %s" file file)))
     (unless (stringp device-id)
+      (ndeb-binary-unbind-temporary-file file)
       (error "MCI open command error %d" device-id))
     (mw32-mci-send-string (format "play %s notify" file))
     (mw32-mci-add-notify-callback
@@ -607,24 +647,19 @@ FILE and confirm overwriting if necessary."
     (mw32-mci-remove-notify-callback
      device-id 'ndeb-binary-play-with-mci-notify)
     (mw32-mci-send-string (format "close %s" file))
-    (condition-case nil
-	(delete-file file)
-      (error nil)))
+    (ndeb-binary-unbind-temporary-file file))
    (t
     (error "Abnormal termination"))))
 
-(defun ndeb-binary-play-sound-file (dictionary target type parameters)
+(defun ndeb-binary-play-sound-file (dictionary type target parameters file)
   "Play media link by play-sound-file function.
 When you use Meadow, use `ndeb-binary-play-with-mci'.
 Using this function with :snd-autoplay option is not recommendable."
   (unless (functionp 'play-sound-file)
+    (ndeb-binary-unbind-temporary-file file)
     (error "This emacs does not have play-sound-file function"))
-  (let ((file (ndeb-binary-make-temp-name type)))
-    (ndeb-binary-extract dictionary type target parameters file)
-    (play-sound-file file)
-    (condition-case nil
-	(delete-file file)
-      (error nil))))
+  (play-sound-file file)
+  (ndeb-binary-unbind-temporary-file file))
 
 (defun lookup-entry-play-ndeb-sound (&optional num)
   "Play first wave link of ndeb contents."
@@ -644,10 +679,10 @@ Using this function with :snd-autoplay option is not recommendable."
   "Play first link of ndeb contents. Binary types to play is decided by `ndeb-play-binaries-from-entry'."
   (interactive "p")
   (let ((types
-	 (or (lookup-assoc-ref ndeb-play-binaries-from-entry
+	 (or (lookup-assoc-ref 'ndeb-play-binaries-from-entry
 			       (this-command-keys))
 	     ;; when called with prefix argument.
-	     (lookup-assoc-ref ndeb-play-binaries-from-entry
+	     (lookup-assoc-ref 'ndeb-play-binaries-from-entry
 			       (and
 				(string-match
 				 (format "^\\(.+%s\\)\\([^0-9].*$\\)"
@@ -720,9 +755,9 @@ Using this function with :snd-autoplay option is not recommendable."
   (when ndeb-binary-glyph-compose-function
     (let ((command (format "xbm %s %s %s" target width height))
 	  xbm glyph start)
-      (lookup-proceeding-message command)
-      (setq xbm (ndeb-with-dictionary dictionary
-                  (ndeb-process-require command)))
+      (lookup-with-message command
+        (setq xbm (ndeb-with-dictionary dictionary
+                    (ndeb-process-require command))))
       (condition-case nil
 	  (setq glyph (funcall ndeb-binary-glyph-compose-function xbm))
 	(if (string-match "[ \t\r\n]+$" xbm)
@@ -745,28 +780,25 @@ Using this function with :snd-autoplay option is not recommendable."
 (defun ndeb-binary-insert-color-image (dictionary type target &optional start end)
   "Insert an inline color image of type TYPE."
   (when (lookup-inline-image-p type)
-    (let ((file (make-temp-name
-		 (ndeb-binary-expand-file-name
-		  "nb" ndeb-binary-temporary-subdirectory))))
-      (ndeb-binary-extract dictionary type target nil file)
+    (let ((file (ndeb-binary-bind-temporary-file dictionary type target nil)))
       (if (and start end)
 	  (lookup-img-file-insert file type start end)
 	(insert ?\n)
 	(lookup-img-file-insert file type)
+        (error "hoge")
 	(unless (= (following-char) ?\n)
 	  (insert ?\n)))
-      (condition-case nil
-	  (delete-file file)
-	(error nil))
-      t)))
+      (ndeb-binary-unbind-temporary-file file))
+    t))
 
 ;;;
 ;;; Arrange functions
 ;;;
 
 (defun ndeb-arrange-xbm (entry)
-  "Arrange monochrome images on an ndeb entry."
-  (let ((regexp (lookup-dictionary-option dictionary :xbm-regexp t)))
+  "Arrange monochrome images on an ndeb ENTRY."
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (regexp (lookup-dictionary-option dictionary :xbm-regexp t)))
     (while (re-search-forward (car regexp) nil t)
       (let ((width (match-string 1))
 	    (height (match-string 2))
@@ -785,8 +817,9 @@ Using this function with :snd-autoplay option is not recommendable."
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-bmp (entry)
-  "Arrange bmp images on an ndeb entry."
-  (let ((regexp (lookup-dictionary-option dictionary :bmp-regexp t)))
+  "Arrange bmp images on an ndeb ENTRY."
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (regexp (lookup-dictionary-option dictionary :bmp-regexp t)))
     (while (re-search-forward (car regexp) nil t)
       (let ((start (match-beginning 0)))
 	(replace-match "" t t)
@@ -808,8 +841,9 @@ Using this function with :snd-autoplay option is not recommendable."
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-jpeg (entry)
-  "Arrange jpeg images on an ndeb entry."
-  (let ((regexp (lookup-dictionary-option dictionary :jpeg-regexp t)))
+  "Arrange jpeg images on an ndeb ENTRY."
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (regexp (lookup-dictionary-option dictionary :jpeg-regexp t)))
     (while (re-search-forward (car regexp) nil t)
       (let ((start (match-beginning 0)))
 	(replace-match "" t t)
@@ -829,8 +863,9 @@ Using this function with :snd-autoplay option is not recommendable."
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-wave (entry)
-  "Arrange wave sound on an ndeb entry."
-  (let ((regexp (lookup-dictionary-option dictionary :wave-regexp t)))
+  "Arrange wave sound on an ndeb ENTRY."
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (regexp (lookup-dictionary-option dictionary :wave-regexp t)))
     (while (re-search-forward (car regexp) nil t)
       (let ((pos_start (match-string 1))
 	    (pos_end (match-string 2))
@@ -841,13 +876,14 @@ Using this function with :snd-autoplay option is not recommendable."
 	      (re-search-forward (cdr regexp))
 	      (setq end (match-beginning 0))
 	      (replace-match "" t t)
-	      (ndeb-binary-format-caption start end 'wave 
+	      (ndeb-binary-format-caption start end 'wave
 						(concat pos_start " " pos_end)))
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-mpeg (entry)
-  "Arrange mpeg movie on an ndeb entry."
-  (let* ((regexp (lookup-dictionary-option dictionary :mpeg-regexp t)))
+  "Arrange mpeg movie on an ndeb ENTRY."
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (regexp (lookup-dictionary-option dictionary :mpeg-regexp t)))
     (while (re-search-forward (car regexp) nil t)
       (let ((id1 (match-string 1))
 	    (id2 (match-string 2))
@@ -889,10 +925,10 @@ Using this function with :snd-autoplay option is not recommendable."
 		(delete-region start end)
 		(goto-char start)
 		(insert (format "<reference>%04d,%04d-%04d,%04d"
-				(car (car params))
-				(cdr (car params))
-				(car (cdr params))
-				(cdr (cdr params)))))
+				(caar params)
+				(cdar params)
+				(cadr params)
+				(cddr params))))
 	    (error nil))))
       (when (search-forward  "</image-page>" nil t)
 	(delete-region (match-beginning 0) (point-max)))
@@ -946,22 +982,60 @@ Using this function with :snd-autoplay option is not recommendable."
 
 (defun ndeb-binary-clear-dictionary (dictionary)
   "Clear temporary files for DICTIONARY."
-  (mapc
-   (lambda (file)
-     (condition-case nil
-	 (let ((name (nth 1 file)))
-	   (when (file-exists-p name)
-	     (let ((lookup-proceeding-message (format "Deleting %s" name)))
-	       (lookup-proceeding-message nil)
-	       (delete-file name)
-	       (lookup-proceeding-message t))))
-	   (error nil)))
-   (lookup-get-property dictionary 'binary-files))
+  (let ((lookup-proceeding-message "Deleting"))
+    (mapc
+     (lambda (file)
+       (let ((name (cdr file)))
+	   (condition-case nil
+	       (progn
+		 (when (file-exists-p name)
+		   (lookup-with-message name
+		     (delete-file name)))
+		 (setq ndeb-binary-files
+		       (lookup-assoc-del ndeb-binary-files name)))
+	     (error nil))))
+     (lookup-get-property dictionary 'binary-files))
+    )
   (lookup-put-property dictionary 'binary-files nil))
 
 (defun ndeb-binary-clear (agent)
-  "Clear temporary files used by ndeb-binary."
-  (let ((dictionaries (append (lookup-agent-dictionaries agent) nil)))
+  "Clear temporary files used by ndeb-binary for AGENT."
+  (let ((dictionaries (lookup-agent-dictionaries agent)))
     (mapc 'ndeb-binary-clear-dictionary dictionaries)))
+
+(defun ndeb-binary-flush-tables ()
+  "Flush binary data and filename tables."
+  (interactive)
+  (mapc (lambda (agent)
+	  (when (memq (lookup-agent-class agent)
+		      (list (quote ndeb) (quote ndebs)))
+	    (ndeb-binary-flush-tables-agent agent)))
+	lookup-agent-list))
+
+(defun ndeb-binary-flush-tables-agent (agent)
+  (mapc
+   (lambda (dictionary)
+     (let ((binaries
+	    (lookup-get-property dictionary (quote binary-files))))
+       (when binaries
+	 (lookup-put-property
+	  dictionary (quote binary-files)
+	  (ndeb-binary-flush-tables-binaries binaries)))))
+   (lookup-agent-dictionaries agent)))
+
+(defun ndeb-binary-flush-tables-binaries (binaries)
+  (let (result)
+    (mapc
+     (lambda (elt)
+       (let* ((file (cdr elt))
+	      (lock (lookup-assoc-ref 'ndeb-binary-files file)))
+	 (if (or (null lock)
+		 (and (eq lock 0)
+		      (null (file-exists-p file))))
+	     (setq ndeb-binary-files
+		   (lookup-assoc-del ndeb-binary-files file))
+	   (setq result (cons elt result)))))
+     binaries)
+    result))
 
 (provide 'ndeb-binary)

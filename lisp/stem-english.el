@@ -1,5 +1,5 @@
 ;;; stem.el ---- routines for stemming
-;;; $Id: stem-english.el,v 1.4 2007/07/16 14:53:19 kawabata Exp $
+;;; $Id: stem-english.el,v 1.5 2009/03/07 17:34:07 kawabata Exp $
 
 ;;; Author: Tsuchiya Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: stemming
@@ -884,7 +884,7 @@
 		  (list (substring str -5 -4)))
 		 ((stem:match "ing$") '("" "e"))
 		 ))
-	(append (mapcar '(lambda (s) (concat stem s)) l)
+	(append (mapcar (lambda (s) (concat stem s)) l)
 		(list str))
 	)))
 
@@ -909,8 +909,8 @@
 			(if (> (length str) stem:minimum-word-length)
 			    ;; 単語長が条件を満たせば、Porter のアルゴリズムを適用
 			    (mapcar
-			     '(lambda (func)
-				(setq str (funcall func str)))
+			     (lambda (func)
+			       (setq str (funcall func str)))
 			     '(stem:step1 stem:step2 stem:step3 stem:step4 stem:step5))))
 		       'string<))))))
 

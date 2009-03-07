@@ -278,8 +278,9 @@ will be used instead of the usual `kill-ring'."
   (save-excursion
     (beginning-of-line)
     (goto-char (+ (point) 2))
-    (if (looking-at "[^ ]+")
-	(lookup-get-dictionary (match-string 0)))))
+    (let ((overlay (car (overlays-at (point)))))
+      (and overlay
+           (lookup-get-dictionary (elt (overlay-get overlay 'lookup) 1))))))
 
 (defun lookup-select-reset-dictionaries ()
   "Reset the current module dictionaries with their priorities."

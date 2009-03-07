@@ -50,7 +50,7 @@
 ;;; types
 ;;;
 
-(put 'ndict :arrange-table '((fill . lookup-arrange-nofill)))
+(put 'ndict :arrange-table '((fill lookup-arrange-nofill)))
 
 ;; ndict agent:
 ;;
@@ -157,7 +157,7 @@
     (let* ((server (ndict-process-require "SHOW SERVER"
 		     (lambda (process)
 		       (forward-line)
-		       (buffer-substring (point) (lookup-point-eol)))))
+		       (buffer-substring (point) (line-end-position)))))
 	   (system (if (string-match "^dictd " server) 'dictd t))
 	   (table (lookup-assq-get ndict-system-info-alist system)))
       ;; set method-table

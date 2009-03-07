@@ -115,7 +115,7 @@
 
 (setq lookup-support-options
       (list :gaiji-table genius-gaiji-table
-	    :arrange-table '((structure . genius-arrange-structure))
-	    :transformer 'lookup-stemming-search))
+	    :arranges '((structure genius-arrange-structure))
+	    :transformer 'lookup-stem-english-search))
 
 ;;; genius.el ends here

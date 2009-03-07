@@ -379,7 +379,7 @@
 	    :coding 'iso-8859-1
 	    :stop-code "0x1f090000"
 	    :gaiji-table   oxford-gaiji-table
-	    :arrange-table '((before-fill . oxford-arrange-structure))
-	    :transformer 'lookup-stemming-search))
+	    :arranges '((structure oxford-arrange-structure))
+	    :transformer 'lookup-stem-english-search))
 
 ;;; oxford.el ends here

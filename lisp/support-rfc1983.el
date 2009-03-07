@@ -34,7 +34,6 @@
 
 (setq lookup-support-options
       (list :title "RFC1983"
-	    :arranges '(rfc1983-arrange-references
-			lookup-arrange-default-headings)))
+	    :arranges '((references rfc1983-arrange-references))))
 
 ;;; rfc1983.el ends here

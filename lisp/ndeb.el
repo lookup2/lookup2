@@ -34,7 +34,7 @@
   "Lookup ndeb interface."
   :group 'lookup-agents)
 
-(defcustom ndeb-program-name "eblook"
+(defcustom ndeb-program-name (executable-find "eblook")
   "*Program name of eblook."
   :type 'string
   :group 'ndeb)
@@ -64,6 +64,39 @@
 		 (const 48))
   :group 'ndeb)
 
+(defcustom ndeb-minimum-indent 1
+  "指定した数字を越えた分だけ字下げ処理を行う。通常は0または1。"
+  :type 'integer
+  :group 'ndeb)
+
+(defcustom ndeb-default-script-height 0.8
+  "Default height of super/subscript letters.
+1 or 0 mean height is not set."
+  :type '(choice 
+	  (list :tag "step" (const -) (integer :tag "count" :value 2))
+	  (number :tag "scale factor" :value 0.8)
+	  (function :tag "function")
+	  (sexp :tag "other"))
+  :group 'ndeb)
+
+(defface ndeb-bold-face
+  '((t (:weight bold)))
+  "Face used to bold text."
+  :group 'ndeb
+  :group 'lookup-faces)
+
+(defface ndeb-italic-face
+  '((t (:slant italic)))
+  "Face used to italic text."
+  :group 'ndeb
+  :group 'lookup-faces)
+
+(defface ndeb-emphasis-face
+  '((t (:slant italic :weight bold)))
+  "Face used to emphasized text."
+  :group 'ndeb
+  :group 'lookup-faces)
+
 
 ;;;
 ;;; Interfaces
@@ -87,25 +120,32 @@
 ;; arrangements
 
 (put 'ndeb :arrange-table
-     '((replace   ndeb-arrange-xbm
+     '((replace   lookup-arrange-replaces
+                  ndeb-arrange-xbm
                   ndeb-arrange-bmp
                   ndeb-arrange-jpeg
                   ndeb-arrange-image-page
                   ndeb-arrange-wave
                   ndeb-arrange-mpeg
+                  ndeb-arrange-scripts
+                  ndeb-arrange-faces
+                  ndeb-arrange-no-newline
                   ndeb-arrange-prev-next
-                  ndeb-arrange-snd-autoplay
-                  lookup-arrange-replaces)
-       (gaiji     ndeb-arrange-misc
-                  lookup-arrange-gaijis)
+                  ndeb-arrange-decode-entity
+                  )
+       (gaiji     lookup-arrange-gaijis)
        ;(media    lookup-arrange-media)              ; default
        (reference ndeb-arrange-auto-jump-reference
                   ndeb-arrange-paged-reference
                   ndeb-arrange-squeezed-references
                   lookup-arrange-references)
-       (structure lookup-arrange-structure)
-       (fill      ndeb-arrange-no-newline
-                  lookup-arrange-fill-lines)
+       (structure 
+                  ndeb-arrange-indent
+                  lookup-arrange-structure
+                  )
+       (fill      lookup-arrange-fill-lines
+                  ndeb-arrange-snd-autoplay
+                  )
        ))
 
 ;; lookup content-arrangement functions and options
@@ -143,6 +183,15 @@
 (defconst ndeb-method-table
   '((exact . "exact") (prefix . "word") (suffix . "endword") (wild . "wild")))
 
+(defconst ndeb-entities-table
+  '(("amp" . "&")
+    ("lt" . "<")
+    ("gt" . ">")))
+
+(defconst ndeb-faces-table
+  '(("italic" . ndeb-italic-face)
+    ("bold" . ndeb-bold-face)
+    ("em" . ndeb-emphasis-face)))
 ;;;
 ;;; Internal variables
 ;;;
@@ -160,8 +209,21 @@
 
 (defvar ndeb-current-dictionary nil)
 
+(defvar ndeb-support-escape-text nil
+  "Positive numeric value means that eblook supports text escape.
+Zero or negative value mean that feature is not supported.
+Nil means it has not been checked yet.")
+
+;; ndeb entry:
+;;
+;; CODE    - entry specific code (e.g. "2c00:340") by eblook `search' command
+;; HEADING - given by eblook `search' command
+
+(defun ndeb-new-entry (type code &optional heading)
+  (lookup-new-entry type ndeb-current-dictionary code heading))
+
 ;;;
-;;; Macros
+;;; macros
 ;;;
 
 (put 'ndeb-with-agent 'lisp-indent-function 1)
@@ -214,8 +276,8 @@
 	(ndeb-process-require (format "set %s \"%s\"" var value))
       (ndeb-process-require (format "unset %s" var)))))
 
-;; If `eblook' process is not started yet, start it.
 (defun ndeb-process-open ()
+  "eblookが起動していなければ起動する。"
   (unless (and (processp ndeb-process)
 	       (eq (process-status ndeb-process) 'run))
     (let ((buffer (or (lookup-open-process-buffer " *ndeb*")
@@ -242,7 +304,15 @@
 	(kill-buffer buffer)))
     ;;(ndeb-process-require-set "prompt" "")
     (ndeb-process-require-set "prompt" ndeb-prompt-string)
-    ))
+    (ndeb-process-require-set "decorate-mode" "on")
+
+    ;; Check if eblook support escape text feature.
+    (unless ndeb-support-escape-text
+      (if  (string-match "^escape-text\t" (ndeb-process-require "show"))
+	  (setq ndeb-support-escape-text 1)
+	(setq ndeb-support-escape-text 0)))
+    (when (> ndeb-support-escape-text 0)
+      (ndeb-process-require-set "escape-text" "on"))))
 
 
 
@@ -288,23 +358,23 @@
 ;; <:menu>
 (defun ndeb-dictionary-menu (dictionary)
   (ndeb-with-dictionary dictionary
-    (let ((string (ndeb-dictionary-get-info dictionary "search methods"))
-          menu content image-menu image-content copyright copyright-content)
-      (when string
-        (when (string-match  " menu\\($\\| \\)" string)
-          (setq menu    (list (ndeb-new-entry 'regular "menu" "[Menu]"))
-                content (ndeb-process-require "menu"))
-          (lookup-put-property menu 'ndeb-content content))
-        (when (string-match  "image_menu" string)
-          (setq image-menu (list (ndeb-new-entry 'regular "image_menu" "[Graphic menu]"))
-                image-content (ndeb-process-require "image_menu"))
-          (lookup-put-property image-menu 'ndeb-content image-content))
-        (when (string-match "copyright" string)
-          (setq copyright (list (ndeb-new-entry 'regular "copyright" "[Copyright]"))
-                copyright-content (ndeb-process-require "copyright"))
-          (lookup-put-property copyright 'ndeb-content copyright-content))
-        )
-    (nconc menu image-menu copyright))))
+  (let ((string (ndeb-dictionary-get-info dictionary "search methods"))
+        menu content image-menu image-content copyright copyright-content)
+    (when string
+      (when (string-match  " menu\\($\\| \\)" string)
+        (setq menu    (list (ndeb-new-entry 'regular "menu" "[Menu]"))
+              content (ndeb-process-require "menu"))
+        (lookup-put-property menu 'ndeb-content content))
+      (when (string-match  "image_menu" string)
+        (setq image-menu (list (ndeb-new-entry 'regular "image_menu" "[Graphic menu]"))
+              image-content (ndeb-process-require "image_menu"))
+        (lookup-put-property image-menu 'ndeb-content image-content))
+      (when (string-match "copyright" string)
+        (setq copyright (list (ndeb-new-entry 'regular "copyright" "[Copyright]"))
+              copyright-content (ndeb-process-require "copyright"))
+        (lookup-put-property copyright 'ndeb-content copyright-content))
+      )
+  (nconc menu image-menu copyright))))
 
 ;; <:search>
 (defun ndeb-dictionary-search (dictionary query)
@@ -350,12 +420,12 @@
 	      (unless (member (cons code heading) dupchk)
 		(setq entries (cons (ndeb-new-entry 'regular code heading) entries))
 		(setq dupchk (cons (cons code heading) dupchk))))
-            (when (re-search-forward "<more point=\\([0-9]*\\)>" nil t)
-              (setq entry (ndeb-new-entry 'dynamic "more"))
-              (lookup-put-property entry 'ndeb-query query)
-              (lookup-put-property entry 'ndeb-offset
-                                   (string-to-int (match-string 1)))
-              (setq entries (cons entry entries)))
+            ;(when (re-search-forward "<more point=\\([0-9]*\\)>" nil t)
+            ;  (setq entry (ndeb-new-entry 'dynamic "more"))
+            ;  (lookup-put-property entry 'ndeb-query query)
+            ;  (lookup-put-property entry 'ndeb-offset
+            ;                       (string-to-int (match-string 1)))
+            ;  (setq entries (cons entry entries)))
 	    (nreverse entries)))))))
 
 ;; <:gaiji>
@@ -435,9 +505,6 @@
       (lookup-put-property agent 'ndeb-process nil))))
 
 
-(defun ndeb-new-entry (type code &optional heading)
-  (lookup-new-entry type ndeb-current-dictionary code heading))
-
 (defun ndeb-dictionary-get-info (dictionary key)
   (let ((alist (lookup-get-property dictionary 'ndeb-alist)))
     (unless alist
@@ -494,41 +561,6 @@
     (if (re-search-forward "\\(</prev>\\|</next>\\)" nil t)
 	(replace-match ")"))))
 
-(defun ndeb-arrange-misc (entry)
-  (let ((start (point)) obj char)
-    (while (re-search-forward "<sup>\\(.+?\\)</sup>" nil t)
-      (save-match-data
-        (setq obj (japanese-hankaku (match-string 1)))
-        (dotimes (i (length obj))
-          (setq char (lookup-superscript-character (aref obj i)))
-          (if char (aset obj i char))))
-      (replace-match obj))
-    (goto-char start)
-    (while (re-search-forward "<sub>\\(.+?\\)</sub>" nil t)
-      (save-match-data
-        (setq obj (japanese-hankaku (match-string 1)))
-        (dotimes (i (length obj))
-          (setq char (lookup-subscript-character (aref obj i)))
-          (if char (aset obj i char))))
-      (replace-match obj))
-    (goto-char start)
-    (while (re-search-forward "<em>\\(.+?\\)</em>" nil t)
-      (save-match-data
-        (setq obj (match-string 1))
-        (put-text-property 0 (length em) 'face 'bold em))
-      (replace-match em))))
-
-(defun ndeb-arrange-auto-jump-reference (entry)
-  (ndeb-with-dictionary (lookup-entry-dictionary entry)
-    (when (re-search-forward "<auto-jump-reference></auto-jump-reference=\\([0-9]+:[0-9]+\\)>" nil t)
-      (let ((code (match-string 1)))
-        (delete-region (point-min) (point-max))
-        (insert
-         (if (eq (lookup-agent-class (lookup-dictionary-agent dictionary)) 'ndeb)
-             (ndeb-entry-content (ndeb-new-entry 'regular code nil))
-           (ndeb-entry-content
-            (lookup-new-entry 'regular dictionary code nil))))))))
-
 (defun ndeb-arrange-paged-reference (entry)
   (while (re-search-forward "<paged-reference=\\([0-9]+:[0-9]+\\)>" nil t)
     (let ((pos (match-string 1))
@@ -542,6 +574,94 @@
 	    (goto-char start)
 	    (insert "<reference>"))
 	(error nil)))))
+
+(defun ndeb-arrange-auto-jump-reference (entry)
+  (ndeb-with-dictionary (lookup-entry-dictionary entry)
+  (when (re-search-forward "<auto-jump-reference></auto-jump-reference=\\([0-9]+:[0-9]+\\)>" nil t)
+    (let ((code (match-string 1)))
+      (delete-region (point-min) (point-max))
+      (insert
+       (if (eq (lookup-agent-class (lookup-dictionary-agent dictionary)) 'ndeb)
+           (ndeb-entry-content (ndeb-new-entry 'regular code nil))
+         (ndeb-entry-content
+          (lookup-new-entry 'regular dictionary code nil))))))))
+
+(defun ndeb-arrange-indent (entry)
+  (while (re-search-forward "<ind=\\([0-9]\\)>" nil t)
+    (let ((beg-beg (match-beginning 0))
+	  (beg-end (match-end 0))
+	  (level (- (string-to-number (match-string 1))
+		    (or 
+		     (lookup-dictionary-option dictionary ':minimum-indent t)
+		     ndeb-minimum-indent)))
+	  indent-end point)
+      (delete-region beg-beg (point))
+      (when (> level 0)
+	(setq point (point))
+	(setq indent-end
+	      (or (and (re-search-forward "<ind=[0-9]>" nil t)
+		       (match-beginning 0))
+		  (point-max)))
+	(set-left-margin point indent-end level)
+	(goto-char point)))))
+
+(defun ndeb-arrange-scripts (entry)
+  (while (re-search-forward "<\\(su[bp]\\)>" nil t)
+    (let ((beg-beg (match-beginning 0))
+	  (tag (match-string 1)))
+      (delete-region beg-beg (match-end 0))
+      (if (and (re-search-forward (concat "<\\(/?\\)" tag ">") nil t)
+	       (equal (match-string 1) "/"))
+	  (let ((end-beg (match-beginning 0))
+		(height (or (lookup-dictionary-option
+			     dictionary ':script-height t)
+			    ndeb-default-script-height)))
+	    (goto-char end-beg)
+	    (add-text-properties
+	     beg-beg (point) `(display ,(delq nil
+					      `((raise ,(if (equal tag "sub")
+							    -0.3
+							  0.3))
+						,(if (or (eq height 0)
+							 (eq height 1))
+						     nil
+						   `(height ,height))))))
+	    (delete-region end-beg (match-end 0)))
+	(goto-char beg-beg)))))
+
+(defun ndeb-arrange-faces (entry)
+  (while (re-search-forward "<\\(/?\\)em>" nil t)
+    (if (equal (match-string 1) "/")
+	(replace-match "</font>" t t)
+      (replace-match "<font=em>" t t)))
+  (goto-char (point-min))
+  (while (re-search-forward "<font=\\([a-z]+\\)>" nil t)
+    (let ((beg-beg (match-beginning 0))
+	  (beg-end (match-end 0))
+	  (class (match-string 1)))
+      (if (and (re-search-forward
+		"<\\(/?\\)font\\(=[a-z]+\\)?>" nil t)
+	       (equal (match-string 1) "/"))
+	  (let ((end-beg (match-beginning 0))
+		(end-end (match-end 0)))
+	    (add-text-properties beg-end end-beg
+				 `(face ,(or (lookup-assoc-ref
+					      'ndeb-faces-table class)
+					     default)))
+	    (delete-region end-beg end-end)
+	    (delete-region beg-beg beg-end))
+	(goto-char beg-beg)
+	(delete-region beg-beg beg-end)))))
+
+(defun ndeb-arrange-decode-entity (entry)
+  (when (> ndeb-support-escape-text 0)
+    (while (re-search-forward "&\\(amp\\|lt\\|gt\\);" nil t)
+      (let* ((pos (match-beginning 0))
+	     (properties (text-properties-at pos)))
+	(replace-match (lookup-assoc-ref
+			'ndeb-entities-table (match-string 1)) t t)
+	(set-text-properties pos (1+ pos) properties)
+	(goto-char (1+ pos))))))
 
 ;;; Get/Set functions
 
@@ -561,4 +681,4 @@
 
 (provide 'ndeb)
 
-;;; ndsrd.el ends here
+;;; ndeb.el ends here

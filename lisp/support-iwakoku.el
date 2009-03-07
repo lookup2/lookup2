@@ -30,9 +30,6 @@
      ("za339" nil "[音]") ("za33a" nil "[例]") ("za33b" nil "[メモ]")
      ("za33c" nil "[一覧]") ("za37c" "(C)") ("za37d" "(R)") ("za722" "⇒"))))
 
-(defconst iwakoku-arrange-table
-  '((structure . iwakoku-arrange-headings)))
-
 (defun iwakoku-fix-by-black-list (entry)
   (let ((code (lookup-entry-code entry)))
     (cond
@@ -52,6 +49,6 @@
 
 (setq lookup-support-options
       (list :gaiji-table iwakoku-gaiji-table
-	    :arrange-table iwakoku-arrange-table))
+	    :arranges '((structure iwakoku-arrange-headings))))
 
 ;;; iwakoku.el ends here

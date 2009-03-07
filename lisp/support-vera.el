@@ -30,6 +30,6 @@
 
 (setq lookup-support-options
       (list :title "V.E.R.A"
-	    :arrange-table '((reference . vera-arrange-references))))
+	    :arranges '((reference vera-arrange-references))))
 
 ;;; vera.el ends here

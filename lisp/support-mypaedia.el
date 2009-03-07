@@ -73,6 +73,6 @@
 
 (setq lookup-support-options
       (list :gaiji-table   mypaedia-gaiji-table
-	    :arrange-table '((before-reference mypaedia-arrange-references))))
+	    :arranges '((reference mypaedia-arrange-references))))
 
 ;;; mypaedia.el ends here

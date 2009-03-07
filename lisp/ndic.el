@@ -42,7 +42,7 @@
 ;;; types
 ;;;
 
-(put 'ndic :arrange-table '((fill . lookup-arrange-nofill)))
+(put 'ndic :arrange-table '((fill lookup-arrange-nofill)))
 
 ;; ndic agent:
 ;;
@@ -204,7 +204,7 @@
       (with-current-buffer (ndic-dictionary-object dictionary)
 	(goto-char (point-min))
 	(while (re-search-forward regexp nil t)
-	  (setq string (buffer-substring (lookup-point-bol)
+	  (setq string (buffer-substring (line-beginning-position)
 					 (1- (search-forward "\t"))))
 	  (when (looking-at "\\([^\t]+\\)\t\\(.*\\)")
 	    (setq code (concat (match-string 1) ":" (match-string 2)))

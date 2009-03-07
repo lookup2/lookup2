@@ -195,9 +195,7 @@ Dictionary option `cite-prefix' overrides this variable."
   :group 'lookup-additional-features)
 
 (defcustom lookup-use-kakasi
-  (if (let ((load-path exec-path))
-	(or (locate-library lookup-kakasi-program t)
-	    (locate-library (concat lookup-kakasi-program ".exe") t))) t)
+  (if (executable-find lookup-kakasi-program) t)
   "*Non-nil enables Kanji extraction by using KAKASI."
   :type 'boolean
   :group 'lookup-additional-features)
@@ -330,12 +328,11 @@ should be only refered in support files.")
 This variable should be only set in support files.")
 
 (defvar lookup-arrange-table
-  '((replace          lookup-arrange-replaces)
-    (gaiji            lookup-arrange-gaijis)
-    ;(reference        lookup-arrange-media)
-    (reference        lookup-arrange-references)
-    (structure        lookup-arrange-structure)
-    (fill             lookup-arrange-fill-lines)))
+  '((replace   lookup-arrange-replaces)
+    (gaiji     lookup-arrange-gaijis)
+    (reference lookup-arrange-references)
+    (structure lookup-arrange-structure)
+    (fill      lookup-arrange-fill-lines)))
 
 ;;;
 ;:: Hooks
@@ -363,6 +360,7 @@ This hook will run just after loading `lookup-init-file' and
 
 (defvar lookup-agent-list nil)
 (defvar lookup-module-list nil)
+(defvar lookup-current-module nil)
 (defvar lookup-dictionary-list nil)
 (defvar lookup-entry-table nil)
 (defvar lookup-buffer-list nil)

@@ -71,7 +71,7 @@
     ;; rebuild buffer
     (let ((inhibit-read-only t)
 	  (modified (buffer-modified-p))
-	  (start (lookup-point-bol)))
+	  (start (line-beginning-position)))
       (delete-region start (progn (forward-line) (point)))
       (mapc 'lookup-search-query-insert entries)
       (goto-char start)
@@ -650,7 +650,7 @@ which indicates the number of the dictionary."
 ;;;;;;;;;;;;;;;;;;;;
 
 (defun lookup-summary-goto-link ()
-  (let ((p (lookup-point-bol)))
+  (let ((p (line-beginning-position)))
     (if (setq p (next-single-property-change p 'lookup-entry))
 	(goto-char p))))
 

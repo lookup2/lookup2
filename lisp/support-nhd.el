@@ -37,7 +37,6 @@
 
 (setq lookup-support-options
       (list :title "Newbury House"
-	    :arrange-table '((structure . nhd-arrange-structure)
-                             (fill . lookup-arrange-fill-lines))))
+	    :arranges '((structure nhd-arrange-structure))))
 
 ;;; jargon.el ends here

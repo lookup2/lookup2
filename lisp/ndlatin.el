@@ -2,7 +2,7 @@
 ;; Copyright (C) 2007 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: KAWABATA, Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: ndlatin.el,v 1.1 2009/02/27 18:11:34 kawabata Exp $
+;; Version: $Id: ndlatin.el,v 1.2 2009/03/07 17:34:07 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -70,18 +70,19 @@
   "Lookup ndlatin interface."
   :group 'lookup-agents)
 
-(defcustom ndlatin-splitter ";$"
+(defcustom ndlatin-splitter 
+  (if (eq system-type 'windows-nt) ";$" "")
   "Splitting regexp for output results.
-For Macintosh version (ver 1.93), '' would be better, while for
-Windows version (ver 1.97), ';$' may be appropriate (but it
-sometimes fails)."
+For Macintosh/Linux version, '' would be better, while for
+Windows version, ';$' may be appropriate (but it sometimes
+fails)."
   :type 'string
   :group 'ndlatin)
 
 (defcustom ndlatin-dic-change-char "~"
   "Dictionary Change Command character.
 For Macintosh version (ver 1.93), it should be '>', while for
-Windows version (ver 1.97), it should be '~'"
+Windows/Linux version (ver 1.97), it should be '~'"
   :type 'string
   :group 'ndlatin)
 
@@ -117,7 +118,8 @@ Windows version (ver 1.97), it should be '~'"
           ndlatin-dictionary-table))
 
 (defun ndlatin-kill (agent)
-  (lookup-process-kill ndlatin-process))
+  (if ndlatin-process
+      (lookup-process-kill ndlatin-process)))
 
 (defun ndlatin-dictionary-title (dictionary)
   (ndlatin-process-open (lookup-dictionary-agent dictionary))
@@ -148,9 +150,9 @@ Windows version (ver 1.97), it should be '~'"
       (setq output (remove-duplicates output :test 'equal))
       (setq output
             (remove-if ;; remove empty output
-             #'(lambda (x) (not (string-match "[a-zA-Z]" x))) output))
-      (mapcar #'(lambda (x) (lookup-new-entry 'regular dictionary
-                                              x string))
+             (lambda (x) (not (string-match "[a-zA-Z]" x))) output))
+      (mapcar (lambda (x) (lookup-new-entry 'regular dictionary
+                                            x string))
               output))))
 
 (defun ndlatin-entry-content (entry)
@@ -166,8 +168,8 @@ Windows version (ver 1.97), it should be '~'"
   "Open Latin Words process with name specified by AGENT.
 It must be started with command directory."
   (setq ndlatin-program (lookup-agent-location agent))
-  (if (null ndlatin-program)
-      (error "NDLATIN program location not specified!"))
+  (unless ndlatin-program
+      (error "ndlatin-program location not specified!"))
   (unless (and (processp ndlatin-process)
                (eq (process-status ndlatin-process) 'run))
     (let ((buffer (or (lookup-open-process-buffer " *ndlatin*")

@@ -35,9 +35,6 @@
      ("za423" "⇔") ("za424" nil "[TEL]") ("za428" "(R)") ("za43f" "(C)")
      ("za44a" "[海]") ("za44b" "[新]") ("za460" "√2"))))
 
-(defconst chiezo-arrange-table
-  '((structure . chiezo-arrange-structure)))
-
 (defun chiezo-arrange-structure (entry)
   (lookup-arrange-structure entry)
   (goto-char (point-min))
@@ -46,6 +43,6 @@
 
 (setq lookup-support-options
       (list :gaiji-table chiezo-gaiji-table
-	    :arrange-table chiezo-arrange-table))
+	    :arranges '((structure chiezo-arrange-structure))))
 
 ;;; chiezo.el ends here

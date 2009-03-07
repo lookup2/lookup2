@@ -1,5 +1,5 @@
 ;;; support-plus.el --- support file for 『リーダーズ・プラス v2』
-;; Copyright (C) 2000 KAWABATA, Taichi <knsihida@ring.gr.jp>
+;; Copyright (C) 2000 KAWABATA, Taichi
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -140,7 +140,7 @@
      ("ha23e" . "ə́")
      ("ha23f" . "ɚ́")
      ("ha240" . "ɛ́")
-     ("ha241" . "ɪ́")
+     ("ha241" . "í")
      ("ha242" . "ɔ́")
      ("ha243" . "ʊ́")
      ("ha244" . "ɯ́")
@@ -149,7 +149,7 @@
      ("ha247" . "ə́")
      ("ha248" . "ɚ́")
      ("ha249" . "ɛ́")
-     ("ha24a" . "ɪ́")
+     ("ha24a" . "í")
      ("ha24b" . "ɔ́")
      ("ha24c" . "ʊ́")
      ("ha24d" . "ɯ́")
@@ -158,7 +158,7 @@
      ("ha250" . "ə̀")
      ("ha251" . "ɚ̀")
      ("ha252" . "ɛ̀")
-     ("ha253" . "ɪ̀")
+     ("ha253" . "ì")
      ("ha254" . "ɔ̀")
      ("ha255" . "ʊ̀")
      ("ha256" . "ɯ̀")
@@ -362,7 +362,7 @@
      ("zb155" . "æ"))))
 
 (setq lookup-support-options
-      (list ':gaiji-table readers-plus-v2-gaiji-table))
+      (list :gaiji-table readers-plus-v2-gaiji-table))
 
 (require 'lookup)
 

@@ -18,7 +18,9 @@
 ;;; Code:
 
 (setq lookup-support-autoload-alist
-      '(("IWAKOKU\\'" . "support-iwakoku")
+      '(
+        ;; EB/EPWING Dictionaries
+        ("IWAKOKU\\'" . "support-iwakoku")
 	("CHUJITEN\\'" . "support-chujiten")
 	("CHIEZO\\'" . "support-chiezo")
 	("MYPAEDIA\\'" . "support-mypaedia")
@@ -33,8 +35,11 @@
 	("COMP\\'" . "support-comp")
 	("OXFORD\\'" . "support-oxford")
         ("ZHONG_RI\\'" . "support-zhongri")
-        ("ndsrd:" . "support-srd")
 	("SRD-FPW\\'" . "support-srd-fpw")
+        ("MWSEDIC\\'" . "support-mwsedic")
+        ("/CEBD\\'" . "support-cebd")
+        ;; MISC
+        ("ndsrd:" . "support-srd")
 	("foldoc" . "support-foldoc")
 	("jargon" . "support-jargon")
 	("vera" . "support-vera")

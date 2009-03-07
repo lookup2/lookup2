@@ -25,12 +25,6 @@
 (require 'cl)
 (require 'lookup-vars)
 
-(defun lookup-point-bol ()
-  (save-excursion (beginning-of-line) (point)))
-
-(defun lookup-point-eol ()
-  (save-excursion (end-of-line) (point)))
-
 ;; alist by assq
 
 (defsubst lookup-assq-get (alist key)
@@ -179,9 +173,11 @@
 			(concat "%" string "s"))))
 		  format-list ""))
     ;; insert table
-    (while args-list
-      (insert (apply 'format format (car args-list)))
-      (setq args-list (cdr args-list)))))
+    (dolist (args args-list)
+      (setq start (point))
+      (insert (apply 'format format args))
+      (let ((ov (make-overlay start (point))))
+        (overlay-put ov 'lookup args)))))
 
 (defvar lookup-property-table nil)
 
@@ -197,21 +193,16 @@
 
 (defun lookup-current-word ()
   (save-excursion
-    (unless (eq (char-syntax (or (char-after (point)) 0))
-		(if (boundp 'MULE) ?e ?w))
-      (let ((syntax (if (boundp 'MULE) "^e" "^w")))
-	(skip-syntax-backward syntax (lookup-point-bol))
-	(if (bolp)
-	    (skip-syntax-forward syntax (lookup-point-eol))
-	  (backward-char))))
+    (unless (eq (char-syntax (or (char-after (point)) 0)) ?w)
+      (skip-syntax-backward "^w" (line-beginning-position))
+      (if (bolp)
+          (skip-syntax-forward "^w" (line-end-position))
+        (backward-char)))
     (let* ((ch (or (char-after (point)) 0))
-	   (charset (if (not (fboundp 'char-leading-char))
-			(char-charset ch)
-		      (setq ch (char-leading-char ch))
-		      (cond ((eq ch 0) 'ascii)
-			    ((eq ch 146) 'japanese-jisx0208)))))
-      (cond ((eq charset 'ascii) (lookup-current-word-ascii))
-	    ((eq charset 'japanese-jisx0208) (lookup-current-word-japanese))
+	   (charset (char-charset ch)))
+      (cond ((and (eq charset 'japanese-jisx0208)
+                  (< #x3000 ch))
+             (lookup-current-word-japanese))
 	    (t (lookup-current-word-general))))))
 
 (defun lookup-current-word-general ()
@@ -221,27 +212,15 @@
      (progn (skip-syntax-backward "w") (point))
      (progn (skip-syntax-forward "w") (point)))))
 
-(defun lookup-current-word-ascii ()
-  (let ((word (buffer-substring-no-properties
-	       (progn (skip-chars-backward "a-zA-Z0-9") (point))
-	       (progn (skip-chars-forward "a-zA-Z0-9") (point)))))
-    (if (not (looking-at "-\n"))
-	word
-      (forward-line)
-      (concat word (buffer-substring-no-properties
-		    (progn (skip-chars-forward "^a-zA-Z0-9\n") (point))
-		    (progn (skip-chars-forward "a-zA-Z0-9") (point)))))))
-
 (defun lookup-current-word-japanese ()
   (if (not lookup-use-kakasi)
       (lookup-current-word-general)
     (let ((temp-buffer (lookup-temp-buffer))
-	  (syntax (if (boundp 'MULE) "e" "w"))
 	  (start (point)) (n 1) regexp)
       (lookup-with-coding-system lookup-kakasi-coding-system
 	(call-process-region
-	 (progn (skip-syntax-backward syntax) (point))
-	 (progn (skip-syntax-forward syntax) (point))
+	 (progn (skip-syntax-backward "w") (point))
+	 (progn (skip-syntax-forward "w") (point))
 	 lookup-kakasi-program nil temp-buffer nil "-w"))
       (with-current-buffer temp-buffer
 	(goto-char (point-min))

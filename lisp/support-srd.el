@@ -661,9 +661,9 @@
   )
 
 (setq lookup-support-options
-      (list :arrange-table '((structure . srd-arrange-structure))
+      (list :arranges '((structure srd-arrange-structure))
 	    :gaiji-regexp  "<\\(G[0-9]-[0-9a-f][0-9a-f]\\)>"
 	    :gaiji-table   srd-gaiji-table
-	    :transformer   'lookup-stemming-search))
+	    :transformer   'lookup-stem-english-search))
 
 ;;; srd.el ends here

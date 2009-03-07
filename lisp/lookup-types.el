@@ -40,6 +40,12 @@
   '((exact . ?=) (prefix . ?>) (suffix . ?<) (substring . ?-) (wildcard . ?*)
     (regexp . ?%) (keyword . ?@) (text . ?/) (index . ?I) (menu . ?M)))
 
+(defconst lookup-content-arrange-order
+  '(replace gaiji reference structure fill))
+
+(defconst lookup-heading-arrange-order
+  '(replace gaiji))
+
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Search Query
@@ -134,23 +140,32 @@
 (defstruct lookup-module name dictionaries bookmarks priority-alist)
 
 (defun lookup-new-module (name &rest dict-specs)
-  ;; Create new Lookup Module from module NAME and DICT-SPECS.
-  ;; If DICT-SPECS is t, then new module will be created.
-  (let ((module (make-lookup-module :name name)) dict-id dict dicts prio)
+  "Create new Lookup Module from module NAME and DICT-SPECS.
+If DICT-SPECS is t, then new module will be created.
+When new dictionaries not specified by DICT-SPECS are found, they
+will be attached to the modules."
+  (let ((module (make-lookup-module :name name))
+        (dict-list (mapcar #'lookup-dictionary-id lookup-dictionary-list))
+        dict-id dict dicts prio)
     (if (eq (car dict-specs) t)
-	(setq dict-specs (mapcar #'lookup-dictionary-id lookup-dictionary-list)))
+	(setq dict-specs
+              (mapcar (lambda (x) (list (lookup-dictionary-id x)))
+                      lookup-dictionary-list)))
     (dolist (dict-spec dict-specs)
-      (if (stringp dict-spec)
-          (setq dict-id   dict-spec
-                dict-spec nil)
-        (setq dict-id   (car dict-spec)
-              dict-spec (cdr dict-spec)))
+      (setq dict-id   (car dict-spec)
+            dict-spec (cdr dict-spec))
       (setq dict (lookup-get-dictionary dict-id))
       (when dict
-        (setq prio (if (memq :priority dict-spec) (plist-get dict-spec :priority)
+        (setq dict-list (remove dict-id dict-list))
+        (setq prio (if (memq :priority dict-spec)
+                       (plist-get dict-spec :priority)
                      (or (lookup-dictionary-ref dict :priority) t)))
         (lookup-module-dictionary-set-priority module dict prio)
         (setq dicts (append dicts (list dict)))))
+    (dolist (dict-id dict-list) ; add new dictionaries
+      (setq dict (lookup-get-dictionary dict-id))
+      (lookup-module-dictionary-set-priority module dict t)
+      (setq dicts (append dicts (list (dict)))))
     (setf (lookup-module-dictionaries module) dicts)
     (if lookup-cache-file (lookup-restore-module-attributes module))
     module))
@@ -247,6 +262,7 @@
 	(let ((lookup-support-agent (lookup-agent-class
 				     (lookup-dictionary-agent dictionary)))
 	      (lookup-support-options nil))
+          (require lookup-support-agent)
 	  (load file)
 	  (let ((list lookup-support-options))
 	    (while list
@@ -320,20 +336,35 @@
   (lookup-dictionary-get dictionary 'methods
     (lambda () (lookup-dictionary-command dictionary :methods))))
 
-(defun lookup-dictionary-arranges (dictionary)
-  (lookup-dictionary-get dictionary 'arrange-table
-    ;; default arrange functions
+(defun lookup-dictionary-content-arranges (dictionary)
+  (lookup-dictionary-get dictionary 'content-arranges
     (lambda ()
-      (let* ((table1 (lookup-dictionary-option dictionary :arrange-table)) ; higher priority
-	     (table2 (lookup-dictionary-ref dictionary :arrange-table))    ; lower  priority
-             func funcs)
-	(dolist (entry lookup-arrange-table)
-          (setq func
-                (or (lookup-assq-get table1 (car entry))
-                    (lookup-assq-get table2 (car entry))
-                    (cdr entry)))
-          (if func (setq funcs (append funcs (if (listp func) func (list func))))))
-        funcs))))
+      (lookup-dictionary-arranges 
+       dictionary lookup-content-arrange-order))))
+
+(defun lookup-dictionary-heading-arranges (dictionary)
+  (lookup-dictionary-get dictionary 'heading-arranges
+    (lambda ()
+      (lookup-dictionary-arranges 
+       dictionary lookup-heading-arrange-order))))
+
+(defun lookup-dictionary-arranges (dictionary arrange-order)
+  (let* ((dict-arranges       
+          (lookup-dictionary-option dictionary :arranges))
+         (dict-arrange-table  
+          (lookup-dictionary-option dictionary :arrange-table))
+         (agent-arrange-table 
+          (lookup-dictionary-ref dictionary :arrange-table))
+         funcs)
+    (dolist (kind arrange-order)
+      (setq funcs
+            (append
+             funcs
+             (cdr (assoc kind dict-arranges))
+             (cdr (or (assoc kind dict-arrange-table)
+                      (assoc kind agent-arrange-table)
+                      (assoc kind lookup-arrange-table))))))
+        funcs))
 
 (defun lookup-dictionary-gaiji-table (dictionary)
   (lookup-dictionary-get dictionary 'gaiji-table
@@ -405,24 +436,69 @@
 (defun lookup-regular-search (dictionary query)
   (lookup-dictionary-command dictionary :search query))
 
-(defun lookup-stemming-search (dictionary query)
-  (let* ((string (downcase (lookup-query-string query)))
-	 (query (lookup-new-query 'exact string))
-	 entries dict heading last-entry)
-    (if (setq entries (reverse (lookup-dictionary-search-internal
-				dictionary query 'lookup-regular-search)))
-	(setq last-entry (lookup-entry-substance (car entries))))
-    (dolist (string (cdr (nreverse (stem-english string))))
-      (when (> (length string) 3)
-	(setf (lookup-query-string query) string)
-	(dolist (entry (lookup-dictionary-search-internal
-			dictionary query 'lookup-regular-search))
-	  ;; Sometimes stemming creates duplicate entries with different
-	  ;; headings.  Let's remove them.
-	  (unless (eq (lookup-entry-substance entry) last-entry)
-	    (setq entries (cons (lookup-new-slink entry) entries))
-	    (setq last-entry (lookup-entry-substance entry))))))
-    (nreverse entries)))
+(defun lookup-search-multiple (dictionary query-strings)
+  (let* ((queries
+          (mapcar (lambda (string) 
+                    (lookup-new-query 'exact string))
+                  query-strings))
+         (entries
+          (apply 'nconc 
+                 (mapcar (lambda (query)
+                           (lookup-dictionary-search-internal
+                            dictionary query 'lookup-regular-search))
+                         queries)))
+         (entries (remove-if 'null entries)))
+    (if (> (length entries) 1)
+        (remove-duplicates 
+         entries
+         :test (lambda (x y)
+                 (eq (lookup-entry-substance x) 
+                     (lookup-entry-substance y))))
+      entries)))
+
+(defun lookup-stem-english-search (dictionary query)
+  (let* ((query-string (downcase (lookup-query-string query)))
+         (query-strings
+          (cons query-string
+                (remove-if 
+                 '(lambda (x) (< (length x) 4))
+                 (cdr (nreverse (stem-english (downcase (lookup-query-string query)))))))))
+    (lookup-search-multiple dictionary query-strings)))
+
+(defun lookup-kana-search (dictionary query)
+  (let ((query-strings 
+         (lookup-kanji-get-readings (lookup-query-string query))))
+    (lookup-search-multiple dictionary query-strings)))
+
+(defun lookup-decompose-alphabet-chars (chars)
+  "Decompose alphabet characters CHARS."
+  (apply 'append
+         (mapcar '(lambda (x)
+                    (or (and (< x #x2000)
+                             (get-char-code-property x 'decomposition))
+                        (list x)))
+                 chars)))
+
+(defun lookup-remove-alphabet-accents (string)
+  (let* ((chars (string-to-list string))
+         (new-chars (lookup-decompose-alphabet-chars chars)))
+    (while (/= (length chars) (length new-chars))
+      (setq chars new-chars)
+      (setq new-chars
+            (remove-if 
+             (lambda (x)
+               (let ((ccc 
+                      (get-char-code-property x 'canonical-combining-class)))
+                 (and ccc (< 0 ccc))))
+             (lookup-decompose-alphabet-chars new-chars))))
+    (apply 'string chars)))
+
+(defun lookup-remove-alphabet-accents-query-string ()
+  (setq lookup-query-string 
+        (downcase (lookup-remove-alphabet-accents lookup-query-string))))
+
+;; remove-hook if you don't like.
+(add-hook 'lookup-query-string-hook 'lookup-remove-alphabet-accents-query-string)
 
 (defconst lookup-obarray (make-vector 1511 nil))
 
@@ -491,13 +567,12 @@
 (defsetf lookup-entry-heading lookup-entry-set-heading)
 (defun lookup-entry-set-heading (entry heading)
   (let ((type (lookup-entry-type entry))
-	(regexp (lookup-dictionary-gaiji-regexp
-		 (lookup-entry-dictionary entry))))
-    (if (and regexp (string-match regexp heading))
+        (funcs (lookup-dictionary-heading-arranges
+                (lookup-entry-dictionary entry))))
+    (if funcs
 	(with-temp-buffer
 	  (insert heading)
-	  (goto-char (point-min))
-	  (lookup-arrange-gaijis entry)
+          (lookup-format-internal entry funcs nil)
 	  (setq heading (buffer-string))))
     (cond ((eq type 'slink) (setq heading (concat "-> " heading)))
 	  ((eq type 'dynamic) (setq heading (concat "-> [" heading "]"))))
@@ -643,7 +718,7 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
          start end (list 'display glyph
                          'intangible glyph
                          'rear-nonsticky (list 'display))))
-    (insert-image glyph)))
+    (insert-image glyph "[image]")))
 
 (defun lookup-img-file-insert (file type &optional start end)
   (when (or (not lookup-max-image-size)

@@ -230,27 +230,24 @@
 
 ;; arrange table
 
-(defconst chujiten-arrange-table
-  '((structure . chujiten-arrange-structure)))
+(defconst chujiten-example-regexp
+  (cond ((eq lookup-support-agent 'ndtp)
+	 "→<gaiji:za33a><\\([0-9a-f:]+\\)>")
+	((eq lookup-support-agent 'ndeb)
+	 "<reference>→<gaiji=za33a></reference=\\([0-9a-f:]+\\)>")))
 
-; (defconst chujiten-example-regexp
-;   (cond ((eq lookup-support-agent 'ndtp)
-; 	 "→<gaiji:za33a><\\([0-9a-f:]+\\)>")
-; 	((eq lookup-support-agent 'ndeb)
-; 	 "<reference>→<gaiji=za33a></reference=\\([0-9a-f:]+\\)>")))
-
-; (defun chujiten-arrange-expand-examples (entry)
-;   (setq entry (lookup-new-entry (lookup-entry-dictionary entry) nil ""))
-;   (while (re-search-forward chujiten-example-regexp nil t)
-;     (lookup-entry-set-code entry (match-string 1))
-;     (delete-region (match-beginning 0) (match-end 0))
-;     (forward-line)
-;     (narrow-to-region (point) (progn (insert (lookup-dictionary-command
-; 					      dictionary 'content entry))
-; 				     (point)))
-;     (goto-char (point-min))
-;     (while (not (eobp)) (insert "*") (forward-line))
-;     (widen)))
+(defun chujiten-arrange-expand-examples (entry)
+  (setq entry (lookup-new-entry (lookup-entry-dictionary entry) nil ""))
+  (while (re-search-forward chujiten-example-regexp nil t)
+    (lookup-entry-set-code entry (match-string 1))
+    (delete-region (match-beginning 0) (match-end 0))
+    (forward-line)
+    (narrow-to-region (point) (progn (insert (lookup-dictionary-command
+					      dictionary 'content entry))
+				     (point)))
+    (goto-char (point-min))
+    (while (not (eobp)) (insert "*") (forward-line))
+    (widen)))
 
 (defconst chujiten-eiwa-structure-regexp
   (concat "^\\(−\\[[^]\n]+\\]\\)\\|"		; level 2
@@ -305,8 +302,8 @@
 
 (setq lookup-support-options
       (list :gaiji-table chujiten-gaiji-table
-;;	    :reference-pattern 'chujiten-reference-pattern
-	    :arrange-table chujiten-arrange-table
-	    :transformer 'lookup-stemming-search))
+;	    :reference-pattern 'chujiten-reference-pattern
+;	    :arranges '((structure chujiten-arrange-structure))
+	    :transformer 'lookup-stem-english-search))
 
 ;;; chujiten.el ends here

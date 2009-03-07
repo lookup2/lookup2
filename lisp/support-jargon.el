@@ -30,6 +30,6 @@
 (setq lookup-support-options
       (list :title "The Jargon File"
 	    :reference-pattern jargon-reference-pattern
-	    :arrange-table '((structure . jargon-arrange-structure))))
+	    :arranges '((structure jargon-arrange-structure))))
 
 ;;; jargon.el ends here
