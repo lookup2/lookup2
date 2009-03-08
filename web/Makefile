@@ -1,5 +1,5 @@
-TARGETS = index.html
-SUBDIRS = info ja
+TARGETS = index.shtml
+SUBDIRS = 
 
 all: $(TARGETS)
 	@for subdir in $(SUBDIRS); do \
@@ -14,11 +14,6 @@ clean::
 
 install:: all
 	rsync -av -e ssh --delete --exclude=CVS --exclude='*~' \
-	  --exclude="header.html" --exclude='footer.html' --exclude='subpage.html' \
-	  --exclude="*.tpl.html" --exclude='Makefile*' --exclude='*.in' --exclude="*.scm" \
-	  * $(SF_USERNAME)@lookup.sourceforge.net:/home/groups/l/lo/lookup/htdocs
+	  --exclude='Makefile*' --exclude='*.in' --exclude="*.scm" \
+	  * $(SF_USERNAME),lookup@web.sourceforge.net:/home/groups/l/lo/lookup/htdocs
 #	(cd ja && $(MAKE) install)
-
-%.html: %.tpl.html
-	 ruby -p -e 'gsub(/<!-- (.+\.html) -->/) {|f| $$_ + open($$1).readline(nil)}'  $< > $@ || rm $@
-	chmod go+r $@
