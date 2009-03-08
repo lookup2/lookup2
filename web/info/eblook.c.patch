@@ -1,0 +1,87 @@
+--- eblook.c.orig	2007-06-16 00:35:08.000000000 +0900
++++ eblook.c	2007-06-17 23:31:17.000000000 +0900
+@@ -189,6 +189,7 @@
+ int insert_font_list (EB_Book *);
+ 
+ EB_Error_Code hook_font (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
++EB_Error_Code hook_gb2312 (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ EB_Error_Code hook_stopcode (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ EB_Error_Code hook_tags (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ EB_Error_Code hook_img (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+@@ -197,6 +198,7 @@
+ 
+ EB_Error_Code can_menu_narrow_char (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ EB_Error_Code can_menu_wide_char (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
++EB_Error_Code can_menu_gb2312 (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ EB_Error_Code can_menu_gaiji (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
+ 
+ #if 0
+@@ -348,6 +350,7 @@
+   {EB_HOOK_NARROW_JISX0208, hook_euc_to_ascii},
+   {EB_HOOK_NARROW_FONT,     hook_font},
+   {EB_HOOK_WIDE_FONT,	    hook_font},
++  {EB_HOOK_GB2312,	    hook_gb2312},
+   {EB_HOOK_NEWLINE,         eb_hook_newline},
+ #ifdef EB_HOOK_STOP_CODE
+   {EB_HOOK_STOP_CODE,       hook_stopcode},
+@@ -396,6 +399,7 @@
+   {EB_HOOK_NARROW_JISX0208, hook_euc_to_ascii},
+   {EB_HOOK_NARROW_FONT,     hook_font},
+   {EB_HOOK_WIDE_FONT,	    hook_font},
++  {EB_HOOK_GB2312,	    hook_gb2312},
+   {EB_HOOK_NEWLINE,         eb_hook_newline},
+ #ifdef EB_HOOK_STOP_CODE
+   {EB_HOOK_STOP_CODE,       hook_stopcode},
+@@ -2687,6 +2691,21 @@
+ }
+ 
+ EB_Error_Code
++hook_gb2312 (book, appendix, container, code, argc, argv)
++     EB_Book *book;
++     EB_Appendix *appendix;
++     void *container;
++     EB_Hook_Code code;
++     int argc;
++     const unsigned int *argv;
++{
++  char buff[EB_MAX_ALTERNATION_TEXT_LENGTH + 1];
++  sprintf (buff, "<gaiji=g%04x>", argv[0]);
++  eb_write_text_string(book, buff);
++  return 0;
++}
++
++EB_Error_Code
+ hook_decoration (book, appendix, container, code, argc, argv)
+      EB_Book *book;
+      EB_Appendix *appendix;
+@@ -3698,6 +3717,22 @@
+     return EB_SUCCESS;
+ }
+ 
++EB_Error_Code
++can_menu_gb2312(book, appendix, container, hook_code, argc, argv)
++    EB_Book *book;
++    EB_Appendix *appendix;
++    void *container;
++    EB_Hook_Code hook_code;
++    int argc;
++    const unsigned int *argv;
++{
++    char workbuf[EB_MAX_ALTERNATION_TEXT_LENGTH + 1];
++    sprintf(workbuf, "<gaiji=g%04x>", argv[0]);
++    strcat(can_word, workbuf);
++    return EB_SUCCESS;
++}
++
++
+ EB_Hookset multi_candidate_hookset;
+ EB_Hook
+ multi_candidate_hooks [] = {
+@@ -3705,6 +3740,7 @@
+   {EB_HOOK_WIDE_FONT,	    can_menu_gaiji},
+   {EB_HOOK_NARROW_JISX0208, can_menu_narrow_char},
+   {EB_HOOK_WIDE_JISX0208,   can_menu_wide_char},
++  {EB_HOOK_GB2312,          can_menu_gb2312},
+   {EB_HOOK_BEGIN_CANDIDATE,      can_menu_begin},
+   {EB_HOOK_END_CANDIDATE_LEAF,   can_menu_end},
+   {EB_HOOK_END_CANDIDATE_GROUP,  can_menu_end},

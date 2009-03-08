@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+        "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Lookup - Screenshots -</title>
+</head>
+
+<body bgcolor="white">
+
+<!--#include virtual="/header.html" -->
+
+<h2>Screenshots</h2>
+
+<h3>M. Monier-Williams Sanskrit-English Dictionary</h3>
+<ul>
+  <li><a href="http://www.pup.waiwai-net.ne.jp/~iwaihiro/Mwsedictk/">[Home Page]</a>
+</ul>
+<p>
+  “Lookup” can automatically convert Devanagari to Kyoto-Harvard and vice versa.
+</p>
+<img src="sanskrit.png">
+
+<br/>
+<hr/>
+
+<h3>Shōgakukan Chūnichi Nicchū Jiten</h3>
+<ul>
+  <li><a href="./eblook.c.patch">[Patch for eblook]</a>
+</ul>
+<p>
+  “Lookup” can automatically convert GB Hanzi to pinyin when used with EBXA-C dictionary.
+</p>
+<img src="chinese.png">
+
+<br/>
+<hr/>
+
+<h3>“WORDS” Latin-English Dictionary Program</h3>
+<ul>
+  <li><a href="http://users.erols.com/whitaker/wordsdoc.htm">[Home Page]</a>
+</ul>
+<p>
+  “Lookup” can be used as an interface of "WORDS Latin-English
+  Dictionary Program".  It can be used as both Latin-English
+  and English-Latin dictionary.
+</p>
+<img src="latin.png">
+
+<br/>
+<hr/>
+
+<h3>“Kojien” Japanese Language Dictionary</h3>
+<ul>
+  <li><a href="http://www.iwanami.co.jp/kojien/">[Home Page]</a>
+</ul>
+<p>
+  “Lookup” can handle EBG/EBXA/EPWING (up to V6) dictionaries with
+  `eblook' and EB libraries.  When used with EBXA dictionaries, Kanji
+  characters in the query can automatically be converted to Hiragana
+  so that the dictionaries can handle the queries.  Furthermore, when
+  used with EPWING dictionaries, old Kanji characters （旧字） in the
+  query can automatically be converted to new Kanji characters （新字）.
+</p>
+
+<img src="kojien.png">
+
+<br/>
+<hr/>
+
+<!--#include virtual="/footer.html" -->
+
+</body>
+</html>

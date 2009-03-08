@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+        "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>メーリングリスト一覧</title>
+</head>
+
+<!--#include virtual="/header.html" -->
+
+<h2>メーリングリスト一覧</h2>
+
+<p>
+  Lookup に関連して、以下のいくつかのメーリングリストがあります。
+</p>
+
+<dl>
+  <dt>lookup@ring.gr.jp</dt>
+  <dd>
+    Lookup に関する情報交換を行なうためのメーリングリストです。
+    参加を希望される方は、
+    <a href="mailto:lookup-subscribe@ring.gr.jp">lookup-subscribe@ring.gr.jp</a>
+    宛てに空のメールを送って下さい。
+  </dd>
+  <ul>
+    <li><a href="http://news.ring.gr.jp/news/openlab.lookup-ja/">アーカイブ</a></li>
+    <li><a href="news://news.ring.gr.jp/ring.openlab.lookup-ja">ニュースグループ</li>
+  </ul>
+  <br>
+  <dt><a href="/openlab/edict/">edict ML</a></dt>
+  <dd>
+    電子辞書一般について情報交換を行なうためのメーリングリストです。
+    Lookup に関係する情報もときおり流れます。
+  </dd>
+  <ul>
+    <li><a href="http://news.ring.gr.jp/news/openlab.edict/">アーカイブ</a></li>
+    <li><a href="news://news.ring.gr.jp/ring.openlab.edict">ニュースグループ</a></li>
+  </ul>
+  <br>
+  <dt><a href="http://www.sra.co.jp/people/m-kasahr/ndtpd/">NDTPD</a></dt>
+  <dd>
+    NDTPD のメーリングリストでも Lookup 関連の話題が出ることがあります。
+    特に市販の CD-ROM 辞書を利用している場合、NDTPD のメーリングリストにも
+    参加されることをお勧めします。
+  </dd>
+</dl>
+
+<!--#include virtual="/footer.html" -->
+
+</body>
+</html>

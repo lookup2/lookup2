@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+        "http://www.w3.org/TR/REC-html40/strict.dtd">
+<hml>
+<head>
+  <title>ダウンロードサイト一覧</title>
+</head>
+
+<!--#include virtual="/header.html" -->
+
+<h2>ダウンロードサイト一覧</h2>
+<p>
+  Lookup 関連のアーカイブは以下のところにミラーされています。
+  お近くのサイトを選んでダウンロードして下さい。
+</p>
+
+<h3>Sourceforge<h3>
+<ul>
+  <li><a href="http://download.sourceforge.net/lookup/">(lookup-1.x のみ)</a></li>
+</ul>
+
+<h3>Ring Servers</h3>
+<ul>
+  <li><a href="ftp://core.ring.gr.jp/pub/text/elisp/lookup/">ftp://core.ring.gr.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.etl.go.jp/pub/text/elisp/lookup/">ftp://ring.etl.go.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.asahi-net.or.jp/pub/text/elisp/lookup/">ftp://ring.asahi-net.or.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.crl.go.jp/pub/text/elisp/lookup/">ftp://ring.crl.go.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.astem.or.jp/pub/text/elisp/lookup/">ftp://ring.astem.or.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.jah.ne.jp/pub/text/elisp/lookup/">ftp://ring.jah.ne.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.nacsis.ac.jp/pub/text/elisp/lookup/">ftp://ring.nacsis.ac.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.exp.fujixerox.co.jp/pub/text/elisp/lookup/">ftp://ring.exp.fujixerox.co.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.so-net.ne.jp/pub/text/elisp/lookup/">ftp://ring.so-net.ne.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.ip-kyoto.ad.jp/pub/text/elisp/lookup/">ftp://ring.ip-kyoto.ad.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.iwate-pu.ac.jp/pub/text/elisp/lookup/">ftp://ring.iwate-pu.ac.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.shibaura-it.ac.jp/pub/text/elisp/lookup/">ftp://ring.shibaura-it.ac.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.ocn.ad.jp/pub/text/elisp/lookup/">ftp://ring.ocn.ad.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.htcn.ne.jp/pub/text/elisp/lookup/">ftp://ring.htcn.ne.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.omp.ad.jp/pub/text/elisp/lookup/">ftp://ring.omp.ad.jp/pub/text/elisp/lookup/</a></li>
+  <li><a href="ftp://ring.jec.ad.jp/pub/text/elisp/lookup/">ftp://ring.jec.ad.jp/pub/text/elisp/lookup/</a></li>
+
+<!--#include virtual="/footer.html" -->
+
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"
+        "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <title>Lookup - Supported Dictionaries -</title>
+</head>
+
+<!-- #include virtual="/header.html" -->
+
+<h2>EPWing Dictionaries</h2>
+
+<dl>
+<dt>EPWing Commercial Dictionaries
+<dd><a href="http://www.epwing.or.jp/">
+    EPWing Consortium</a> 
+</dl>
+
+<dl>
+<dt>EPWing Converted Dictionaries
+<dd><a href="http://www.epwing.or.jp/">
+    EPWing Consortium</a> 
+</dl>
+
+<dl>
+<dt>EPWing Free/Converted Dictionaries</dt>
+<dd><a href="http://www.epwing.or.jp/">
+    EPWing Consortium</a></dd>
+</dl>
+
+<hr/>
+
+<h2>Random House Dictionary</h2>
+
+<dl>Shogakukan Random House Dictionary (ISBN-XX-XXXXX)
+<dd><a href="csrd"></a>
+</dl>
+
+<!-- #include virtual="/footer.html" -->
+</td></tr></table>
+
+</body>
+</html>
