@@ -165,7 +165,7 @@ will be attached to the modules."
     (dolist (dict-id dict-list) ; add new dictionaries
       (setq dict (lookup-get-dictionary dict-id))
       (lookup-module-dictionary-set-priority module dict t)
-      (setq dicts (append dicts (list (dict)))))
+      (setq dicts (append dicts (list dict))))
     (setf (lookup-module-dictionaries module) dicts)
     (if lookup-cache-file (lookup-restore-module-attributes module))
     module))
