@@ -176,8 +176,7 @@
     (dolist (args args-list)
       (setq start (point))
       (insert (apply 'format format args))
-      (let ((ov (make-overlay start (point))))
-        (overlay-put ov 'lookup args)))))
+      (put-text-property start (1- (point)) 'lookup args))))
 
 (defvar lookup-property-table nil)
 

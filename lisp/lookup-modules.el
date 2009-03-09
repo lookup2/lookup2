@@ -173,9 +173,9 @@ will be used instead of the usual `kill-ring'."
   (save-excursion
     (beginning-of-line)
     (goto-char (+ (point) 2))
-    (let ((overlay (car (overlays-at (point)))))
-      (and overlay
-           (lookup-get-module (elt (overlay-get overlay 'lookup) 1))))))
+    (let ((lookup-property (plist-get (text-properties-at (point)) 'lookup)))
+      (and lookup-property 
+           (lookup-get-module (elt lookup-property 1))))))
 
 (provide 'lookup-modules)
 

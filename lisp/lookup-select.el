@@ -1,7 +1,8 @@
 ;;; lookup-select.el --- Lookup select mode
-;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2000,2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Modified by: Taichi Kawabata <kawabata.taichi@gmail.com>
 ;; Keywords: dictionary
 
 ;; This file is part of Lookup.
@@ -278,9 +279,9 @@ will be used instead of the usual `kill-ring'."
   (save-excursion
     (beginning-of-line)
     (goto-char (+ (point) 2))
-    (let ((overlay (car (overlays-at (point)))))
-      (and overlay
-           (lookup-get-dictionary (elt (overlay-get overlay 'lookup) 1))))))
+    (let ((lookup-property (plist-get (text-properties-at (point)) 'lookup)))
+      (and lookup-property 
+           (lookup-get-dictionary (elt lookup-property 1))))))
 
 (defun lookup-select-reset-dictionaries ()
   "Reset the current module dictionaries with their priorities."

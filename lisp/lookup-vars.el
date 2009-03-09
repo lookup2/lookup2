@@ -110,7 +110,7 @@ Dictionary option `cite-prefix' overrides this variable."
   :group 'lookup-general-options)
 
 (defcustom lookup-max-hits 50
-  "*Maximum entries to display.
+  "*Maximum entries to display for each Agent.
 0 means unlimited."
   :type 'integer
   :group 'lookup-general-options)
@@ -125,6 +125,11 @@ Dictionary option `cite-prefix' overrides this variable."
   "*Maximum number of sessions in search history.
 0 means unlimited."
   :type 'integer
+  :group 'lookup-general-options)
+
+(defcustom lookup-edit-input t
+  "If t, word or region to be searched will be filtered and edited."
+  :type 'boolean
   :group 'lookup-general-options)
 
 ;; from 1.4.1
@@ -349,7 +354,6 @@ This hook will run just after loading `lookup-init-file' and
 ;;; Command control
 ;;;
 
-(defvar lookup-search-method nil)
 (defvar lookup-force-update nil)
 (defvar lookup-open-function 'lookup-other-window)
 
@@ -360,7 +364,6 @@ This hook will run just after loading `lookup-init-file' and
 
 (defvar lookup-agent-list nil)
 (defvar lookup-module-list nil)
-(defvar lookup-current-module nil)
 (defvar lookup-dictionary-list nil)
 (defvar lookup-entry-table nil)
 (defvar lookup-buffer-list nil)

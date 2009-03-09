@@ -269,7 +269,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 ;;;
 
 (defun lookup-pattern-input ()
-  (let* ((module (if current-prefix-arg (lookup-input-module)))
+  (let* ((module (lookup-input-module-interactively))
 	 (pattern (lookup-input-pattern module)))
     (list pattern module)))
 
@@ -277,7 +277,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-pattern (pattern &optional module)
   "Search for the PATTERN with MODULE."
   (interactive (lookup-pattern-input))
-  (lookup-search-pattern (or module (lookup-current-module)) pattern))
+  (lookup-search-pattern module pattern))
 
 ;;;###autoload
 (defun lookup-pattern-full-screen (pattern &optional module)
@@ -296,7 +296,7 @@ See `lookup-pattern' for details."
     (lookup-pattern pattern module)))
 
 (defun lookup-word-input ()
-  (let ((module (if current-prefix-arg (lookup-input-module)))
+  (let ((module (lookup-input-module-interactively))
 	(word (lookup-current-word)))
     (list word module)))
 
@@ -304,8 +304,9 @@ See `lookup-pattern' for details."
 (defun lookup-word (word &optional module)
   "Search for the word near the cursor."
   (interactive (lookup-word-input))
-  (let ((lookup-search-method lookup-default-method))
-    (lookup-pattern word module)))
+  (if lookup-edit-input 
+      (lookup-search-pattern module (lookup-input-pattern module word))
+    (lookup-search-pattern module word lookup-default-method)))
 
 ;;;###autoload
 (defun lookup-word-full-screen (word &optional module)
@@ -324,7 +325,7 @@ See `lookup-word' for details."
     (lookup-word word module)))
 
 (defun lookup-region-input ()
-  (let ((module (if current-prefix-arg (lookup-input-module)))
+  (let ((module (lookup-input-module-interactively))
 	(start (mark)) (end (point)) tmp)
     (if (> start end) (setq tmp start start end end tmp))
     (list start end module)))
@@ -421,38 +422,41 @@ See `lookup-secondary' for details."
 (defvar lookup-query-string-hook nil
   "Functions to be applied before QUERY-STRING is queried.")
 
-(defun lookup-input-pattern (module)
-  (let ((default (lookup-current-word))
-        lookup-query-string)
-    (setq lookup-query-string default)
+(defun lookup-input-pattern (module &optional default)
+  (let* ((lookup-query-string default))
+    (or default (setq default (lookup-current-word)))
     (if lookup-query-string
         (run-hooks 'lookup-query-string-hook))
-    (if (string-equal default "") (setq default nil))
-    (unless module (setq module (lookup-current-module)))
-    (lookup-read-string 
+    (if (or (string-equal default "")
+            (string-equal default lookup-query-string))
+        (setq default nil))
+    (lookup-read-string
      (concat (if module (concat "[" (lookup-module-name module) "] "))
              "Look up")
      lookup-query-string 'lookup-input-history default t)))
 
+(defun lookup-input-module-interactively ()
+  (if current-prefix-arg (lookup-input-module) (lookup-default-module)))
+
 (defun lookup-input-module ()
-  (let ((table (mapcar (lambda (module) (lookup-module-name module) module)
-		       lookup-module-list)))
+  (let ((table (mapcar (lambda (module) (lookup-module-name module))
+                       lookup-module-list)))
     (lookup-get-module
      (completing-read "Search module: " table nil t nil
-		      'lookup-input-module-history))))
+                      'lookup-input-module-history)))
+  (lookup-default-module))
 
 (defun lookup-input-dictionary ()
-  (let ((table (mapcar (lambda (dict) (lookup-dictionary-id dict) dict)
+  (let ((table (mapcar (lambda (dict) (lookup-dictionary-id dict))
 		       lookup-dictionary-list)))
     (lookup-get-dictionary
      (completing-read "Dictionary: " table nil t nil
 		      'lookup-input-dictionary-history))))
 
-(defun lookup-search-pattern (module pattern)
+(defun lookup-search-pattern (module pattern &optional method)
   (cond ((> (length pattern) 80) (error "Too long query"))
 	((string-match "\n" pattern) (error "Query should be one line")))
-  (let ((query (if lookup-search-method
-		   (lookup-new-query lookup-search-method pattern)
+  (let ((query (if method (lookup-new-query method pattern)
 		 (lookup-parse-pattern pattern))))
     (when (or (not (eq (lookup-query-method query) 'text))
 	      (y-or-n-p "Are you sure to search text? "))
@@ -863,6 +867,7 @@ If there is no session, default module will be returned."
 (put 'lookup-set-dictionary-options 'lisp-indent-function 1)
 ;;;###autoload
 (defun lookup-set-dictionary-options (id &rest options)
+  "Set dictionary ID's OPTIONS prior to dictionary initialization."
   (let ((plist (lookup-assoc-ref 'lookup-dictionary-option-alist id)))
     (while options
       (setq plist (plist-put plist (car options) (cadr options)))
