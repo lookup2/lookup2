@@ -122,22 +122,26 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
     (nth pos lookup-module-list)))
 
 (defun lookup-forward-module (arg)
-  "Forward current module by ARG.
-This should be called only from lookup-***-mode."
+  "Forward default module by ARG.
+When current session is active, then new session will immediately
+begin, except during `lookup-select-mode', in such case only the
+session module will be changed.  If there is no session, then new
+session with empty query will be created."
   (interactive "p")
-  (when (memq major-mode '(lookup-summary-mode lookup-content-mode
-                         lookup-select-mode))
-    (let ((module (lookup-nth-module arg (lookup-current-module)))
-          (session (lookup-current-session)) query)
-      (lookup-set-current-module module)
-      (if (or (eq major-mode 'lookup-select-mode)
-              (null session))
-          (lookup-select-dictionaries module)
-        (setq query (lookup-session-query session))
-        (if (not (eq (lookup-query-method query) 'reference))
-            (lookup-search-query module query)
-          (error "Module is changed at `reference' entry.  Please exit session first")))
-      (princ (lookup-module-name module)))))
+  (let ((module (lookup-nth-module arg (lookup-current-module)))
+        (session (lookup-current-session)) query)
+    (if (eq major-mode 'lookup-select-mode)
+        (progn
+          (if (null session)
+              (setq lookup-current-session (lookup-new-session module nil nil))
+            (setf (lookup-session-module session) module))
+          (lookup-select-dictionaries module))
+      (setq query (lookup-session-query session))
+      (if (not (eq (lookup-query-method query) 'reference))
+          (lookup-search-query module query)
+        (error
+         "Current session handles `reference'.  Please exit session first")))
+    (princ (lookup-module-name module))))
 
 (defun lookup-backward-module (arg)
   (interactive "p")
@@ -215,7 +219,6 @@ Type `\\[lookup]' to back to Lookup."
 	(setq lookup-buffer-list nil)
 	(setq lookup-agent-list nil)
 	(setq lookup-module-list nil)
-	(setq lookup-current-module nil)
 	(setq lookup-dictionary-list nil)
 	(setq lookup-entry-table nil)
 	(setq lookup-current-session nil)
@@ -274,7 +277,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-pattern (pattern &optional module)
   "Search for the PATTERN with MODULE."
   (interactive (lookup-pattern-input))
-  (lookup-search-pattern (or module (lookup-default-module)) pattern))
+  (lookup-search-pattern (or module (lookup-current-module)) pattern))
 
 ;;;###autoload
 (defun lookup-pattern-full-screen (pattern &optional module)
@@ -697,21 +700,10 @@ See `lookup-secondary' for details."
 
 (defun lookup-current-module ()
   "Return current session module.
-If there is no session, `lookup-current-module' or default module will be returned."
+If there is no session, default module will be returned."
   (let ((session (lookup-current-session)))
     (if session (lookup-session-module session)
-      (or lookup-current-module
-          (lookup-default-module)))))
-
-(defun lookup-set-current-module (module)
-  "Set current module to MODULE.
-If session with different module exits, such will be
-automatically finished."
-  (let ((session (lookup-current-session)))
-    (when (and session
-               (not (equal (lookup-session-module session) module)))
-      (setq lookup-current-session nil))
-    (setq lookup-current-module module)))
+      (lookup-default-module))))
 
 (defun lookup-default-module ()
   "Default module of current buffer."

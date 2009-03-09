@@ -1,21 +1,16 @@
-;;; support-plus.el --- support file for 『漢英佛學大辭典』
+;;; support-cebd.el --- support file for 『漢英佛學大辭典』
 
-;; This program is free software; you can redistribute it and/or
-;; modify it under the terms of the GNU General Public License
-;; as published by the Free Software Foundation; either version 2
-;; of the License, or (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program; if not, write to the Free Software Foundation,
-;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+;; Quoted content in this file is taken from original dictionary.
 
 ;;; Code:
-(let ((cebd-map "
+(defconst cebd-gaiji-table
+  (lookup-new-gaiji-table
+   (eval-when-compile
+     (let ((mapping-table "
+# 漢英佛學大辭典 (EPWING)   Ver. 0.1   2006.09.12
+# cebd.map for EBPocket/EBWin
+# (#: optimized for MS UI Gothic)
+
 hA121	u00A0	 
 hA122	u00A1	
 hA123	u00A2	¢
@@ -260,30 +255,30 @@ hA355	u221E	∞
 hA356	u2260	≠
 hA357	u2660	
 
-#hA358	u0902	
-#hA359	u0905	A
-#hA35A	u0906	AA
-#hA35B	u092A	PA
-#hA35C	u092D	BHA
+hA358	u0902	
+hA359	u0905	A
+hA35A	u0906	AA
+hA35B	u092A	PA
+hA35C	u092D	BHA
 
-#hA35D	u1E0D	d
-#hA35E	u1E25	h
-#hA35F	u1E37	l
-#hA360	u1E39	l
-#hA361	u1E41	m
-#hA362	u1E43	m
-#hA363	u1E44	N
-#hA364	u1E45	n
-#hA365	u1E47	n
-#hA366	u1E5A	R
-#hA367	u1E5B	r
-#hA368	u1E5D	r
-#hA369	u1E62	S
-#hA36A	u1E63	s
-#hA36B	u1E6D	T
+hA35D	u1E0D	d
+hA35E	u1E25	h
+hA35F	u1E37	l
+hA360	u1E39	l
+hA361	u1E41	m
+hA362	u1E43	m
+hA363	u1E44	N
+hA364	u1E45	n
+hA365	u1E47	n
+hA366	u1E5A	R
+hA367	u1E5B	r
+hA368	u1E5D	r
+hA369	u1E62	S
+hA36A	u1E63	s
+hA36B	u1E6D	T
 
-#hA36C	u20D2	
-#hA36D	u20D9	
+hA36C	u20D2	
+hA36D	u20D9	
 
 hA36E	u2101	
 hA36F	u2106	
@@ -296,8 +291,8 @@ hA375	u2323
 hA376	u2465	
 hA377	u2667	
 
-#hA378	u28A3	
-#hA379	u28B5	
+hA378	u28A3	
+hA379	u28B5	
 
 zB121	u4E5C	
 zB122	u4E73	
@@ -794,20 +789,17 @@ zB62D	u8FB5
 zB62E	u8FB6	
 zB62F	u98E0	
 ") gaiji-pair)
-  (defconst cebd-gaiji-table
-    (lookup-new-gaiji-table
-     (with-temp-buffer
-       (insert cebd-map)
-       (goto-char (point-min))
-       (while (re-search-forward
-               "^\\([hz][A-F][0-9A-F]+\\)	u\\([0-9A-F]+\\)" nil t)
-         (setq gaiji-pair (cons (cons (downcase (match-string 1))
-                                      (char-to-string
-                                       (string-to-int 
-                                        (match-string 2) 16)))
-                                gaiji-pair)))
-       (message "debug: gaiji-pair=%s" gaiji-pair)
-       gaiji-pair))))
+       (with-temp-buffer
+         (insert mapping-table)
+         (goto-char (point-min))
+         (while (re-search-forward
+                 "^\\([hz][A-F][0-9A-F]+\\)	u\\([0-9A-F]+\\)" nil t)
+           (setq gaiji-pair (cons (cons (downcase (match-string 1))
+                                        (char-to-string
+                                         (string-to-number 
+                                          (match-string 2) 16)))
+                                  gaiji-pair)))
+         gaiji-pair)))))
 
 (setq lookup-support-options
       (list ':gaiji-table cebd-gaiji-table))

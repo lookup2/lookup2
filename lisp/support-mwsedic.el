@@ -357,7 +357,7 @@
 (add-hook 'lookup-query-string-hook 'mwsedic-kyoto-harvard-query-string)
 
 (setq lookup-support-options
-      (list :arranges '((structure mwsedic-arrange-structure))
+      (list :arranges '((fill mwsedic-arrange-structure))
             :gaiji-table mwsedic-gaiji-table))
 
 ;;; support-mwsedic.el ends here

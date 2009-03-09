@@ -137,7 +137,8 @@ will be used instead of the usual `kill-ring'."
 	  (call-interactively (key-binding (this-command-keys))))
       (use-local-map lookup-modules-mode-map))
     (setq lookup-modules-kill-ring kill-ring)
-    (lookup-modules-reset-dictionaries)))
+;    (lookup-modules-reset-dictionaries)))
+    ))
 
 (defun lookup-modules-update ()
   (interactive)
