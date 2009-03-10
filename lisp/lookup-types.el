@@ -143,7 +143,7 @@
   "Create new Lookup Module from module NAME and DICT-SPECS.
 If DICT-SPECS is t, then new module will be created.
 When new dictionaries not specified by DICT-SPECS are found, they
-will be attached to the modules."
+will be attached to the module 'default'."
   (let ((module (make-lookup-module :name name))
         (dict-list (mapcar #'lookup-dictionary-id lookup-dictionary-list))
         dict-id dict dicts prio)
@@ -162,10 +162,11 @@ will be attached to the modules."
                      (or (lookup-dictionary-ref dict :priority) t)))
         (lookup-module-dictionary-set-priority module dict prio)
         (setq dicts (append dicts (list dict)))))
-    (dolist (dict-id dict-list) ; add new dictionaries
-      (setq dict (lookup-get-dictionary dict-id))
-      (lookup-module-dictionary-set-priority module dict t)
-      (setq dicts (append dicts (list dict))))
+    (if (eq name "default")
+        (dolist (dict-id dict-list)
+          (setq dict (lookup-get-dictionary dict-id))
+          (lookup-module-dictionary-set-priority module dict t)
+          (setq dicts (append dicts (list dict)))))
     (setf (lookup-module-dictionaries module) dicts)
     (if lookup-cache-file (lookup-restore-module-attributes module))
     module))
@@ -265,6 +266,9 @@ will be attached to the modules."
           (require lookup-support-agent)
 	  (load file)
 	  (let ((list lookup-support-options))
+            (when plist
+              (message "debug: plist=%s" plist)
+              (message "debug: list=%s" list))
 	    (while list
 	      (setq plist (plist-put plist (car list) (cadr list)))
 	      (setq list (cddr list)))))))

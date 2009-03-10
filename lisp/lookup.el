@@ -436,7 +436,7 @@ See `lookup-secondary' for details."
      lookup-query-string 'lookup-input-history default t)))
 
 (defun lookup-input-module-interactively ()
-  (if current-prefix-arg (lookup-input-module) (lookup-default-module)))
+  (if current-prefix-arg (lookup-input-module) (lookup-current-module)))
 
 (defun lookup-input-module ()
   (let ((table (mapcar (lambda (module) (lookup-module-name module))
@@ -867,7 +867,7 @@ If there is no session, default module will be returned."
 (put 'lookup-set-dictionary-options 'lisp-indent-function 1)
 ;;;###autoload
 (defun lookup-set-dictionary-options (id &rest options)
-  "Set dictionary ID's OPTIONS prior to dictionary initialization."
+  "Set dictionary ID's OPTIONS plist prior to dictionary initialization."
   (let ((plist (lookup-assoc-ref 'lookup-dictionary-option-alist id)))
     (while options
       (setq plist (plist-put plist (car options) (cadr options)))
