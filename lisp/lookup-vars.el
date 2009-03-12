@@ -307,7 +307,7 @@ KEY 及び VALUE は省略可能で、エージェントに対するオプショ
   "Face used to highlight reference."
   :group 'lookup-faces)
 
-(defface lookup-refered-face
+(defface lookup-referred-face
   '((((class color) (background light)) (:foreground "DarkViolet"))
     (((class color) (background dark)) (:foreground "Plum")))
   "Face used to highlight refered reference."

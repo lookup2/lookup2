@@ -306,7 +306,12 @@ See `lookup-pattern' for details."
   (interactive (lookup-word-input))
   (if lookup-edit-input 
       (lookup-search-pattern module (lookup-input-pattern module word))
-    (lookup-search-pattern module word lookup-default-method)))
+    (lookup-search-pattern 
+     module 
+     (let ((lookup-query-string word))
+       (run-hooks 'lookup-query-string-hook)
+       lookup-query-string)
+     lookup-default-method)))
 
 ;;;###autoload
 (defun lookup-word-full-screen (word &optional module)
@@ -605,7 +610,7 @@ See `lookup-secondary' for details."
    (point-min) (point-max) 'lookup-reference
    (lambda (start end entry)
      (if (lookup-entry-referred-p entry)
-	 (put-text-property start end 'face 'lookup-refered-face)
+	 (put-text-property start end 'face 'lookup-referred-face)
        (put-text-property start end 'face 'lookup-reference-face)))))
 
 (defun lookup-dynamic-search (entry)

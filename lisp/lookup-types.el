@@ -262,13 +262,11 @@ will be attached to the module 'default'."
       (when file
 	(let ((lookup-support-agent (lookup-agent-class
 				     (lookup-dictionary-agent dictionary)))
+	      (lookup-support-dictionary-id 
+               (lookup-dictionary-id dictionary))
 	      (lookup-support-options nil))
-          (require lookup-support-agent)
 	  (load file)
 	  (let ((list lookup-support-options))
-            (when plist
-              (message "debug: plist=%s" plist)
-              (message "debug: list=%s" list))
 	    (while list
 	      (setq plist (plist-put plist (car list) (cadr list)))
 	      (setq list (cddr list)))))))

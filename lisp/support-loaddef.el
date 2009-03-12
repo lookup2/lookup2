@@ -39,10 +39,11 @@
         ("/CEBD\\'" . "support-cebd")
         ("/SKP\\'" . "support-skp")
         ;; ndsary
-        ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-jawiki")
+        ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-wikipedia")
+        ("ndsary:.*/enwiki.*-abstract\\.xml" . "support-wikipedia")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
-        ("ndsary:.*/jigen\\.xml" . "support-jigen")
+        ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
         ("ndsary:.*/Unihan" . "support-unihan")
         ;; MISC
         ("ndsrd:" . "support-srd")
