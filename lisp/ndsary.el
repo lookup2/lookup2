@@ -51,7 +51,11 @@
 ;; `:content-end' is a natural number, then that number of following
 ;; lines will be provided as a content.
 ;;
-;; `:max-hits' checks the number of hit data.
+;; `:max-hits' checks the number of hit data.  If `:regular' option is
+;; `t', then it is assumed that index points are only provided among
+;; index regions and there is no duplicate entries.  No dual
+;; `:entry-start's check or entry duplication check will be performed,
+;; so that it would be a little faster.
 ;;
 ;; All the above options can be provided by the agent option
 ;; `:dict-specs'.  If multiple option lists are provided by the
@@ -63,15 +67,6 @@
 ;; agents.  Dictionary `support-xxxxx' files can only provide 
 ;; the options for each dictionary.
 ;; 
-;;
-;; TODO
-;;
-;; * speed-up options: (1) If a file is known that there is no
-;;   duplicate start tag in the same line, then backward search
-;;   checking is not necessary.  (2) If a file is known that index
-;;   point only exists within proper index char ranges, then costly
-;;   filtering & checking of `ndsary-extract-entries' is also not 
-;;   necessary and speed increases greatly.
 
 ;;; Usage:
 ;;
@@ -173,28 +168,23 @@ If END tag is provided, then that will also be attached."
   "Return entry list of DICTIONARY for QUERY."
   (let ((entry-start (lookup-dictionary-option dictionary :entry-start))
         (entry-end   (lookup-dictionary-option dictionary :entry-end))
-        (entry-pairs (lookup-dictionary-option dictionary :entry-start-end-pairs)))
+        (entry-pairs (lookup-dictionary-option dictionary :entry-start-end-pairs))
+        (regular     (lookup-dictionary-option dictionary :regular)))
     (if entry-pairs
-        (apply 'nconc
-         (mapcar (lambda (x)
-                   (ndsary-dictionary-search-each dictionary (car x) (cdr x)))
-                 entry-pairs))
-      (ndsary-dictionary-search-each dictionary entry-start entry-end))))
+        (progn
+          (if (functionp entry-pairs)
+              (setq entry-pairs (funcall entry-pairs query)))
+          (apply 'nconc
+                 (mapcar (lambda (x)
+                           (ndsary-dictionary-search-each
+                            dictionary query (car x) (cdr x) regular))
+                         entry-pairs)))
+      (ndsary-dictionary-search-each
+       dictionary query entry-start entry-end regular))))
 
-(defun ndsary-filter-regexp (method string entry-start entry-end)
-  "Return regexp that should match the line of specified query.
-METHOD is a query method.  ENTRY-START and ENTRY-END is specified entries.  
-STRING is query string."
-  (concat (regexp-quote entry-start)
-          (if (or (eq method 'suffix) 
-                  (eq method 'substring)) ".*?")
-          (regexp-quote string)
-          (if (or (eq method 'prefix) 
-                  (eq method 'substring)) ".*?")
-          (regexp-quote entry-end)))
-
-(defun ndsary-extract-entries (method string entry-start entry-end)
+(defun ndsary-extract-entries (method string entry-start entry-end regular)
   "Extract entries in accordance with METHOD, STRING, ENTRY-START and ENTRY-END.
+If REGULAR is t, then no duplicate start-tag in single line is assumed.
 Extraction are done in accordance with follows.
   * exact, keyword:  No need to extract.  Just use query-string.
   * suffix:    <start>.....|[str]</end>
@@ -216,7 +206,9 @@ Entries will be a list of (quote . string)."
         (while (re-search-forward forward-regexp nil t)
           (setq end (match-end 0)
                 end1 (match-end 1))
-          (if (or (eq method 'suffix) (eq method 'substring))
+          (if (and (null regular)
+                   (or (eq method 'suffix) (eq method 'substring)))
+              ;; backward double check
               (progn
                 (goto-char (match-beginning 2))
                 (re-search-backward entry-start-re nil t)
@@ -246,16 +238,18 @@ Entries will be a list of (quote . string)."
                  (if (equal method 'prefix) ".*?")
                  "\\)"
                  (if entry-end (regexp-quote entry-end))))
-        (start end start1 end1 result))
+        result)
     (while (re-search-forward forward-regexp nil t)
       (setq result (cons (cons (buffer-substring-no-properties
                                 (match-beginning 0) (match-end 0))
                                (buffer-substring-no-properties
-                                (match-beginning 1) (match-end 1))))))
+                                (match-beginning 1) (match-end 1)))
+                         result)))
     result))
   
-(defun ndsary-dictionary-search-each (dictionary entry-start entry-end)
-  "Return entry list of DICTIONARY for ENTRY-START and ENTRY-END."
+(defun ndsary-dictionary-search-each (dictionary query entry-start entry-end regular)
+  "Return entry list of DICTIONARY QUERY for ENTRY-START and ENTRY-END.
+REGULAR is t if dictionary does not have duplicate entries."
   (let* ((method   (lookup-query-method query))
          (string   (lookup-query-string query))
          (locations (file-expand-wildcards
@@ -299,13 +293,16 @@ Entries will be a list of (quote . string)."
                     ndsary-sary-program nil t nil "-i"
                     query-string location)))
                (setq result
-                     (remove-duplicates
-                      (if (and entry-start entry-end)
-                          (ndsary-extract-entries
-                           method string entry-start entry-end)
-                        (ndsary-extract-entries-2
-                         method string entry-start entry-end))
-                      :test (lambda (x y) (equal (car x) (car y)))))
+                     (if (and entry-start entry-end)
+                         (ndsary-extract-entries
+                          method string entry-start entry-end regular)
+                       (ndsary-extract-entries-2
+                        method string entry-start entry-end)))
+               (unless regular
+                 (setq result
+                       (remove-duplicates
+                        result
+                        :test (lambda (x y) (equal (car x) (car y))))))
                (mapcar (lambda (x)
                          (lookup-new-entry
                           'regular dictionary
@@ -327,6 +324,17 @@ Entries will be a list of (quote . string)."
       (with-temp-buffer
         (lookup-with-coding-system 'utf-8
           (dolist (location locations)
+            (message "debug: %s"
+                   `(,ndsary-sary-program nil t nil "-i"
+                     ,@(if (stringp content-start) (list "-s" content-start)
+                         (if (integerp content-start)
+                             (list "-A" (number-to-string content-start))
+                           (list "-A" "0")))
+                     ,@(if (stringp content-end) (list "-e" content-end)
+                         (if (integerp content-end)
+                             (list "-B" (number-to-string content-end))
+                           (list "-B" "0")))
+                     ,string ,location))
             (apply 'call-process
                    `(,ndsary-sary-program nil t nil "-i"
                      ,@(if (stringp content-start) (list "-s" content-start)

@@ -18,11 +18,11 @@
 ;;; Documentation:
 
 ;; This agent will search the the "字源" XML dictionary file for
-;; the character.
+;; the character.  File can be downloaded from the following site:
+;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
 ;; Following Program will make index point file, which then can be
-;; sorted by 'mksary -s' command.  (Please make sure that your text
-;; does not exeed 2G byte.  In that case, please split the text.
+;; sorted by 'mksary -s' command.  
 ;;
 ;; #!/usr/bin/env ruby -Ku
 ;; # Usage: ruby zigen.rb < all.xml > all.xml.ary

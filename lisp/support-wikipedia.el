@@ -1,4 +1,4 @@
-;;; support-wikipedia.el --- suport file for "Wikipedia" Summar file.
+;;; support-wikipedia.el --- suport file for "Wikipedia" Summary file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -17,8 +17,8 @@
 
 ;;; Documentation:
 
-;; This agent will search the wikipedia summary file.  You will need
-;; to make the sufary-index by "mksary" program.
+;; This support-file will search the wikipedia summary file.  You will
+;; need to make the sufary-index by "mksary" program.
 ;;
 ;; Unfortunately, current English wikipedia summary file exceeds
 ;; 2Gbyte, so you must split it in half (by `split' command, for
@@ -116,6 +116,6 @@
             :entry-end "</title>"
             :content-start "<doc>" :content-end "</doc>"
             :arranges '((reference support-wikipedia-arrange-structure))
-            :max-hits 100))
+            :max-hits 100 :regular t))
 
 ;;; support-wikipedia.el ends here
