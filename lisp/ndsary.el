@@ -114,7 +114,6 @@
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
 (defun ndsary-dictionary-methods (dictionary)
-  (message "debug: option=%s"(lookup-dictionary-option dictionary :entry-start))
   (if (or (and (lookup-dictionary-option dictionary :entry-start)
                (lookup-dictionary-option dictionary :entry-end))
           (lookup-dictionary-option dictionary :entry-start-end-pairs))
@@ -324,17 +323,6 @@ REGULAR is t if dictionary does not have duplicate entries."
       (with-temp-buffer
         (lookup-with-coding-system 'utf-8
           (dolist (location locations)
-            (message "debug: %s"
-                   `(,ndsary-sary-program nil t nil "-i"
-                     ,@(if (stringp content-start) (list "-s" content-start)
-                         (if (integerp content-start)
-                             (list "-A" (number-to-string content-start))
-                           (list "-A" "0")))
-                     ,@(if (stringp content-end) (list "-e" content-end)
-                         (if (integerp content-end)
-                             (list "-B" (number-to-string content-end))
-                           (list "-B" "0")))
-                     ,string ,location))
             (apply 'call-process
                    `(,ndsary-sary-program nil t nil "-i"
                      ,@(if (stringp content-start) (list "-s" content-start)
