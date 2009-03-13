@@ -217,8 +217,8 @@ other dictionaries."
     (lookup-search-pattern (lookup-current-module) pattern)))
 
 (defun lookup-select-add-dictionary (dictionary)
-  "Add a dictionary into the current module."
-  (interactive (list (lookup-input-dictionary)))
+  "Add a DICTIONARY into the current module."
+  (interactive (list (lookup-input-dictionary (lookup-current-module))))
   (let* ((module (lookup-current-module))
 	 (dict (lookup-select-this-dictionary))
 	 (dicts (lookup-module-dictionaries module)))
@@ -226,6 +226,18 @@ other dictionaries."
 	(setf (lookup-module-dictionaries module) (cons dictionary dicts))
       (while (not (eq dict (cadr dicts))) (setq dicts (cdr dicts)))
       (setcdr dicts (cons dictionary (cdr dicts)))))
+  (lookup-select-update-buffer))
+
+(defun lookup-select-add-all-dictionaries ()
+  "Add all dictionaries into the current module at the end."
+  (interactive)
+  (let* ((module (lookup-current-module))
+	 (dicts (lookup-module-dictionaries module))
+         (diffs
+          (set-difference lookup-dictionary-list dicts)))
+    (if diffs
+        (setf (lookup-module-dictionaries module)
+              (nconc dicts diffs))))
   (lookup-select-update-buffer))
 
 (defun lookup-select-wrap-command (arg)
@@ -264,7 +276,7 @@ will be used instead of the usual `kill-ring'."
 (defun lookup-select-goto-first ()
   "Set point to the beginning of the first dictionary line."
   (goto-char (point-min))
-  (forward-line 4))
+  (forward-line 5))
 
 (defun lookup-select-set-mark (mark)
   "Set MARK for the current line dictionary."

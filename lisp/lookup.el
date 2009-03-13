@@ -451,12 +451,20 @@ See `lookup-secondary' for details."
                       'lookup-input-module-history)))
   (lookup-default-module))
 
-(defun lookup-input-dictionary ()
+(defun lookup-input-dictionary (&optional module)
+  "Let the user input dictionary.
+If MODULE is specified, then dictionaries NOT in a module are shown as
+candidates."
   (let ((table (mapcar (lambda (dict) (lookup-dictionary-id dict))
-		       lookup-dictionary-list)))
+                       (if module
+                           (set-difference lookup-dictionary-list
+                                           (lookup-module-dictionaries module))
+                         lookup-dictionary-list))))
+    (if (null table)
+        (error "Module has all dictionaries"))
     (lookup-get-dictionary
      (completing-read "Dictionary: " table nil t nil
-		      'lookup-input-dictionary-history))))
+                      'lookup-input-dictionary-history))))
 
 (defun lookup-search-pattern (module pattern &optional method)
   (cond ((> (length pattern) 80) (error "Too long query"))
