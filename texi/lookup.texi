@@ -75,23 +75,23 @@ approved by the Free Software Foundation.
 @node Top, Getting Started, (dir), (dir)
 @top Lookup User's Manual
 
-Lookup $B$O(B Emacs $B%(%G%#%?$GMxMQ$G$-$k<-=q8!:w%$%s%?!<%U%'!<%9$G$9!#;THN$N(B
-CD-ROM $B<-=q$d%M%C%H%o!<%/$N<-=q%5!<%P$r;O$a!"MM!9$J>pJs8;$+$i4JC1$JA`:n(B
-$B$H@_Dj$G<-=q8!:w$,9T$J$($^$9!#(B
+Lookup は Emacs エディタで利用できる辞書検索インターフェースです。市販の
+CD-ROM 辞書やネットワークの辞書サーバを始め、様々な情報源から簡単な操作
+と設定で辞書検索が行なえます。
 
-$B$3$N%^%K%e%"%k$O(B Lookup @value{VERSION} $B$K$D$$$F@bL@$7$^$9!#(B
+このマニュアルは Lookup @value{VERSION} について説明します。
 
 @menu
-* Getting Started::             $B2?$O$H$b$"$l;H$C$F$_$k(B
-* Dictionary Setup::            $B<-=q$N=`Hw$r@0$($k(B
-* How to Lookup::               $B$=$l$G$O8!:w$7$F$_$h$&(B
-* Advanced Features::           $B$h$j9bEY$J;H$$J}(B
-* Customization::               $B<+J,9%$_$K%+%9%?%^%$%:(B
-* Information::                 $B99$J$k>pJs$rF@$k$K$O(B
-* Search Agents::               $B8!:w%(!<%8%'%s%H0lMw(B
-* Concept Index::               $B%3%s%;%W%H0lMw(B
-* Command Index::               $B%3%^%s%I0lMw(B
-* Variable Index::              $BJQ?t0lMw(B
+* Getting Started::             何はともあれ使ってみる
+* Dictionary Setup::            辞書の準備を整える
+* How to Lookup::               それでは検索してみよう
+* Advanced Features::           より高度な使い方
+* Customization::               自分好みにカスタマイズ
+* Information::                 更なる情報を得るには
+* Search Agents::               検索エージェント一覧
+* Concept Index::               コンセプト一覧
+* Command Index::               コマンド一覧
+* Variable Index::              変数一覧
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -124,7 +124,7 @@ CD-ROM Dictionary
 * Original Dictionary::         Original format dictionary.
 * Gaiji Installation::          Display Gaiji by using bitmap.
 
-$B%M%C%H%o!<%/<-=q$rMxMQ$9$k(B
+ネットワーク辞書を利用する
 
 * NDTP Server::                 Network Dictionary Transport Protocol.
 * DICT Server::                 DICT the Internet dictionary server.
@@ -132,143 +132,143 @@ CD-ROM Dictionary
 Miscellaneous Dictionary
 
 * ndnmz agent::                 Namazu
-* ndkks agent::                 $BF|K\8l$NFI$_$rD4$Y$k(B
-* ndspell agent::               $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
-* ndcookie agent::              $B:#F|$N1?@*$r%A%'%C%/$9$k(B
+* ndkks agent::                 日本語の読みを調べる
+* ndspell agent::               スペルチェックとスペル検索
+* ndcookie agent::              今日の運勢をチェックする
 
-$B$=$l$G$O8!:w$7$F$_$h$&(B
+それでは検索してみよう
 
-* Setup Dictionary::            $B<-=q$N=`Hw$r@0$($k(B
-* Setup Agent::                 $B<-=q$K9g$o$;$F@_Dj$9$k(B
-* Setup Command::               $B?7$7$$8!:w%3%^%s%I$r:n$k(B
-* Setup Others::                $B$=$NB>$N<g$J@_Dj9`L\(B
-* Setup Example::               $B=i4|2=%U%!%$%k$N@_DjNc(B
-* Setup Variables::             $B%;%C%H%"%C%WJQ?t0lMw(B
-* Setup Functions::             $B%;%C%H%"%C%W4X?t0lMw(B
+* Setup Dictionary::            辞書の準備を整える
+* Setup Agent::                 辞書に合わせて設定する
+* Setup Command::               新しい検索コマンドを作る
+* Setup Others::                その他の主な設定項目
+* Setup Example::               初期化ファイルの設定例
+* Setup Variables::             セットアップ変数一覧
+* Setup Functions::             セットアップ関数一覧
 
-$B<-=q$K9g$o$;$F@_Dj$9$k(B
+辞書に合わせて設定する
 
-* Setup Basis::                 $B4pK\E*$J@_DjJ}K!(B
-* Setup Option::                $B3F<o%*%W%7%g%s$N@_Dj(B
-* Setup Restriction::           $BMxMQ$9$k<-=q$N@)8B(B
-* Setup Package::               $BJd=u%Q%C%1!<%8$NMxMQ(B
+* Setup Basis::                 基本的な設定方法
+* Setup Option::                各種オプションの設定
+* Setup Restriction::           利用する辞書の制限
+* Setup Package::               補助パッケージの利用
 
-$B$=$NB>$N<g$J@_Dj9`L\(B
+その他の主な設定項目
 
-* Setup Query Expansion::       $B3HD%8!:w$N=`Hw(B
+* Setup Query Expansion::       拡張検索の準備
 
-$B3HD%8!:w$N=`Hw(B
+拡張検索の準備
 
-* Stemming::                    $BC18l$N8lHx$r<h$j=|$/(B
-* Spell Checking::              $B%9%Z%k%A%'%C%/$r9T$J$&(B
-* Kanji-Kana Expansion::        $B4A;z$R$i$,$J3HD%8!:w(B
-* Universal Query Expansion::   $BG$0U$N3HD%8!:w(B
+* Stemming::                    単語の語尾を取り除く
+* Spell Checking::              スペルチェックを行なう
+* Kanji-Kana Expansion::        漢字ひらがな拡張検索
+* Universal Query Expansion::   任意の拡張検索
 
-$B=i4|2=%U%!%$%k$N@_DjNc(B
+初期化ファイルの設定例
 
-* Initialization::              $B=i4|2=%W%m%;%9$N35MW(B
-* ~/.emacs::                    @file{~/.emacs} $B$N@_Dj(B
-* ~/.lookup::                   @file{~/.lookup} $B$N@_Dj(B
-* site-start.el::               $B%5%$%HKh$N6&DL@_Dj(B
+* Initialization::              初期化プロセスの概要
+* ~/.emacs::                    @file{~/.emacs} の設定
+* ~/.lookup::                   @file{~/.lookup} の設定
+* site-start.el::               サイト毎の共通設定
 
 Advanced Features
 
-* Startup Commands::            $B5/F0$H=*N;(B
-* Search String::               $BJ8;zNs8!:w(B
-* See Result::                  $B8!:w7k2L$ND/$aJ}(B
-* Specify Dictionary::          $BFCDj$N<-=q$rMxMQ$9$k(B
+* Startup Commands::            起動と終了
+* Search String::               文字列検索
+* See Result::                  検索結果の眺め方
+* Specify Dictionary::          特定の辞書を利用する
 
-$BJ8;zNs8!:w(B
+文字列検索
 
-* Search Commands::             $BI8=`$N8!:w%3%^%s%I(B
-* Default Method::              $BI8=`$N8!:wJ}<0(B
-* Search Methods::              $B8!:wJ}<0$N$$$m$$$m(B
+* Search Commands::             標準の検索コマンド
+* Default Method::              標準の検索方式
+* Search Methods::              検索方式のいろいろ
 
-$B8!:w7k2L$ND/$aJ}(B
+検索結果の眺め方
 
-* See Entries::                 $B%(%s%H%j$r=g$K8+$k(B
-* See Contents::                $BK\J8$r>\$7$/8+$k(B
-* Make Reference::              $B%j%U%!%l%s%9$r;2>H$9$k(B
-* Cite Contents::               $BK\J8$r0zMQ$9$k(B
+* See Entries::                 エントリを順に見る
+* See Contents::                本文を詳しく見る
+* Make Reference::              リファレンスを参照する
+* Cite Contents::               本文を引用する
 
 Customization
 
-* Customize General::           $B0lHLE*$J%+%9%?%^%$%:(B
-* Customize Option::            $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
+* Customize General::           一般的なカスタマイズ
+* Customize Option::            辞書とエージェントのカスタマイズ
 
-$B0lHLE*$J%+%9%?%^%$%:(B
+一般的なカスタマイズ
 
-* Customize Variables::         $B<g$J%+%9%?%^%$%:JQ?t(B
-* Customize Face::              $BJ8;zAu>~$N%+%9%?%^%$%:(B
+* Customize Variables::         主なカスタマイズ変数
+* Customize Face::              文字装飾のカスタマイズ
 
-$B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
+辞書とエージェントのカスタマイズ
 
-* Agent Options::               $B%(!<%8%'%s%H!&%*%W%7%g%s0lMw(B
-* Dictionary Options::          $B<-=q%*%W%7%g%s0lMw(B
+* Agent Options::               エージェント・オプション一覧
+* Dictionary Options::          辞書オプション一覧
 
-$B8!:w%(!<%8%'%s%H0lMw(B
+検索エージェント一覧
 
-* ndic::                        $B%U%j!<<-=q$+$i8!:w$9$k(B
-* ndeb::                        CD-ROM $B<-=q$+$i8!:w$9$k(B
-* ndtp::                        NDTP $B%5!<%P$+$i8!:w$9$k(B
-* ndict::                       DICT $B%5!<%P$+$i8!:w$9$k(B
-* ndsrd::                       $B%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$r8!:w$9$k(B
-* ndkks::                       $BF|K\8l$NFI$_$rD4$Y$k(B
-* ndspell::                     $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
-* ndcookie::                    cookie $B%U%!%$%k$+$i8!:w$9$k(B
+* ndic::                        フリー辞書から検索する
+* ndeb::                        CD-ROM 辞書から検索する
+* ndtp::                        NDTP サーバから検索する
+* ndict::                       DICT サーバから検索する
+* ndsrd::                       ランダムハウス英語辞典Windows版を検索する
+* ndkks::                       日本語の読みを調べる
+* ndspell::                     スペルチェックとスペル検索
+* ndcookie::                    cookie ファイルから検索する
 
 ndic
 
-* ndic prepare::                ndic $B$N=`Hw(B
-* ndic setup::                  ndic $B$N@_Dj(B
-* ndic dictionary::             ndic $B$N<-=q(B
-* ndic customize::              ndic $B$N%+%9%?%^%$%:(B
+* ndic prepare::                ndic の準備
+* ndic setup::                  ndic の設定
+* ndic dictionary::             ndic の辞書
+* ndic customize::              ndic のカスタマイズ
 
 ndeb
 
-* ndeb prepare::                ndeb $B$N=`Hw(B
-* ndeb setup::                  ndeb $B$N@_Dj(B
-* ndeb dictionary::             ndeb $B$N<-=q(B
-* ndeb customize::              ndeb $B$N%+%9%?%^%$%:(B
+* ndeb prepare::                ndeb の準備
+* ndeb setup::                  ndeb の設定
+* ndeb dictionary::             ndeb の辞書
+* ndeb customize::              ndeb のカスタマイズ
 
 ndtp
 
-* ndtp prepare::                ndtp $B$N=`Hw(B
-* ndtp setup::                  ndtp $B$N@_Dj(B
-* ndtp dictionary::             ndtp $B$N<-=q(B
+* ndtp prepare::                ndtp の準備
+* ndtp setup::                  ndtp の設定
+* ndtp dictionary::             ndtp の辞書
 
 ndict
 
-* ndict prepare::               ndict $B$N=`Hw(B
-* ndict setup::                 ndict $B$N@_Dj(B
-* ndict dictionary::            ndict $B$N<-=q(B
+* ndict prepare::               ndict の準備
+* ndict setup::                 ndict の設定
+* ndict dictionary::            ndict の辞書
 
 ndsrd
 
-* ndsrd prepare::               ndsrd $B$N=`Hw(B
-* ndsrd setup::                 ndsrd $B$N@_Dj(B
-* ndsrd dictionary::            ndsrd $B$N<-=q(B
-* ndsrd customize::             ndsrd $B$N%+%9%?%^%$%:(B
+* ndsrd prepare::               ndsrd の準備
+* ndsrd setup::                 ndsrd の設定
+* ndsrd dictionary::            ndsrd の辞書
+* ndsrd customize::             ndsrd のカスタマイズ
 
 ndkks
 
-* ndkks prepare::               ndkks $B$N=`Hw(B
-* ndkks setup::                 ndkks $B$N@_Dj(B
-* ndkks dictionary::            ndkks $B$N<-=q(B
-* ndkks customize::             ndkks $B$N%+%9%?%^%$%:(B
+* ndkks prepare::               ndkks の準備
+* ndkks setup::                 ndkks の設定
+* ndkks dictionary::            ndkks の辞書
+* ndkks customize::             ndkks のカスタマイズ
 
 ndspell
 
-* ndspell prepare::             ndspell $B$N=`Hw(B
-* ndspell setup::               ndspell $B$N@_Dj(B
-* ndspell dictionary::          ndspell $B$N<-=q(B
-* ndspell customize::           ndspell $B$N%+%9%?%^%$%:(B
+* ndspell prepare::             ndspell の準備
+* ndspell setup::               ndspell の設定
+* ndspell dictionary::          ndspell の辞書
+* ndspell customize::           ndspell のカスタマイズ
 
 ndcookie
 
-* ndcookie prepare::            ndcookie $B$N=`Hw(B
-* ndcookie setup::              ndcookie $B$N@_Dj(B
-* ndcookie dictionary::         ndcookie $B$N<-=q(B
+* ndcookie prepare::            ndcookie の準備
+* ndcookie setup::              ndcookie の設定
+* ndcookie dictionary::         ndcookie の辞書
 
 @end detailmenu
 @end menu
@@ -286,119 +286,119 @@ ndcookie
 @end menu
 
 @node Quick Prepare, Quick Setup, Getting Started, Getting Started
-@section $B<-=q$N=`Hw(B
+@section 辞書の準備
 
-$B$^$:!"2?$O$J$/$H$b<-=q$,I,MW$G$9!#$H$O$$$($?$V$s!"$3$N%W%m%0%i%`$r;H$*$&(B
-$B$H;W$o$l$?;~E@$G4{$K!"MxMQ$7$?$$<-=q$O7h$^$C$F$$$k$G$7$g$&$M!#<-=q$r$b$&(B
-$BMQ0U$7$F$$$k$H$$$&J}$O!"K\@a$OFI$_Ht$P$7$F<!$X?J$s$G2<$5$$!#(B
+まず、何はなくとも辞書が必要です。とはいえたぶん、このプログラムを使おう
+と思われた時点で既に、利用したい辞書は決まっているでしょうね。辞書をもう
+用意しているという方は、本節は読み飛ばして次へ進んで下さい。
 
-$B$b$7$3$l$+$i<-=q$rC5$=$&$H;W$C$F$$$k!"$"$k$$$O$I$N<-=q$rA*$Y$P$$$$$+LB$C(B
-$B$F$$$k$H$$$&J}$O!"(BLookup $B$N%[!<%`%Z!<%8$dG[I[J*$K4^$^$l$k(B FAQ $B$K$$$/$D$+(B
-$B%"%I%P%$%9$,$"$j$^$9$N$G!";29M$K$7$F2<$5$$!#(B
+もしこれから辞書を探そうと思っている、あるいはどの辞書を選べばいいか迷っ
+ているという方は、Lookup のホームページや配布物に含まれる FAQ にいくつか
+アドバイスがありますので、参考にして下さい。
 
-$B$"$k$$$O!"!V<-=q$O$$$i$J$$$+$i!"$H$K$+$/(B Lookup $B$r;H$C$F$_$?$$$s$@$C(B!$B!W(B
-$B$H$$$&4qFC$JJ}$bCf$K$O$*$i$l$k$+$b$7$l$^$;$s!#$=$N$h$&$JJ}$N$?$a$K0l$D!"(B
-Lookup $B$r<j$C<h$jAa$/;n$9$?$a$N:`NA$H$7$F!"(BEmacs $B$KImB0$N(B Zippy $B%U%!%$%k(B
-$B$r>R2p$7$F$*$-$^$7$g$&!#(B
+あるいは、「辞書はいらないから、とにかく Lookup を使ってみたいんだっ!」
+という奇特な方も中にはおられるかもしれません。そのような方のために一つ、
+Lookup を手っ取り早く試すための材料として、Emacs に附属の Zippy ファイル
+を紹介しておきましょう。
 
 @node Quick Setup, Quick Example, Quick Prepare, Getting Started
-@section $B@_Dj$9$Y$-$3$H(B
+@section 設定すべきこと
 
-@cindex $B8!:w%(!<%8%'%s%H(B
-$B$5$F!"<-=q$NMQ0U$,=PMh$?$i(B Lookup $B$N@_Dj$G$9!#$7$+$7BT$C$?!#(BLookup $B$,BP(B
-$B1~$7$F$$$k<-=q$K$O?tB?$/$N<oN`$,$"$j$^$9!#$^$:;O$a$K!"<-=q$H$N<B:]$NO"Mm(B
-$B78$H$J$k(B @dfn{$B8!:w%(!<%8%'%s%H(B} $B$rA*$P$M$P$J$j$^$;$s!#(B
+@cindex 検索エージェント
+さて、辞書の用意が出来たら Lookup の設定です。しかし待った。Lookup が対
+応している辞書には数多くの種類があります。まず始めに、辞書との実際の連絡
+係となる @dfn{検索エージェント} を選ばねばなりません。
 
-$B$3$N%P!<%8%g%s$N(B Lookup $B$K$O!"0J2<$N8!:w%(!<%8%'%s%H$,4^$^$l$F$$$^$9!#$3(B
-$B$l$i$OMxMQ$9$k<-=q$N<oN`$dMxMQ7ABV$N0c$$$K$h$C$F!"$=$l$>$l0[$J$k@-3J$r;}$C(B
-$B$F$$$^$9!#$=$l$>$l$N@bL@$r;2>H$7$F!"<+J,$NL\E*$K9g$C$?$b$N$r%T%C%/%"%C%W(B
-$B$7$F2<$5$$!#(B
+このバージョンの Lookup には、以下の検索エージェントが含まれています。こ
+れらは利用する辞書の種類や利用形態の違いによって、それぞれ異なる性格を持っ
+ています。それぞれの説明を参照して、自分の目的に合ったものをピックアップ
+して下さい。
 
-@subheading $BMQ8l8!:w$K8~$$$?%(!<%8%'%s%H(B
+@subheading 用語検索に向いたエージェント
 
 @table @code
 @item ndic
-$B%U%j!<<-=q$+$i$ND>@\8!:w(B (@pxref{ndic})
+フリー辞書からの直接検索 (@pxref{ndic})
 @item ndeb
-EPWING $B$J$I$K=`5r$7$?(B CD-ROM $B=q@R$N8D?MMxMQ(B (@pxref{ndeb})
+EPWING などに準拠した CD-ROM 書籍の個人利用 (@pxref{ndeb})
 @item ndtp
-NDTP $B%5!<%P$rMQ$$$?!"%M%C%H%o!<%/<-=q$NMxMQ(B (@pxref{ndtp})
+NDTP サーバを用いた、ネットワーク辞書の利用 (@pxref{ndtp})
 @item ndict
-DICT $B%5!<%P$rMQ$$$?!"%M%C%H%o!<%/<-=q$NMxMQ(B (@pxref{ndict})
+DICT サーバを用いた、ネットワーク辞書の利用 (@pxref{ndict})
 @end table
 
-@subheading $B%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$r8!:w$9$k%(!<%8%'%s%H(B
+@subheading ランダムハウス英語辞典Windows版を検索するエージェント
 
 @table @code
 @item ndsrd
-$B%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$r8!:w$9$k(B (@pxref{ndsrd})
+ランダムハウス英語辞典Windows版を検索する (@pxref{ndsrd})
 @item ndcookie
-cookie $B%U%!%$%k$+$i8!:w(B (@pxref{ndcookie})
+cookie ファイルから検索 (@pxref{ndcookie})
 @end table
 
-@subheading $BJd=uE*$J%(!<%8%'%s%H(B
+@subheading 補助的なエージェント
 
 @table @code
 @item ndkks
-$BF|K\8l$NFI$_$rD4$Y$k(B (@pxref{ndkks})
+日本語の読みを調べる (@pxref{ndkks})
 @item ndspell
-$B%9%Z%k%A%'%C%/$d%9%Z%k8!:w(B (@pxref{ndspell})
+スペルチェックやスペル検索 (@pxref{ndspell})
 @end table
 
 
-$BMxMQ$9$k%(!<%8%'%s%H$,7h$^$C$?$i!"@bL@$K=>$C$F=`Hw$r@0$($F2<$5$$!#<-=q$N(B
-$B@_Dj$d%$%s%9%H!<%k!"30It%W%m%0%i%`$,I,MW$K$J$k$3$H$b$"$j$^$9!#(BEmacs $B$N@_(B
-$BDj$K$D$$$F$bNc$b5s$2$i$l$F$$$k$O$:$G$9$+$i!"<+J,$N>l9g$N@_DjFbMF$rGD0.$7(B
-$B$F2<$5$$!#(B
+利用するエージェントが決まったら、説明に従って準備を整えて下さい。辞書の
+設定やインストール、外部プログラムが必要になることもあります。Emacs の設
+定についても例も挙げられているはずですから、自分の場合の設定内容を把握し
+て下さい。
 
-$B0J>e$,=*$o$l$P!"(B@file{~/.emacs} $B%U%!%$%k$K@_Dj$r=q$-9~$_$^$9!#4pK\E*$K$O(B
-$BJQ?t(B @code{lookup-search-agents} $B$r%;%C%H$9$k$@$1$G$9!#MxMQ$7$?$$8!:w%(!<(B
-$B%8%'%s%H$N?t$@$1!"@_Dj$rJB$Y$k$3$H$,=PMh$^$9!#(B
+以上が終われば、@file{~/.emacs} ファイルに設定を書き込みます。基本的には
+変数 @code{lookup-search-agents} をセットするだけです。利用したい検索エー
+ジェントの数だけ、設定を並べることが出来ます。
 
-$BNc$($P!"(BNDTP $B%5!<%P$,%[%9%H(B @samp{dserver} $B$GF0$$$F$*$j!"(BCD-ROM $B<-=q$r(B
-@file{/cdrom} $B$K%^%&%s%H$7$F$$$k$N$G$"$l$P!"@_Dj$O<!$N$h$&$K$J$j$^$9!#(B
+例えば、NDTP サーバがホスト @samp{dserver} で動いており、CD-ROM 辞書を
+@file{/cdrom} にマウントしているのであれば、設定は次のようになります。
 
 @lisp
 (setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
 @end lisp
 
 @node Quick Example, Quick Startup, Quick Setup, Getting Started
-@section $B4JC1$J@_DjNc(B
+@section 簡単な設定例
 
-$B$5$"!"<-=q$N@_Dj$O=*$o$j$^$7$?!#$7$+$7<B:]$K$O!"4IM}<T$NJ}$,FCJL$K@_Dj$r(B
-$B9T$J$C$F$G$b$$$J$$8B$j!"B>$K$b$$$/$D$+$N@_Dj$,I,MW$H$J$j$^$9!#<BMQ>e!"(B
-@file{~/.emacs} $B$K$O<!$N$h$&$K=q$$$F$*$/$H$h$$$G$7$g$&!#(B
+さあ、辞書の設定は終わりました。しかし実際には、管理者の方が特別に設定を
+行なってでもいない限り、他にもいくつかの設定が必要となります。実用上、
+@file{~/.emacs} には次のように書いておくとよいでしょう。
 
 @lisp
 ;;;
 ;;; Lookup Setup Example
 ;;;
 
-;; $B%*!<%H%m!<%I$N@_Dj(B
+;; オートロードの設定
 (autoload 'lookup "lookup" nil t)
 (autoload 'lookup-region "lookup" nil t)
 (autoload 'lookup-pattern "lookup" nil t)
 
-;; $B%-!<%P%$%s%I$N@_Dj(B
+;; キーバインドの設定
 (define-key ctl-x-map "l" 'lookup)              ; C-x l - lookup
 (define-key ctl-x-map "y" 'lookup-region)       ; C-x y - lookup-region
 (define-key ctl-x-map "\C-y" 'lookup-pattern)   ; C-x C-y - lookup-pattern
 
-;; $B8!:w%(!<%8%'%s%H$N@_Dj(B
+;; 検索エージェントの設定
 (setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
 @end lisp
 
-$B:G=i$NCJMn$G$O!"(BLookup $B$N3F%3%^%s%I$r<B9T$7$?$H$-!"<+F0E*$K%W%m%0%i%`$r(B
-$BFI$_9~$`$h$&$K@_Dj$7$F$$$^$9!#$b$7(B Emacs $B5/F0;~$K=i4|2=$r:Q$^$;$F$7$^$&(B
-$B$3$H$,$*9%$_$J$i!"Be$o$j$K(B @code{(require 'lookup)} $B$J$I$H=q$$$F$*$1$P$h(B
-$B$$$G$7$g$&!#(B
+最初の段落では、Lookup の各コマンドを実行したとき、自動的にプログラムを
+読み込むように設定しています。もし Emacs 起動時に初期化を済ませてしまう
+ことがお好みなら、代わりに @code{(require 'lookup)} などと書いておけばよ
+いでしょう。
 
-$BFsHVL\$NCJMn$G$O!"%3%^%s%I$r<B9T$9$k$?$a$N%-!<%P%$%s%I$rDj5A$7$F$$$^$9!#(B
-$B$3$l$OI,?\$G$O$"$j$^$;$s$,!">e5-$N%3%^%s%I$O$h$/MQ$$$k$N$G!"E,Ev$J%-!<$K(B
-$B3d$jEv$F$F$*$/$HJXMx$G$9!#3F<+$G9%$_$N%-!<$K%P%$%s%I$7$F2<$5$$!#(B
+二番目の段落では、コマンドを実行するためのキーバインドを定義しています。
+これは必須ではありませんが、上記のコマンドはよく用いるので、適当なキーに
+割り当てておくと便利です。各自で好みのキーにバインドして下さい。
 
-$B:G8e$NCJMn$G$O!"MxMQ$9$k8!:w%(!<%8%'%s%H$r@_Dj$7$F$$$^$9!#$3$l$OA0@a$G@b(B
-$BL@$7$?DL$j$G$9!#3F<+$N$b$N$K9g$o$;$F@_Dj$7$F2<$5$$!#(B
+最後の段落では、利用する検索エージェントを設定しています。これは前節で説
+明した通りです。各自のものに合わせて設定して下さい。
 
 As you have seen in the previous chapters, all you have to do in the
 Emacs level to use Lookup is to install program files, to load autoloads
@@ -445,10 +445,10 @@ are designed to be defined in @file{~/.lookup}.
 [ mention about supplement file ]
 
 @node Quick Startup, Quick Search, Quick Example, Getting Started
-@section $B5/F0$9$k$K$O(B
+@section 起動するには
 
-$B$*BT$?$;$7$^$7$?!#$=$l$G$O(B Lookup $B$rF0$+$7$F$$$-$^$7$g$&!#$^$:<j;O$a$K(B
-@kbd{M-x lookup} $B$H$7$F!"%W%m%0%i%`$,5/F0$9$k$3$H$r3NG'$7$F2<$5$$!#(B
+お待たせしました。それでは Lookup を動かしていきましょう。まず手始めに
+@kbd{M-x lookup} として、プログラムが起動することを確認して下さい。
 
 @example
 
@@ -460,9 +460,9 @@ Type `m' to select, `u' to unselect, `?' for help.
 
 % Identifier          Title                Method
 - ----------          -----                ------
-* ndtp+dserver:KOKUGO $B9q8l<-E5(B             =<>
-* ndeb+/cdrom:EIWA    $B1QOB<-E5(B             =<>
-* ndeb+/cdrom:WAEI    $BOB1Q<-E5(B             =<>
+* ndtp+dserver:KOKUGO 国語辞典             =<>
+* ndeb+/cdrom:EIWA    英和辞典             =<>
+* ndeb+/cdrom:WAEI    和英辞典             =<>
 
 
 
@@ -475,58 +475,58 @@ Type `m' to select, `u' to unselect, `?' for help.
 
 @end example
 
-$B>e$N$h$&$J2hLL$,I=<($5$l$^$7$?$+(B? $B$b$7%(%i!<$,5/$3$C$?$j!"$"$k$$$O0lMw$,(B
-$BI=<($5$l$J$$$h$&$J$i!"<-=q$d%W%m%0%i%`$N@_Dj$K<:GT$7$F$$$k$+$b$7$l$^$;$s!#(B
-$BLdBjE@$r3NG'$7$F!"$b$&0lEY$d$jD>$7$F$_$F2<$5$$!#$h$/$"$k%_%9$J$i(B FAQ $B$K(B
-$B>pJs$,$"$k$+$b$7$l$^$;$s$7!"$o$+$i$J$$$3$H$,$"$l$P%a!<%k$G?R$M$F$b$i$C$F(B
-$B$b0l8~$K9=$$$^$;$s!#(B
+上のような画面が表示されましたか? もしエラーが起こったり、あるいは一覧が
+表示されないようなら、辞書やプログラムの設定に失敗しているかもしれません。
+問題点を確認して、もう一度やり直してみて下さい。よくあるミスなら FAQ に
+情報があるかもしれませんし、わからないことがあればメールで尋ねてもらって
+も一向に構いません。
 
-@cindex $B<-=q0lMw%P%C%U%!(B
-$B$3$N$H$-I=<($5$l$k%P%C%U%!$r(B @dfn{$B<-=q0lMw%P%C%U%!(B} $B$H8F$S$^$9!#>e$NNc$G(B
-$B$O!"!V9q8l<-E5!W!V1QOB<-E5!W!VOB1Q<-E5!W$N;0$D$N<-=q$,;H$($k$h$&$K$J$C$F(B
-$B$$$^$9!#0J2<!"$3$l$i$N<-=q$rNc$K@bL@$7$F$$$-$^$9!#(B
+@cindex 辞書一覧バッファ
+このとき表示されるバッファを @dfn{辞書一覧バッファ} と呼びます。上の例で
+は、「国語辞典」「英和辞典」「和英辞典」の三つの辞書が使えるようになって
+います。以下、これらの辞書を例に説明していきます。
 
-$B9TF,$K(B @samp{*}($B%"%9%?%j%9%/(B)$B$N%^!<%/$,IU$$$F$$$k$N$O!"$=$N<-=q$r8!:w$K(B
-$BMQ$$$k$b$N$H$7$F!"<-=q$,A*Br$5$l$F$$$k$H$$$&$3$H$rI=$o$7$F$$$^$9!#>e$N>l(B
-$B9g!";0$DA4$F$N<-=q$+$i0lEY$K8!:w$,9T$J$o$l$k$H$$$&0UL#$K$J$j$^$9!#DL>o!"(B
-$B:G=i$OMxMQ=PMh$kA4$F$N<-=q$,A*Br>uBV$K$J$C$F$$$^$9!#(B
+行頭に @samp{*}(アスタリスク)のマークが付いているのは、その辞書を検索に
+用いるものとして、辞書が選択されているということを表わしています。上の場
+合、三つ全ての辞書から一度に検索が行なわれるという意味になります。通常、
+最初は利用出来る全ての辞書が選択状態になっています。
 
-@cindex $B<-=qL>(B
-@cindex $B<-=q(BID
-@cindex $B%(!<%8%'%s%H(BID
-@samp{Identifier} $B$H$"$k%3%i%`$K$O!"<-=q$rFCDj$9$k$?$a$NL>>N$,I=<($5$l$F(B
-$B$$$^$9!#$3$l$OMxMQ$7$F$$$k8!:w%(!<%8%'%s%H(B(@var{agent})$B$H!"<-=q$N=j:_(B
-(@var{location})$B!"5Z$S<-=qL>(B(@var{name})$B$H$rAH$_9g$o$;$F!"(B
-@samp{@var{agent+location:name}} $B$H$$$&7A$GI=$o$5$l$^$9!#K\=q$G$O$3$l$r(B
-@dfn{$B<-=q(BID} $B$H8F$S!"(B@samp{@var{name}} $B$GI=$o$5$l$k(B @dfn{$B<-=qL>(B} $B$H$O6h(B
-$BJL$7$^$9!#$^$?F1MM$K!"(B@samp{@var{agent+location}} $B$NItJ,$O(B @dfn{$B%(!<%8%'(B
-$B%s%H(BID} $B$H8F$S$^$9!#(B
+@cindex 辞書名
+@cindex 辞書ID
+@cindex エージェントID
+@samp{Identifier} とあるコラムには、辞書を特定するための名称が表示されて
+います。これは利用している検索エージェント(@var{agent})と、辞書の所在
+(@var{location})、及び辞書名(@var{name})とを組み合わせて、
+@samp{@var{agent+location:name}} という形で表わされます。本書ではこれを
+@dfn{辞書ID} と呼び、@samp{@var{name}} で表わされる @dfn{辞書名} とは区
+別します。また同様に、@samp{@var{agent+location}} の部分は @dfn{エージェ
+ントID} と呼びます。
 
-@samp{Title} $B$H$"$k%3%i%`$K$O!"<-=q$N%?%$%H%k$,I=<($5$l$^$9!#$3$l$O8!:w(B
-$B7k2L$N=PNO$J$I$K!"IaCJMQ$$$i$l$k$b$N$G$9!#%*%W%7%g%s@_Dj$K$h$j<+M3$KJQ99(B
-$B$9$k$3$H$b2DG=$G$9$+$i!"8e$G8+$d$9$$$b$N$KJQ$($F$*$-$^$7$g$&!#(B
+@samp{Title} とあるコラムには、辞書のタイトルが表示されます。これは検索
+結果の出力などに、普段用いられるものです。オプション設定により自由に変更
+することも可能ですから、後で見やすいものに変えておきましょう。
 
-$B:G8e$N(B @samp{Methods} $B$H$"$k%3%i%`$K$O!"<-=q$,BP1~$7$F$$$k8!:wJ}<0$,<($5(B
-$B$l$F$$$^$9!#$3$l$O3F<o8!:wJ}<0$,$=$l$>$l0l$D$N5-9f$GI=$o$5$l$F$*$j!">e$N(B
-$B>l9g$O$I$N<-=q$b!VA0J}0lCW8!:w!W!V8eJ}0lCW8!:w!W!V40A40lCW8!:w!W$KBP1~$7(B
-$B$F$$$k$H$$$&0UL#$K$J$j$^$9!#>\$7$/$O8e$[$I@bL@$7$^$9!#(B
+最後の @samp{Methods} とあるコラムには、辞書が対応している検索方式が示さ
+れています。これは各種検索方式がそれぞれ一つの記号で表わされており、上の
+場合はどの辞書も「前方一致検索」「後方一致検索」「完全一致検索」に対応し
+ているという意味になります。詳しくは後ほど説明します。
 
-$B$3$N%P%C%U%!$G$O<-=q$N0lMw$r3NG'$9$k0J30$K$b!"<-=q$NA*Br>uBV$r@Z$jBX$($k(B
-$B$J$I$$$/$D$+$NA`:n$,2DG=$H$J$C$F$$$^$9!#;n$7$K(B @kbd{?} $B$r2!$7$F$_$F2<$5(B
-$B$$!#JL$N%P%C%U%!$K%3%^%s%I$N0lMw$,I=<($5$l$^$7$?$M(B? Lookup $B$N3F%P%C%U%!(B
-$B$G$O!"(B@kbd{?} $B%-!<$r2!$9$3$H$G4JC1$J%3%^%s%I0lMw$,=P$k$h$&$K$J$C$F$$$k$N(B
-$B$G!"$A$g$C$HD4$Y$?$$$H$-$K$4MxMQ2<$5$$!#(B
+このバッファでは辞書の一覧を確認する以外にも、辞書の選択状態を切り替える
+などいくつかの操作が可能となっています。試しに @kbd{?} を押してみて下さ
+い。別のバッファにコマンドの一覧が表示されましたね? Lookup の各バッファ
+では、@kbd{?} キーを押すことで簡単なコマンド一覧が出るようになっているの
+で、ちょっと調べたいときにご利用下さい。
 
-$B$I$3$G$b;H$($k%-!<A`:n$r$b$&0l$D!#(B@kbd{q} $B$r2!$;$P!"$=$N%P%C%U%!$rH4$1$F(B
-$B85$N:n6H$KLa$k$3$H$,=PMh$^$9!#$5$"!"$=$l$G$O<-=q$N3NG'$O$3$NJU$K$7$F!"<!(B
-$B$N%9%F%C%W$K?J$_$^$7$g$&!#(B
+どこでも使えるキー操作をもう一つ。@kbd{q} を押せば、そのバッファを抜けて
+元の作業に戻ることが出来ます。さあ、それでは辞書の確認はこの辺にして、次
+のステップに進みましょう。
 
 @node Quick Search, Quick View, Quick Startup, Getting Started
-@section $B8!:w$7$F$_$h$&(B
+@section 検索してみよう
 
-$B$$$h$$$h8!:w$r9T$J$$$^$9!#:G$bBeI=E*$J8!:w%3%^%s%I$H$7$F!"(B@kbd{M-x
-lookup-region} $B$H(B @kbd{M-x lookup-pattern} $B$NFs$D$,$"$j$^$9!#$=$l$>$l(B
-$B%j!<%8%g%s$NFbMF!"5Z$S%_%K%P%C%U%!$+$i$NF~NO$r8!:w8l$K!"8!:w$r3+;O$7$^$9!#(B
+いよいよ検索を行ないます。最も代表的な検索コマンドとして、@kbd{M-x
+lookup-region} と @kbd{M-x lookup-pattern} の二つがあります。それぞれ
+リージョンの内容、及びミニバッファからの入力を検索語に、検索を開始します。
 
 @example
 
@@ -534,126 +534,126 @@ lookup-region} $B$H(B @kbd{M-x lookup-pattern} $B$NFs$D$,$"$j$^$9!#$=$l$>$l(
 
 ======== Lookup Windows ========================================
 ----------------------------------------------------------------
-$B9q8l<-E5(B            @point{}$B%F%9%H(B
-$B1QOB<-E5(B            test
+国語辞典            @point{}テスト
+英和辞典            test
 
 
 ----------------------------------------------------------------
 -J:%*  Lookup: *Entry* @{*:test@} [2]      (Entry Abbrev)--L1--C20
 ----------------------------------------------------------------
-$B%F%9%H(B
-[$BL>(B] 1. $B;n83(B....
+テスト
+[名] 1. 試験....
 
 
 
 
 ----------------------------------------------------------------
--J:%*  Lookup: *Content* @{$B%F%9%H(B@}      (Content Abbrev)--L1--C0-
+-J:%*  Lookup: *Content* @{テスト@}      (Content Abbrev)--L1--C0-
 ----------------------------------------------------------------
 ================================================================
 
 @end example
 
-@cindex Entry $B%P%C%U%!(B
-$BFs$D$N%P%C%U%!$,I=<($5$l$^$7$?!#>eB&$N%P%C%U%!$O(B @dfn{Entry $B%P%C%U%!(B} $B$H(B
-$B8@$$!"8!:w$N7k2L8+IU$+$C$?%(%s%H%j$r0lMw$7$^$9!#$3$3$G$OFs$D$N%(%s%H%j$,(B
-$BI=<($5$l$F$$$^$9!#(B@point{} $B$H$"$k$N$O!"$=$3$K%]%$%s%H$,$"$k$H$$$&0u$G$9!#(B
-$B$D$^$j!"8=:_0l$DL\$N!V%F%9%H!W$H$$$&%(%s%H%j$,A*Br$5$l$F$$$^$9!#(B
+@cindex Entry バッファ
+二つのバッファが表示されました。上側のバッファは @dfn{Entry バッファ} と
+言い、検索の結果見付かったエントリを一覧します。ここでは二つのエントリが
+表示されています。@point{} とあるのは、そこにポイントがあるという印です。
+つまり、現在一つ目の「テスト」というエントリが選択されています。
 
-@cindex Content $B%P%C%U%!(B
-$B2<B&$N%P%C%U%!$O(B @dfn{Content $B%P%C%U%!(B} $B$H8@$$!"A*Br$5$l$F$$$k%(%s%H%j$N(B
-$BK\J8$,I=<($5$l$^$9!#(BEntry $B%P%C%U%!$G(B @key{SPC} $B$r2!$7$F$$$1$P!"FbMF$,<!!9(B
-$B$HI=<($5$l$^$9!#(B
+@cindex Content バッファ
+下側のバッファは @dfn{Content バッファ} と言い、選択されているエントリの
+本文が表示されます。Entry バッファで @key{SPC} を押していけば、内容が次々
+と表示されます。
 
-$B>e$NNc$G$O(B @samp{test} $B$H$$$&8!:w8l$G8!:w$r9T$J$$$^$7$?$,!"$3$3$GF~NO$r(B
-$B<!$N$h$&$K$9$k$3$H$G!"8!:wJ}<0$rMM!9$K@Z$j49$($k$3$H$,=PMh$^$9!#(B
+上の例では @samp{test} という検索語で検索を行ないましたが、ここで入力を
+次のようにすることで、検索方式を様々に切り換えることが出来ます。
 
 @table @t
 @item word
-$BC18l8!:w!#I8=`$N8!:wJ}K!!#(B
+単語検索。標準の検索方法。
 @item word*
-$BA0J}0lCW8!:w!#;XDj$7$?J8;zNs$G;O$^$k8l$r8+IU$1$k!#(B
+前方一致検索。指定した文字列で始まる語を見付ける。
 @item *word
-$B8eJ}0lCW8!:w!#;XDj$7$?J8;zNs$G=*$o$k8l$r8+IU$1$k!#(B
+後方一致検索。指定した文字列で終わる語を見付ける。
 @item *word*
-$BItJ,0lCW8!:w!#;XDj$7$?J8;zNs$r4^$s$@8l$r8+IU$1$k!#(B
+部分一致検索。指定した文字列を含んだ語を見付ける。
 @item 'word'
-$B40A40lCW8!:w!#;XDj$7$?J8;zNs$H0lCW$9$k8l$r8+IU$1$k!#(B
+完全一致検索。指定した文字列と一致する語を見付ける。
 @item @@word
-$B%-!<%o!<%I8!:w!#;XDj$7$?J8;zNs$r%-!<%o!<%I$K;}$D%(%s%H%j$r8+IU$1$k!#(B
+キーワード検索。指定した文字列をキーワードに持つエントリを見付ける。
 @end table
 
-$B$R$H$^$:$3$l$@$13P$($F$*$1$P==J,$G$7$g$&!#8!:wJ}<0$OB>$K$b$^$@$$$/$D$+(B
-$B$"$j$^$9$,!">\$7$/$O8e$[$I@bL@$7$^$9!#$3$3$G$O$b$&>/$7!"8!:w7k2L$N8+J}$K(B
-$B$D$$$FOC$r?J$a$F$$$-$^$9!#(B
+ひとまずこれだけ覚えておけば十分でしょう。検索方式は他にもまだいくつか
+ありますが、詳しくは後ほど説明します。ここではもう少し、検索結果の見方に
+ついて話を進めていきます。
 
 @node Quick View,  , Quick Search, Getting Started
-@section $B7k2L$r8+$F$$$/(B
+@section 結果を見ていく
 
-$B0J2<!"(BEntry $B%P%C%U%!$G$h$/MQ$$$i$l$k%3%^%s%I$K$D$$$F@bL@$7$^$9!#%-!<A`:n(B
-$B$rK:$l$F$7$^$C$?$H$-$K$O!"(B@kbd{?} $B$r2!$;$P3NG'=PMh$^$9!#(B
+以下、Entry バッファでよく用いられるコマンドについて説明します。キー操作
+を忘れてしまったときには、@kbd{?} を押せば確認出来ます。
 
 @itemize @bullet
 @item
-$BK\J8$N%9%/%m!<%k(B
+本文のスクロール
 @table @kbd
 @item @key{SPC}
-$B0l2hLLJ,!"@h$K?J$`!#(B
+一画面分、先に進む。
 @item @key{DEL}
-$B0l2hLLJ,!"A0$KLa$k!#(B
+一画面分、前に戻る。
 @item <
-$B%P%C%U%!$N@hF,$XLa$k!#(B
+バッファの先頭へ戻る。
 @item >
-$B%P%C%U%!$N:G8e$X?J$`!#(B
+バッファの最後へ進む。
 @end table
 
 @item
-$B%(%s%H%j$NA*Br(B
+エントリの選択
 @table @kbd
 @item n
-$B<!$N%(%s%H%j$K0\F0!#(B
+次のエントリに移動。
 @item p
-$BA0$N%(%s%H%j$K0\F0!#(B
+前のエントリに移動。
 @item M-n
-$B8!:wMzNr$r<!$K?J$`!#(B
+検索履歴を次に進む。
 @item M-p
-$B8!:wMzNr$rA0$KLa$k!#(B
+検索履歴を前に戻る。
 @end table
 
 @item
-$BK\J8$KBP$9$kA`:n(B
+本文に対する操作
 @table @kbd
 @item s
-Content $B%P%C%U%!$G(B @code{isearch-forward} $B$r<B9T!#(B
+Content バッファで @code{isearch-forward} を実行。
 @item w
-Content $B%P%C%U%!$NFbMF$r%-%k%j%s%0$K%;!<%V!#(B
+Content バッファの内容をキルリングにセーブ。
 @item L
-$B%j%U%!%l%s%9$r0lMw!#(B
+リファレンスを一覧。
 @end table
 @end itemize
 
-@cindex Overview $B%b!<%I(B
-$B$^$@$^$@$"$j$^$9!#8+IU$+$C$?%(%s%H%j$,B?$/$F0lMw$,8+?I$$$H$-$K$O!"(B
-@kbd{v} $B$r2!$9$3$H$G(B @dfn{Overview $B%b!<%I(B} $B$KF~$j$^$9!#(B
-Overview $B%b!<%I$G$O(B Content $B%P%C%U%!$,%/%m!<%:$5$l!"(BEntry $B%P%C%U%!$r(B
-$B9-$/8+$k$3$H$,=PMh$^$9!#(BOverview $B%b!<%I$rH4$1$k$K$O!"$b$&0lEY(B @kbd{v} 
-$B$H$9$k$+!"$"$k$$$O(B @key{SPC} $B$r2!$7$F2<$5$$!#(B
+@cindex Overview モード
+まだまだあります。見付かったエントリが多くて一覧が見辛いときには、
+@kbd{v} を押すことで @dfn{Overview モード} に入ります。
+Overview モードでは Content バッファがクローズされ、Entry バッファを
+広く見ることが出来ます。Overview モードを抜けるには、もう一度 @kbd{v} 
+とするか、あるいは @key{SPC} を押して下さい。
 
-$B5U$K%(%s%H%j$NK\J8$r9-$/8+$?$$$H$-$K$O!"(B@kbd{o} $B$,;H$($^$9!#$3$l$O(B 
-Lookup $B$N%&%#%s%I%&$r%U%l!<%`0lGU$K9-$2!"0l;~E*$KI=<(NN0h$r9-$/<h$j$^$9!#(B
-@kbd{q} $B$G%P%C%U%!$rJD$8$l$P!"<!$+$i$^$?85$KLa$j$^$9!#(B
+逆にエントリの本文を広く見たいときには、@kbd{o} が使えます。これは 
+Lookup のウィンドウをフレーム一杯に広げ、一時的に表示領域を広く取ります。
+@kbd{q} でバッファを閉じれば、次からまた元に戻ります。
 
-$B0lEY%P%C%U%!$rJD$8$?8e$G$b!"$b$&0lEY(B @kbd{M-x lookup} $B$H$9$k$3$H$G!":G8e(B
-$B$K(B Lookup $B$rH4$1$?$H$-$N>uBV$,<h$jLa$5$l$^$9!#(B@kbd{q} $B$H(B @kbd{M-x lookup} 
-$B$r7+$jJV$9$3$H$G!"2?EY$G$b8!:w7k2L$r8+D>$9$3$H$,=PMh$^$9!#(B
+一度バッファを閉じた後でも、もう一度 @kbd{M-x lookup} とすることで、最後
+に Lookup を抜けたときの状態が取り戻されます。@kbd{q} と @kbd{M-x lookup} 
+を繰り返すことで、何度でも検索結果を見直すことが出来ます。
 
-$B8!:w7k2L$rI=<($7$?$^$^:G=i$N%P%C%U%!$KLa$j$?$$$H$-$K$O!"(B@kbd{r} $B$r2!$;$P(B 
-OK $B$G$9!#(B@kbd{h} $B$rO"BG$9$l$P!"(BEntry $B%P%C%U%!$H(B Content $B%P%C%U%!$N4V$r(B
-$B1}I|$9$k$3$H$b=PMh$^$9!#(B
+検索結果を表示したまま最初のバッファに戻りたいときには、@kbd{r} を押せば 
+OK です。@kbd{h} を連打すれば、Entry バッファと Content バッファの間を
+往復することも出来ます。
 
-$B$3$l$@$13P$($F$*$1$P!"F|>o$N:n6H$O==J,$K9T$J$($k$G$7$g$&!#$7$+$7(B Lookup 
-$B$K$O!">l9g$K$h$C$FLr$KN)$D$$$/$D$+$N%3%^%s%I$,B>$K$bMQ0U$5$l$F$$$^$9!#(B
-$B<!>O0J9_$G!"$=$l$i$r4^$`(B Lookup $B$N40A4$J5!G=$K$D$$$F@bL@$7$^$9!#(B
+これだけ覚えておけば、日常の作業は十分に行なえるでしょう。しかし Lookup 
+には、場合によって役に立ついくつかのコマンドが他にも用意されています。
+次章以降で、それらを含む Lookup の完全な機能について説明します。
 
 @node Dictionary Setup, How to Lookup, Getting Started, Top
 @chapter Dictionary Setup
@@ -691,108 +691,108 @@ SDIC, dictd, and FreePWING.
 @node SDIC Dictionary, dictd Dictionary, Free Dictionary, Free Dictionary
 @subsection SDIC Dictionary
 
-@dfn{SDIC $B%U%)!<%^%C%H(B} $B$H$O!"(BEmacs $B$G;H$($k%7%s%W%k$J<-=q8!:w%=%U%H(B
+@dfn{SDIC フォーマット} とは、Emacs で使えるシンプルな辞書検索ソフト
 @uref{http://pine.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html, SDIC}
-$B$G:NMQ$5$l$F$$$k9T;X8~$N<-=q7A<0$G$9!#(Bgrep $B0l$D$G9bB.$K8!:w$r9T$J$($k$N$,(B
-$BFCD'$G$9!#(B
+で採用されている行指向の辞書形式です。grep 一つで高速に検索を行なえるのが
+特徴です。
 
-@subsubheading SDIC $B<-=q$N=`Hw(B
+@subsubheading SDIC 辞書の準備
 
-SDIC $B<-=q$O(B @file{.sdic} $B$r3HD%;R$K;}$DC10l$N%U%!%$%k$+$i$J$j$^$9!#(B
-$BC1=c$f$($N=@Fp@-$G!"MW5a$K1~$8$F;0$D$N8!:wJ}<0$,MQ0U$5$l$F$$$^$9!#(B
+SDIC 辞書は @file{.sdic} を拡張子に持つ単一のファイルからなります。
+単純ゆえの柔軟性で、要求に応じて三つの検索方式が用意されています。
 
 @enumerate
 @item
-direct $BJ}<0(B
+direct 方式
 
-$B<-=q$r(B Emacs $B$N%P%C%U%!$KFI$_9~$s$G!"D>@\8!:w$r9T$J$&J}<0$G$9!#(B
-$B%a%b%j$r05Gw$9$k$J$I$N%G%a%j%C%H$b$"$j$^$9$,!"(BEmacs $B0J30$N30It%3%^%s%I$r(B
-$BI,MW$H$7$J$$$?$a(B Windows $B%f!<%6$K$b<j7Z$KMxMQ=PMh$k$H$$$&MxE@$,$"$j$^$9!#(B
-
-@item
-grep $BJ}<0(B
-
-$B30It%3%^%s%I$H$7$F(B @code{fgrep} $B$b$7$/$O(B @code{grep} $B$rMQ$$$F(B
-$B8!:w$r9T$J$&J}<0$G$9!#==J,$K9bB.$GJXMx$J$?$a!"DL>o$O$3$l$rMxMQ$7$^$9!#(B
+辞書を Emacs のバッファに読み込んで、直接検索を行なう方式です。
+メモリを圧迫するなどのデメリットもありますが、Emacs 以外の外部コマンドを
+必要としないため Windows ユーザにも手軽に利用出来るという利点があります。
 
 @item
-array $BJ}<0(B
+grep 方式
 
-$B30It%3%^%s%I$H$7$F(B @uref{http://cactus.aist-nara.ac.jp/lab/nlt/ss/, SUFARY}
-$B$H$$$&%=%U%H%&%'%"$rMQ$$$F8!:w$r9T$J$&J}<0$G$9!#(B
-$B$3$l$O$"$i$+$8$aFCJL$J%$%s%G%C%/%9$r@8@.$9$k$3$H$G8!:w$r9bB.2=$7$^$9!#(B
-5MB $B$rD6$($k$h$&$JBg$-$J%5%$%:$N<-=q$rMQ$$$k>l9g$K$O!"$3$A$i$NMxMQ$,(B
-$BM-8z$+$b$7$l$^$;$s!#(B
+外部コマンドとして @code{fgrep} もしくは @code{grep} を用いて
+検索を行なう方式です。十分に高速で便利なため、通常はこれを利用します。
+
+@item
+array 方式
+
+外部コマンドとして @uref{http://cactus.aist-nara.ac.jp/lab/nlt/ss/, SUFARY}
+というソフトウェアを用いて検索を行なう方式です。
+これはあらかじめ特別なインデックスを生成することで検索を高速化します。
+5MB を超えるような大きなサイズの辞書を用いる場合には、こちらの利用が
+有効かもしれません。
 @end enumerate
 
-grep $BJ}<0$rMQ$$$k$K$O!"30It%3%^%s%I$H$7$F(B @code{fgrep} $B$b$7$/$O(B
-@code{grep} $B$r<B9T%Q%9$KCV$$$F2<$5$$!#0lHLE*$J(B UNIX $B%7%9%F%`$G$"$l$P(B
-$BI8=`$GImB0$7$F$$$^$9!#(Barray $BJ}<0$rMQ$$$k$K$O!"(BSUFARY $B$r%$%s%9%H!<%k$7$F(B
-@code{mkary} $B$G%$%s%G%C%/%9$r@8@.$7$F2<$5$$!#(B
+grep 方式を用いるには、外部コマンドとして @code{fgrep} もしくは
+@code{grep} を実行パスに置いて下さい。一般的な UNIX システムであれば
+標準で附属しています。array 方式を用いるには、SUFARY をインストールして
+@code{mkary} でインデックスを生成して下さい。
 
-$B<-=q$O9%$-$J%G%#%l%/%H%j$KCV$$$F9=$$$^$;$s!#(Bdirect $BJ}<0$rMQ$$$k>l9g$O!"(B
-Emacs 19.34 $B0J9_$J$i<-=q$r(B @code{gzip} $B$J$I$G05=L$7$F$*$/$3$H$b=PMh$^$9!#(B
-@file{~/.emacs} $B$G(B @code{(auto-compression-mode t)} $B$H$7$F$*$$$F2<$5$$!#(B
+辞書は好きなディレクトリに置いて構いません。direct 方式を用いる場合は、
+Emacs 19.34 以降なら辞書を @code{gzip} などで圧縮しておくことも出来ます。
+@file{~/.emacs} で @code{(auto-compression-mode t)} としておいて下さい。
 
-@subsubheading SDIC $B<-=q$NMxMQ(B
+@subsubheading SDIC 辞書の利用
 
-SDIC $B<-=q$O!"(BLookup $B$N(B ndic $B%(!<%8%'%s%H$GMxMQ$9$k$3$H$,=PMh$^$9!#(B
-$B<-=q$rCV$$$?%G%#%l%/%H%j$r0z?t$K$7$F!"Nc$($P<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+SDIC 辞書は、Lookup の ndic エージェントで利用することが出来ます。
+辞書を置いたディレクトリを引数にして、例えば次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndic "/usr/local/dict")))
 @end lisp
 
-$B%G%#%l%/%H%j$K4^$^$l$kA4$F$N(B @file{.sdic} $B%U%!%$%k$,<-=q$H$7$FG'<1$5$l$^$9!#(B
+ディレクトリに含まれる全ての @file{.sdic} ファイルが辞書として認識されます。
 
 @node dictd Dictionary, FreePWING Dictionary, SDIC Dictionary, Free Dictionary
 @subsection dictd Dictionary
 
-@dfn{dictd $B%U%)!<%^%C%H(B} $B$H$O!"(BDICT $B%W%m%H%3%k(B(@sc{RFC 2229})$B$KBP1~$7$?(B
-$B<-=q%5!<%P$G$"$k(B @uref{http://www.dict.org, dictd} $B$,FH<+$K:NMQ$7$F$$$k(B
-$B<-=q7A<0$G$9!#C1=c$+$D==J,$K<BMQE*$J%U%)!<%^%C%H$G$9!#(B
+@dfn{dictd フォーマット} とは、DICT プロトコル(@sc{RFC 2229})に対応した
+辞書サーバである @uref{http://www.dict.org, dictd} が独自に採用している
+辞書形式です。単純かつ十分に実用的なフォーマットです。
 
-@subsubheading dictd $B<-=q$N=`Hw(B
+@subsubheading dictd 辞書の準備
 
-dictd $B<-=q$O!"(B@file{.index} $B$r3HD%;R$K;}$D%$%s%G%C%/%9!&%U%!%$%k$H!"(B
-@file{.dict} $B$r3HD%;R$K;}$D%G!<%?!&%U%!%$%k$NFs$D$+$i$J$j$^$9!#(B
-$BN>J}$N%U%!%$%k$rE,Ev$JF1$8%G%#%l%/%H%j$KCV$$$F2<$5$$!#(B
+dictd 辞書は、@file{.index} を拡張子に持つインデックス・ファイルと、
+@file{.dict} を拡張子に持つデータ・ファイルの二つからなります。
+両方のファイルを適当な同じディレクトリに置いて下さい。
 
-@file{.dict} $B%U%!%$%k$O(B dictd $B$KImB0$N(B @code{dictzip} $B$H$$$&%3%^%s%I$G(B
-$B05=L$9$k$3$H$,=PMh$^$9!#>\$7$/$O(B dictd $B$N%^%K%e%"%k$r;2>H$7$F2<$5$$!#(B
+@file{.dict} ファイルは dictd に附属の @code{dictzip} というコマンドで
+圧縮することが出来ます。詳しくは dictd のマニュアルを参照して下さい。
 
-@subsubheading dictd $B<-=q$NMxMQ(B
+@subsubheading dictd 辞書の利用
 
-dictd $B<-=q$O!"(BLookup $B$N(B ndic $B$b$7$/$O(B ndict $B%(!<%8%'%s%H$GMxMQ$9$k$3$H$,(B
-$B=PMh$^$9!#(Bndic $B$G$O<-=q$ND>@\8!:w$r9T$J$$!"(Bndict $B$G$O(B DICT $B%W%m%H%3%k$r(B
-$BMQ$$$F%5!<%P$+$i8!:w$r9T$J$$$^$9!#(Bndic $B$NJ}$,$*<j7Z$G$9$,!"(Bndict $B$NJ}$,(B
-$B$h$j9bB.$J8!:w$,2DG=$G$9!#(B
+dictd 辞書は、Lookup の ndic もしくは ndict エージェントで利用することが
+出来ます。ndic では辞書の直接検索を行ない、ndict では DICT プロトコルを
+用いてサーバから検索を行ないます。ndic の方がお手軽ですが、ndict の方が
+より高速な検索が可能です。
 
 @enumerate
 @item
-ndic $B$rMQ$$$k>l9g(B
+ndic を用いる場合
 
-$B<-=q$rCV$$$?%G%#%l%/%H%j$r0z?t$K$7$F!"Nc$($P<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+辞書を置いたディレクトリを引数にして、例えば次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndic "/usr/local/dict")))
 @end lisp
 
-$B%G%#%l%/%H%j$K4^$^$l$kA4$F$N(B @file{.index} $B%U%!%$%k$,<-=q$H$7$FG'<1$5$l$^$9!#(B
-$B@h$N(B SDIC $B<-=q$H:.:_$7$F$"$C$F$b9=$$$^$;$s!#<-=q$r05=L$7$F$"$k>l9g$K$O!"(B
-@code{dictzip} $B%3%^%s%I$r<B9T%Q%9$NDL$C$?%G%#%l%/%H%j$K%$%s%9%H!<%k$7$F(B
-$B$*$$$F2<$5$$!#(B
+ディレクトリに含まれる全ての @file{.index} ファイルが辞書として認識されます。
+先の SDIC 辞書と混在してあっても構いません。辞書を圧縮してある場合には、
+@code{dictzip} コマンドを実行パスの通ったディレクトリにインストールして
+おいて下さい。
 
 @item
-ndict $B$rMQ$$$k>l9g(B
+ndict を用いる場合
 
-$B$"$i$+$8$a(B DICT $B%5!<%P$rN)$A>e$2$F$*$$$F!"<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+あらかじめ DICT サーバを立ち上げておいて、次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndict "dict-server")))
 @end lisp
 
-DICT $B%5!<%P$NN)$A>e$2$K$D$$$F$O!"(B@ref{DICT server} $B$r;2>H$7$F2<$5$$!#(B
+DICT サーバの立ち上げについては、@ref{DICT server} を参照して下さい。
 @end enumerate
 
 @node FreePWING Dictionary,  , dictd Dictionary, Free Dictionary
@@ -805,13 +805,13 @@ free implementation of generating dictionaries compatible with EPWING.
 @node CD-ROM Dictionary, Network Dictionary, Free Dictionary, Dictionary Setup
 @section CD-ROM Dictionary
 
-Lookup $B$G$OB?$/$N;THN$N(B CD-ROM $B<-=q$rMxMQ$9$k$3$H$,=PMh$^$9!#MxMQ2DG=$J(B
-$B<-=q$N0lMw$,!"(B@uref{http://openlab.ring.gr.jp/lookup/dicts/, $B<-=q%G!<%?%Y!<%9(B}
-$B$N%Z!<%8$K$^$H$a$i$l$F$$$k$N$G;2>H$7$F2<$5$$!#(B
+Lookup では多くの市販の CD-ROM 辞書を利用することが出来ます。利用可能な
+辞書の一覧が、@uref{http://openlab.ring.gr.jp/lookup/dicts/, 辞書データベース}
+のページにまとめられているので参照して下さい。
 
-Lookup $B$OI8=`$G!"EE;R%V%C%/$d(B EPWING $B5,Ls$K=`5r$7$?(B CD-ROM $B=q@R$NMxMQ$K(B
-$BBP1~$7$F$$$^$9!#JLG[I[$N@lMQ%W%m%0%i%`$rMQ0U$9$k$3$H$G!"FH<+%U%)!<%^%C%H(B
-$B$N(B CD-ROM $B<-=q$K$D$$$F$bMxMQ=PMh$k$b$N$,$"$j$^$9!#(B
+Lookup は標準で、電子ブックや EPWING 規約に準拠した CD-ROM 書籍の利用に
+対応しています。別配布の専用プログラムを用意することで、独自フォーマット
+の CD-ROM 辞書についても利用出来るものがあります。
 
 @menu
 * EB/EPWING Dictionary::        E-Book/EPWING dictionary.
@@ -822,120 +822,120 @@ Lookup $B$OI8=`$G!"EE;R%V%C%/$d(B EPWING $B5,Ls$K=`5r$7$?(B CD-ROM $B=q@R$N
 @node EB/EPWING Dictionary, Original Dictionary, CD-ROM Dictionary, CD-ROM Dictionary
 @subsection E-Book/EPWING Dictionary
 
-$BEE;R%V%C%/$d(B EPWING $B5,Ls$O!"F|K\$G0lHLE*$JEE;R<-=q$N6&DL5,3J$G$9!#(B
-$B%Q%C%1!<%8$N30H"$K=q$+$l$?!V(BEBXA$B!W$H$+!V(BEPWING$B!W$H$$$C$?%m%4$,(B
-$BL\0u$G$9!#(B($B0J2<!"$^$H$a$F(B EPWING $B<-=q$H8F$V(B)
+電子ブックや EPWING 規約は、日本で一般的な電子辞書の共通規格です。
+パッケージの外箱に書かれた「EBXA」とか「EPWING」といったロゴが
+目印です。(以下、まとめて EPWING 辞書と呼ぶ)
 
 @subsubheading Preparing EPWING Dictionary
 
-EPWING $B<-=q$O(B CD-ROM $B$+$iD>@\8!:w$;$:$H$b!"$"$i$+$8$a%O!<%I%G%#%9%/$K(B
-$B%3%T!<$7$F$*$/$3$H$G!"$h$jJXMx$K9bB.$K8!:w$r9T$J$($^$9!#%G%#%9%/MFNL$K(B
-$BM>M5$N$"$k?M$O!"G'$a$i$l$?HO0OFb$G%3%T!<$7$F$*$/$H$$$$$G$7$g$&!#(B
+EPWING 辞書は CD-ROM から直接検索せずとも、あらかじめハードディスクに
+コピーしておくことで、より便利に高速に検索を行なえます。ディスク容量に
+余裕のある人は、認められた範囲内でコピーしておくといいでしょう。
 
-$B$3$N$H$-!"B@ED;a:n$N(B @uref{ftp://ftp.nerimadors.or.jp/pub/epwutil/, EPWUTIL}
-$B$d!"3^86;a:n$N(B @uref{http://www.sra.co.jp/people/m-kasahr/eb/, EB $B%i%$%V%i%j(B}
-$B$K4^$^$l$k(B @code{ebzip} $B$H$$$C$?%D!<%k$rMQ$$$k$3$H$G!"<-=q$N%5%$%:$r(B
-$B>.$5$/<}$a$k$3$H$,2DG=$G$9(B(1/2 $B!A(B 1/10 $BDxEY(B)$B!#>\$7$/$O!"$=$l$>$l$N(B
-$B%W%m%0%i%`$KImB0$N%I%-%e%a%s%H$r;2>H$7$F2<$5$$!#(B
+このとき、太田氏作の @uref{ftp://ftp.nerimadors.or.jp/pub/epwutil/, EPWUTIL}
+や、笠原氏作の @uref{http://www.sra.co.jp/people/m-kasahr/eb/, EB ライブラリ}
+に含まれる @code{ebzip} といったツールを用いることで、辞書のサイズを
+小さく収めることが可能です(1/2 〜 1/10 程度)。詳しくは、それぞれの
+プログラムに附属のドキュメントを参照して下さい。
 
 @subsubheading Using EPWING Dictionary
 
-EPWING $B<-=q$O!"(BLookup $B$N(B ndeb $B$b$7$/$O(B ndtp $B%(!<%8%'%s%H$GMxMQ$9$k$3$H$,(B
-$B=PMh$^$9!#(Bndeb $B$O8D?M$G$N(B CD-ROM $B<-=qMxMQ$K8~$$$F$*$j!"(Bndtp $B$O%M%C%H%o!<%/$r(B
-$B2p$7$?<-=q$N6&M-$K8~$$$F$$$^$9!#(B
+EPWING 辞書は、Lookup の ndeb もしくは ndtp エージェントで利用することが
+出来ます。ndeb は個人での CD-ROM 辞書利用に向いており、ndtp はネットワークを
+介した辞書の共有に向いています。
 
 @enumerate
 @item
-ndeb $B$rMQ$$$k>l9g(B
+ndeb を用いる場合
 
-$B8!:w$r9T$J$&$?$a$N30It%3%^%s%I$H$7$F(B
-@uref{http://openlab.ring.gr.jp/lookup/eblook/, eblook} $B$,I,MW$G$9!#(B
-$B$"$i$+$8$aF~<j$7$F%$%s%9%H!<%k$7$F$*$$$F2<$5$$!#(B
+検索を行なうための外部コマンドとして
+@uref{http://openlab.ring.gr.jp/lookup/eblook/, eblook} が必要です。
+あらかじめ入手してインストールしておいて下さい。
 
-$B$b$730;z$rI=<(=PMh$k4D6-$K$J$$$+!"30;z$rMQ$$$?$/$J$$$H$$$&>l9g$K$O!"(B
-$B30;zCV$-49$(@_Dj%U%!%$%k$G$"$k(B
-@uref{http://www.sra.co.jp/people/m-kasahr/eb/, Appendix} $B$bF~<j$7$F2<$5$$!#(B
+もし外字を表示出来る環境にないか、外字を用いたくないという場合には、
+外字置き換え設定ファイルである
+@uref{http://www.sra.co.jp/people/m-kasahr/eb/, Appendix} も入手して下さい。
 
-Lookup $B$N@_Dj$O!"Nc$($P<!$N$h$&$K$7$F2<$5$$!#(B
+Lookup の設定は、例えば次のようにして下さい。
 
 @lisp
 (setq lookup-search-agents '((ndeb "/cdrom" :appendix "/your/appendix")))
 @end lisp
 
 @item
-ndtp $B$rMQ$$$k>l9g(B
+ndtp を用いる場合
 
-$B$"$i$+$8$a(B NDTP $B%5!<%P$rN)$A>e$2$F$*$$$F!"<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+あらかじめ NDTP サーバを立ち上げておいて、次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndtp "dserver")))
 @end lisp
 
-NDTP $B%5!<%P$NN)$A>e$2$K$D$$$F$O!"(B@ref{NDTP server} $B$r;2>H$7$F2<$5$$!#(B
+NDTP サーバの立ち上げについては、@ref{NDTP server} を参照して下さい。
 @end enumerate
 
 @node Original Dictionary, Gaiji Installation, EB/EPWING Dictionary, CD-ROM Dictionary
 @subsection Original Format Dictionary
 
-$B8=:_!">.3X4[$N!V%i%s%@%`%O%&%91Q8l<-E5!W$+$i8!:w$,9T$J$($k$h$&$K$J$C$F(B
-$B$$$^$9$,!"$^$@3+H/CJ3,$K$"$j$^$9!#6=L#$N$"$kJ}$O!"(B
-@uref{http://openlab.ring.gr.jp/edict/, $BEE;R<-=q%*!<%W%s%i%\(B}
-$B$N(B edict ML $B$G?R$M$F2<$5$$!#(B
+現在、小学館の「ランダムハウス英語辞典」から検索が行なえるようになって
+いますが、まだ開発段階にあります。興味のある方は、
+@uref{http://openlab.ring.gr.jp/edict/, 電子辞書オープンラボ}
+の edict ML で尋ねて下さい。
 
 @node Gaiji Installation,  , Original Dictionary, CD-ROM Dictionary
 @subsection Gaiji Installation
 
-Lookup $B$O(B CD-ROM $B=q@R$J$I$K4^$^$l$k30;z$NI=<($r%5%]!<%H$7$F$$$^$9!#(B
-@footnote{$B$?$@$7!"C<Kv(B(tty)$B$G$OI=<(=PMh$^$;$s!#(B}
-$B30;z$rI=<($9$k$K$O!"$=$l$>$l$N8!:w%(!<%8%'%s%H$GE,@Z$J@_Dj$r9T$J$C$?>e$G!"(B
-Lookup $B$r<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+Lookup は CD-ROM 書籍などに含まれる外字の表示をサポートしています。
+@footnote{ただし、端末(tty)では表示出来ません。}
+外字を表示するには、それぞれの検索エージェントで適切な設定を行なった上で、
+Lookup を次のように設定して下さい。
 
 @enumerate
 @item
-GNU Emacs $B5Z$S(B Mule $B$N>l9g(B:
+GNU Emacs 及び Mule の場合:
 
-Emacs $B$G%S%C%H%^%C%WI=<($r9T$J$&$?$a$N(B 
+Emacs でビットマップ表示を行なうための 
 @uref{ftp://ftp.jaist.ac.jp/pub/GNU/elisp/bitmap-mule/, bitmap-mule}
-$B%Q%C%1!<%8(B $B$rMQ$$$F30;z$rI=<($7$^$9!#ImB0$N%I%-%e%a%s%H$J$I$r;29M$K(B
-$B%$%s%9%H!<%k$r9T$J$C$F2<$5$$!#$b$7@_Dj$,$h$/$o$+$i$J$1$l$P!"(BLookup $B$N(B
-FAQ $B$K$b>pJs$,$"$k$N$G;29M$K$7$F2<$5$$!#(B
+パッケージ を用いて外字を表示します。附属のドキュメントなどを参考に
+インストールを行なって下さい。もし設定がよくわからなければ、Lookup の
+FAQ にも情報があるので参考にして下さい。
 
-bitmap-mule $B$N=`Hw$,=PMh$?$i!"<!$N$$$:$l$+$NJ}K!$G=`Hw$,40N;$G$9!#(B
+bitmap-mule の準備が出来たら、次のいずれかの方法で準備が完了です。
 
 @enumerate
 @item
-Lookup $B$N5/F0A0$K(B bitmap-mule $B$r%m!<%I$9$k!#(B
+Lookup の起動前に bitmap-mule をロードする。
 
-$BNc$($P(B @file{~/.emacs} $B$K(B @code{(require 'bitmap)} $B$H=q$$$F$*$$$F2<$5$$!#(B
+例えば @file{~/.emacs} に @code{(require 'bitmap)} と書いておいて下さい。
 
 @item
 @vindex lookup-use-bitmap
-$B=i4|2=%U%!%$%k$G(B @code{lookup-use-bitmap} $B$r(B @code{t} $B$K%;%C%H$9$k!#(B
+初期化ファイルで @code{lookup-use-bitmap} を @code{t} にセットする。
 
-$B$3$N>l9g!"<B:]$K30;z$rI=<($9$k:]$K(B bitmap-mule $B$,FI$_9~$^$l$^$9!#(B
+この場合、実際に外字を表示する際に bitmap-mule が読み込まれます。
 @end enumerate
 
 @item
-XEmacs $B$N>l9g(B:
+XEmacs の場合:
 
-$BFCJL$J=`Hw$OI,MW$"$j$^$;$s!#(BLookup $B$O(B XEmacs $B$N(B glyph $B$N5!G=$rMxMQ$7$F!"(B
-$B30;z$r0l<o$N2hA|$H$7$F07$$$^$9!#@_Dj$O<+F0$G9T$J$o$l$^$9!#(B
+特別な準備は必要ありません。Lookup は XEmacs の glyph の機能を利用して、
+外字を一種の画像として扱います。設定は自動で行なわれます。
 @end enumerate
 
 @vindex lookup-enable-gaiji
-$B5U$K!"30;z$rI=<($5$;$?$/$J$$>l9g$K$O!"JQ?t(B @code{lookup-enable-gaiji} $B$r(B 
-@code{nil} $B$K@_Dj$7$F2<$5$$!#$3$l$O%G%U%)%k%H$G(B @code{t} $B$H$J$C$F$$$^$9!#(B
+逆に、外字を表示させたくない場合には、変数 @code{lookup-enable-gaiji} を 
+@code{nil} に設定して下さい。これはデフォルトで @code{t} となっています。
 
 @node Network Dictionary, Miscellaneous Dictionary, CD-ROM Dictionary, Dictionary Setup
-@section $B%M%C%H%o!<%/<-=q$rMxMQ$9$k(B
+@section ネットワーク辞書を利用する
 
-$BEE;R<-=q$r%M%C%H%o!<%/$G6&M-$7$FMxMQ$7$?$$>l9g$O!"<-=q%5!<%P$rN)$A>e$2$F(B
-$B8!:w%5!<%S%9$rDs6!$9$k$N$,0l$D$NJ}K!$G$9!#$^$?!"%$%s%?!<%M%C%H$K$O<+M3$K(B
-$B%"%/%;%9=PMh$k<-=q%5!<%P$bB8:_$7!"$=$l$i$K%"%/%;%9$9$k$3$H$b2DG=$G$9!#(B
+電子辞書をネットワークで共有して利用したい場合は、辞書サーバを立ち上げて
+検索サービスを提供するのが一つの方法です。また、インターネットには自由に
+アクセス出来る辞書サーバも存在し、それらにアクセスすることも可能です。
 
-Lookup $B$,BP1~$7$F$$$k<-=q%5!<%P$O!"(B@dfn{NDTP $B%5!<%P(B} $B$H(B
-@dfn{DICT $B%5!<%P(B} $B$NFs$D$G$9!#$3$3$G$O$=$l$>$l$K$D$$$F!"(B
-$B%5!<%P$N>R2p$H(B Lookup $B$N@_Dj$K$D$$$F@bL@$7$^$9!#(B
+Lookup が対応している辞書サーバは、@dfn{NDTP サーバ} と
+@dfn{DICT サーバ} の二つです。ここではそれぞれについて、
+サーバの紹介と Lookup の設定について説明します。
 
 @menu
 * NDTP Server::                 Network Dictionary Transport Protocol.
@@ -945,15 +945,15 @@ Lookup $B$,BP1~$7$F$$$k<-=q%5!<%P$O!"(B@dfn{NDTP $B%5!<%P(B} $B$H(B
 @node NDTP Server, DICT Server, Network Dictionary, Network Dictionary
 @subsection NDTP Server
 
-NDTP(Network Dictionary Transport Protocol)$B$H$O!"<g$KF|K\$G;H$o$l$F$$$k!"(B
-CD-ROM $B<-=q$r%M%C%H%o!<%/$GMxMQ$9$k$?$a$N8!:wMQ%W%m%H%3%k$G$9!#(B
+NDTP(Network Dictionary Transport Protocol)とは、主に日本で使われている、
+CD-ROM 辞書をネットワークで利用するための検索用プロトコルです。
 
 @subsubheading Preparing NDTP Server
 
-NDTP $B%5!<%P$H$7$F$O!"8=:_(B
+NDTP サーバとしては、現在
 @uref{http://www.sra.co.jp/people/m-kasahr/ndtpd/, NDTPD}
-$B$,<g$KMQ$$$i$l$F$$$^$9!#ImB0$N%I%-%e%a%s%H$r;2>H$7$F!"(B
-$B%$%s%9%H!<%k!"5Z$S@_Dj$r9T$J$C$F2<$5$$!#(B
+が主に用いられています。附属のドキュメントを参照して、
+インストール、及び設定を行なって下さい。
 
 @table @asis
 @item NDPTD
@@ -961,7 +961,7 @@ NDTP $B%5!<%P$H$7$F$O!"8=:_(B
 
 @subsubheading Using NDTP Server
 
-$BNc$($P<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+例えば次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndtp "dserver")))
@@ -970,17 +970,17 @@ NDTP $B%5!<%P$H$7$F$O!"8=:_(B
 @node DICT Server,  , NDTP Server, Network Dictionary
 @subsection DICT Server
 
-DICT $B$H$O!"(B@sc{RFC 2229} $B$GDj5A$5$l$F$$$k<-=q8!:w$N$?$a$N%W%m%H%3%k$G$9!#(B
+DICT とは、@sc{RFC 2229} で定義されている辞書検索のためのプロトコルです。
 
-@subsubheading DICT $B%5!<%P$N=`Hw(B
+@subsubheading DICT サーバの準備
 
-DICT $B%5!<%P$H$7$F!"(B@uref{http://www.dict.org, DICT $B%W%m%8%'%/%H(B} $B$K$h$j(B 
-dictd $B$,8x3+$5$l$F$$$^$9!#ImB0$N%I%-%e%a%s%H$r;2>H$7$F!"%$%s%9%H!<%k!"(B
-$B5Z$S@_Dj$r9T$J$C$F2<$5$$!#(B
+DICT サーバとして、@uref{http://www.dict.org, DICT プロジェクト} により 
+dictd が公開されています。附属のドキュメントを参照して、インストール、
+及び設定を行なって下さい。
 
-@subsubheading DICT $B%5!<%P$NMxMQ(B
+@subsubheading DICT サーバの利用
 
-$BNc$($P<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+例えば次のように設定して下さい。
 
 @example
 (setq lookup-search-agents '((ndict "dict.org")))
@@ -989,264 +989,264 @@ dictd $B$,8x3+$5$l$F$$$^$9!#ImB0$N%I%-%e%a%s%H$r;2>H$7$F!"%$%s%9%H!<%k!"(B
 @node Miscellaneous Dictionary,  , Network Dictionary, Dictionary Setup
 @section Miscellaneous Dictionary
 
-Lookup $B$G$OB>$K$b!"<!$N$h$&$JFC<l$J8!:w%(!<%8%'%s%H$,I8=`$GMxMQ2DG=$G$9!#(B
-$B9%$_$K1~$8$F=`Hw$r@0$($F2<$5$$!#(B
+Lookup では他にも、次のような特殊な検索エージェントが標準で利用可能です。
+好みに応じて準備を整えて下さい。
 
 @menu
 * ndnmz agent::                 Namazu
-* ndkks agent::                 $BF|K\8l$NFI$_$rD4$Y$k(B
-* ndspell agent::               $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
-* ndcookie agent::              $B:#F|$N1?@*$r%A%'%C%/$9$k(B
+* ndkks agent::                 日本語の読みを調べる
+* ndspell agent::               スペルチェックとスペル検索
+* ndcookie agent::              今日の運勢をチェックする
 @end menu
 
 @node ndnmz agent, ndkks agent, Miscellaneous Dictionary, Miscellaneous Dictionary
 @subsection 
 
 @node ndkks agent, ndspell agent, ndnmz agent, Miscellaneous Dictionary
-@subsection $BF|K\8l$NFI$_$rD4$Y$k(B
+@subsection 日本語の読みを調べる
 
-`ndkks' $B$O!"F|K\8l$N4A;z$NFI$_$rD4$Y$k$?$a$N8!:w%(!<%8%'%s%H$G$9!#4A;z$r(B
-$B4^$`8!:w8l$,;XDj$5$l$?>l9g!"4A;z$+$JJQ49%W%m%0%i%`(B KAKASI $B$rMQ$$$F$=$N(B
-$BFI$_$rD4$Y$^$9!#(B
+`ndkks' は、日本語の漢字の読みを調べるための検索エージェントです。漢字を
+含む検索語が指定された場合、漢字かな変換プログラム KAKASI を用いてその
+読みを調べます。
 
-$B4A;z$N4^$^$l$k8!:w8l$r;XDj$7$?>l9g!"4A;z$+$JJQ49%W%m%0%i%`(B KAKASI $B$rMQ$$(B
-$B$F$=$NFI$_$rD4$Y$FI=<($7$^$9!#(B
+漢字の含まれる検索語を指定した場合、漢字かな変換プログラム KAKASI を用い
+てその読みを調べて表示します。
 
-KAKASI $B$O<!$N$H$3$m$+$i(B @file{kakasi-2.2.5.tar.gz}($BK\BN%U%!%$%k(B)$B$H(B
-@file{kakasidict.940620.gz}($B<-=q%U%!%$%k(B)$B$NL>>N$GF~<j2DG=$G$9!#(B
+KAKASI は次のところから @file{kakasi-2.2.5.tar.gz}(本体ファイル)と
+@file{kakasidict.940620.gz}(辞書ファイル)の名称で入手可能です。
 
 @example
 @url{ftp://sunsite.sut.ac.jp/pub/asia-info/japanese-src/packages/}
 @end example
 
-$B<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndkks)))
 @end lisp
 
 @node ndspell agent, ndcookie agent, ndkks agent, Miscellaneous Dictionary
-@subsection $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
+@subsection スペルチェックとスペル検索
 
-`ndspell' $B$O!"(BLookup $B$G%9%Z%k%A%'%C%/$r9T$J$&$?$a$N8!:w%(!<%8%'%s%H$G$9!#(B
-$B$b$78!:w8l$rIaDL$K8!:w$7$F2?$b8+IU$+$i$J$+$C$?>l9g!"%9%Z%k%A%'%C%/$r(B
-$B9T$J$C$F$+$i$b$&0lEY:F8!:w$r;n$_$^$9!#(B
+`ndspell' は、Lookup でスペルチェックを行なうための検索エージェントです。
+もし検索語を普通に検索して何も見付からなかった場合、スペルチェックを
+行なってからもう一度再検索を試みます。
 
-ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(BIspell $B$O(B
-$BBPOC7?$N%9%Z%k%A%'%C%/%3%^%s%I$G!"(Bgrep $B$O8@$o$:$HCN$l$?(B UNIX $B%D!<%k$G$9!#(B
-$B$I$A$i$b(B GNU $B$N(B FTP $B%5%$%H$J$I$+$iF~<j2DG=$G$9!#(B
+ndspell は外部コマンドとして Ispell と grep を利用しています。Ispell は
+対話型のスペルチェックコマンドで、grep は言わずと知れた UNIX ツールです。
+どちらも GNU の FTP サイトなどから入手可能です。
 
 @example
 @url{ftp://ftp.gnu.org/pub/GNU/}
 @end example
 
-$B$3$N%(!<%8%'%s%H$OC1FH$G$OMQ$$$:$K!"B>$N<-=q$HAH$_9g$o$;$F!"Nc$($P(B
-$B<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+このエージェントは単独では用いずに、他の辞書と組み合わせて、例えば
+次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndic "/usr/local/dict") (ndspell)))
 @end lisp
 
 @node ndcookie agent,  , ndspell agent, Miscellaneous Dictionary
-@subsection $B:#F|$N1?@*$r%A%'%C%/$9$k(B
+@subsection 今日の運勢をチェックする
 
-`ndcookie' $B$O!"8!:w;~$K(B cookie $B%U%!%$%k(B($B0zMQ=8(B)$B$+$i0l6gH4$-=P$7$FI=<($9$k(B
-$B$?$a$N8!:w%(!<%8%'%s%H$G$9!#(B@code{fortune} $B%W%m%0%i%`$HF1MM$NF/$-$r$7$^$9!#(B
+`ndcookie' は、検索時に cookie ファイル(引用集)から一句抜き出して表示する
+ための検索エージェントです。@code{fortune} プログラムと同様の働きをします。
 
-$BMxMQ=PMh$k%U%!%$%k$NNc$H$7$F$O!"(BEmacs $B$KImB0$N(B Zippy $B%U%!%$%k$,$"$j$^$9!#(B
-$B<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+利用出来るファイルの例としては、Emacs に附属の Zippy ファイルがあります。
+次のように設定して下さい。
 
 @lisp
 (setq lookup-search-agents '((ndcookie "yow.lines")))
 @end lisp
 
 @node How to Lookup, Advanced Features, Dictionary Setup, Top
-@chapter $B$=$l$G$O8!:w$7$F$_$h$&(B
+@chapter それでは検索してみよう
 
-$B$3$N>O$G$O!"(BLookup $B$N%$%s%9%H!<%k8e$K9T$J$o$J$1$l$P$J$i$J$$@_Dj9`L\$K$D(B
-$B$$$F@bL@$7$^$9!#%W%m%0%i%`$N%$%s%9%H!<%k$K$D$$$F$O!"(BLookup $BG[I[J*$KImB0(B
-$B$N%U%!%$%k(B INSTALL $B$r;2>H$7$F2<$5$$!#@_Dj8e$N99$J$k%+%9%?%^%$%:$K$D$$$F(B
-$B$O!"(B@ref{Customization} $B$r;2>H$7$F2<$5$$!#(B
+この章では、Lookup のインストール後に行なわなければならない設定項目につ
+いて説明します。プログラムのインストールについては、Lookup 配布物に附属
+のファイル INSTALL を参照して下さい。設定後の更なるカスタマイズについて
+は、@ref{Customization} を参照して下さい。
 
 @menu
-* Setup Dictionary::            $B<-=q$N=`Hw$r@0$($k(B
-* Setup Agent::                 $B<-=q$K9g$o$;$F@_Dj$9$k(B
-* Setup Command::               $B?7$7$$8!:w%3%^%s%I$r:n$k(B
-* Setup Others::                $B$=$NB>$N<g$J@_Dj9`L\(B
-* Setup Example::               $B=i4|2=%U%!%$%k$N@_DjNc(B
-* Setup Variables::             $B%;%C%H%"%C%WJQ?t0lMw(B
-* Setup Functions::             $B%;%C%H%"%C%W4X?t0lMw(B
+* Setup Dictionary::            辞書の準備を整える
+* Setup Agent::                 辞書に合わせて設定する
+* Setup Command::               新しい検索コマンドを作る
+* Setup Others::                その他の主な設定項目
+* Setup Example::               初期化ファイルの設定例
+* Setup Variables::             セットアップ変数一覧
+* Setup Functions::             セットアップ関数一覧
 @end menu
 
 @node Setup Dictionary, Setup Agent, How to Lookup, How to Lookup
-@section $B<-=q$N=`Hw$r@0$($k(B
+@section 辞書の準備を整える
 
-Lookup $B$G$O!"0J2<$N<-=q$NMxMQ$r%5%]!<%H$7$F$$$^$9!#<+J,$NMxMQ$7$?$$<-=q(B
-$B$r3NG'$7!"$=$l$>$l$N2<=`Hw$r@0$($F2<$5$$!#(B
+Lookup では、以下の辞書の利用をサポートしています。自分の利用したい辞書
+を確認し、それぞれの下準備を整えて下さい。
 
 @node Setup Agent, Setup Command, Setup Dictionary, How to Lookup
-@section $B<-=q$K9g$o$;$F@_Dj$9$k(B
+@section 辞書に合わせて設定する
 
 @menu
-* Setup Basis::                 $B4pK\E*$J@_DjJ}K!(B
-* Setup Option::                $B3F<o%*%W%7%g%s$N@_Dj(B
-* Setup Restriction::           $BMxMQ$9$k<-=q$N@)8B(B
-* Setup Package::               $BJd=u%Q%C%1!<%8$NMxMQ(B
+* Setup Basis::                 基本的な設定方法
+* Setup Option::                各種オプションの設定
+* Setup Restriction::           利用する辞書の制限
+* Setup Package::               補助パッケージの利用
 @end menu
 
 @node Setup Basis, Setup Option, Setup Agent, Setup Agent
-@subsection $B4pK\E*$J@_DjJ}K!(B
+@subsection 基本的な設定方法
 
-Lookup $B$rMxMQ$9$k$K$O!"$^$:;O$a$K<-=q$H$ND>@\$N%$%s%?!<%U%'!<%9$H$J$k(B
-@dfn{$B8!:w%(!<%8%'%s%H(B} $B$rA*$VI,MW$,$"$j$^$9!#MxMQ=PMh$k8!:w%(!<%8%'%s%H(B
-$B$O(B @ref{Search Agents} $B$K0lMw$,$"$k$N$G!"$=$A$i$r;2>H$7$F$I$l$rMQ$$$k$+(B
-$B7h$a$F2<$5$$!#(B
+Lookup を利用するには、まず始めに辞書との直接のインターフェースとなる
+@dfn{検索エージェント} を選ぶ必要があります。利用出来る検索エージェント
+は @ref{Search Agents} に一覧があるので、そちらを参照してどれを用いるか
+決めて下さい。
 
 @vindex lookup-search-agents
-$BMQ$$$k%(!<%8%'%s%H$,7h$^$l$P!"JQ?t(B @code{lookup-search-agents} $B$r@_Dj$7(B
-$B$^$9!#$3$l$O%(!<%8%'%s%H$N@_Dj$N%j%9%H$G!"%j%9%H$N3FMWAG$O<!$N7A<0$r<h$j(B
-$B$^$9!#(B
+用いるエージェントが決まれば、変数 @code{lookup-search-agents} を設定し
+ます。これはエージェントの設定のリストで、リストの各要素は次の形式を取り
+ます。
 
 @lisp
 (@var{class} @var{location} [@var{option}...])
 @end lisp
 
-@var{class} $B$K$O!"%(!<%8%'%s%H$N<oN`$r%7%s%\%k$G;XDj$7$^$9!#$3$l$O(B
-@code{ndic} $B$H$+(B @code{ndtp} $B$H$+8@$&%(!<%8%'%s%H$NL>A0$=$N$b$N$G$9!#(B
+@var{class} には、エージェントの種類をシンボルで指定します。これは
+@code{ndic} とか @code{ndtp} とか言うエージェントの名前そのものです。
 
-@var{location} $B$K$O!"<-=q$N=j:_$rJ8;zNs$K$h$jI=$7$^$9!#2?$r;XDj$9$Y$-$+(B
-$B$OMxMQ$9$k%(!<%8%'%s%H$K$h$j0[$J$k$N$G!"$=$l$>$l$N%(!<%8%'%s%H$K$D$$$F$N(B
-$B@bL@$r;2>H$7$F2<$5$$!#$3$l$O>JN,2DG=$J>l9g$b$"$j$^$9!#(B
+@var{location} には、辞書の所在を文字列により表します。何を指定すべきか
+は利用するエージェントにより異なるので、それぞれのエージェントについての
+説明を参照して下さい。これは省略可能な場合もあります。
 
-@var{option} $B$O!"%(!<%8%'%s%H$KBP$9$k>JN,2DG=$J%*%W%7%g%s$G$9!#$3$l$O(B
-$B%Q%i%a!<%?$rL>A0IU$-$GM?$($k$?$a$N$b$N$G!"%?%0$H$J$k%7%s%\%k$H!"CM$H$J$k(B
-$BG$0U$N%*%V%8%'%/%H$H$N(B cons $B$K$h$C$FI=$o$7$^$9!#$$$/$D$G$b;XDj$G$-$^$9!#(B
+@var{option} は、エージェントに対する省略可能なオプションです。これは
+パラメータを名前付きで与えるためのもので、タグとなるシンボルと、値となる
+任意のオブジェクトとの cons によって表わします。いくつでも指定できます。
 
-$B6qBNE*$JNc$r5s$2$^$7$g$&!#Nc$($P!"<!$N@_Dj$G$O!"(B
+具体的な例を挙げましょう。例えば、次の設定では、
 
 @lisp
 (ndtp "dserver" :port 2010 :account "user@@domain")
 @end lisp
 @noindent
-$B%(!<%8%'%s%H$N<oN`$O(B @code{ndtp}$B!"<-=q$N=j:_$O(B @code{"dserver"} $B$G!"(B
-$B%*%W%7%g%s(B @code{:port} $B$KCM(B @code{2010} $B$r!"%*%W%7%g%s(B @code{:account} $B$K(B
-$BCM(B @code{"user@@domain"} $B$r$=$l$>$l;XDj$7$F$$$^$9!#(B
+エージェントの種類は @code{ndtp}、辞書の所在は @code{"dserver"} で、
+オプション @code{:port} に値 @code{2010} を、オプション @code{:account} に
+値 @code{"user@@domain"} をそれぞれ指定しています。
 
-$B3F%(!<%8%'%s%H$G6qBNE*$K2?$r@_Dj$9$Y$-$+$O!"$=$l$>$l$N%(!<%8%'%s%H$K$D$$(B
-$B$F$N@bL@$r;2>H$7$F2<$5$$!#%*%W%7%g%s$K$D$$$F$O!"$9$Y$F$N%(!<%8%'%s%H$G6&(B
-$BDL$K;H$($k$b$N$b$"$j$^$9!#(B@ref{Agent Options} $B$r;2>H$7$F2<$5$$!#(B
+各エージェントで具体的に何を設定すべきかは、それぞれのエージェントについ
+ての説明を参照して下さい。オプションについては、すべてのエージェントで共
+通に使えるものもあります。@ref{Agent Options} を参照して下さい。
 
-$B>e$N$h$&$J@_Dj$r!"MxMQ$9$k%(!<%8%'%s%H$N?t$@$1JB$Y$?$b$N$,!"<B:]$N(B
-@code{lookup-search-agents} $B$NCM$H$J$j$^$9!#Nc$($P0l$D$NE57?E*$JNc$H$7$F!"(B
-$B<!$N$h$&$J@_Dj$,9M$($i$l$k$G$7$g$&!#(B
+上のような設定を、利用するエージェントの数だけ並べたものが、実際の
+@code{lookup-search-agents} の値となります。例えば一つの典型的な例として、
+次のような設定が考えられるでしょう。
 
 @lisp
-;; $B%[%9%H(B dserver $B$G(B NDTP $B%5!<%P$,F0$$$F$*$j!"(B
-;; $B%9%Z%k%A%'%C%/$N5!G=$rM-8z$H$9$k>l9g!#(B
+;; ホスト dserver で NDTP サーバが動いており、
+;; スペルチェックの機能を有効とする場合。
 (setq lookup-search-agents
       '((ndtp "dserver") (ndspell)))
 @end lisp
 
 @node Setup Option, Setup Restriction, Setup Basis, Setup Agent
-@subsection $B3F<o%*%W%7%g%s$N@_Dj(B
+@subsection 各種オプションの設定
 
-$B@h$N@a$G$O!"%(!<%8%'%s%H$K%*%W%7%g%s$r;XDj$9$k$d$jJ}$K$D$$$F@bL@$7$^$7$?(B
-$B$,!"%*%W%7%g%s$O<-=q$K$b@_Dj$9$k$3$H$,2DG=$G$9!#<B:]!"(BLookup $B$N%(!<%8%'(B
-$B%s%H$d<-=q$O$[$H$s$I!"2?$i$+$N%*%W%7%g%s;XDj$K$h$C$F%+%9%?%^%$%:$5$l$k$h(B
-$B$&$K$J$C$F$$$^$9!#%*%W%7%g%s$N@_Dj$O:#8e$$$m$$$m$J>lLL$G=P$F$/$k$N$G!"$3(B
-$B$3$G0lEY>\$7$/@bL@$7$F$*$-$^$9!#(B
+先の節では、エージェントにオプションを指定するやり方について説明しました
+が、オプションは辞書にも設定することが可能です。実際、Lookup のエージェ
+ントや辞書はほとんど、何らかのオプション指定によってカスタマイズされるよ
+うになっています。オプションの設定は今後いろいろな場面で出てくるので、こ
+こで一度詳しく説明しておきます。
 
-@cindex $B%*%W%7%g%s(B
-Lookup $B$G(B @dfn{$B%*%W%7%g%s(B} $B$H$O!"L>A0IU$-%Q%i%a!<%?$N$3$H$r0UL#$7$^$9!#(B
-$B$D$^$jFCDj$N%7%s%\%k$r%?%0$H$7$F!"$=$l$KBP1~$5$;$k7A$GCM$r@_Dj$7$^$9!#(B
-$B$3$l$OE57?E*$K$O!"(B@code{(@var{key} . @var{value})} $B$H$$$&(B cons $B$N7A$G(B
-$BI=8=$5$l$^$9!#(B
+@cindex オプション
+Lookup で @dfn{オプション} とは、名前付きパラメータのことを意味します。
+つまり特定のシンボルをタグとして、それに対応させる形で値を設定します。
+これは典型的には、@code{(@var{key} . @var{value})} という cons の形で
+表現されます。
 
 @vindex lookup-dictionary-options-alist
-$B@hDx$O%(!<%8%'%s%H$N%*%W%7%g%s$H$7$F!"(B@code{lookup-search-agents} $B$K(B
-$B%*%W%7%g%s$N(B cons $B$N%j%9%H$r@_Dj$7$^$7$?$,!"<-=q$N>l9g$K$OJQ?t(B 
-@code{lookup-dictionary-options-alist} $B$rMQ$$$k$3$H$,=PMh$^$9!#(B
+先程はエージェントのオプションとして、@code{lookup-search-agents} に
+オプションの cons のリストを設定しましたが、辞書の場合には変数 
+@code{lookup-dictionary-options-alist} を用いることが出来ます。
 
-$BNc$($P<-=q$K%*%W%7%g%s(B @code{:title} $B$r@_Dj$9$k$3$H$r9M$($F$_$^$7$g$&!#(B
-$B$3$l$O<-=q$N%?%$%H%k$rJQ99$9$k$?$a$N6&DL%*%W%7%g%s$G$9!#<!$N$h$&$K$7$^$9!#(B
+例えば辞書にオプション @code{:title} を設定することを考えてみましょう。
+これは辞書のタイトルを変更するための共通オプションです。次のようにします。
 
 @lisp
 (setq lookup-dictionary-options-alist
-      '(("ndtp+dserver:KOKUGO" ':title "$B9q8l<-E5(B")
-        ("ndeb+/cdrom:EIWA" ':title "$B1QOB<-E5(B")
-        ("ndeb+/cdrom:WAEI" ':title "$BOB1Q<-E5(B")))
+      '(("ndtp+dserver:KOKUGO" ':title "国語辞典")
+        ("ndeb+/cdrom:EIWA" ':title "英和辞典")
+        ("ndeb+/cdrom:WAEI" ':title "和英辞典")))
 @end lisp
 
-$B@h$N%(!<%8%'%s%H!&%*%W%7%g%s$N@_DjK!$H$h$/;w$F$$$k$N$,$o$+$k$H;W$$$^$9!#(B
-$B<-=q$rFCDj$9$k$?$a$K!"<-=q(BID(@pxref{Quick Startup})$B$rJ8;zNs$G;XDj$7$F$$(B
-$B$^$9!#(B
+先のエージェント・オプションの設定法とよく似ているのがわかると思います。
+辞書を特定するために、辞書ID(@pxref{Quick Startup})を文字列で指定してい
+ます。
 
 @findex lookup-set-dictionary-option
-$B$7$+$7$3$NJ}K!$G$O!"@_Dj$,A}$($F$/$k$H!"$4$A$c$4$A$c$H$7$F>/!9$o$+$j$E$i(B
-$B$/$J$C$F$7$^$$$^$9!#$=$3$G<B:]$N%*%W%7%g%s@_Dj$N$?$a$KJXMx$J4X?t(B
-@code{lookup-set-dictionary-option} $B$rMQ0U$7$F$$$^$9!#$3$N4X?t$O4V@\E*$K(B
-@code{lookup-dictionary-options-alist} $B$r=q$-49$($^$9!#<BMQ>e$O$3$N4X?t(B
-$B$rMxMQ$7!"(B@code{lookup-dictionary-options-alist} $B$OD>@\$KJQ99$7$J$$J}$,(B
-$B$$$$$G$7$g$&!#>e$NNc$O!"<!$N<0$HEy2A$K$J$j$^$9!#(B
+しかしこの方法では、設定が増えてくると、ごちゃごちゃとして少々わかりづら
+くなってしまいます。そこで実際のオプション設定のために便利な関数
+@code{lookup-set-dictionary-option} を用意しています。この関数は間接的に
+@code{lookup-dictionary-options-alist} を書き換えます。実用上はこの関数
+を利用し、@code{lookup-dictionary-options-alist} は直接に変更しない方が
+いいでしょう。上の例は、次の式と等価になります。
 
 @lisp
-(lookup-set-dictionary-option "ndtp+dserver:KOKUGO" ':title "$B9q8l<-E5(B")
-(lookup-set-dictionary-option "ndeb+/cdrom:EIWA" ':title "$B1QOB;~E@(B")
-(lookup-set-dictionary-option "ndeb+/cdrom:WAEI" ':title "$BOB1Q<-E5(B")
+(lookup-set-dictionary-option "ndtp+dserver:KOKUGO" ':title "国語辞典")
+(lookup-set-dictionary-option "ndeb+/cdrom:EIWA" ':title "英和時点")
+(lookup-set-dictionary-option "ndeb+/cdrom:WAEI" ':title "和英辞典")
 @end lisp
 
-$B$?$@$7!"$3$l$O4X?t$J$N$G!"(BLookup $B$N%W%m%0%i%`!&%U%!%$%k$r%m!<%I$7$F$+$i(B
-$B$G$J$$$HMxMQ=PMh$^$;$s!#$=$3$G%W%m%0%i%`$N%m!<%ID>8e$K@_Dj$,40N;$9$k$h$&!"(B
-Lookup $B@lMQ$N=i4|2=%U%!%$%k(B @file{~/.lookup} $B$rMQ$$$k$3$H$,=PMh$^$9!#$3(B
-$B$l$O8e$G$^$?>\$7$/@bL@$7$^$9!#(B(@pxref{Setup Example})
+ただし、これは関数なので、Lookup のプログラム・ファイルをロードしてから
+でないと利用出来ません。そこでプログラムのロード直後に設定が完了するよう、
+Lookup 専用の初期化ファイル @file{~/.lookup} を用いることが出来ます。こ
+れは後でまた詳しく説明します。(@pxref{Setup Example})
 
 @vindex lookup-default-dictionary-options
-$B$^$?!"A4$F$N<-=q$KBP$7$F%G%U%)%k%H$N%*%W%7%g%s$r@_Dj$9$k$?$a$K!"JQ?t(B 
-@code{lookup-default-dictionary-options} $B$,MxMQ=PMh$^$9!#%*%W%7%g%s$N(B
-cons $B$r%j%9%H$K$7$FJB$Y$^$9!#Nc$($P<!$N$h$&$K@_Dj$9$l$P!"C18l$N8lHx$r(B
-$B<h$j=|$/=hM}$r%G%U%)%k%H$G9T$J$&$h$&$K$J$j$^$9!#(B
+また、全ての辞書に対してデフォルトのオプションを設定するために、変数 
+@code{lookup-default-dictionary-options} が利用出来ます。オプションの
+cons をリストにして並べます。例えば次のように設定すれば、単語の語尾を
+取り除く処理をデフォルトで行なうようになります。
 
 @lisp
 (setq lookup-default-dictionary-options
       '((:stemmer .  stem-english)))
 @end lisp
 
-$BA4$F$N<-=q$KBP$7$F$G$O$J$/!"$"$kFCDj$N%(!<%8%'%s%H$K$@$1%G%U%)%k%H$r@_Dj(B
-$B$7$?$$$3$H$b$"$j$^$9!#$3$l$OC1=c$K!"<-=q%*%W%7%g%s$r%(!<%8%'%s%H!&%*%W%7%g(B
-$B%s$HF1$8$KJB$Y$k$@$1$G$9!#<-=q%*%W%7%g%s$,;XDj$5$l$J$+$C$?>l9g!"<!$K%(!<(B
-$B%8%'%s%H!&%*%W%7%g%s$+$iF1$8$b$N$,C5$7=P$5$l$^$9!#$?$@$7(B @code{:title} $B$N(B
-$B@_Dj$J$I!"6&M-$,L50UL#$J$b$N$K$D$$$F$O$=$N8B$j$G$O$"$j$^$;$s!#(B
+全ての辞書に対してではなく、ある特定のエージェントにだけデフォルトを設定
+したいこともあります。これは単純に、辞書オプションをエージェント・オプショ
+ンと同じに並べるだけです。辞書オプションが指定されなかった場合、次にエー
+ジェント・オプションから同じものが探し出されます。ただし @code{:title} の
+設定など、共有が無意味なものについてはその限りではありません。
 
 @vindex lookup-agent-options-alist
 @findex lookup-set-agent-option
 @vindex lookup-default-agent-options
-$B<-=q%*%W%7%g%s$HF1MM$K!"%(!<%8%'%s%H!&%*%W%7%g%s$N$?$a$K$b@_DjMQ$NJQ?t!&(B
-$B4X?t$,MQ0U$5$l$F$$$^$9!#$=$l$>$l(B @code{lookup-agent-options-alist}$B!"(B
-@code{lookup-set-agent-option}$B!"(B@code{lookup-default-agent-options} $B$G$9!#(B
-$BNc$($P<-=q$rL58z2=$9$k$K$O!"<!$N$h$&$K=q$/$3$H$b=PMh$^$9!#(B
+辞書オプションと同様に、エージェント・オプションのためにも設定用の変数・
+関数が用意されています。それぞれ @code{lookup-agent-options-alist}、
+@code{lookup-set-agent-option}、@code{lookup-default-agent-options} です。
+例えば辞書を無効化するには、次のように書くことも出来ます。
 
 @lisp
 (setq lookup-search-agents '((agent "location")))
 (lookup-set-agent-option "agent+location" ':disable '("KOKUGO" "WAEI"))
 @end lisp
 
-$B$J$*!"%*%W%7%g%s@_Dj$NM%@h=g0L$O<!$NDL$j$G$9!#(B
+なお、オプション設定の優先順位は次の通りです。
 
 @itemize @bullet
-@item $B<-=q%*%W%7%g%s(B
+@item 辞書オプション
 @enumerate
 @item
 lookup-dictionary-options-alist
 @item
 lookup-default-dictionary-options
 @item
-$B%(!<%8%'%s%H!&%*%W%7%g%s$+$i7QB3$7$F8!:w(B
+エージェント・オプションから継続して検索
 @end enumerate
 
-@item $B%(!<%8%'%s%H!&%*%W%7%g%s(B
+@item エージェント・オプション
 @enumerate 4
 @item
-lookup-search-agents $B@_Dj;~$N%*%W%7%g%s(B
+lookup-search-agents 設定時のオプション
 @item
 lookup-agent-options-alist
 @item
@@ -1255,271 +1255,271 @@ lookup-default-agent-options
 @end itemize
 
 @node Setup Restriction, Setup Package, Setup Option, Setup Agent
-@subsection $BMxMQ$9$k<-=q$N@)8B(B
+@subsection 利用する辞書の制限
 
-$BJQ?t(B @code{lookup-search-agents} $B$G@_Dj$5$l$?%(!<%8%'%s%H$ODL>o!"(BLookup 
-$B$N5/F0$HF1;~$KA4$F=i4|2=$5$l!"$=$3$K4^$^$l$kA4$F$N<-=q$,MxMQ$5$l$k$b$N$H(B
-$B$7$FA*Br$5$l$^$9!#$7$+$7>l9g$K$h$C$F$O!"$=$N$&$A0lIt$N<-=q$7$+I,MW$H$7$J(B
-$B$$$3$H$b$"$k$+$b$7$l$^$;$s!#%(!<%8%'%s%H$K<!$N6&DL%*%W%7%g%s$rM?$($k$3$H(B
-$B$G!"$"$i$+$8$aM-8z$H$9$k<-=q$r@)8B$9$k$3$H$,=PMh$^$9!#(B
+変数 @code{lookup-search-agents} で設定されたエージェントは通常、Lookup 
+の起動と同時に全て初期化され、そこに含まれる全ての辞書が利用されるものと
+して選択されます。しかし場合によっては、そのうち一部の辞書しか必要としな
+いこともあるかもしれません。エージェントに次の共通オプションを与えること
+で、あらかじめ有効とする辞書を制限することが出来ます。
 
 @table @code
 @item :enable
-$BM-8z$H$9$k<-=qL>$N%j%9%H!#(B
+有効とする辞書名のリスト。
 @item :disable
-$BL58z$H$9$k<-=qL>$N%j%9%H!#(B
+無効とする辞書名のリスト。
 @end table
 
-$BNc$($P!"$"$k%(!<%8%'%s%H$,;0$D$N<-=q(B @samp{KOKUGO}, @samp{EIWA},
-@samp{WAEI} $B$r;}$C$F$$$k$H$7$^$7$g$&!#$3$NFb(B @samp{EIWA} $B$@$1$r(B
-$BM-8z$K$7$?$$$N$G$"$l$P!"<!$N$h$&$K@_Dj$7$^$9!#(B
+例えば、あるエージェントが三つの辞書 @samp{KOKUGO}, @samp{EIWA},
+@samp{WAEI} を持っているとしましょう。この内 @samp{EIWA} だけを
+有効にしたいのであれば、次のように設定します。
 
 @lisp
 (agent "location" :enable ("EIWA"))
 @end lisp
 
-$B$"$k$$$O(B
+あるいは
 
 @lisp
 (agent "location" :disable ("KOKUGO" "WAEI"))
 @end lisp
 
-$B$3$3$G;XDj$9$Y$-<-=qL>$O!"(B@kbd{M-x lookup} $B$H$7$FI=<($5$l$k<-=q0lMw$N(B
-$B%P%C%U%!$+$iCN$k$3$H$,=PMh$^$9(B(@pxref{Quick Startup})$B!#:G=i$K%*%W%7%g%s(B
-$B$J$7$G5/F0$7$F4^$^$l$k<-=q$r3NG'$7!"8e$+$i@_Dj$rJQ99$9$k$H$h$$$G$7$g$&!#(B
+ここで指定すべき辞書名は、@kbd{M-x lookup} として表示される辞書一覧の
+バッファから知ることが出来ます(@pxref{Quick Startup})。最初にオプション
+なしで起動して含まれる辞書を確認し、後から設定を変更するとよいでしょう。
 
-$B$"$k$$$O!"L58z$K$O$7$?$/$J$$$,!"LGB?$KMQ$$$J$$$H$$$&<-=q$b$"$k$+$b$7$l$^(B
-$B$;$s!#>e$HF1MM$K!"<!$N6&DL%*%W%7%g%s$rM?$($k$3$H$G!"<-=q$N=i4|A*Br>uBV$r(B
-$BJQ$($k$3$H$,=PMh$^$9!#(B
+あるいは、無効にはしたくないが、滅多に用いないという辞書もあるかもしれま
+せん。上と同様に、次の共通オプションを与えることで、辞書の初期選択状態を
+変えることが出来ます。
 
 @table @code
 @item :select
-$BA*Br$9$k<-=qL>$N%j%9%H!#(B
+選択する辞書名のリスト。
 @item :unselect
-$BL$A*Br$K$9$k<-=qL>$N%j%9%H!#(B
+未選択にする辞書名のリスト。
 @end table
 
-$BL$A*Br$K$5$l$?<-=q$O!"8e$+$iA*Br$9$k$3$H$GMxMQ2DG=$H$J$j$^$9!#(B
+未選択にされた辞書は、後から選択することで利用可能となります。
 (@pxref{Specify Dictionary})
 
 @node Setup Package,  , Setup Restriction, Setup Agent
-@subsection $BJd=u%Q%C%1!<%8$NMxMQ(B
+@subsection 補助パッケージの利用
 
-@cindex $BJd=u%Q%C%1!<%8(B
-Lookup $B$G$OMM!9$J<oN`$N<-=q$r07$$$^$9$,!"3F%(!<%8%'%s%H$G$OBP1~$7$-$l$J(B
-$B$$<-=qKh$N:Y$+$JD4@0$r9T$J$&$?$a$K!"(B@dfn{$BJd=u%Q%C%1!<%8(B} $B$H$$$&$b$N$,Mx(B
-$BMQ=PMh$^$9!#$3$l$O<-=q$K8GM-$N@_Dj$r$^$H$a$?@_Dj%U%!%$%k=8$G$9!#(B
+@cindex 補助パッケージ
+Lookup では様々な種類の辞書を扱いますが、各エージェントでは対応しきれな
+い辞書毎の細かな調整を行なうために、@dfn{補助パッケージ} というものが利
+用出来ます。これは辞書に固有の設定をまとめた設定ファイル集です。
 
-$BJd=u%Q%C%1!<%8$,$J$/$H$b8!:w$K;Y>c$O$"$j$^$;$s$,!"$=$l$rMQ$$$k$3$H$G=PNO(B
-$B$,$h$j8+$d$9$/@07A$5$l$?$j!"ITB-$9$k@_Dj$,Jd$o$l$?$j$H!";H$$>!<j$,NI$/$J(B
-$B$k$3$H$O4|BT=PMh$^$9!#(B
+補助パッケージがなくとも検索に支障はありませんが、それを用いることで出力
+がより見やすく整形されたり、不足する設定が補われたりと、使い勝手が良くな
+ることは期待出来ます。
 
-$B$$$/$D$+$N<-=q$KBP1~$7$?Jd=u%Q%C%1!<%8$,(B Lookup $B$N%[!<%`%Z!<%8$KMQ0U$5$l(B
-$B$F$$$k$N$G!"<+J,$N<-=q$KBP1~$7$?$b$N$,$J$$$+C5$7$F$_$F2<$5$$(B
-(@pxref{How To Get})$B!#(B
-$B$b$74|BT$N$b$N$,8+IU$+$l$P!"<!$N$h$&$K$7$F=`Hw$7$F2<$5$$!#(B
+いくつかの辞書に対応した補助パッケージが Lookup のホームページに用意され
+ているので、自分の辞書に対応したものがないか探してみて下さい
+(@pxref{How To Get})。
+もし期待のものが見付かれば、次のようにして準備して下さい。
 
-@cindex $B%Q%C%1!<%8!&%G%#%l%/%H%j(B
-@cindex $B%Q%C%1!<%8L>(B
-$B$^$:!"Jd=u%Q%C%1!<%8$rE,Ev$J%G%#%l%/%H%j$KE83+$7$F2<$5$$!#E83+$9$k(B
-$B%G%#%l%/%H%j$r0J2<$G$O(B @dfn{$B%Q%C%1!<%8!&%G%#%l%/%H%j(B} $B$H8F$S$^$9!#(B
-$B%Q%C%1!<%8$rE83+$9$k$H%G%#%l%/%H%j$,0l$D@8@.$5$l$^$9$,!"Cf$N%U%!%$%k$r(B
-$B%Q%C%1!<%8!&%G%#%l%/%H%j$K0\F0$7$F$b9=$$$^$;$s!#(B
-$B$^$?!"@8@.$5$l$?%G%#%l%/%H%j$NL>A0$r(B @dfn{$B%Q%C%1!<%8L>(B} $B$H8F$S$^$9!#(B
+@cindex パッケージ・ディレクトリ
+@cindex パッケージ名
+まず、補助パッケージを適当なディレクトリに展開して下さい。展開する
+ディレクトリを以下では @dfn{パッケージ・ディレクトリ} と呼びます。
+パッケージを展開するとディレクトリが一つ生成されますが、中のファイルを
+パッケージ・ディレクトリに移動しても構いません。
+また、生成されたディレクトリの名前を @dfn{パッケージ名} と呼びます。
 
-$B<!$K!"=i4|2=%U%!%$%k(B(@file{~/.lookup}; @pxref{Setup Example}) $B$G(B
-$B<!$N$h$&$K@_Dj$7$^$9!#(B
+次に、初期化ファイル(@file{~/.lookup}; @pxref{Setup Example}) で
+次のように設定します。
 
 @lisp
-;; $B%Q%C%1!<%8!&%G%#%l%/%H%j$N@_Dj(B
+;; パッケージ・ディレクトリの設定
 (setq lookup-package-directory "/your/package/directory")
 
-;; $B!X<-!&E5!&HW(B97$B!Y$N%Q%C%1!<%8MxMQ(B
+;; 『辞・典・盤97』のパッケージ利用
 (lookup-use-package "ndeb+/cdrom" "jitenban97")
 @end lisp
 
 @vindex lookup-package-directory
 @findex lookup-use-package
-$BJQ?t(B @code{lookup-package-directory} $B$K$h$j%Q%C%1!<%8!&%G%#%l%/%H%j$r(B
-$B@_Dj$7$^$9!#(B@code{lookup-use-package} $B$K$h$j%Q%C%1!<%8$NFI$_9~$_$r(B
-$B9T$J$$$^$9!#Bh0l0z?t$O%(!<%8%'%s%H(BID$B!"BhFs0z?t$O%Q%C%1!<%8L>$G$9!#(B
+変数 @code{lookup-package-directory} によりパッケージ・ディレクトリを
+設定します。@code{lookup-use-package} によりパッケージの読み込みを
+行ないます。第一引数はエージェントID、第二引数はパッケージ名です。
 
-@code{lookup-use-package} $B$OFbItE*$K$O!"(B@ref{Setup Option} $B$G@bL@$7$?(B
-$B@_DjMQ4X?t(B @code{lookup-set-agent-option} $B$H(B
- @code{lookup-set-dictionary-option} $B$rMQ$$$F%*%W%7%g%s@_Dj$r9T$J$C$F$$$k(B
-$B$@$1$G$9!#=>$C$F0lEY%Q%C%1!<%8$rFI$_9~$s$@8e$G$b!"$3$l$i$N4X?t$rMQ$$$F(B
-$B99$K@_Dj$r>e=q$-$9$k$3$H$d!"F1$8%(!<%8%'%s%H$KJL$N%Q%C%1!<%8$r=E$M$F(B
-$BE,MQ$9$k$3$H$b2DG=$G$9!#(B
+@code{lookup-use-package} は内部的には、@ref{Setup Option} で説明した
+設定用関数 @code{lookup-set-agent-option} と
+ @code{lookup-set-dictionary-option} を用いてオプション設定を行なっている
+だけです。従って一度パッケージを読み込んだ後でも、これらの関数を用いて
+更に設定を上書きすることや、同じエージェントに別のパッケージを重ねて
+適用することも可能です。
 
-$B<j;}$A$N<-=q$N%Q%C%1!<%8$,B8:_$7$J$$>l9g!"$=$l$r<+J,$G:n$k$3$H$b=PMh$^$9!#(B
+手持ちの辞書のパッケージが存在しない場合、それを自分で作ることも出来ます。
 (@pxref{Supplement Package})
 
 @node Setup Command, Setup Others, Setup Agent, How to Lookup
-@section $B?7$7$$8!:w%3%^%s%I$r:n$k(B
+@section 新しい検索コマンドを作る
 
-$B4{B8$N%=!<%9$r;29M$K$7$F$/$@$5$$!#$b$7J,$+$i$J$$$3$H$,$"$l$P!"(B
-$B%a%$%j%s%0%j%9%H(B ( @email{lookup-ja@@ring.gr.jp} ) 
-$B$K<ALd$7$F$_$k$H$h$$$+$b$7$l$^$;$s!#(B
+既存のソースを参考にしてください。もし分からないことがあれば、
+メイリングリスト ( @email{lookup-ja@@ring.gr.jp} ) 
+に質問してみるとよいかもしれません。
 
 @node Setup Others, Setup Example, Setup Command, How to Lookup
-@section $B$=$NB>$N<g$J@_Dj9`L\(B
+@section その他の主な設定項目
 
 @menu
-* Setup Query Expansion::       $B3HD%8!:w$N=`Hw(B
+* Setup Query Expansion::       拡張検索の準備
 @end menu
 
 @node Setup Query Expansion,  , Setup Others, Setup Others
-@subsection $B3HD%8!:w$N=`Hw(B
+@subsection 拡張検索の準備
 
-$BF|:"$+$i8!:w$r$7$F$$$k$H!"F~NO$N$A$g$C$H$7$?8m$j$/$i$$$O<+F0E*$K=$@5$7$F(B
-$B8!:w$r9T$J$C$F$/$l$k$HM-$jFq$/;W$$$^$9!#(BLookup $B$K$O!"F~NO$5$l$?8!:w8l$r(B
-$BJd@5$9$k$?$a$N$$$/$D$+$N5!G=$,Hw$o$C$F$$$^$9!#(B
+日頃から検索をしていると、入力のちょっとした誤りくらいは自動的に修正して
+検索を行なってくれると有り難く思います。Lookup には、入力された検索語を
+補正するためのいくつかの機能が備わっています。
 
 @menu
-* Stemming::                    $BC18l$N8lHx$r<h$j=|$/(B
-* Spell Checking::              $B%9%Z%k%A%'%C%/$r9T$J$&(B
-* Kanji-Kana Expansion::        $B4A;z$R$i$,$J3HD%8!:w(B
-* Universal Query Expansion::   $BG$0U$N3HD%8!:w(B
+* Stemming::                    単語の語尾を取り除く
+* Spell Checking::              スペルチェックを行なう
+* Kanji-Kana Expansion::        漢字ひらがな拡張検索
+* Universal Query Expansion::   任意の拡張検索
 @end menu
 
 @node Stemming, Spell Checking, Setup Query Expansion, Setup Query Expansion
-@subsubheading $BC18l$N8lHx$r<h$j=|$/(B
+@subsubheading 単語の語尾を取り除く
 
-$B1Q8l$J$I$G!"C18l$NJ#?t7A$d2a5n7A$J$I$KIU$/M>J,$JJ8;zNs$r<h$j=|$-!"867?$r(B
-$B?dB,$9$k$?$a$N=hM}$r(B @dfn{stemming} $B$H$$$$$^$9!#$3$l$,=PMh$k$H!"J8;zNs$N(B
-$B=$@5$J$7$K8!:w$r9T$J$($k$N$GJXMx$G$9!#(BLookup $B$G$O!"<-=q%*%W%7%g%s(B 
-@code{:stemmer} $B$r;XDj$9$k$3$H$G!"(Bstemming $B$r9T$J$&$h$&@_Dj=PMh$^$9!#(B
+英語などで、単語の複数形や過去形などに付く余分な文字列を取り除き、原型を
+推測するための処理を @dfn{stemming} といいます。これが出来ると、文字列の
+修正なしに検索を行なえるので便利です。Lookup では、辞書オプション 
+@code{:stemmer} を指定することで、stemming を行なうよう設定出来ます。
 
-$B%*%W%7%g%s(B @code{:stemmer} $B$K$O!"(Bstemming $B$r9T$J$&4X?t$r;XDj$7$^$9!#I8=`(B
-$B$G$O!"1QC18lMQ$N(B stemming $B4X?t(B @code{stem-english} $B$,Hw$($i$l$F$$$^$9!#(B
-$B<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+オプション @code{:stemmer} には、stemming を行なう関数を指定します。標準
+では、英単語用の stemming 関数 @code{stem-english} が備えられています。
+次のように設定して下さい。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':stemmer 'stem-english)
 @end lisp
 
-$B$3$l$G;XDj$7$?<-=q$+$i8!:w$r9T$J$&$H$-$K$O!"(Bstemming $B$,9T$J$o$l$k$h$&$K(B
-$B$J$j$^$9!#6qBNE*$K$O!"<!$N<j=g$G8!:w$5$l$^$9!#(B
+これで指定した辞書から検索を行なうときには、stemming が行なわれるように
+なります。具体的には、次の手順で検索されます。
 
 @enumerate
 @item
-$B85$N8!:w8l$G8!:w$9$k!#(B
+元の検索語で検索する。
 
-$B;O$a$OF~NO$r$=$N$^$^8!:w$7$^$9!#$=$l$G8+IU$+$l$P2?$bLdBj$"$j$^$;$s!#(B
-
-@item
-$B@_Dj$5$l$?(B stemming $B4X?t$G867?$r?dB,$9$k!#(B
-
-stemming $B4X?t$O!"J8;zNs$r<u$1<h$C$F$=$N867?$N8uJd$N%j%9%H$rJV$7$^$9!#(B
-Lookup $B$O8uJd$N$=$l$>$l$K$D$$$F!"<-=q$+$iC18l$,8+IU$+$k$^$G8!:w$r7+$jJV(B
-$B$7$^$9!#8!:w8l$,C1=c$JJ#?t7A$d2a5n7A$r$7$F$$$l$P!"0lEY$N$d$jD>$7$G7k2L$K(B
-$B$?$I$jIU$1$k$O$:$G$9!#(B
+始めは入力をそのまま検索します。それで見付かれば何も問題ありません。
 
 @item
-$B6&DL$N8lF,$r;}$C$?;w$?C18l$rC5$7=P$9!#(B
+設定された stemming 関数で原型を推測する。
 
-$BNc$($P!"(B@samp{lexicographer} $B$H$$$&8l$O:\$C$F$$$J$$$,!"(B
-@samp{lexicography} $B$J$i:\$C$F$$$k$H$$$&<-=q$,$"$k$+$b$7$l$^$;$s!#(B
-stemming $B$G$O$=$N$h$&$J%1!<%9$KBP1~$9$k$3$H$O=PMh$^$;$s$,!";29MDxEY$K$=(B
-$B$N>pJs$r<($7$F$/$l$k$H?F@Z$G$9!#$=$3$G!"$"$kDxEY$N8lD9$r;}$D8l$r8!:w$7$?(B
-$B>l9g$K8B$C$F!"(BLookup $B$O6&DL8lF,$r;}$D8l$N8!:w$KD)@o$7$^$9!#(B
+stemming 関数は、文字列を受け取ってその原型の候補のリストを返します。
+Lookup は候補のそれぞれについて、辞書から単語が見付かるまで検索を繰り返
+します。検索語が単純な複数形や過去形をしていれば、一度のやり直しで結果に
+たどり付けるはずです。
+
+@item
+共通の語頭を持った似た単語を探し出す。
+
+例えば、@samp{lexicographer} という語は載っていないが、
+@samp{lexicography} なら載っているという辞書があるかもしれません。
+stemming ではそのようなケースに対応することは出来ませんが、参考程度にそ
+の情報を示してくれると親切です。そこで、ある程度の語長を持つ語を検索した
+場合に限って、Lookup は共通語頭を持つ語の検索に挑戦します。
 @end enumerate
 
-$B$3$l$G$b2?$b8+IU$+$i$J$1$l$P8!:w$rD|$a$^$9!#$=$N>l9g!"Fs2s$+;02s$N8!:w=h(B
-$BM}$,L5BL$K$J$j$^$9$,!"1s3VCO$N<-=q%5!<%P$K%"%/%;%9$7$F$$$k$N$G$b$J$$8B$j!"(B
-$B$3$l$OBg$7$?%3%9%H$G$O$"$j$^$;$s!#$h$C$F$"$i$+$8$a873J$J%9%Z%k%A%'%C%/$r(B
-$B9T$J$&$h$j$b!"$3$NJ}<0$rMQ$$$kJ}$,!"8zN(E*$K<+F0Jd@5$r9T$J$($^$9!#(B
+これでも何も見付からなければ検索を諦めます。その場合、二回か三回の検索処
+理が無駄になりますが、遠隔地の辞書サーバにアクセスしているのでもない限り、
+これは大したコストではありません。よってあらかじめ厳格なスペルチェックを
+行なうよりも、この方式を用いる方が、効率的に自動補正を行なえます。
 
 @node Spell Checking, Kanji-Kana Expansion, Stemming, Setup Query Expansion
-@subsubheading $B%9%Z%k%A%'%C%/$r9T$J$&(B
+@subsubheading スペルチェックを行なう
 
-$B8lHx$@$1$NLdBj$G$O$J$/!"DV$j$=$N$b$N$r4V0c$($?$N$G$O2?$b8+IU$+$j$^$;$s!#(B
-$B$=$3$G8!:w8l$N%9%Z%k%A%'%C%/$r9T$J$$!"$=$N>e$G8!:w$r9T$J$&5!G=$,M_$7$/$J(B
-$B$j$^$9!#(B
+語尾だけの問題ではなく、綴りそのものを間違えたのでは何も見付かりません。
+そこで検索語のスペルチェックを行ない、その上で検索を行なう機能が欲しくな
+ります。
 
-Lookup $B$N%9%Z%k%A%'%C%/5!G=$O!"8!:w%(!<%8%'%s%H(B `ndspell' $B$H$7$F<B8=$5$l(B
-$B$F$$$^$9(B(@pxref{ndspell})$B!#(B@code{lookup-search-agents} $B$N@_Dj$K$*$$$F!"(B
-$B%j%9%H$K(B ndspell $B$r2C$($k$3$H$G%9%Z%k%A%'%C%/$,9T$J$o$l$k$h$&$K$J$j$^$9!#(B
+Lookup のスペルチェック機能は、検索エージェント `ndspell' として実現され
+ています(@pxref{ndspell})。@code{lookup-search-agents} の設定において、
+リストに ndspell を加えることでスペルチェックが行なわれるようになります。
 
-$B$3$3$G%j%9%H$N$I$N0LCV$K(B ndspell $B$r2C$($k$+$,LdBj$H$J$j$^$9!#(Bndspell $B$r(B
-$BCV$/0LCV$rJQ$($k$3$H$G!"%9%Z%k%A%'%C%/$r9T$J$&%?%$%_%s%0$rJQ$($k$3$H$,(B
-$B2DG=$G$9!#(B
+ここでリストのどの位置に ndspell を加えるかが問題となります。ndspell を
+置く位置を変えることで、スペルチェックを行なうタイミングを変えることが
+可能です。
 
-$B%j%9%H$N:G=i$K(B ndspell $B$rCV$/$H!"$$$-$J$j%9%Z%k%A%'%C%/$r;O$a$^$9!#%9%Z(B
-$B%k%_%9$,$"$^$j$K$bB?$/!"%9%Z%k%A%'%C%/$r$7$F$+$i8!:w$r;O$a$?$$$H$$$&?M$K(B
-$B$O!"$3$NJ}K!$,8~$$$F$$$k$+$b$7$l$^$;$s!#(B
+リストの最初に ndspell を置くと、いきなりスペルチェックを始めます。スペ
+ルミスがあまりにも多く、スペルチェックをしてから検索を始めたいという人に
+は、この方法が向いているかもしれません。
 
-$B$7$+$7!"8!:w$NEY$KKh2s%9%Z%k%A%'%C%/$r9T$J$&$H$$$&$N$O8zN(E*$G$O$"$j$^$;(B
-$B$s!#$=$3$G(B ndspell $B$r%j%9%H$N:G8e$KCV$/$3$H$G!"$^$:B>$N<-=q$G0lEY8!:w$r(B
-$B9T$J$$!"$=$l$G$b2?$b8+IU$+$i$J$+$C$?$H$-$N$_!"(Bndspell $B$G%9%Z%k%A%'%C%/$r(B
-$B9T$J$&$h$&$K$9$k$3$H$,=PMh$^$9!#(Bndspell $B$O!"$=$N$h$&$JMxMQ$rA[Dj$7$F:n$i(B
-$B$l$F$$$^$9!#(B
+しかし、検索の度に毎回スペルチェックを行なうというのは効率的ではありませ
+ん。そこで ndspell をリストの最後に置くことで、まず他の辞書で一度検索を
+行ない、それでも何も見付からなかったときのみ、ndspell でスペルチェックを
+行なうようにすることが出来ます。ndspell は、そのような利用を想定して作ら
+れています。
 
-$B$b$7$I$&$7$F$b%9%Z%k%A%'%C%/$r9T$J$$$?$$$H$$$&$3$H$,$"$l$P!"(BEntry $B%P%C%U%!(B
-$B$G(B @kbd{g} $B$r2!$7$F:F8!:w$r9T$J$&$3$H$G!"(Bndspell $B$K%9%Z%k%A%'%C%/$r6/@)(B
-$B$9$k$3$H$b2DG=$G$9!#$h$j>\$7$/$O!"(B@ref{ndspell} $B$r;2>H$7$F2<$5$$!#(B
+もしどうしてもスペルチェックを行ないたいということがあれば、Entry バッファ
+で @kbd{g} を押して再検索を行なうことで、ndspell にスペルチェックを強制
+することも可能です。より詳しくは、@ref{ndspell} を参照して下さい。
 
 @node Kanji-Kana Expansion, Universal Query Expansion, Spell Checking, Setup Query Expansion
-@subsubheading $B4A;z$R$i$,$J3HD%8!:w$N=`Hw(B
+@subsubheading 漢字ひらがな拡張検索の準備
 
-$B<-=q$K$h$C$F$O!"4A;z$r4^$`8!:w8l$rMQ$$$F8!:w$9$k$3$H$,$G$-$:!"4A;z$r$R$i(B
-$B$,$J$KJQ49$9$kI,MW$,$"$k>l9g$,$"$j$^$9!#<-=q%*%W%7%g%s(B :hiragana $B$r@_Dj(B
-$B$9$k$H!"$3$N$h$&$J<-=q$r2wE,$K8!:w$9$k$3$H$,$G$-$^$9!#(B
+辞書によっては、漢字を含む検索語を用いて検索することができず、漢字をひら
+がなに変換する必要がある場合があります。辞書オプション :hiragana を設定
+すると、このような辞書を快適に検索することができます。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':hiragana t)
 @end lisp
 
-$B4A;z$R$i$,$J3HD%8!:w$r9T$&$h$&$K@_Dj$9$k$H!"<!$N$h$&$JF0:n$r9T$$$^$9!#(B
+漢字ひらがな拡張検索を行うように設定すると、次のような動作を行います。
 
 @enumerate
 @item
-$B85$N8!:w8l$G8!:w$9$k!#(B
+元の検索語で検索する。
 
-$B;O$a$OF~NO$r$=$N$^$^8!:w$7$^$9!#$=$l$G8+IU$+$l$P2?$bLdBj$"$j$^$;$s!#(B
-
-@item
-$B4A;zNs$r$R$i$,$JNs$KJQ49$7!"F@$i$l$?$R$i$,$JNs$r8!:w8l$H$7$F:F8!:w$r9T$&!#(B
+始めは入力をそのまま検索します。それで見付かれば何も問題ありません。
 
 @item
-$BF@$i$l$?%(%s%H%j$r!"4A;zNs$rMQ$$$F%U%#%k%?%j%s%0$9$k!#(B
+漢字列をひらがな列に変換し、得られたひらがな列を検索語として再検索を行う。
+
+@item
+得られたエントリを、漢字列を用いてフィルタリングする。
 @end enumerate
 
-$B4A;z$R$i$,$J3HD%8!:w5!G=$rMxMQ$9$k$?$a$K$O!"(BKAKASI $B$,%$%s%9%H!<%k$5$l$F(B
-$B$$$kI,MW$,$"$j$^$9!#(B@xref{ndkks prepare}.
+漢字ひらがな拡張検索機能を利用するためには、KAKASI がインストールされて
+いる必要があります。@xref{ndkks prepare}.
 
 @node Universal Query Expansion,  , Kanji-Kana Expansion, Setup Query Expansion
-@subsubheading $BG$0U$N3HD%8!:w(B
+@subsubheading 任意の拡張検索
 
-$B<-=q$N@-<A$K$h$C$F$O!"%f!<%6!<$,G$0U$NCV$-49$($rDj5A$7$?$$>l9g$,$"$k$+$b(B
-$BCN$l$^$;$s!#$=$N$h$&$J>l9g$K$O!"(B:expander $B%*%W%7%g%s$H(B :expand-filter $B%*(B
-$B%W%7%g%s$,MxMQ$G$-$^$9!#(B
+辞書の性質によっては、ユーザーが任意の置き換えを定義したい場合があるかも
+知れません。そのような場合には、:expander オプションと :expand-filter オ
+プションが利用できます。
 
-$BNc$($P!"<!$N$h$&$J@_Dj$,$G$-$^$9!#(B
+例えば、次のような設定ができます。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expander 'foo-expander)
 (lookup-set-dictionary-option "agent:DICT" ':expand-filter 'foo-filter)
 @end lisp
 
-$B$?$@$7!"(B@code{foo-expander} $B$O!"J8;zNs$r<h$j!"J8;zNs$N%j%9%H$rJV$94X?t$G(B
-$B$J$1$l$P$J$j$^$;$s!#$^$?!"(B@code{foo-filter} $B$O!"J8;zNs$H%(%s%H%j$N%j%9%H(B
-$B$r<h$j!"%(%s%H%j$N%j%9%H$rJV$94X?t$G$J$1$l$P$J$j$^$;$s!#(B
+ただし、@code{foo-expander} は、文字列を取り、文字列のリストを返す関数で
+なければなりません。また、@code{foo-filter} は、文字列とエントリのリスト
+を取り、エントリのリストを返す関数でなければなりません。
 
-$B$3$N$h$&$K@_Dj$9$k$H!"(BLookup $B$O0J2<$N$h$&$J8!:w=hM}$r9T$$$^$9!#(B
+このように設定すると、Lookup は以下のような検索処理を行います。
 
 @enumerate
 @item
-$B85$N8!:w8l$G8!:w$9$k!#(B
+元の検索語で検索する。
 
 @item
-$B8!:w8l$r(B @code{foo-expander} $B$K$h$C$FCV49$7$F:F8!:w$r9T$&!#(B
+検索語を @code{foo-expander} によって置換して再検索を行う。
 
 @item
-$BF@$i$l$?%(%s%H%j$r!"(B@code{foo-filter} $B$rMQ$$$F%U%#%k%?%j%s%0$9$k!#(B
+得られたエントリを、@code{foo-filter} を用いてフィルタリングする。
 @end enumerate
 
-$BA0@a$G@bL@$7$?4A;z$R$i$,$J3HD%8!:w5!G=$O!"<!$N$h$&$J@_Dj$HF1CM$G$9!#(B
+前節で説明した漢字ひらがな拡張検索機能は、次のような設定と同値です。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expander 'lookup-kanji-get-readings)
@@ -1527,69 +1527,69 @@ Lookup $B$N%9%Z%k%A%'%C%/5!G=$O!"8!:w%(!<%8%'%s%H(B `ndspell' $B$H$7$F<B8=$5$
 @end lisp
 
 @node Setup Example, Setup Variables, Setup Others, How to Lookup
-@section $B=i4|2=%U%!%$%k$N@_DjNc(B
+@section 初期化ファイルの設定例
 
 @vindex lookup-init-file
-$B0J2<$O!"(BLookup $B$N6qBNE*$J@_DjNc$G$9!#@_Dj$O$9$Y$F(B @file{~/.emacs} $B$G9T$J(B
-$B$&$3$H$b2DG=$G$9$,!"@lMQ$N=i4|2=%U%!%$%k$H$7$F(B @code{lookup-init-file}
-(@file{~/.lookup}) $B$,(B Lookup $B5/F0;~$KFI$_9~$^$l$k$N$G!"$3$l$rMQ$$$k$3$H(B
-$B$K$7$^$9!#(B
+以下は、Lookup の具体的な設定例です。設定はすべて @file{~/.emacs} で行な
+うことも可能ですが、専用の初期化ファイルとして @code{lookup-init-file}
+(@file{~/.lookup}) が Lookup 起動時に読み込まれるので、これを用いること
+にします。
 
 @menu
-* Initialization::              $B=i4|2=%W%m%;%9$N35MW(B
-* ~/.emacs::                    @file{~/.emacs} $B$N@_Dj(B
-* ~/.lookup::                   @file{~/.lookup} $B$N@_Dj(B
-* site-start.el::               $B%5%$%HKh$N6&DL@_Dj(B
+* Initialization::              初期化プロセスの概要
+* ~/.emacs::                    @file{~/.emacs} の設定
+* ~/.lookup::                   @file{~/.lookup} の設定
+* site-start.el::               サイト毎の共通設定
 @end menu
 
 @node Initialization, ~/.emacs, Setup Example, Setup Example
-@subsection $B=i4|2=%W%m%;%9$N35MW(B
+@subsection 初期化プロセスの概要
 
-$B$^$:(B Lookup $B$N<B9T2aDx$K$D$$$FBg$^$+$K@bL@$7$^$9!#(B
+まず Lookup の実行過程について大まかに説明します。
 
 @enumerate
 @item
-Emacs $B$N5/F0(B
+Emacs の起動
 @item
-@file{~/.emacs} $B$NFI$_9~$_(B
+@file{~/.emacs} の読み込み
 @item
-Lookup $B$N5/F0(B
+Lookup の起動
 @item
-Lookup $B%W%m%0%i%`!&%U%!%$%k(B(@file{*.elc})$B$NFI$_9~$_(B
+Lookup プログラム・ファイル(@file{*.elc})の読み込み
 @item
-Lookup $B=i4|2=%U%!%$%k(B(@file{~/.lookup})$B$NFI$_9~$_(B ($BB8:_$9$l$P(B)
+Lookup 初期化ファイル(@file{~/.lookup})の読み込み (存在すれば)
 @item
-@code{lookup-load-hook} $B$N<B9T(B
+@code{lookup-load-hook} の実行
 @item
-Lookup $B=i4|2=3+;O(B
+Lookup 初期化開始
 @end enumerate
 
-$B$3$N$h$&$K(B Lookup $B$N%W%m%0%i%`!&%U%!%$%k$O(B @file{~/.emacs} $B$h$j$b8e$+$i(B
-$BFI$_9~$^$l$k$?$a!"$3$l$^$G@bL@$7$?%*%W%7%g%s$d%Q%C%1!<%8$N@_DjMQ4X?t$r(B
-$BMQ$$$k$K$O!"DL>o!"<!$N$$$:$l$+$NJ}K!$rMQ$$$^$9!#(B
+このように Lookup のプログラム・ファイルは @file{~/.emacs} よりも後から
+読み込まれるため、これまで説明したオプションやパッケージの設定用関数を
+用いるには、通常、次のいずれかの方法を用います。
 
 @enumerate
 @item
-@file{~/.lookup} $B$rMQ$$$k!#(B
+@file{~/.lookup} を用いる。
 
-$B$3$l$,0lHV!"IaDL$N$d$jJ}$G$9!#(B@file{~/.lookup} $B$rMxMQ$9$l$P!"(B
-$BM>7W$J$3$H$r5$$K$;$:$KA4$F$N@_Dj$r9T$J$($^$9!#(B
+これが一番、普通のやり方です。@file{~/.lookup} を利用すれば、
+余計なことを気にせずに全ての設定を行なえます。
 
 @item
 @vindex lookup-load-hook
-@code{lookup-load-hook} $B$rMQ$$$k!#(B
+@code{lookup-load-hook} を用いる。
 
-$B%5%$%H$G6&DL$N@_Dj$r9T$J$&$h$&$J>l9g!"(B@file{~/.lookup} $B$rMQ$$$k$o$1$K$O(B
-$B$$$-$^$;$s!#$"$k$$$O!"A4$F$r(B @file{~/.emacs} $B$G9T$&$H$$$&%]%j%7!<$N?M$b(B
-$B$$$k$+$b$7$l$^$;$s!#$=$N$h$&$JL\E*$N$?$a$K!"(B@file{~/.lookup} $B$HF1MM$N(B
-$B%?%$%_%s%0$G=i4|2=$r9T$J$&$?$a$N(B hook @code{lookup-load-hook} $B$rMQ$$$k(B
-$B$3$H$,=PMh$^$9!#<!$N$h$&$K$7$^$9!#(B
+サイトで共通の設定を行なうような場合、@file{~/.lookup} を用いるわけには
+いきません。あるいは、全てを @file{~/.emacs} で行うというポリシーの人も
+いるかもしれません。そのような目的のために、@file{~/.lookup} と同様の
+タイミングで初期化を行なうための hook @code{lookup-load-hook} を用いる
+ことが出来ます。次のようにします。
 
 @lisp
-;; load-hook $B$N@_Dj(B
+;; load-hook の設定
 (add-hook 'lookup-load-hook 'init-lookup)
 
-;; Lookup $B$N@_DjFbMF(B
+;; Lookup の設定内容
 (defun init-lookup ()
   (setq lookup-search-agents '((agent) ...))
   (lookup-set-agent-option "agent" ':key 'value)
@@ -1599,17 +1599,17 @@ Lookup $B=i4|2=3+;O(B
 @end enumerate
 
 @node ~/.emacs, ~/.lookup, Initialization, Setup Example
-@subsection @file{~/.emacs} $B$N@_Dj(B
+@subsection @file{~/.emacs} の設定
 
-@file{~/.lookup} $B$rMQ$$$k$K$7$F$b!"%-!<%P%$%s%I$N@_DjEy!"$$$/$D$+$N$b$N$O(B
-@file{~/.emacs} $B$G9T$J$&$3$H$,I,MW$G$9!#0J2<$K$=$NNc$r<($7$^$9!#(B
+@file{~/.lookup} を用いるにしても、キーバインドの設定等、いくつかのものは
+@file{~/.emacs} で行なうことが必要です。以下にその例を示します。
 
 @lisp
 ;;;
 ;;; Lookup
 ;;;
 
-;; $B%-!<%P%$%s%I$H%*!<%H%m!<%I$N@_Dj(B
+;; キーバインドとオートロードの設定
 (define-key ctl-x-map "l" 'lookup)
 (define-key ctl-x-map "y" 'lookup-region)
 (define-key ctl-x-map "\C-y" 'lookup-pattern)
@@ -1617,274 +1617,274 @@ Lookup $B=i4|2=3+;O(B
 (autoload 'lookup-region "lookup" nil t)
 (autoload 'lookup-pattern "lookup" nil t)
 
-;; $B<+:n%3%^%s%I$rMxMQ$9$k>l9g(B
+;; 自作コマンドを利用する場合
 (define-key help-map "\C-e" 'english-search-pattern)
 (autoload 'english-search-pattern "lookup" nil t)
 
-;; $B=i4|2=%U%!%$%k$rJQ99$9$k>l9g(B
+;; 初期化ファイルを変更する場合
 (setq lookup-init-file "~/.lookup")
 @end lisp
 
 @node ~/.lookup, site-start.el, ~/.emacs, Setup Example
-@subsection @file{~/.lookup} $B$N@_Dj(B
+@subsection @file{~/.lookup} の設定
 
-@file{~/.lookup} $B$G<-=q$N@_Dj$r9T$J$$$^$9!#$3$l$^$G@bL@$7$?DL$j$G$9!#(B
+@file{~/.lookup} で辞書の設定を行ないます。これまで説明した通りです。
 
 @lisp
 ;;; .lookup --- setup for Lookup                -*- emacs-lisp -*-
 
-;; $B8!:w%(!<%8%'%s%H$N@_Dj(B
+;; 検索エージェントの設定
 (setq lookup-search-agents '((ndeb "/cdrom") (ndspell)))
 
-;; $BJd=u%Q%C%1!<%8$NFI$_9~$_(B
+;; 補助パッケージの読み込み
 (setq lookup-package-directory "~/emacs/lookup/packages")
 (lookup-use-package "ndeb+/cdrom" "mydict")
 
-;; $B%*%W%7%g%s$N@_Dj(B
-(lookup-set-dictionary-option "ndeb+/cdrom:EIWA" ':title "$B1QOB<-E5(B")
+;; オプションの設定
+(lookup-set-dictionary-option "ndeb+/cdrom:EIWA" ':title "英和辞典")
 
-;; $B30;zMxMQ$N@_Dj(B
+;; 外字利用の設定
 (setq lookup-use-bitmap t)
 
 ;;; .lookup ends here
 @end lisp
 
 @node site-start.el,  , ~/.lookup, Setup Example
-@subsection $B%5%$%HKh$N6&DL@_Dj(B
+@subsection サイト毎の共通設定
 
-Lookup $B$N@_Dj$r%5%$%H$G6&M-$9$k$N$G$"$l$P!"(B@file{site-start.el} $B%U%!%$%k(B
-$B$K@_Dj$r2C$($^$9!#<!$N$h$&$J46$8$K$9$l$P$$$$$G$7$g$&!#(B
+Lookup の設定をサイトで共有するのであれば、@file{site-start.el} ファイル
+に設定を加えます。次のような感じにすればいいでしょう。
 
 @lisp
 ;;;
 ;;; Lookup Site Start
 ;;;
 
-;; $B%*!<%H%m!<%I$N@_Dj(B
+;; オートロードの設定
 (autoload 'lookup "lookup" nil t)
 (autoload 'lookup-region "lookup" nil t)
 (autoload 'lookup-pattern "lookup" nil t)
 
-;; load-hook $B$N@_Dj(B
+;; load-hook の設定
 (add-hook 'lookup-load-hook 'site-start-lookup)
 
 (defun site-start-lookup ()
-  ;; $B8!:w%(!<%8%'%s%H$N@_Dj(B
+  ;; 検索エージェントの設定
   (setq lookup-search-agents '((ndtp "dserver")))
 
-  ;; $BJd=u%Q%C%1!<%8$N@_Dj(B
+  ;; 補助パッケージの設定
   (setq lookup-package-directory "/net/share/emacs/lookup/packages")
   (lookup-use-package "ndtp+dserver" "ourdict")
   )
 @end lisp
 
 @node Setup Variables, Setup Functions, Setup Example, How to Lookup
-@section $B%;%C%H%"%C%WJQ?t0lMw(B
+@section セットアップ変数一覧
 
 @table @asis
 @item @code{lookup-init-file}
-Lookup $B$N=i4|2=%U%!%$%kL>!#%G%U%)%k%H$O(B @file{~/.lookup}$B!#(B
-$B$3$N%U%!%$%k$O(B @file{lookup.el} $B$N%m!<%ID>8e$KFI$_9~$^$l$k!#(B
+Lookup の初期化ファイル名。デフォルトは @file{~/.lookup}。
+このファイルは @file{lookup.el} のロード直後に読み込まれる。
 
 @item @code{lookup-load-hook}
-Lookup $B$N%m!<%I40N;D>8e$K<B9T$5$l$k(B hook$B!#(B
-@code{lookup-init-file} $B$NFI$_9~$_D>8e$K<B9T$5$l$k!#(B
+Lookup のロード完了直後に実行される hook。
+@code{lookup-init-file} の読み込み直後に実行される。
 
 @item @code{lookup-search-agents}
-$B8!:w%(!<%8%'%s%H$N@_Dj$N%j%9%H!#(B
-$B%j%9%H$N3FMWAG$O<!$N7A<0$r<h$k(B:
+検索エージェントの設定のリスト。
+リストの各要素は次の形式を取る:
 
 @lisp
 (@var{class} @var{location} [@var{option}...])
 @end lisp
 
-@var{class} $B$K$O!"%(!<%8%'%s%H$N<oN`$r%7%s%\%k$G;XDj$9$k!#(B
-@var{location} $B$K$O!"%(!<%8%'%s%H$N=j:_$rJ8;zNs$G;XDj$9$k!#(B
-@var{arg} $B$O>JN,2DG=$G!"%(!<%8%'%s%H$KBP$9$kDI2C$N0z?t$r;XDj$9$k!#(B
-@var{options} $B$O>JN,2DG=$G!"F1$8$/DI2C$N%*%W%7%g%s$r;XDj$9$k!#(B
+@var{class} には、エージェントの種類をシンボルで指定する。
+@var{location} には、エージェントの所在を文字列で指定する。
+@var{arg} は省略可能で、エージェントに対する追加の引数を指定する。
+@var{options} は省略可能で、同じく追加のオプションを指定する。
 
 @lisp
-$BNc(B: (setq lookup-search-agents
+例: (setq lookup-search-agents
           '((ndtp "dserver" :port 2010)
             (ndeb "/cdrom" :enable ("EIWA"))))
 @end lisp
 
 @item @code{lookup-default-agent-options}
-$B8!:w%(!<%8%'%s%H$K%G%U%)%k%H$GM?$($k%*%W%7%g%s$N%j%9%H!#(B
-$B3F%*%W%7%g%s$O!"%?%0$H$J$k%7%s%\%k$H!"CM$H$J$kG$0U$N%*%V%8%'%/%H$H$N(B
-cons $B$K$h$C$FI=$o$9!#(B
+検索エージェントにデフォルトで与えるオプションのリスト。
+各オプションは、タグとなるシンボルと、値となる任意のオブジェクトとの
+cons によって表わす。
 
 @item @code{lookup-agent-options-alist}
-$B8!:w%(!<%8%'%s%H$N%*%W%7%g%s$r@_Dj$9$kO"A[%j%9%H!#(B
-$B3FMWAG$N(B car $B$K$O%(!<%8%'%s%H(BID(@code{"@var{class+location}"})$B$r;XDj$7!"(B
-cdr $B$K$O%*%W%7%g%s$N%j%9%H$r;XDj$9$k!#(B
+検索エージェントのオプションを設定する連想リスト。
+各要素の car にはエージェントID(@code{"@var{class+location}"})を指定し、
+cdr にはオプションのリストを指定する。
 
 @item @code{lookup-default-dictionary-options}
-$B<-=q$K%G%U%)%k%H$GM?$($k%*%W%7%g%s$N%j%9%H!#(B
-$B3F%*%W%7%g%s$O!"%?%0$H$J$k%7%s%\%k$H!"CM$H$J$kG$0U$N%*%V%8%'%/%H$H$N(B
-cons $B$K$h$C$FI=$o$9!#(B
+辞書にデフォルトで与えるオプションのリスト。
+各オプションは、タグとなるシンボルと、値となる任意のオブジェクトとの
+cons によって表わす。
 
 @item @code{lookup-dictionary-options-alist}
-$B<-=q$N%*%W%7%g%s$r@_Dj$9$kO"A[%j%9%H!#(B
-$B3FMWAG$N(B car $B$K$O<-=q(BID(@code{"@var{class+location:name}"})$B$r;XDj$7!"(B
-cdr $B$K$O%*%W%7%g%s$N%j%9%H$r;XDj$9$k!#(B
+辞書のオプションを設定する連想リスト。
+各要素の car には辞書ID(@code{"@var{class+location:name}"})を指定し、
+cdr にはオプションのリストを指定する。
 
 @item @code{lookup-package-directory}
-$BJd=u%Q%C%1!<%8$,<}$a$i$l$k%G%#%l%/%H%j!#(B
+補助パッケージが収められるディレクトリ。
 @end table
 
 @node Setup Functions,  , Setup Variables, How to Lookup
-@section $B%;%C%H%"%C%W4X?t0lMw(B
+@section セットアップ関数一覧
 
 @table @asis
 @item @code{lookup-set-agent-option} @var{id} @var{tag} @var{value}
-$B8!:w%(!<%8%'%s%H$N%*%W%7%g%s$r%;%C%H$9$k!#(B
-@var{id} $B$O%(!<%8%'%s%H(BID$B!#(B@var{tag} $B$O%*%W%7%g%s$N%?%0!#(B
-@var{value} $B$O%;%C%H$9$kCM!#(B
+検索エージェントのオプションをセットする。
+@var{id} はエージェントID。@var{tag} はオプションのタグ。
+@var{value} はセットする値。
 
 @item @code{lookup-set-dictionary-option} @var{id} @var{tag} @var{value}
-$B<-=q$N%*%W%7%g%s$r%;%C%H$9$k!#(B
-@var{id} $B$O<-=q(BID$B!#(B@var{tag} $B$O%*%W%7%g%s$N%-!<!#(B
-@code{value} $B$O%;%C%H$9$kCM!#(B
-$B$3$N4X?t$O(B @code{lookup-dictionary-options-alist} $B$NCM$r=q$-49$($k!#(B
+辞書のオプションをセットする。
+@var{id} は辞書ID。@var{tag} はオプションのキー。
+@code{value} はセットする値。
+この関数は @code{lookup-dictionary-options-alist} の値を書き換える。
 
 @item @code{lookup-use-package} @var{agent-id} @var{package-name}
-$BJd=u%Q%C%1!<%8$r%m!<%I$9$k!#(B
-@var{agent-id} $B$O!"%Q%C%1!<%8$rE,MQ$9$k%(!<%8%'%s%H(BID$B!#(B
-@var{package-name} $B$O!"%Q%C%1!<%8L>!"$"$k$$$O%Q%C%1!<%8$N@dBP%Q%9!#(B
-$B@dBP%Q%9$G$J$$>l9g!"%Q%C%1!<%8$OJQ?t(B @code{lookup-package-directory} $B$,(B
-$B<($9%G%#%l%/%H%j$KE83+$7$F$*$/I,MW$,$"$k!#(B
-$B$3$N4X?t$O(B @code{lookup-agent-options-alist} $B5Z$S(B
-@code{lookup-dictionary-options-alist} $B$NCM$r=q$-49$($k!#(B
+補助パッケージをロードする。
+@var{agent-id} は、パッケージを適用するエージェントID。
+@var{package-name} は、パッケージ名、あるいはパッケージの絶対パス。
+絶対パスでない場合、パッケージは変数 @code{lookup-package-directory} が
+示すディレクトリに展開しておく必要がある。
+この関数は @code{lookup-agent-options-alist} 及び
+@code{lookup-dictionary-options-alist} の値を書き換える。
 @end table
 
 @node Advanced Features, Customization, How to Lookup, Top
 @chapter Advanced Features
 
-$B$3$N>O$G$O!"(BLookup $B$G8!:w$r9T$J$&J}K!$K$D$$$F>\$7$/@bL@$7$^$9!#$^$?!"(B
-$BFCDj$N<-=q$+$i>pJs$rF@$k$?$a$NJ}K!$K$D$$$F$b@bL@$7$^$9!#(B
+この章では、Lookup で検索を行なう方法について詳しく説明します。また、
+特定の辞書から情報を得るための方法についても説明します。
 
 @menu
-* Startup Commands::            $B5/F0$H=*N;(B
-* Search String::               $BJ8;zNs8!:w(B
-* See Result::                  $B8!:w7k2L$ND/$aJ}(B
-* Specify Dictionary::          $BFCDj$N<-=q$rMxMQ$9$k(B
+* Startup Commands::            起動と終了
+* Search String::               文字列検索
+* See Result::                  検索結果の眺め方
+* Specify Dictionary::          特定の辞書を利用する
 @end menu
 
 @node Startup Commands, Search String, Advanced Features, Advanced Features
-@section $B5/F0$H=*N;(B
+@section 起動と終了
 
 @findex lookup
-$B:G=i$K(B Lookup $B$r5/F0$9$k$?$a$N%3%^%s%I$O(B @kbd{M-x lookup} $B$G$9!#$3$l$O(B
-$BMxMQ=PMh$k<-=q$N0lMw$r%P%C%U%!$KI=<($7!"<-=qA*Br%b!<%I$KF~$j$^$9!#$3$N(B
-$B%P%C%U%!$G$NA`:n$K$D$$$F$O!"(B@ref{Specify Dictionary} $B$r;2>H$7$F2<$5$$!#(B
+最初に Lookup を起動するためのコマンドは @kbd{M-x lookup} です。これは
+利用出来る辞書の一覧をバッファに表示し、辞書選択モードに入ります。この
+バッファでの操作については、@ref{Specify Dictionary} を参照して下さい。
 
-@kbd{M-x lookup} $B$rMQ$$$:$H$b!"<!@a$N8!:w%3%^%s%I$r$$$-$J$j<B9T$7$F$b(B
-$B9=$$$^$;$s!#0lEY8!:w$,9T$J$o$l$k$H!"(B@kbd{M-x lookup} $B$O:G8e$N8!:w7k2L$r(B
-$B:FI=<($9$k$h$&$K$J$j$^$9!#0lEY(B Lookup $B$N%&%#%s%I%&$rJD$8$?8e$G$b!"$b$&(B
-$B0lEY7k2L$r8+JV$9$N$K;H$($^$9!#(B
+@kbd{M-x lookup} を用いずとも、次節の検索コマンドをいきなり実行しても
+構いません。一度検索が行なわれると、@kbd{M-x lookup} は最後の検索結果を
+再表示するようになります。一度 Lookup のウィンドウを閉じた後でも、もう
+一度結果を見返すのに使えます。
 
 @findex lookup-suspend
-Lookup $B$rH4$1$k$?$a$N%3%^%s%I$O(B @kbd{M-x lookup-suspend} $B$G$9!#$3$l$O(B
-Lookup $B$N3F%&%#%s%I%&$r$$$C$?$sJD$8$F!"8!:w$rCfCG$7$^$9!#8!:w$r40A4$K(B
-$B$d$a$F$7$^$&$H$-$K$O!"(B@kbd{M-x lookup-exit} $B$,;H$($^$9!#$3$l$O%P%C%U%!$d(B
-$B%-%c%C%7%e$N:o=|!"%5%V%W%m%;%9$N=*N;$J$I$N:n6H$r9T$J$$$^$9!#(BLookup $B$N(B
-$B3F%P%C%U%!$G$O!"$3$l$i$N%3%^%s%I$O$=$l$>$l(B @kbd{q} $B$H(B @kbd{Q} $B$K$h$C$F(B
-$BD>@\!"$^$?$O4V@\E*$K8F$S=P$5$l$^$9!#(B
+Lookup を抜けるためのコマンドは @kbd{M-x lookup-suspend} です。これは
+Lookup の各ウィンドウをいったん閉じて、検索を中断します。検索を完全に
+やめてしまうときには、@kbd{M-x lookup-exit} が使えます。これはバッファや
+キャッシュの削除、サブプロセスの終了などの作業を行ないます。Lookup の
+各バッファでは、これらのコマンドはそれぞれ @kbd{q} と @kbd{Q} によって
+直接、または間接的に呼び出されます。
 
 @vindex lookup-save-configuration
-Lookup $B$rH4$1$?$H$-!"JQ?t(B @code{lookup-save-configuration} $B$NCM$,(B
-@code{non-nil} $B$G$"$l$P!"2hLL$,8!:w$r3+;O$7$?$H$-$N>uBV$KLa$5$l$^$9!#(B
-$B$3$l$O%G%U%)%k%H$G(B @code{t} $B$K@_Dj$5$l$F$$$^$9!#(B
+Lookup を抜けたとき、変数 @code{lookup-save-configuration} の値が
+@code{non-nil} であれば、画面が検索を開始したときの状態に戻されます。
+これはデフォルトで @code{t} に設定されています。
 
 @findex lookup-restart
-Lookup $B$N=i4|2=%U%!%$%k$r=q$-49$($?$H$-$K$O!"%3%^%s%I(B
-@kbd{M-x lookup-restart} $B$,MxMQ=PMh$^$9!#$3$l$O(B Lookup $B$r$$$C$?$s=*N;(B
-$B$5$;$?8e!"(B@file{~/.lookup} $B$rFI$_D>$7$F:F=i4|2=$r9T$J$$$^$9!#$3$l$ODL>o(B
-@kbd{R} $B$K3d$jEv$F$i$l$F$$$^$9!#(B
+Lookup の初期化ファイルを書き換えたときには、コマンド
+@kbd{M-x lookup-restart} が利用出来ます。これは Lookup をいったん終了
+させた後、@file{~/.lookup} を読み直して再初期化を行ないます。これは通常
+@kbd{R} に割り当てられています。
 
 @node Search String, See Result, Startup Commands, Advanced Features
-@section $BJ8;zNs8!:w(B
+@section 文字列検索
 
-Lookup $B$N$b$C$H$b0lHLE*$J8!:wJ}K!$O!"8!:w8l$H$J$kJ8;zNs$r;XDj$7$F8!:w$r(B
-$B9T$J$&$3$H$G$9!#0J2<!"$3$l$K$D$$$F>\$7$/@bL@$7$^$9!#(B
+Lookup のもっとも一般的な検索方法は、検索語となる文字列を指定して検索を
+行なうことです。以下、これについて詳しく説明します。
 
 @menu
-* Search Commands::             $BI8=`$N8!:w%3%^%s%I(B
-* Default Method::              $BI8=`$N8!:wJ}<0(B
-* Search Methods::              $B8!:wJ}<0$N$$$m$$$m(B
+* Search Commands::             標準の検索コマンド
+* Default Method::              標準の検索方式
+* Search Methods::              検索方式のいろいろ
 @end menu
 
 @node Search Commands, Default Method, Search String, Search String
-@subsection $BI8=`$N8!:w%3%^%s%I(B
+@subsection 標準の検索コマンド
 
-Lookup $BI8=`$N8!:w%3%^%s%I$K$O!"BeI=$7$F<!$N8^$D$N$b$N$,$"$j$^$9!#(B
+Lookup 標準の検索コマンドには、代表して次の五つのものがあります。
 
 @table @kbd
 @item M-x lookup-pattern
 @findex lookup-pattern
-$B%_%K%P%C%U%!$+$i$NF~NO$r8!:w8l$K8!:w$r3+;O$7$^$9!#(B
-$B%G%U%)%k%H$N8!:w8l$H$7$F!"%]%$%s%H0LCV$NC18l$,<h$j=P$5$l$^$9!#(B
+ミニバッファからの入力を検索語に検索を開始します。
+デフォルトの検索語として、ポイント位置の単語が取り出されます。
 
 @vindex lookup-use-kakasi
-$B$3$N;~!"JQ?t(B @code{lookup-use-kakasi} $B$NCM$,(B @code{non-nil} $B$G$"$l$P!"(B
-KAKASI $B%W%m%0%i%`$rMxMQ$7$FF|K\8l$NC18l$b$=$l$J$j$K@Z$j=P$7$^$9!#(B
-$B$3$l$O%G%U%)%k%H$G$O(B @code{nil} $B$K$J$C$F$$$^$9!#(B
+この時、変数 @code{lookup-use-kakasi} の値が @code{non-nil} であれば、
+KAKASI プログラムを利用して日本語の単語もそれなりに切り出します。
+これはデフォルトでは @code{nil} になっています。
 
-$B:G6a$N(B Emacs $B$G$"$l$P!"%G%U%)%k%H$N8!:w8l$O%_%K%P%C%U%!$G(B @kbd{M-n}
-$B$H$9$k$3$H$GJT=8$9$k$3$H$,=PMh$^$9!#(B
+最近の Emacs であれば、デフォルトの検索語はミニバッファで @kbd{M-n}
+とすることで編集することが出来ます。
 
 @item M-x lookup-region
 @findex lookup-region
-$B%j!<%8%g%s$NJ8;zNs$r8!:w8l$K8!:w$r3+;O$7$^$9!#(B
+リージョンの文字列を検索語に検索を開始します。
 
 @item M-x lookup-word
 @findex lookup-word
-$B%]%$%s%H0LCV$NC18l$r8!:w8l$K8!:w$r3+;O$7$^$9!#(B
+ポイント位置の単語を検索語に検索を開始します。
 
 @item @code{lookup-selection}
 @findex lookup-selection
-$B%^%&%9$K$h$kA*BrNN0h$r8!:w8l$K8!:w$r3+;O$7$^$9!#(B
+マウスによる選択領域を検索語に検索を開始します。
 
-$B$3$l$r%^%&%9$NE,Ev$J%\%?%s$K%P%$%s%I$7$F$*$/$H!"$=$l$r%/%j%C%/$9$k$3$H$G!"(B
-$B$=$N$H$-$N%^%&%9$K$h$kA*BrNN0h$r8!:w8l$K8!:w$r9T$J$&$3$H$,=PMh$^$9!#A*Br(B
-$BNN0h$O(B Emacs $B$N%P%C%U%!$G$"$kI,MW$O$J$/!"B>$N%"%W%j%1!<%7%g%s>e$G$"$C$F(B
-$B$b9=$$$^$;$s!#(B
+これをマウスの適当なボタンにバインドしておくと、それをクリックすることで、
+そのときのマウスによる選択領域を検索語に検索を行なうことが出来ます。選択
+領域は Emacs のバッファである必要はなく、他のアプリケーション上であって
+も構いません。
 
-$B$3$l$O%$%a!<%8$H$7$F$O!"(BX Window System $B$G$N%^%&%9$K$h$k%3%T!<!u%Z!<%9%H(B
-$B$H$h$/;w$F$$$^$9!#:G=i$K%3%T!<$7$?$$NN0h$r%^%&%9$GA*Br$7!"$=$N8e!"%3%T!<(B
-$B@h$N%P%C%U%!$GCf%\%?%s$r%/%j%C%/$9$k$3$H$G%3%T!<$O40N;$7$^$9!#$=$l$HF1MM(B
-$B$K!"<!$N$h$&$K@_Dj$7$F$*$/$3$H$G!"(BEmacs $B$N%P%C%U%!$K%Z!<%9%H$9$kBe$o$j$K!"(B
-Lookup $B$,8!:w$r9T$J$&$h$&$K$J$j$^$9!#(B
+これはイメージとしては、X Window System でのマウスによるコピー＆ペースト
+とよく似ています。最初にコピーしたい領域をマウスで選択し、その後、コピー
+先のバッファで中ボタンをクリックすることでコピーは完了します。それと同様
+に、次のように設定しておくことで、Emacs のバッファにペーストする代わりに、
+Lookup が検索を行なうようになります。
 
 @lisp
 (global-set-key [mouse-2] 'lookup-selection)
 @end lisp
 
-$B$?$@$7!"$3$&$7$F$7$^$&$H!"I8=`$N%Z!<%9%H$NF0:n$,;H$($J$/$J$C$?$j$9$k$N$G!"(B
-$B<B:]$K$OJL$N%/%j%C%/$K%P%$%s%I$7$F$*$/$H$h$$$G$7$g$&!#(B
+ただし、こうしてしまうと、標準のペーストの動作が使えなくなったりするので、
+実際には別のクリックにバインドしておくとよいでしょう。
 
 @item @code{lookup-secondary}
 @findex lookup-secondary
-$B%^%&%9$K$h$kBhFsA*BrNN0h$r8!:w8l$K8!:w$r3+;O$7$^$9!#(B
+マウスによる第二選択領域を検索語に検索を開始します。
 
-Emacs $B$N(B Secondary Selection $B$N5!G=$rMQ$$$F8!:w$r9T$J$$$^$9!#(B
-@footnote{$B8=:_!"(BXEmacs $B$G$OF0:n$7$^$;$s!#$?$V$s!#(B}
+Emacs の Secondary Selection の機能を用いて検索を行ないます。
+@footnote{現在、XEmacs では動作しません。たぶん。}
 
-@dfn{Secondary Selection} $B$H$O!"%]%$%s%H$r0\F0$5$;$k$3$H$J$/%^%&%9$G(B
-$BFCDjNN0h$rA*Br$9$k$?$a$N5!G=$G!"%G%U%)%k%H$G$O(B @kbd{M-Mouse-1} $B$K(B
-$B%P%$%s%I$5$l$F$$$^$9!#(B@inforef{Secondary Selection, , emacs}.
+@dfn{Secondary Selection} とは、ポイントを移動させることなくマウスで
+特定領域を選択するための機能で、デフォルトでは @kbd{M-Mouse-1} に
+バインドされています。@inforef{Secondary Selection, , emacs}.
 
-$B$3$l$r$&$^$/MQ$$$k$3$H$G!"%^%&%9$N%@%V%k%/%j%C%/$d%I%i%C%0$K$h$C$F(B
-$BJ8;zNs$rA*Br$9$k$@$1$G8!:w$,9T$J$($k$h$&$K$J$C$F$$$^$9!#$b$7I8=`$N(B
-$B%P%$%s%I$rCV$-49$($F$h$$$N$G$"$l$P!"<!$N$h$&$K@_Dj$7$F2<$5$$!#(B
+これをうまく用いることで、マウスのダブルクリックやドラッグによって
+文字列を選択するだけで検索が行なえるようになっています。もし標準の
+バインドを置き換えてよいのであれば、次のように設定して下さい。
 
 @lisp
 (global-set-key [M-down-mouse-1] 'lookup-secondary)
 (autoload 'lookup-secondary "lookup" nil t)
 @end lisp
 
-$B?7$?$KDj5A$9$k$N$G$"$l$P!"Nc$($P<!$N$h$&$K$7$^$9!#(B
+新たに定義するのであれば、例えば次のようにします。
 
 @lisp
 (global-set-key [S-mouse-1] 'mouse-start-secondary)
@@ -1893,13 +1893,13 @@ Emacs $B$N(B Secondary Selection $B$N5!G=$rMQ$$$F8!:w$r9T$J$$$^$9!#(B
 (autoload 'lookup-secondary "lookup" nil t)
 @end lisp
 
-$B8e<T$NNc$G$O!"(BShift $B%-!<$r2!$7$J$,$i:8$N%@%V%k%/%j%C%/$G%+!<%=%k0LCV$N(B
-$BC18l$r!"F1$8$/NN0h$r%I%i%C%0$9$k$3$H$GA*BrIt$r8!:w$9$k$h$&$K$J$j$^$9!#(B
+後者の例では、Shift キーを押しながら左のダブルクリックでカーソル位置の
+単語を、同じく領域をドラッグすることで選択部を検索するようになります。
 @end table
 
-$B$3$l$i;M$D$N%3%^%s%I$K$O99$K!"(B@samp{-full-window} $B$H(B @samp{-other-frame}
-$B$rIU2C$7$?%P%j%(!<%7%g%s$,$"$j$^$9!#$D$^$j!"A4It$G0J2<$N==8^$NI8=`8!:w(B
-$B%3%^%s%I$,MQ0U$5$l$F$$$^$9!#(B
+これら四つのコマンドには更に、@samp{-full-window} と @samp{-other-frame}
+を付加したバリエーションがあります。つまり、全部で以下の十五の標準検索
+コマンドが用意されています。
 
 @findex lookup-pattern-full-screen
 @findex lookup-pattern-other-frame
@@ -1913,527 +1913,527 @@ Emacs $B$N(B Secondary Selection $B$N5!G=$rMQ$$$F8!:w$r9T$J$$$^$9!#(B
 @findex lookup-secondary-other-frame
 @table @asis
 @item @kbd{M-x lookup-pattern}
-$B8!:w8l$rF~NO$7$F8!:w$9$k!#(B
+検索語を入力して検索する。
 @item @kbd{M-x lookup-pattern-full-screen}
-@kbd{M-x lookup-pattern} $B$HF1$8!#7k2L$r2hLLA4BN$GI=<($9$k!#(B
+@kbd{M-x lookup-pattern} と同じ。結果を画面全体で表示する。
 @item @kbd{M-x lookup-pattern-other-frame}
-@kbd{M-x lookup-pattern} $B$HF1$8!#7k2L$rJL$N%U%l!<%`$GI=<($9$k!#(B
+@kbd{M-x lookup-pattern} と同じ。結果を別のフレームで表示する。
 @item @kbd{M-x lookup-region}
-$B%j!<%8%g%s$NJ8;zNs$r8!:w8l$K8!:w$9$k!#(B
+リージョンの文字列を検索語に検索する。
 @item @kbd{M-x lookup-region-full-screen}
-@kbd{M-x lookup-region} $B$HF1$8!#7k2L$r2hLLA4BN$GI=<($9$k!#(B
+@kbd{M-x lookup-region} と同じ。結果を画面全体で表示する。
 @item @kbd{M-x lookup-region-other-frame}
-@kbd{M-x lookup-region} $B$HF1$8!#7k2L$rJL$N%U%l!<%`$GI=<($9$k!#(B
+@kbd{M-x lookup-region} と同じ。結果を別のフレームで表示する。
 @item @kbd{M-x lookup-word}
-$B%]%$%s%H0LCV$NC18l$r8!:w8l$K8!:w$9$k!#(B
+ポイント位置の単語を検索語に検索する。
 @item @kbd{M-x lookup-word-full-screen}
-@kbd{M-x lookup-word} $B$HF1$8!#7k2L$r2hLLA4BN$GI=<($9$k!#(B
+@kbd{M-x lookup-word} と同じ。結果を画面全体で表示する。
 @item @kbd{M-x lookup-word-other-frame}
-@kbd{M-x lookup-word} $B$HF1$8!#7k2L$rJL$N%U%l!<%`$GI=<($9$k!#(B
+@kbd{M-x lookup-word} と同じ。結果を別のフレームで表示する。
 @item @code{lookup-selection}
-$B%^%&%9$G$NA*BrNN0h$r8!:w8l$K8!:w$9$k!#(B
+マウスでの選択領域を検索語に検索する。
 @item @code{lookup-selection-full-screen}
-@code{lookup-selection} $B$HF1$8!#7k2L$r2hLLA4BN$GI=<($9$k!#(B
+@code{lookup-selection} と同じ。結果を画面全体で表示する。
 @item @code{lookup-selection-other-frame}
-@code{lookup-selection} $B$HF1$8!#7k2L$rJL$N%U%l!<%`$GI=<($9$k!#(B
+@code{lookup-selection} と同じ。結果を別のフレームで表示する。
 @item @code{lookup-secondary}
-Secondary Selection $B$NJ8;zNs$r8!:w8l$K8!:w$9$k!#(B
+Secondary Selection の文字列を検索語に検索する。
 @item @code{lookup-secondary-full-screen}
-@code{lookup-secondary} $B$HF1$8!#7k2L$r2hLLA4BN$GI=<($9$k!#(B
+@code{lookup-secondary} と同じ。結果を画面全体で表示する。
 @item @code{lookup-secondary-other-frame}
-@code{lookup-secondary} $B$HF1$8!#7k2L$rJL$N%U%l!<%`$GI=<($9$k!#(B
+@code{lookup-secondary} と同じ。結果を別のフレームで表示する。
 @end table
 
 @vindex lookup-frame-alist
-@samp{-other-frame} $B$H$J$C$F$$$k3F%3%^%s%I$rMQ$$$?$H$-$N%U%l!<%`$N(B
-$B%Q%i%a!<%?$O!"JQ?t(B @code{lookup-frame-alist} $B$K$h$jM?$($i$l$^$9!#(B
+@samp{-other-frame} となっている各コマンドを用いたときのフレームの
+パラメータは、変数 @code{lookup-frame-alist} により与えられます。
 
 @node Default Method, Search Methods, Search Commands, Search String
-@subsection $BI8=`$N8!:wJ}<0(B
+@subsection 標準の検索方式
 
-@cindex $BC18l8!:w(B
-@kbd{M-x lookup-pattern} $B$G8!:w$7$?$$C18l$rF~NO$7$?$j!"(B
-@kbd{M-x lookup-region} $B$J$I$G8!:w8l$r;XDj$7$?$H$-$NI8=`$N8!:wJ}<0$r(B
-@dfn{$BC18l8!:w(B} $B$H8F$S$^$9!#$3$l$O<B:]$K$O8GM-$N8!:wJ}<0$G$O$J$/$F!"(B
-$B8e=R$9$k3F<o$N8!:wJ}<0$r4V@\E*$K8F$S=P$9$?$a$N$b$N$G$9!#(B
+@cindex 単語検索
+@kbd{M-x lookup-pattern} で検索したい単語を入力したり、
+@kbd{M-x lookup-region} などで検索語を指定したときの標準の検索方式を
+@dfn{単語検索} と呼びます。これは実際には固有の検索方式ではなくて、
+後述する各種の検索方式を間接的に呼び出すためのものです。
 
-$BDL>o!"8!:w8l$H40A4$K%^%C%A$7$?%(%s%H%j$rC5$7=P$9$3$H$r!V40A40lCW8!:w!W$H(B
-$B8@$$$^$9$,!"(BLookup $B$G$OB?<oN`$N<-=q$r07$&4X78$+$i!"$3$l$r%G%U%)%k%H$H$7(B
-$B$F$7$^$&$N$G$O>/$7LdBj$,$"$j$^$9!#Nc$($P(B @samp{emacs} $B$H$$$&C18l$r8!:w$9(B
-$B$k$H$-!"<-=q$K$h$C$F$O8+=P$78l$H$7$F(B @samp{GNU Emacs} $B$H$7$+;}$?$J$$$?$a(B
-$B$K!"$=$l$,8+IU$+$i$J$$$H$$$&$3$H$,$"$j$^$9!#$3$l$O<-=qB&$NLdBj$@$H8@$($P(B
-$B$=$&$+$b$7$l$^$;$s$,!"$d$O$j$=$l$G$OITJX$J$N$G!">/$79)IW$,I,MW$G$9!#(B
+通常、検索語と完全にマッチしたエントリを探し出すことを「完全一致検索」と
+言いますが、Lookup では多種類の辞書を扱う関係から、これをデフォルトとし
+てしまうのでは少し問題があります。例えば @samp{emacs} という単語を検索す
+るとき、辞書によっては見出し語として @samp{GNU Emacs} としか持たないため
+に、それが見付からないということがあります。これは辞書側の問題だと言えば
+そうかもしれませんが、やはりそれでは不便なので、少し工夫が必要です。
 
-$B$b$7<-=q$,(B @samp{GNU Emacs} $B$H$$$&8+=P$78l$7$+;}$?$J$/$H$b!"40A40lCW8!:w(B
-$B$G$O$J$/!V%-!<%o!<%I8!:w!W$G$H$$$&$3$H$J$i!"$=$l$r8+IU$1=P$9$3$H$b=PMh$k(B
-$B$+$b$7$l$^$;$s!#$=$N$?$aI8=`$N8!:wJ}<0$H$7$F$O!"<-=q$K$h$C$F<B:]$N8!:wJ}(B
-$B<0$r@Z$j49$($J$,$i8!:w$7$F$/$l$k$N$,JXMx$G$9!#$=$N$?$aC18l8!:w$O!">u67$K(B
-$B1~$8$F<B:]$N?6$kIq$$$rE,Ev$KJQ2=$5$;$k$h$&$K$J$C$F$$$^$9!#(B
+もし辞書が @samp{GNU Emacs} という見出し語しか持たなくとも、完全一致検索
+ではなく「キーワード検索」でということなら、それを見付け出すことも出来る
+かもしれません。そのため標準の検索方式としては、辞書によって実際の検索方
+式を切り換えながら検索してくれるのが便利です。そのため単語検索は、状況に
+応じて実際の振る舞いを適当に変化させるようになっています。
 
 @vindex lookup-default-method
-$BC18l8!:w$,<B:]$K9T$J$&8!:wJ}<0$O!"JQ?t(B @code{lookup-default-method}
-$B$K$h$j@_Dj$9$k$3$H$,=PMh$^$9!#$3$l$O%G%U%)%k%H$G$O(B @code{exact}$B!"$D$^$j(B
-$B40A40lCW8!:w$H$J$C$F$$$^$9!#$3$l$rA0J}0lCW8!:w$K$7$?$1$l$P(B @code{prefix}
-$B$H$7$^$9!#2DG=$J8!:wJ}<0$H$=$l$KBP1~$7$?%7%s%\%kL>$K$D$$$F$O!"(B
-@ref{Search Methods} $B$r;2>H$7$F2<$5$$!#(B
+単語検索が実際に行なう検索方式は、変数 @code{lookup-default-method}
+により設定することが出来ます。これはデフォルトでは @code{exact}、つまり
+完全一致検索となっています。これを前方一致検索にしたければ @code{prefix}
+とします。可能な検索方式とそれに対応したシンボル名については、
+@ref{Search Methods} を参照して下さい。
 
-$B$$$/$D$+$N8!:w%(!<%8%'%s%H$G$O!"%G%U%)%k%H$N8!:wJ}<0$r>e=q$-$7$F!"Nc$($P(B
-$B%-!<%o!<%I8!:w$r9T$J$&$h$&$K@_Dj$5$l$F$$$^$9!#>\$7$/$O%(!<%8%'%s%H$N3F@a(B
-$B$r;2>H$7$F2<$5$$!#$^$?!"FCDj$N%(!<%8%'%s%H$d<-=q$G$N8!:wJ}<0$rJQ$($k$K$O!"(B
-$B<-=q%*%W%7%g%s(B @code{:default-method} $B$rMQ$$$k$3$H$,=PMh$^$9!#(B
+いくつかの検索エージェントでは、デフォルトの検索方式を上書きして、例えば
+キーワード検索を行なうように設定されています。詳しくはエージェントの各節
+を参照して下さい。また、特定のエージェントや辞書での検索方式を変えるには、
+辞書オプション @code{:default-method} を用いることが出来ます。
 
 @node Search Methods,  , Default Method, Search String
-@subsection $B8!:wJ}<0$N$$$m$$$m(B
+@subsection 検索方式のいろいろ
 
-@cindex $B%Q%?!<%s8!:w(B
-$BJ8;zNs$r;XDj$9$k8!:w$NCf$G$bFC$K!"(B@kbd{M-x lookup-pattern} $B$N$h$&$KFCDj(B
-$B$N%Q%?!<%s$rF~NO$7$F9T$J$&8!:w$N$3$H$r!"(BLookup $B$G$O(B @dfn{$B%Q%?!<%s8!:w(B} 
-$B$H8F$S$^$9!#%Q%?!<%s8!:w$G$O!"<!$N$h$&$JFC<l$J%Q%?!<%s$r;XDj$9$k$3$H$G!"(B
-$BMM!9$K8!:wJ}<0$r@Z$j49$($k$3$H$,2DG=$G$9!#$=$l$>$l$N8!:wJ}<0$K$O8GM-$N(B
-$B%7%s%\%kL>$H5-9f$,4XO"IU$1$i$l$F$*$j!"$$$/$D$+$N>l=j$GMxMQ$5$l$^$9!#(B
+@cindex パターン検索
+文字列を指定する検索の中でも特に、@kbd{M-x lookup-pattern} のように特定
+のパターンを入力して行なう検索のことを、Lookup では @dfn{パターン検索} 
+と呼びます。パターン検索では、次のような特殊なパターンを指定することで、
+様々に検索方式を切り換えることが可能です。それぞれの検索方式には固有の
+シンボル名と記号が関連付けられており、いくつかの場所で利用されます。
 
 @table @asis
 @item @t{word}
-@itemx $BC18l8!:w(B (@code{default}, @code{~})
-$BI8=`$N8!:wJ}<0$G$9!#$3$l$O<B:]$K$O!"2<5-$N$$$:$l$+$N8!:wJ}<0$r4V@\E*$K(B
-$B8F$S=P$9$h$&$K$J$C$F$$$^$9!#(B@xref{Default Method}.
+@itemx 単語検索 (@code{default}, @code{~})
+標準の検索方式です。これは実際には、下記のいずれかの検索方式を間接的に
+呼び出すようになっています。@xref{Default Method}.
 
 @item @t{'word'}
-@itemx $B40A40lCW8!:w(B (@code{exact}, @code{=})
-@cindex $B40A40lCW8!:w(B
-$BM?$($i$l$?J8;zNs$H40A4$K0lCW$9$k8+=P$78l$r;}$D%(%s%H%j$r8!:w$7$^$9!#(B
-$B$3$NNc$G$O(B @samp{word} $B$d(B @samp{Word} $B$J$I$,8+IU$+$j$^$9!#(B
+@itemx 完全一致検索 (@code{exact}, @code{=})
+@cindex 完全一致検索
+与えられた文字列と完全に一致する見出し語を持つエントリを検索します。
+この例では @samp{word} や @samp{Word} などが見付かります。
 
 @item @t{word*}
-@itemx $BA0J}0lCW8!:w(B (@code{prefix}, @code{<})
-@cindex $BA0J}0lCW8!:w(B
-$BM?$($i$l$?J8;zNs$r8+=P$78l$N@hF,$K;}$D$h$&$J%(%s%H%j$r8!:w$7$^$9!#(B
-$B$3$NNc$G$O(B @samp{wordage} $B$d(B @samp{wording} $B$J$I$,8+IU$+$j$^$9!#(B
+@itemx 前方一致検索 (@code{prefix}, @code{<})
+@cindex 前方一致検索
+与えられた文字列を見出し語の先頭に持つようなエントリを検索します。
+この例では @samp{wordage} や @samp{wording} などが見付かります。
 
 @item @t{*word}
-@itemx $B8eJ}0lCW8!:w(B (@code{suffix}, @code{>})
-@cindex $B8eJ}0lCW8!:w(B
-$BM?$($i$l$?J8;zNs$r8+=P$78l$NKvHx$K;}$D$h$&$J%(%s%H%j$r8!:w$7$^$9!#(B
-$B$3$NNc$G$O(B @samp{keyword} $B$d(B @samp{headword} $B$J$I$,8+IU$+$j$^$9!#(B
+@itemx 後方一致検索 (@code{suffix}, @code{>})
+@cindex 後方一致検索
+与えられた文字列を見出し語の末尾に持つようなエントリを検索します。
+この例では @samp{keyword} や @samp{headword} などが見付かります。
 
 @item @t{*word*}
-@itemx $BItJ,0lCW8!:w(B (@code{substring}, @code{-})
-@cindex $BItJ,0lCW8!:w(B
-$BM?$($i$l$?J8;zNs$r8+=P$78l$N0lIt$K4^$`$h$&$J%(%s%H%j$r8!:w$7$^$9!#(B
-$B$3$NNc$G$O(B @samp{unwordy} $B$d(B @samp{swordsman} $B$J$I$,8+IU$+$j$^$9!#(B
+@itemx 部分一致検索 (@code{substring}, @code{-})
+@cindex 部分一致検索
+与えられた文字列を見出し語の一部に含むようなエントリを検索します。
+この例では @samp{unwordy} や @samp{swordsman} などが見付かります。
 
 @item @t{w*o?d}
-@itemx $B%0%m%V%Q%?!<%s(B
-$B>e$N;0$D$r99$K?J$a$?I=8=$H$7$F!"G$0U$N%0%m%V%Q%?!<%s$,;XDj=PMh$^$9!#(B
-$B$D$^$jJ8;z(B @samp{*} $B$,G$0U$NJ8;zNs$H%^%C%A$7!"J8;z(B @samp{?} $B$,G$0U$N(B
-$B0lJ8;z$H%^%C%A$7$^$9!#$3$NNc$G$O(B @samp{word} $B$d(B @samp{womanhood} $B$J$I$,(B
-$B8+IU$+$j$^$9!#(B
+@itemx グロブパターン
+上の三つを更に進めた表現として、任意のグロブパターンが指定出来ます。
+つまり文字 @samp{*} が任意の文字列とマッチし、文字 @samp{?} が任意の
+一文字とマッチします。この例では @samp{word} や @samp{womanhood} などが
+見付かります。
 
-$B$3$N8!:w%Q%?!<%s$O!"<B:]$K$O%Q%?!<%s$r@55,I=8=$KJQ49$7$F8!:w$r9T$J$$$^$9!#(B
-$B:#$NNc$G$O(B @samp{^w.*o.d$} $B$N$h$&$KJQ49$5$l$^$9!#=>$C$F!"$3$l$rMQ$$$k$K(B
-$B$O<-=q$,<!$N@55,I=8=8!:w$KBP1~$7$F$$$J$1$l$P$J$j$^$;$s!#(B
+この検索パターンは、実際にはパターンを正規表現に変換して検索を行ないます。
+今の例では @samp{^w.*o.d$} のように変換されます。従って、これを用いるに
+は辞書が次の正規表現検索に対応していなければなりません。
 
 @item @t{/word/}
-@itemx $B@55,I=8=8!:w(B (@code{regexp}, @code{r})
-@cindex $B@55,I=8=8!:w(B
-$BM?$($i$l$?@55,I=8=$H%^%C%A$9$k8+=P$78l$r;}$D%(%s%H%j$r8!:w$7$^$9!#(B
-$BF~NO$O$=$N$^$^8!:w%(!<%8%'%s%H$KEO$5$l$k$?$a!"@55,I=8=$N%9%?%$%k$O(B
-$BMxMQ$9$k%(!<%8%'%s%H$K0MB8$7$^$9!#(B
+@itemx 正規表現検索 (@code{regexp}, @code{r})
+@cindex 正規表現検索
+与えられた正規表現とマッチする見出し語を持つエントリを検索します。
+入力はそのまま検索エージェントに渡されるため、正規表現のスタイルは
+利用するエージェントに依存します。
 
 @item @t{@@word}
-@itemx $B%-!<%o!<%I8!:w(B (@code{keyword}, @code{@@})
-@cindex $B%-!<%o!<%I8!:w(B
-$B<-=q$,8+=P$78l$@$1$G$J$/%(%s%H%jKh$N%-!<%o!<%I$r;}$D>l9g!"$3$N%Q%?!<%s$K(B
-$B$h$C$F$=$l$r8!:w$9$k$3$H$,=PMh$^$9!#2?$r%-!<%o!<%I$H$7$F;}$D$+$OMxMQ$9$k(B
-$B8!:w%(!<%8%'%s%H$K$h$C$F0[$J$k$?$a!"$=$l$>$l$N%(!<%8%'%s%H$K$D$$$F$N@bL@(B
-$B$r;2>H$7$F2<$5$$!#(B
+@itemx キーワード検索 (@code{keyword}, @code{@@})
+@cindex キーワード検索
+辞書が見出し語だけでなくエントリ毎のキーワードを持つ場合、このパターンに
+よってそれを検索することが出来ます。何をキーワードとして持つかは利用する
+検索エージェントによって異なるため、それぞれのエージェントについての説明
+を参照して下さい。
 
 @item @t{/word}
-@itemx $BA4J88!:w(B (@code{text}, @code{/})
-@cindex $BA4J88!:w(B
-$B$3$l$OB>$N8!:wJ}<0$H$O>/$70[$J$j$^$9!#B>$N$b$N$O<-=q$K$"$i$+$8$aMQ0U$5$l(B
-$B$F$$$k%$%s%G%C%/%9$+$i8!:w$r9T$J$$$^$9$,!"$3$l$O<-=q$NA4BN$+$iNO$:$/$G(B
-$B8!:w8l$rC5$7=P$7$^$9!#$=$N$?$a$7$P$7$PHs>o$KB?$/$N8!:w;~4V$rI,MW$H$9$k(B
-$B$?$a!"$3$N8!:w%Q%?!<%s$r;XDj$9$k$H3NG'$N$?$a$N%W%m%s%W%H$,I=<($5$l$^$9!#(B
+@itemx 全文検索 (@code{text}, @code{/})
+@cindex 全文検索
+これは他の検索方式とは少し異なります。他のものは辞書にあらかじめ用意され
+ているインデックスから検索を行ないますが、これは辞書の全体から力ずくで
+検索語を探し出します。そのためしばしば非常に多くの検索時間を必要とする
+ため、この検索パターンを指定すると確認のためのプロンプトが表示されます。
 
-@item $B%j%U%!%l%s%9(B (@code{:reference}, @code{%})
-@cindex $B%j%U%!%l%s%9(B
-$B$3$l$O8!:wJ}<0$G$O$"$j$^$;$s$,!"F1$8$/5-9f$,3d$jEv$F$i$l$F$$$k$N$G$3$3$G(B
-$B@bL@$7$F$*$-$^$9!#(B@dfn{$B%j%U%!%l%s%9(B} $B$H$O!"$"$k%(%s%H%j$H4XO"IU$1$i$l$F(B
-$B$$$kJL$N%(%s%H%j$N$3$H$r8@$$$^$9!#DL>o!"(BWeb $B%Z!<%8$HF1MM$K!"%(%s%H%jK\J8(B
-$B$+$iJL$N%(%s%H%j$X$H%j%s%/$,D%$i$l$F$$$^$9!#(B
+@item リファレンス (@code{:reference}, @code{%})
+@cindex リファレンス
+これは検索方式ではありませんが、同じく記号が割り当てられているのでここで
+説明しておきます。@dfn{リファレンス} とは、あるエントリと関連付けられて
+いる別のエントリのことを言います。通常、Web ページと同様に、エントリ本文
+から別のエントリへとリンクが張られています。
 
-$BB>$N8!:wJ}<0$rMxMQ$7$?$N$G$O$J$/!"%j%s%/$rC)$C$F%j%U%!%l%s%9$rI=<($7$?$H(B
-$B$-$K$O!"$=$N$H$-$N8!:wJ}<0$H$7$F>e$N5-9f$,MQ$$$i$l$^$9!#(B
+他の検索方式を利用したのではなく、リンクを辿ってリファレンスを表示したと
+きには、そのときの検索方式として上の記号が用いられます。
 @end table
 
-$B0J>e$NA4$F$N8!:wJ}<0$K<-=q$,BP1~$7$F$$$k$o$1$G$O$"$j$^$;$s!#<-=q$,BP1~$7(B
-$B$F$$$k8!:wJ}<0$rCN$k$?$a$K$O!":G=i$K(B @kbd{M-x lookup} $B$H$7$?$H$-=PNO$5$l(B
-$B$k<-=q0lMw%P%C%U%!$r;2>H$7$F2<$5$$!#(B(@pxref{Specify Dictionary})
+以上の全ての検索方式に辞書が対応しているわけではありません。辞書が対応し
+ている検索方式を知るためには、最初に @kbd{M-x lookup} としたとき出力され
+る辞書一覧バッファを参照して下さい。(@pxref{Specify Dictionary})
 
-$B<-=q$,BP1~$7$F$$$J$$8!:wK!$,;XDj$5$l$?>l9g$K$O!"8=:_$OC1=c$KL5;k$5$l$^$9!#(B
-$B$3$l$O>-MhE*$K$OL$BP1~$NDLCN$r=P$9$h$&$KJQ99$9$k$+$b$7$l$^$;$s!#(B
+辞書が対応していない検索法が指定された場合には、現在は単純に無視されます。
+これは将来的には未対応の通知を出すように変更するかもしれません。
 
 @node See Result, Specify Dictionary, Search String, Advanced Features
-@section $B8!:w7k2L$ND/$aJ}(B
+@section 検索結果の眺め方
 
-Lookup $B$G8!:w$,9T$J$o$l$k$H!"$=$N7k2L$OFs$D$N%&%#%s%I%&$KJ,$+$l$FI=<($5(B
-$B$l$^$9!#0l$D$O8+$D$+$C$?%(%s%H%j$N0lMw$rJB$Y$k$?$a$N$b$N$G!"$b$&0l$D$O3F(B
-$B%(%s%H%j$NK\J8$r8+$k$?$a$N$b$N$G$9!#0J2<!"$3$l$i$r8+$kJ}K!$K$D$$$F>\$7$/(B
-$B@bL@$7$^$9!#(B
+Lookup で検索が行なわれると、その結果は二つのウィンドウに分かれて表示さ
+れます。一つは見つかったエントリの一覧を並べるためのもので、もう一つは各
+エントリの本文を見るためのものです。以下、これらを見る方法について詳しく
+説明します。
 
 @menu
-* See Entries::                 $B%(%s%H%j$r=g$K8+$k(B
-* See Contents::                $BK\J8$r>\$7$/8+$k(B
-* Make Reference::              $B%j%U%!%l%s%9$r;2>H$9$k(B
-* Cite Contents::               $BK\J8$r0zMQ$9$k(B
+* See Entries::                 エントリを順に見る
+* See Contents::                本文を詳しく見る
+* Make Reference::              リファレンスを参照する
+* Cite Contents::               本文を引用する
 @end menu
 
 @node See Entries, See Contents, See Result, See Result
-@subsection $B%(%s%H%j$r=g$K8+$k(B
+@subsection エントリを順に見る
 
-Entry $B%P%C%U%!(B(@pxref{Quick Search})$B$K$O!"8!:w$N7k2L!"8+IU$+$C$?%(%s%H%j(B
-$B$N0lMw$,I=<($5$l$^$9!#(B@kbd{n}(ext) $B$H(B @kbd{p}(revious) $B$r2!$9$3$H$G!"%](B
-$B%$%s%H$rA08e$K0\F0$7$FI=<($9$k%(%s%H%j$r@Z$j49$($k$3$H$,=PMh$^$9!#%^%&%9(B
-$B$NCf%\%?%s$G%/%j%C%/$9$k$3$H$G!"%(%s%H%j$rD>@\A*Br$9$k$3$H$b2DG=$G$9!#(B
+Entry バッファ(@pxref{Quick Search})には、検索の結果、見付かったエントリ
+の一覧が表示されます。@kbd{n}(ext) と @kbd{p}(revious) を押すことで、ポ
+イントを前後に移動して表示するエントリを切り換えることが出来ます。マウス
+の中ボタンでクリックすることで、エントリを直接選択することも可能です。
 
-@kbd{v}(iew) $B$K$h$j(B Overview $B%b!<%I$KF~$j$^$9!#$3$l$O(B Content $B%P%C%U%!$N(B
-$B%&%#%s%I%&$r%/%m!<%:$7!"%(%s%H%j$N0lMw$r0l;~E*$K8+$d$9$/$7$^$9!#(BOverview 
-$B%P%C%U%!$G$O!"(B@kbd{n} $B$H(B @kbd{p} $B$,C1$K%]%$%s%H$N0\F0$@$1$r9T$J$&$h$&$K(B
-$B$J$j$^$9!#$b$&0lEY(B @kbd{v} $B$H$9$k$+(B @key{SPC} $B$r2!$9$3$H$G!"(BOverview
-$B%b!<%I$r=*N;$7$F85$NF0:n$KLa$j$^$9!#(B
+@kbd{v}(iew) により Overview モードに入ります。これは Content バッファの
+ウィンドウをクローズし、エントリの一覧を一時的に見やすくします。Overview 
+バッファでは、@kbd{n} と @kbd{p} が単にポイントの移動だけを行なうように
+なります。もう一度 @kbd{v} とするか @key{SPC} を押すことで、Overview
+モードを終了して元の動作に戻ります。
 
-Lookup $B$O!"2a5n$K9T$J$o$l$?8!:w$N7k2L$rMzNr$H$7$F5-21$7$F$$$^$9!#2a5n$N(B
-$B8!:w7k2L$r;2>H$9$k$K$O(B @kbd{M-p} $B$r2!$7$F$$$C$F2<$5$$!#5U$K!"85$N8!:w7k(B
-$B2L$KLa$k$K$O(B @kbd{M-n} $B$r2!$7$F2<$5$$!#(B
+Lookup は、過去に行なわれた検索の結果を履歴として記憶しています。過去の
+検索結果を参照するには @kbd{M-p} を押していって下さい。逆に、元の検索結
+果に戻るには @kbd{M-n} を押して下さい。
 
 @node See Contents, Make Reference, See Entries, See Result
-@subsection $BK\J8$r>\$7$/8+$k(B
+@subsection 本文を詳しく見る
 
-Content $B%P%C%U%!(B(@pxref{Quick Search})$B$K$O!"A*Br$5$l$F$$$k%(%s%H%j$NK\J8(B
-$B$,I=<($5$l$^$9!#$3$l$O(B @key{SPC} $B$H(B @key{DEL} $B$K$h$C$F!"(BEntry $B%P%C%U%!Fb(B
-$B$+$iA08e$K%9%/%m!<%k$9$k$3$H$,=PMh$^$9!#%P%C%U%!$N:G8e(B($B:G=i(B)$B$^$GC#$9$k$H!"(B
-$B<!(B($BA0(B)$B$N%(%s%H%j$K0\F0$7$^$9!#$^$?!"(B@kbd{<} $B$d(B @kbd{>} $B$K$h$C$F!"K\J8$N(B
-$B:G=i$H:G8e$K0\F0$9$k$3$H$b=PMh$^$9!#(B
+Content バッファ(@pxref{Quick Search})には、選択されているエントリの本文
+が表示されます。これは @key{SPC} と @key{DEL} によって、Entry バッファ内
+から前後にスクロールすることが出来ます。バッファの最後(最初)まで達すると、
+次(前)のエントリに移動します。また、@kbd{<} や @kbd{>} によって、本文の
+最初と最後に移動することも出来ます。
 
-@kbd{o}(pen) $B$r2!$9$H!"(BLookup $B$N%&%#%s%I%&$r2hLLA4BN$K3H$2$F!"(BContent $B%P%C(B
-$B%U%!$NFbMF$r9-$/8+$k$3$H$,=PMh$^$9!#(BLookup $B$N%&%#%s%I%&$r0lEYJD$8$l$P!"(B
-$B<!$+$i$^$?85$KLa$j$^$9!#(B
+@kbd{o}(pen) を押すと、Lookup のウィンドウを画面全体に拡げて、Content バッ
+ファの内容を広く見ることが出来ます。Lookup のウィンドウを一度閉じれば、
+次からまた元に戻ります。
 
-@kbd{s}(earch) $B$K$h$C$F!"(BContent $B%P%C%U%!$G(B @code{isearch-forward} $B$r(B
-$B<B9T$7$^$9!#$3$l$rH4$1$k$K$O(B @kbd{C-g} $B$J$I$H$7$F2<$5$$!#(B
+@kbd{s}(earch) によって、Content バッファで @code{isearch-forward} を
+実行します。これを抜けるには @kbd{C-g} などとして下さい。
 
-$B8=:_;2>H$7$F$$$k%(%s%H%j$N>pJs$r(B @kbd{i}(nfo) $B$K$h$C$FCN$k$3$H$,=PMh$^$9!#(B
-$B$^$?!"(B@kbd{t}(oggle) $B$K$h$C$F!"K\J8$r@07A$9$kA0$N%*%j%8%J%k$N<-=qFbMF$r(B
-$B8+$k$3$H$,=PMh$^$9!#$3$l$i$N>pJs$OK\J8$r%+%9%?%^%$%:$9$k:]$KMxMQ$9$k$3$H(B
-$B$,=PMh$^$9!#(B
+現在参照しているエントリの情報を @kbd{i}(nfo) によって知ることが出来ます。
+また、@kbd{t}(oggle) によって、本文を整形する前のオリジナルの辞書内容を
+見ることが出来ます。これらの情報は本文をカスタマイズする際に利用すること
+が出来ます。
 
 @node Make Reference, Cite Contents, See Contents, See Result
-@subsection $B%j%U%!%l%s%9$r;2>H$9$k(B
+@subsection リファレンスを参照する
 
-$B%(%s%H%j$,%j%U%!%l%s%9$r;}$D>l9g!"(B@kbd{L}(inks) $B$r2!$9$3$H$G$=$l$r?7$?$K(B 
-Entry $B%P%C%U%!$K0lMw$7$^$9!#C10l$N%j%U%!%l%s%9$N$_;2>H$7$?$$>l9g$K$O!"$^(B
-$B$:(B @kbd{h} $B$G(B Content $B%P%C%U%!$K0\F0$7!"(B@key{TAB} $B$NO"BG$GL\E*$N%j%s%/$K(B
-$B0\F0$7$?8e!"(B@key{RET} $B$H$9$l$P$=$l$rC)$k$3$H$,=PMh$^$9!#$"$k$$$OL\E*$N%j(B
-$B%s%/$rD>@\!"%^%&%9$NCf%\%?%s$G%/%j%C%/$7$F$b9=$$$^$;$s!#(B
+エントリがリファレンスを持つ場合、@kbd{L}(inks) を押すことでそれを新たに 
+Entry バッファに一覧します。単一のリファレンスのみ参照したい場合には、ま
+ず @kbd{h} で Content バッファに移動し、@key{TAB} の連打で目的のリンクに
+移動した後、@key{RET} とすればそれを辿ることが出来ます。あるいは目的のリ
+ンクを直接、マウスの中ボタンでクリックしても構いません。
 
-$BMQ$$$k<-=q$d8!:w%(!<%8%'%s%H$K$h$C$F$O!"%j%s%/$,8+?I$+$C$?$j!"%j%s%/$r(B
-$BC)$k$H0lMw$N8+=P$7$,$*$+$7$/$J$k$J$I$NITK~$,$"$k$+$b$7$l$^$;$s!#$3$l$O(B
-$B<-=qKh$N:90[$K(B Lookup $B$,%G%U%)%k%H$G$OBP1~$7$-$l$J$$$?$a$G$9!#%j%s%/$r(B
-$B$h$j8+$d$9$/$9$k$?$a$K$O!"(B@ref{Reference Pattern} $B$r;2>H$7$F3F<+$G@_Dj$r(B
-$B9T$J$C$F2<$5$$!#(B
+用いる辞書や検索エージェントによっては、リンクが見辛かったり、リンクを
+辿ると一覧の見出しがおかしくなるなどの不満があるかもしれません。これは
+辞書毎の差異に Lookup がデフォルトでは対応しきれないためです。リンクを
+より見やすくするためには、@ref{Reference Pattern} を参照して各自で設定を
+行なって下さい。
 
 @node Cite Contents,  , Make Reference, See Result
-@subsection $BK\J8$r0zMQ$9$k(B
+@subsection 本文を引用する
 
-Entry $B%P%C%U%!$G(B @kbd{w}(rite) $B$r2!$9$H!"%(%s%H%j$NK\J8$r%-%k%j%s%0$K(B
-$BJ]B8$7$^$9!#$3$N$H$-<!$NJQ?t$K$h$j$=$N?6$kIq$$$rD4@a=PMh$^$9!#(B
+Entry バッファで @kbd{w}(rite) を押すと、エントリの本文をキルリングに
+保存します。このとき次の変数によりその振る舞いを調節出来ます。
 
 @vtable @code
 @item lookup-cite-style
-$B%(%s%H%jK\J8$r0zMQ$9$k$H$-$N%9%?%$%k!#(B
+エントリ本文を引用するときのスタイル。
 
-@code{asis} $B$K$9$k$H!"(BContent $B%P%C%U%!$NFbMF$,$=$N$^$^%3%T!<$5$l$k!#(B
-@code{plain} $B$K$9$k$H!"%W%l!<%s%F%-%9%H$H$7$F8+$d$9$$$h$&JQ49$5$l$k!#(B
-$B<!$N$h$&$K(B alist $B$r;XDj$9$k$3$H$G!"99$K:Y$+$/@_Dj$9$k$3$H$b2DG=!#(B
+@code{asis} にすると、Content バッファの内容がそのままコピーされる。
+@code{plain} にすると、プレーンテキストとして見やすいよう変換される。
+次のように alist を指定することで、更に細かく設定することも可能。
 
 @lisp
 ((@var{key1} . @var{value1}) (@var{key2} . @var{value2}) ...)
 @end lisp
 
-@var{key} $B$H$7$F$O!"<!$N$b$N$,;XDj2DG=!#(B
+@var{key} としては、次のものが指定可能。
 
 @table @code
 @item gaiji
-$B30;z$r%3%T!<$9$k$H$-$N%9%?%$%k!#CM$H$7$F<!$N$b$N$,2DG=!#(B
+外字をコピーするときのスタイル。値として次のものが可能。
 @table @asis
 @item @code{glyph}
-Content $B%P%C%U%!$KI=<($5$l$kFbMF!#(B(@code{asis})
+Content バッファに表示される内容。(@code{asis})
 @item @code{alternate}
-gaiji-table $B$G;XDj$5$l$?BeBXJ8;z!#(B(@code{plain})
-@item $BG$0U$NJ8;zNs(B
-$B$=$NJ8;zNs$rMxMQ!#(B
+gaiji-table で指定された代替文字。(@code{plain})
+@item 任意の文字列
+その文字列を利用。
 @end table
 @end table
 
 @item lookup-cite-header
-$B%(%s%H%jK\J8$r0zMQ$9$k$H$-$N%X%C%@!#(B
+エントリ本文を引用するときのヘッダ。
 
-$B%3%^%s%I(B @kbd{M-x lookup-entry-cite-content} $B5Z$S(B
-@kbd{M-x lookup-content-cite-region} $B$K$h$jFbMF$r<h$j9~$`$H$-!"(B
-$B$=$N@hF,$K;XDj$7$?J8;zNs$,IU$12C$($i$l$k!#(B
-$BJ8;zNs$,(B @samp{%T} $B$r4^$`>l9g!"<-=q$N%?%$%H%k$KCV$-49$($i$l$k!#(B
+コマンド @kbd{M-x lookup-entry-cite-content} 及び
+@kbd{M-x lookup-content-cite-region} により内容を取り込むとき、
+その先頭に指定した文字列が付け加えられる。
+文字列が @samp{%T} を含む場合、辞書のタイトルに置き換えられる。
 
 @item lookup-cite-prefix
-$B%(%s%H%jK\J8$r0zMQ$9$k$H$-$N%W%l%U%#%/%9!#(B
+エントリ本文を引用するときのプレフィクス。
 
-$B%3%^%s%I(B @kbd{M-x lookup-entry-cite-content} $B5Z$S(B
-@kbd{M-x lookup-content-cite-region} $B$K$h$jFbMF$r<h$j9~$`$H$-!"(B
-$B3F9T$N@hF,$K;XDj$7$?J8;zNs$,IU$12C$($i$l$k!#(B
+コマンド @kbd{M-x lookup-entry-cite-content} 及び
+@kbd{M-x lookup-content-cite-region} により内容を取り込むとき、
+各行の先頭に指定した文字列が付け加えられる。
 @end vtable
 
-$BNc$($P!"@_Dj$r<!$N$h$&$K$7$F$*$/$H!"(B
+例えば、設定を次のようにしておくと、
 
 @lisp
-(setq lookup-cite-style '((gaiji . "$B""(B")))
-(setq lookup-cite-header "$B!V(B%T$B!W$h$j(B\n")
+(setq lookup-cite-style '((gaiji . "□")))
+(setq lookup-cite-header "「%T」より\n")
 (setq lookup-cite-prefix "| ")
 @end lisp
 
-$B<!$N$h$&$JFbMF$,J]B8$5$l$^$9!#(B
+次のような内容が保存されます。
 
 @example
-$B!V9q8l<-E5!W$h$j(B
-| $B%F%9%H(B
-| $B""(B 1. $B;n83(B....
+「国語辞典」より
+| テスト
+| □ 1. 試験....
 @end example
 
-$B$3$l$i$NJQ?t$KBP1~$7$F!"$=$l$>$l<-=q%*%W%7%g%s(B @code{:cite-style},
-@code{:cite-header}, @code{:cite-prefix} $B$,;XDj$9$k$3$H$G!"$=$N@_Dj$,(B
-$BM%@hE*$KMxMQ$5$l$^$9!#(B(@pxref{Dictionary Options})
+これらの変数に対応して、それぞれ辞書オプション @code{:cite-style},
+@code{:cite-header}, @code{:cite-prefix} が指定することで、その設定が
+優先的に利用されます。(@pxref{Dictionary Options})
 
-$B$^$?!"(BContent $B%P%C%U%!$K0\F0$7$F(B @kbd{w} $B$r2!$9$3$H$G!"$=$N$H$-$N(B
-$B%j!<%8%g%s$NJ8;zNs$@$1%3%T!<$9$k$3$H$b2DG=$G$9!#(B
-@footnote{$B$?$@$78=:_!"$3$N$H$-(B cite-style $B$N;XDj$OL58z$G$9!#<jH4$-!&!&!&(B}
+また、Content バッファに移動して @kbd{w} を押すことで、そのときの
+リージョンの文字列だけコピーすることも可能です。
+@footnote{ただし現在、このとき cite-style の指定は無効です。手抜き・・・}
 
 @node Specify Dictionary,  , See Result, Advanced Features
-@section $BFCDj$N<-=q$rMxMQ$9$k(B
+@section 特定の辞書を利用する
 
-Lookup $B$N@_Dj8e!":G=i$K(B @kbd{M-x lookup} $B$H$9$k$+!"$"$k$$$O8!:w3+;O8e$K(B
-Entry $B%P%C%U%!(B(@pxref{Entry Mode})$B$G(B @kbd{S} $B$H$9$k$3$H$G!"(BSelect $B%b!<%I(B
-$B$KF~$j$^$9!#(B
+Lookup の設定後、最初に @kbd{M-x lookup} とするか、あるいは検索開始後に
+Entry バッファ(@pxref{Entry Mode})で @kbd{S} とすることで、Select モード
+に入ります。
 
-$B$3$N%P%C%U%!$K$OMxMQ2DG=$J<-=q$N0lMw$,I=<($5$l$^$9!#(B@samp{%} $B$H$"$kNs$K(B
-$B$O<-=q$NA*Br>uBV$,<($5$l$F$*$j!"(B@samp{*} $B$,A*Br!"6uGr(B(@samp{ })$B$,L$A*Br(B
-$B$G$"$k$3$H$rI=$o$7$F$$$^$9!#(B
+このバッファには利用可能な辞書の一覧が表示されます。@samp{%} とある列に
+は辞書の選択状態が示されており、@samp{*} が選択、空白(@samp{ })が未選択
+であることを表わしています。
 
-@samp{Identifier} $B$H$"$kNs$K$O<-=q$N(B ID $B$,<($5$l$^$9!#$3$l$O<g$K@_Dj$N$?(B
-$B$a$KMQ$$$i$l!"<-=q$NB0$9$k8!:w%(!<%8%'%s%H$N%/%i%9(B(@var{class})$B$H$=$N=j(B
-$B:_(B(@var{location})$B!"$=$7$F<-=qL>(B(@var{name})$B$rMQ$$$F(B
-@var{class+location:name} $B$H$7$FI=$5$l$^$9!#(B
+@samp{Identifier} とある列には辞書の ID が示されます。これは主に設定のた
+めに用いられ、辞書の属する検索エージェントのクラス(@var{class})とその所
+在(@var{location})、そして辞書名(@var{name})を用いて
+@var{class+location:name} として表されます。
 
-@samp{title} $B$H$"$kNs$K$O!"<-=q$N%?%$%H%k$,<($5$l$^$9!#$3$l$O<g$KI=<($N(B
-$B$?$a$KMQ$$$i$l!"<-=q%*%W%7%g%s(B @code{:title} $B$K$h$C$FJQ992DG=$G$9!#(B
+@samp{title} とある列には、辞書のタイトルが示されます。これは主に表示の
+ために用いられ、辞書オプション @code{:title} によって変更可能です。
 (@pxref{Dictionary Options})
 
-@samp{Methods} $B$H$"$kNs$K$O!"<-=q$,BP1~$7$F$$$k8!:wJ}<0$,<($5$l$^$9!#(B
-$B$3$3$KJB$Y$i$l$k5-9f$NNs$O!"0lJ8;z$,$=$l$>$l0l$D$N8!:wJ}<0$r0UL#$7$F$$$^(B
-$B$9!#$=$NBP1~$K$D$$$F$O!"(B@ref{Search Methods} $B$K$"$k0lMw$r;2>H$7$F2<$5$$!#(B
+@samp{Methods} とある列には、辞書が対応している検索方式が示されます。
+ここに並べられる記号の列は、一文字がそれぞれ一つの検索方式を意味していま
+す。その対応については、@ref{Search Methods} にある一覧を参照して下さい。
 
-$B%P%C%U%!$G(B @kbd{?}$B$HF~NO$9$k$H!"MxMQ2DG=$J%3(B
-$B%^%s%I$K$D$$$F$N4J0W%X%k%W$,I=<($5$l$^$9!#%P%C%U%!$rH4$1$k$H%X%k%W$bJD$8(B
-$B$i$l$^$9!#(B
+バッファで @kbd{?}と入力すると、利用可能なコ
+マンドについての簡易ヘルプが表示されます。バッファを抜けるとヘルプも閉じ
+られます。
 
-$B%3%^%s%I(B @kbd{g}$B$G8=:_$N%b%8%e!<%k$r=i4|2=(B
-$B$7D>$7!"%P%C%U%!$r99?7$7$^$9!#$?$@$7!"$3$l$O%b%8%e!<%k<+BN$r:F@_Dj$9$k$o(B
-$B$1$G$O$J$$$N$G!"@_Dj%U%!%$%k$G%b%8%e!<%k$N@_Dj$rJQ$($?>l9g$K$O!"(B
-@kbd{R}$B$K$h$j(B Lookup $B$r:F5/F0$9$kI,MW$,$"$j$^$9!#(B
+コマンド @kbd{g}で現在のモジュールを初期化
+し直し、バッファを更新します。ただし、これはモジュール自体を再設定するわ
+けではないので、設定ファイルでモジュールの設定を変えた場合には、
+@kbd{R}により Lookup を再起動する必要があります。
 
-@kbd{q}$B$G%P%C%U%!$rH4$1$^$9!#(B
-@kbd{Q}$B$G(B Lookup $B$r=*N;$7$^$9!#(B
+@kbd{q}でバッファを抜けます。
+@kbd{Q}で Lookup を終了します。
 
-@kbd{n}$B$H(B @kbd{p}$B$K$h$C$F!"%]%$%s%H$r>e2<$K(B
-$B0\F0$7$^$9!#(B
+@kbd{n}と @kbd{p}によって、ポイントを上下に
+移動します。
 
-@kbd{m}$B$K$h$j$=$N9T$N<-=q$rA*Br$7!"(B
-@kbd{u}$B$K$h$jHsA*Br$K$7$^$9!#$^$?!"(B
-@kbd{M-x lookup-select-toggle-selected}$B$K$h$jA*Br>uBV$r%H%0%k$9$k$3$H$b(B
-$B2DG=$G$9!#(B
+@kbd{m}によりその行の辞書を選択し、
+@kbd{u}により非選択にします。また、
+@kbd{M-x lookup-select-toggle-selected}により選択状態をトグルすることも
+可能です。
 
 @findex lookup-select-do-select-all
 @findex lookup-select-do-select-only
-@kbd{a}$B$K$h$j!"A4$F$N<-=q$rA*Br>uBV(B
-$B$K$7$^$9!#(B@key{RET}$B$K$h$j!"$=$N9T$N(B
-$B<-=q$@$1$rA*Br>uBV$K$9$k$3$H$b=PMh$^$9!#(B
+@kbd{a}により、全ての辞書を選択状態
+にします。@key{RET}により、その行の
+辞書だけを選択状態にすることも出来ます。
 
-@kbd{d}$B$r2!$9$H!"<-=q$KL58z2=$N%^!<%/(B
-$B$,IU$1$i$l$^$9!#$3$l$O(B @kbd{x}$B$r2!$9$3(B
-$B$H$G<B:]$KL58z2=$5$l$^$9!#$3$&$7$FL58z2=$5$l$?<-=q$G$b!"(BLookup $B$r:F5/F0(B
-$B$9$k$+!"(B@kbd{g} $B$H$9$k$H85$KLa$j$^$9!#<-=q$r915WE*$KL58z2=$9$k$?$a$K$O!"(B
-$B%*%W%7%g%s$K$h$j@_Dj$7$F2<$5$$!#(B(@pxref{Setup Restriction})
+@kbd{d}を押すと、辞書に無効化のマーク
+が付けられます。これは @kbd{x}を押すこ
+とで実際に無効化されます。こうして無効化された辞書でも、Lookup を再起動
+するか、@kbd{g} とすると元に戻ります。辞書を恒久的に無効化するためには、
+オプションにより設定して下さい。(@pxref{Setup Restriction})
 
-@kbd{f}$B$K$h$C$F!"A*Br>uBV$K$"$k<-=q(B
-$B$+$i8!:w$r9T$J$$$^$9!#$3$l$O<B:]$K$O!"IaDL$K(B @kbd{M-x lookup-pattern} $B$r(B
-$B9T$J$&$N$HF1$8$G$9!#(B
+@kbd{f}によって、選択状態にある辞書
+から検索を行ないます。これは実際には、普通に @kbd{M-x lookup-pattern} を
+行なうのと同じです。
 
-@kbd{M}$B$K$h$j!"<-=q@lMQ$N%a%K%e!<$K0\$k$3$H$,(B
-$B=PMh$^$9!#$3$l$O<B:]$K$O$?$@$N(B Entry $B%P%C%U%!$G!"%j%U%!%l%s%9$rC)$C$F$$(B
-$B$/$3$H$K$h$j<-=q$r!VFI$`!W$3$H$,=PMh$^$9!#(B
+@kbd{M}により、辞書専用のメニューに移ることが
+出来ます。これは実際にはただの Entry バッファで、リファレンスを辿ってい
+くことにより辞書を「読む」ことが出来ます。
 
-@kbd{/}$B$H$9$k$H!"%]%$%s%H9T$N<-=q$+$i(B
-$BA4J88!:w$r9T$J$$$^$9!#$?$@$7$b$A$m$s!"<-=q$,A4J88!:w$KBP1~$7$F$$$kI,MW$,(B
-$B$"$j$^$9!#A4J88!:w$O40N;$^$G$KHs>o$K;~4V$,3]$+$k>l9g$,$"$k$N$GCm0U$7$F2<(B
-$B$5$$!#(B(@pxref{Search Methods})
+@kbd{/}とすると、ポイント行の辞書から
+全文検索を行ないます。ただしもちろん、辞書が全文検索に対応している必要が
+あります。全文検索は完了までに非常に時間が掛かる場合があるので注意して下
+さい。(@pxref{Search Methods})
 
 @node Customization, Information, Advanced Features, Top
 @chapter Customization
 
 @menu
-* Customize General::           $B0lHLE*$J%+%9%?%^%$%:(B
-* Customize Option::            $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
+* Customize General::           一般的なカスタマイズ
+* Customize Option::            辞書とエージェントのカスタマイズ
 @end menu
 
 @node Customize General, Customize Option, Customization, Customization
-@section $B0lHLE*$J%+%9%?%^%$%:(B
+@section 一般的なカスタマイズ
 
-Lookup $B$NA4HL$K4X$o$k%+%9%?%^%$%:JQ?t$NB?$/$O!"(BCustom $B%Q%C%1!<%8$rMxMQ$9(B
-$B$k$3$H$GJQ992DG=$G$9!#(BLookup $B$r5/F08e(B @kbd{M-x customize-group @key{RET}
-lookup @key{RET}} $B$H$9$l$P!"@_Dj=PMh$kJQ?t$N0lMw$r8+$k$3$H$,=PMh$^$9!#(B
+Lookup の全般に関わるカスタマイズ変数の多くは、Custom パッケージを利用す
+ることで変更可能です。Lookup を起動後 @kbd{M-x customize-group @key{RET}
+lookup @key{RET}} とすれば、設定出来る変数の一覧を見ることが出来ます。
 
 @menu
-* Customize Variables::         $B<g$J%+%9%?%^%$%:JQ?t(B
-* Customize Face::              $BJ8;zAu>~$N%+%9%?%^%$%:(B
+* Customize Variables::         主なカスタマイズ変数
+* Customize Face::              文字装飾のカスタマイズ
 @end menu
 
 @node Customize Variables, Customize Face, Customize General, Customize General
-@subsection $B<g$J%+%9%?%^%$%:JQ?t(B
+@subsection 主なカスタマイズ変数
 
 @table @code
 @item lookup-default-method
-$B%G%U%)%k%H$N8!:wJ}<0$r;XDj$9$k!#(B
+デフォルトの検索方式を指定する。
 
 @item lookup-frame-alist
-$B%U%l!<%`$N%Q%i%a!<%?$N%j%9%H!#(B
+フレームのパラメータのリスト。
 
 @item lookup-fill-column
 @vindex lookup-fill-column
-$B%(%s%H%jFbMF$r(B fill $B$9$k$H$-$N7e?t!#(B
+エントリ内容を fill するときの桁数。
 
 @item lookup-window-height
 @vindex lookup-window-height
-Entry $B%P%C%U%!Ey$N%&%#%s%I%&$N9b$5!#(B
+Entry バッファ等のウィンドウの高さ。
 
 @item lookup-save-configuration
 @vindex lookup-save-configuration
-non-nil $B$r;XDj$9$k$H!"(BLookup $B$rH4$1$?$H$-$K2hLL$N>uBV$,(B
-$B8!:w3+;O;~$N$b$N$KLa$5$l$k!#(B
+non-nil を指定すると、Lookup を抜けたときに画面の状態が
+検索開始時のものに戻される。
 
 @item lookup-use-bitmap
-non-nil $B$K;XDj$9$k$H!"(Bbitmap-mule $B$rMxMQ$7$?30;zI=<($r9T$J$&$h$&$K$J$j$^(B
-$B$9!#(Bbitmap-mule $B$,4{$K%m!<%I$5$l$F$$$l$P<+F0E*$K(B @code{t} $B$K$J$j$^$9!#(B
-@ref{Setup Gaiji} $B$r;2>H$7$F2<$5$$!#(B
+non-nil に指定すると、bitmap-mule を利用した外字表示を行なうようになりま
+す。bitmap-mule が既にロードされていれば自動的に @code{t} になります。
+@ref{Setup Gaiji} を参照して下さい。
 
 @item lookup-use-kakasi
-non-nil $B$K;XDj$9$k$H!"(BKAKASI $B$rMQ$$$FF|K\8l$N8!:w8l$N@Z$j=P$7$r9T$J$&$h(B
-$B$&$K$J$j$^$9!#(B@ref{Search Commands} $B$r;2>H$7$F2<$5$$!#(B
+non-nil に指定すると、KAKASI を用いて日本語の検索語の切り出しを行なうよ
+うになります。@ref{Search Commands} を参照して下さい。
 
 @item lookup-enable-gaiji
-nil $B$K;XDj$9$k$H!"30;z$NI=<($r9T$J$o$J$/$J$j$^$9!#(B@ref{Setup Gaiji} $B$r;2(B
-$B>H$7$F2<$5$$!#(B
+nil に指定すると、外字の表示を行なわなくなります。@ref{Setup Gaiji} を参
+照して下さい。
 
 @item lookup-max-hits
 @item lookup-max-text
 @vindex lookup-max-hits
 @vindex lookup-max-text
-$BI=<($9$k%(%s%H%j$N>e8B?t!"5Z$S%(%s%H%jK\J8$N>e8B%5%$%:$rDj$a$^$9!#(B
-$B$3$l$i$O8=:_(B ndeb $B$G$N$_M-8z$G$9!#(B
+表示するエントリの上限数、及びエントリ本文の上限サイズを定めます。
+これらは現在 ndeb でのみ有効です。
 
 @item lookup-cite-style
 @itemx lookup-cite-header
 @itemx lookup-cite-header
-$B%(%s%H%jK\J8$r0zMQ$9$k$H$-$N%9%?%$%k!"%X%C%@!"%W%l%U%#%/%9$r@_Dj$9$k!#(B
-@ref{Cite Contents} $B$r;2>H!#(B
+エントリ本文を引用するときのスタイル、ヘッダ、プレフィクスを設定する。
+@ref{Cite Contents} を参照。
 @end table
 
 @node Customize Face,  , Customize Variables, Customize General
-@subsection $BJ8;zAu>~$N%+%9%?%^%$%:(B
+@subsection 文字装飾のカスタマイズ
 
-Lookup $B$G$O%U%'%$%9(B($BJ8;zAu>~(B)$B$N@_Dj$K(B Custom $B%Q%C%1!<%8$N(B @code{defface} 
-$B$rMQ$$$F$$$^$9!#$3$l$r%+%9%?%^%$%:$9$k$K$O!"(B@kbd{M-x customize-group
-@key{RET} lookup-faces @key{RET}} $B$J$I$H$7$F@_Dj$r9T$J$C$F2<$5$$!#(B
+Lookup ではフェイス(文字装飾)の設定に Custom パッケージの @code{defface} 
+を用いています。これをカスタマイズするには、@kbd{M-x customize-group
+@key{RET} lookup-faces @key{RET}} などとして設定を行なって下さい。
 
-Mule $B$rMxMQ$7$F$$$k$J$I!"(BCustom $B$,%$%s%9%H!<%k$5$l$F$J$$>l9g$K$O!"(BLookup
-$B$N=i4|2=%U%!%$%k(B(@file{~/.lookup})$B$G@_Dj$r9T$J$&I,MW$,$"$j$^$9!#$3$l$O(B
-$B<!$N$h$&$K$7$F9T$J$$$^$9!#(B
+Mule を利用しているなど、Custom がインストールされてない場合には、Lookup
+の初期化ファイル(@file{~/.lookup})で設定を行なう必要があります。これは
+次のようにして行ないます。
 
 @lisp
-;; lookup-heading-1-face $B$N@_Dj(B
+;; lookup-heading-1-face の設定
 (set-face-bold-p 'lookup-heading-1-face t)
 (set-face-foreground 'lookup-heading-1-face "SlateBlue")
 @end lisp
 
-$B@_Dj=PMh$k%U%'%$%9$O<!$NDL$j$G$9!#(B
+設定出来るフェイスは次の通りです。
 
 @vtable @code
 @item lookup-heading-1-face
-$BK\J8$N:G=i$N8+=P$7(B($BDL>o!"0l9TL\(B)$B$KIU$1$i$l$k%U%'%$%9!#(B
+本文の最初の見出し(通常、一行目)に付けられるフェイス。
 @item lookup-heading-2-face
-$BK\J8$,9=B$$r;}$D>l9g!"FsHVL\$N8+=P$7$KIU$1$i$l$k%U%'%$%9!#(B
+本文が構造を持つ場合、二番目の見出しに付けられるフェイス。
 @item lookup-heading-3-face
-$BK\J8$,9=B$$r;}$D>l9g!";0HVL\$N8+=P$7$KIU$1$i$l$k%U%'%$%9!#(B
+本文が構造を持つ場合、三番目の見出しに付けられるフェイス。
 @item lookup-heading-4-face
-$BK\J8$,9=B$$r;}$D>l9g!";MHVL\$N8+=P$7$KIU$1$i$l$k%U%'%$%9!#(B
+本文が構造を持つ場合、四番目の見出しに付けられるフェイス。
 @item lookup-heading-5-face
-$BK\J8$,9=B$$r;}$D>l9g!"8^HVL\$N8+=P$7$KIU$1$i$l$k%U%'%$%9!#(B
+本文が構造を持つ場合、五番目の見出しに付けられるフェイス。
 @item lookup-heading-low-face
-$BK\J8$,9=B$$r;}$D>l9g!"$"$^$j=EMW$G$J$$ItJ,$KIU$1$i$l$k%U%'%$%9!#(B
+本文が構造を持つ場合、あまり重要でない部分に付けられるフェイス。
 @item lookup-reference-face
-$BK\J8$N%j%s%/ItJ,$KMQ$$$i$l$k%U%'%$%9!#(B
+本文のリンク部分に用いられるフェイス。
 @item lookup-refered-face
-$BK\J8$N;2>H:Q$_%j%s%/$KMQ$$$i$l$k%U%'%$%9!#(B
+本文の参照済みリンクに用いられるフェイス。
 @end vtable
 
-$B@_Dj$K$O<!$N$h$&$J4X?t$,MxMQ=PMh$^$9!#(B
+設定には次のような関数が利用出来ます。
 
 @table @code
 @item set-face-foreground
-$B%U%'%$%9$NJ8;z?'$r;XDj$9$k!#(B
+フェイスの文字色を指定する。
 @item set-face-background
-$B%U%'%$%9$NGX7J?'$r;XDj$9$k!#(B
+フェイスの背景色を指定する。
 @item set-face-bold-p
-$B%U%'%$%9$rB@;z$K$9$k!#(B
+フェイスを太字にする。
 @item set-face-italic-p
-$B%U%'%$%9$r<PBN$K$9$k!#(B
+フェイスを斜体にする。
 @item set-face-underline-p
-$B%U%'%$%9$r2<@~IU$-$K$9$k!#(B
+フェイスを下線付きにする。
 @end table
 
 @node Customize Option,  , Customize General, Customization
-@section $B<-=q$H%(!<%8%'%s%H$N%+%9%?%^%$%:(B
+@section 辞書とエージェントのカスタマイズ
 
 @menu
-* Agent Options::               $B%(!<%8%'%s%H!&%*%W%7%g%s0lMw(B
-* Dictionary Options::          $B<-=q%*%W%7%g%s0lMw(B
+* Agent Options::               エージェント・オプション一覧
+* Dictionary Options::          辞書オプション一覧
 @end menu
 
 @node Agent Options, Dictionary Options, Customize Option, Customize Option
-@subsection $B%(!<%8%'%s%H!&%*%W%7%g%s0lMw(B
+@subsection エージェント・オプション一覧
 
-$B8!:w%(!<%8%'%s%H$K%*%W%7%g%s$r@_Dj$9$k$3$H$G!"$=$N?6Iq$$$N%+%9%?%^%$%:$,(B
-$B2DG=$G$9!#(B(@pxref{Setup Option})
+検索エージェントにオプションを設定することで、その振舞いのカスタマイズが
+可能です。(@pxref{Setup Option})
 
-$B%*%W%7%g%s$K$OA4$F$N%(!<%8%'%s%H$G6&DL$KMxMQ=PMh$k$b$N$H!"%(!<%8%'%s%HKh(B
-$B$K0[$J$k$b$N$H$,$"$j$^$9!#8!:w%(!<%8%'%s%HJL$N%*%W%7%g%s$O!"$=$l$>$l$N%(!<(B
-$B%8%'%s%H$K$D$$$F$N@bL@$r;2>H$7$F2<$5$$!#6&DL%*%W%7%g%s$H$7$F$O!"<!$N$b$N(B
-$B$,MxMQ=PMh$^$9!#(B
+オプションには全てのエージェントで共通に利用出来るものと、エージェント毎
+に異なるものとがあります。検索エージェント別のオプションは、それぞれのエー
+ジェントについての説明を参照して下さい。共通オプションとしては、次のもの
+が利用出来ます。
 
 @table @code
 @item :alias
-$B%(!<%8%'%s%H$KJLL>$rM?$($k!#%(!<%8%'%s%H(BID $B$OIaDL(B
-@samp{@var{class+location}} $B$H$7$FM?$($i$l$k$,(B(@pxref{Quick Startup})$B!"(B
-$B$3$N%*%W%7%g%s$K$h$j(B @var{location} $B$NItJ,$rCV$-49$($i$l$k!#EvA3$J$,$i!"(B
-$B$3$l$O(B @code{lookup-search-agents} $B$G@_Dj$7$J$1$l$P$J$i$J$$!#<!$N$h$&$K(B
-$BMQ$$$i$l$k!#(B
+エージェントに別名を与える。エージェントID は普通
+@samp{@var{class+location}} として与えられるが(@pxref{Quick Startup})、
+このオプションにより @var{location} の部分を置き換えられる。当然ながら、
+これは @code{lookup-search-agents} で設定しなければならない。次のように
+用いられる。
 
 @lisp
 (setq lookup-search-agents
@@ -2441,155 +2441,155 @@ Mule $B$rMxMQ$7$F$$$k$J$I!"(BCustom $B$,%$%s%9%H!<%k$5$l$F$J$$>l9g$K$O!"(BLo
 (lookup-use-package "ndic+dict" "dict-package")
 @end lisp
 @item :title
-$B8!:w%(!<%8%'%s%H$K%?%$%H%k$r@_Dj$9$k!#$3$l$O8=:_!"MQ$$$i$l$F$$$J$$!#(B
+検索エージェントにタイトルを設定する。これは現在、用いられていない。
 @item :enable
-$BM-8z$H$9$k<-=qL>$N%j%9%H!#(B(@pxref{Setup Restriction})
+有効とする辞書名のリスト。(@pxref{Setup Restriction})
 @item :disable
-$BL58z$H$9$k<-=qL>$N%j%9%H!#(B(@pxref{Setup Restriction})
+無効とする辞書名のリスト。(@pxref{Setup Restriction})
 @item :select
-$BA*Br$9$k<-=qL>$N%j%9%H!#(B(@pxref{Setup Restriction})
+選択する辞書名のリスト。(@pxref{Setup Restriction})
 @item :unselect
-$BL$A*Br$K$9$k<-=qL>$N%j%9%H!#(B(@pxref{Setup Restriction})
+未選択にする辞書名のリスト。(@pxref{Setup Restriction})
 @end table
 
 @node Dictionary Options,  , Agent Options, Customize Option
-@subsection $B<-=q%*%W%7%g%s0lMw(B
+@subsection 辞書オプション一覧
 
-$B<-=q$O!"%*%W%7%g%s$r@_Dj$9$k$3$H$K$h$j%+%9%?%^%$%:$,2DG=$G$9!#(B
+辞書は、オプションを設定することによりカスタマイズが可能です。
 (@pxref{Setup Option})
 
-$B<!$N%*%W%7%g%s$,MxMQ=PMh$^$9!#(B
+次のオプションが利用出来ます。
 
 @table @code
 @item :title
-$B<-=q$N%?%$%H%k$r;XDj$9$k!#(B
+辞書のタイトルを指定する。
 @item :stemmer
-stemming $B4X?t$r;XDj$9$k!#$3$l$OJ#?t7A$J$IC18l$N8lHx$r<h$j=|$$$F85$NC18l(B
-$B$r?dB,$9$k$?$a$N4X?t$G!"J8;zNs$r<u$1<h$j8uJd$H$J$kJ8;zNs$N%j%9%H$rJV$5$M(B
-$B$P$J$i$J$$!#<!$N$h$&$K@_Dj$9$k!#(B
+stemming 関数を指定する。これは複数形など単語の語尾を取り除いて元の単語
+を推測するための関数で、文字列を受け取り候補となる文字列のリストを返さね
+ばならない。次のように設定する。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':stemmer 'stem-english)
 @end lisp
 @item :hiragana
-$B4A;z$R$i$,$J3HD%8!:w$r9T$&$h$&$K;XDj$9$k!#(B:expander $B%*%W%7%g%s5Z$S(B
-:expand-filter $B%*%W%7%g%s$r>e=q$-$9$k!#(B@xref{Kanji-Kana Expansion}.
+漢字ひらがな拡張検索を行うように指定する。:expander オプション及び
+:expand-filter オプションを上書きする。@xref{Kanji-Kana Expansion}.
 @item :expander
-expander $B4X?t$r;XDj$9$k!#$3$l$O8!:w8l$rE,Ev$JB>$N8!:w8l$KCV$-49$($k$?$a$N(B
-$B4X?t$G!"J8;zNs$r<u<h$j!"J8;zNs$N%j%9%H$rJV$5$J$1$l$P$i$J$i$J$$!#<!$N$h$&(B
-$B$K@_Dj$9$k!#(B
+expander 関数を指定する。これは検索語を適当な他の検索語に置き換えるための
+関数で、文字列を受取り、文字列のリストを返さなければらならない。次のよう
+に設定する。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expander 'lookup-kanji-get-readings)
 @end lisp
 
-:hiragana $B%*%W%7%g%s$HF1;~$K;XDj$9$k$3$H$O$G$-$J$$!#(B@xref{Universal Query Expansion}.
+:hiragana オプションと同時に指定することはできない。@xref{Universal Query Expansion}.
 @item :expand-filter
-expand-filter $B4X?t$r;XDj$9$k!#(Bexpander $B4X?t$K$h$C$F8!:w8l$,3HD%$5$l$k$H!"(B
-$B8!:w7k2L$KB?$/$NL5BL$J%(%s%H%j$,4^$^$l$k$h$&$K$J$k!#$3$N4X?t$O!"$=$N$h$&(B
-$B$J%(%s%H%j$r85!9$N8!:w8l$rMQ$$$F%U%#%k%?%j%s%0$9$k$?$a$N4X?t$G$"$k!#<!$N(B
-$B$h$&$K@_Dj$9$k!#(B
+expand-filter 関数を指定する。expander 関数によって検索語が拡張されると、
+検索結果に多くの無駄なエントリが含まれるようになる。この関数は、そのよう
+なエントリを元々の検索語を用いてフィルタリングするための関数である。次の
+ように設定する。
 
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expand-filter 'lookup-kanji-filter)
 @end lisp
 
-:hiragana $B%*%W%7%g%s$HF1;~$K;XDj$9$k$3$H$O$G$-$J$$!#(B@xref{Universal Query Expansion}.
+:hiragana オプションと同時に指定することはできない。@xref{Universal Query Expansion}.
 @item :arranges
-arrange $B4X?t$N%j%9%H!#(B(@pxref{Format Contents})
+arrange 関数のリスト。(@pxref{Format Contents})
 @item :adjusts
-adjust $B4X?t$N%j%9%H!#(B(@pxref{Format Contents})
+adjust 関数のリスト。(@pxref{Format Contents})
 @item :gaiji-table
-$B30;z$NCV$-49$(%F!<%V%k!#(B(@pxref{Gaiji Table})
+外字の置き換えテーブル。(@pxref{Gaiji Table})
 @item :cite-style
 @itemx :cite-header
 @itemx :cite-prefix
-$B$=$l$>$l!"(B@code{lookup-cite-style}, @code{lookup-cite-header},
-@code{lookup-cite-prefix} $B$NBe$o$j$KM%@h$7$FMQ$$$i$l$k!#(B
+それぞれ、@code{lookup-cite-style}, @code{lookup-cite-header},
+@code{lookup-cite-prefix} の代わりに優先して用いられる。
 (@pxref{Cite Contents})
 @end table
 
-$B$3$NFb!"(B@code{:title} $B$H(B @code{:gaiji-table} $B$r=|$/A4$F$N%*%W%7%g%s$O!"(B
-$B%(!<%8%'%s%H!&%*%W%7%g%s$H$7$F@_Dj$9$k$3$H$b2DG=$G$9!#(B
+この内、@code{:title} と @code{:gaiji-table} を除く全てのオプションは、
+エージェント・オプションとして設定することも可能です。
 
-$B%(!<%8%'%s%H$K$h$C$F$O!"$3$l0J30$K$bFCJL$J<-=q%*%W%7%g%s$,MxMQ=PMh$k>l9g(B
-$B$,$"$j$^$9!#$=$l$>$l$N%(!<%8%'%s%H$N@bL@$r;2>H$7$F2<$5$$!#(B
+エージェントによっては、これ以外にも特別な辞書オプションが利用出来る場合
+があります。それぞれのエージェントの説明を参照して下さい。
 
 @node Information, Search Agents, Customization, Top
-@appendix $B99$J$k>pJs$rF@$k$K$O(B
+@appendix 更なる情報を得るには
 
 @itemize
-@item $B%[!<%`%Z!<%8(B
+@item ホームページ
 
 @url{http://lookup.sourceforge.net}
 
-@item $B%a!<%j%s%0%j%9%H(B
+@item メーリングリスト
 
-@email{lookup-ja-subscribe@@ring.gr.jp} $B$K(B subscribe $B$H=q$$$?%a!<%k$r(B
-$BAw$C$F2<$5$$!#(B
+@email{lookup-ja-subscribe@@ring.gr.jp} に subscribe と書いたメールを
+送って下さい。
 @end itemize
 
 @node Search Agents, Concept Index, Information, Top
-@appendix $B8!:w%(!<%8%'%s%H0lMw(B
+@appendix 検索エージェント一覧
 
 @menu
-* ndic::                        $B%U%j!<<-=q$+$i8!:w$9$k(B
-* ndeb::                        CD-ROM $B<-=q$+$i8!:w$9$k(B
-* ndtp::                        NDTP $B%5!<%P$+$i8!:w$9$k(B
-* ndict::                       DICT $B%5!<%P$+$i8!:w$9$k(B
-* ndsrd::                       $B%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$r8!:w$9$k(B
-* ndkks::                       $BF|K\8l$NFI$_$rD4$Y$k(B
-* ndspell::                     $B%9%Z%k%A%'%C%/$H%9%Z%k8!:w(B
-* ndcookie::                    cookie $B%U%!%$%k$+$i8!:w$9$k(B
+* ndic::                        フリー辞書から検索する
+* ndeb::                        CD-ROM 辞書から検索する
+* ndtp::                        NDTP サーバから検索する
+* ndict::                       DICT サーバから検索する
+* ndsrd::                       ランダムハウス英語辞典Windows版を検索する
+* ndkks::                       日本語の読みを調べる
+* ndspell::                     スペルチェックとスペル検索
+* ndcookie::                    cookie ファイルから検索する
 @end menu
 
 @node ndic, ndeb, Search Agents, Search Agents
 @section ndic
 
-`ndic' $B$O!"<g$K%U%j!<$KG[I[$5$l$F$$$k<-=q$+$i!"<j7Z$K8!:w$r9T$J$&$3$H$r(B
-$BL\E*$H$7$?8!:w%(!<%8%'%s%H$G$9!#<-=q0J30$KB>$KMQ0U$9$Y$-$b$N$b$J$$$N$G!"(B
-$B$H$j$"$($:(B Lookup $B$r;n$7$F$_$k$K$O$A$g$&$I$$$$$G$7$g$&!#(B
+`ndic' は、主にフリーに配布されている辞書から、手軽に検索を行なうことを
+目的とした検索エージェントです。辞書以外に他に用意すべきものもないので、
+とりあえず Lookup を試してみるにはちょうどいいでしょう。
 
-dictd $B<-=q$O(B ndict $B%(!<%8%'%s%H$G$bMxMQ2DG=$G$9!#@-G=$r=E;k$9$k>l9g$K$O!"(B
-$B$=$A$i$r;2>H$7$F$_$F2<$5$$!#(B(@pxref{ndict})
+dictd 辞書は ndict エージェントでも利用可能です。性能を重視する場合には、
+そちらを参照してみて下さい。(@pxref{ndict})
 
 
 @menu
-* ndic prepare::                ndic $B$N=`Hw(B
-* ndic setup::                  ndic $B$N@_Dj(B
-* ndic dictionary::             ndic $B$N<-=q(B
-* ndic customize::              ndic $B$N%+%9%?%^%$%:(B
+* ndic prepare::                ndic の準備
+* ndic setup::                  ndic の設定
+* ndic dictionary::             ndic の辞書
+* ndic customize::              ndic のカスタマイズ
 @end menu
 
 @node ndic prepare, ndic setup, ndic, ndic
-@subsection ndic $B$N=`Hw(B
+@subsection ndic の準備
 
-ndic $B$G$O8=:_!"(Bdictd-1.4.x $BMQ$KMQ0U$5$l$?<-=q(B $B$H(B SDIC $B<-=q$+$i8!:w$r(B
-$B9T$J$&$3$H$,2DG=$H$J$C$F$$$^$9!#$$$/$D$+$N%U%j!<$J<-=q$,!"(BLookup $B$N%[!<%`(B
-$B%Z!<%8$+$iF~<j=PMh$^$9!#(B
+ndic では現在、dictd-1.4.x 用に用意された辞書 と SDIC 辞書から検索を
+行なうことが可能となっています。いくつかのフリーな辞書が、Lookup のホーム
+ページから入手出来ます。
 
 @table @asis
 @item Lookup dictionary collection
 @url{http://openlab.ring.gr.jp/lookup/dicts/}
 @end table
 
-dictd $B<-=q(B(@file{*.index} $B$H(B @file{*.dict})$B$d(BSDIC $B<-=q(B(@file{*.sdic})
-$B$OE,Ev$J%G%#%l%/%H%j$K%$%s%9%H!<%k$7$F2<$5$$!#(Bdictd $B<-=q$O(B $B05=L(B(dictzip)$B$7$F$*$$$F$b(B
-$B9=$$$^$;$s!#I,MW$J=`Hw$O$3$l$@$1$G$9!#(B
+dictd 辞書(@file{*.index} と @file{*.dict})やSDIC 辞書(@file{*.sdic})
+は適当なディレクトリにインストールして下さい。dictd 辞書は 圧縮(dictzip)しておいても
+構いません。必要な準備はこれだけです。
 
 @node ndic setup, ndic dictionary, ndic prepare, ndic
-@subsection ndic $B$N@_Dj(B
+@subsection ndic の設定
 
-ndic $B$O<!$N$h$&$K@_Dj$7$^$9!#(B
+ndic は次のように設定します。
 
 @lisp
 (ndic @var{directory})
 @end lisp
 
-@var{directory} $B$K$O<-=q$N$"$k%G%#%l%/%H%j$r;XDj$7$^$9!#%*%W%7%g%s$=$NB>(B
-$B$NFCJL$J@_Dj$O$"$j$^$;$s!#(B
+@var{directory} には辞書のあるディレクトリを指定します。オプションその他
+の特別な設定はありません。
 
-$BNc$($P<!$N$h$&$K$J$j$^$9!#(B
+例えば次のようになります。
 
 @lisp
 (setq lookup-search-agents
@@ -2597,125 +2597,125 @@ ndic $B$O<!$N$h$&$K@_Dj$7$^$9!#(B
 @end lisp
 
 @node ndic dictionary, ndic customize, ndic setup, ndic
-@subsection ndic $B$N<-=q(B
+@subsection ndic の辞書
 
-$B;XDj$7$?%G%#%l%/%H%j$K4^$^$l$k!"(Bdictd$B<-=q$N%$%s%G%C%/%9%U%!%$%k(B(@file{*.index})
-$B$d(B SDIC $B<-=q(B(@file{*.sdic})$B$,<-=q$H$7$FG'<1$5$l$^$9!#(B
-$B$=$N3HD%;R$r<h$j=|$$$?%U%!%$%kL>$,<-=qL>$H$J$j$^$9!#<-=q$N%?%$%H%k$O<+F0E*$KG'<1$5$l$^$9!#(B
+指定したディレクトリに含まれる、dictd辞書のインデックスファイル(@file{*.index})
+や SDIC 辞書(@file{*.sdic})が辞書として認識されます。
+その拡張子を取り除いたファイル名が辞書名となります。辞書のタイトルは自動的に認識されます。
 
-$BA4J88!:w$r=|$/!"A4$F$N8!:wJ}<0$,M-8z$G$9!#(B(@pxref{Search Methods})
+全文検索を除く、全ての検索方式が有効です。(@pxref{Search Methods})
 
 @node ndic customize,  , ndic dictionary, ndic
-@subsection ndic $B$N%+%9%?%^%$%:(B
+@subsection ndic のカスタマイズ
 
 @vindex ndic-dictzip-program
-$B<-=q$,(B dictzip $B%3%^%s%I$K$h$j05=L$7$F$"$k>l9g!"$=$NE83+$K(B dictzip $B$r8F$S(B
-$B=P$7$^$9!#JQ?t(B @code{ndic-dictzip-program} $B$K$h$j!"$=$N%W%m%0%i%`L>$r;X(B
-$BDj$7$^$9!#%G%U%)%k%H$G$O(B "dictzip" $B$K$J$C$F$$$^$9!#(B
+辞書が dictzip コマンドにより圧縮してある場合、その展開に dictzip を呼び
+出します。変数 @code{ndic-dictzip-program} により、そのプログラム名を指
+定します。デフォルトでは "dictzip" になっています。
 
 @node ndeb, ndtp, ndic, Search Agents
 @section ndeb
 
-`ndeb' $B$O!"EE;R%V%C%/$d(B EPWING $B5,Ls$K=`5r$7$?(B CD-ROM $B=q@R$N8D?MMxMQ$K8~(B
-$B$$$?8!:w%(!<%8%'%s%H$G$9!#(Beblook $B$H$$$&30It%3%^%s%I$rMQ$$$k$3$H$G!"FCJL(B
-$B$J@_Dj$NI,MW$J$7$K<j85$N(B CD-ROM $B<-=q$,MxMQ=PMh$^$9!#(B
+`ndeb' は、電子ブックや EPWING 規約に準拠した CD-ROM 書籍の個人利用に向
+いた検索エージェントです。eblook という外部コマンドを用いることで、特別
+な設定の必要なしに手元の CD-ROM 辞書が利用出来ます。
 
 @menu
-* ndeb prepare::                ndeb $B$N=`Hw(B
-* ndeb setup::                  ndeb $B$N@_Dj(B
-* ndeb dictionary::             ndeb $B$N<-=q(B
-* ndeb customize::              ndeb $B$N%+%9%?%^%$%:(B
+* ndeb prepare::                ndeb の準備
+* ndeb setup::                  ndeb の設定
+* ndeb dictionary::             ndeb の辞書
+* ndeb customize::              ndeb のカスタマイズ
 @end menu
 
 @node ndeb prepare, ndeb setup, ndeb, ndeb
-@subsection ndeb $B$N=`Hw(B
+@subsection ndeb の準備
 
-ndeb $B$O30It%3%^%s%I$H$7$F(B eblook $B$r;HMQ$7$^$9!#(Beblook $B$H$O!"EE;R%V%C%/$d(B
-EPWING $B5,Ls$K=>$C$?(B CD-ROM $B<-=q$r%"%/%;%9$9$k$?$a$N4J0W8!:w%3%^%s%I$G$9!#(B
+ndeb は外部コマンドとして eblook を使用します。eblook とは、電子ブックや
+EPWING 規約に従った CD-ROM 辞書をアクセスするための簡易検索コマンドです。
 
 
-ndeb $B$O30It%3%^%s%I$H$7$F(B eblook $B$rMxMQ$7$F$$$^$9!#(Beblook $B$O!"EE;R%V%C%/(B
-$B$d(B EPWING $B$H$$$C$?5,Ls$K=>$C$?(B CD-ROM $B=q@R$r%"%/%;%9$9$k$?$a$N%D!<%k$G$9!#(B
+ndeb は外部コマンドとして eblook を利用しています。eblook は、電子ブック
+や EPWING といった規約に従った CD-ROM 書籍をアクセスするためのツールです。
 
-@subsubheading CD-ROM $B$N=`Hw(B
+@subsubheading CD-ROM の準備
 
-$BMxMQ=PMh$k(B CD-ROM $B$O!"0lHL$N=qE9$G9XF~$9$k$3$H$,=PMh$^$9!#BgBN!"?t@i1_$+(B
-$B$i?tK|1_DxEY$GGd$C$F$$$^$9!#$3$l$+$i9XF~$9$k>l9g$K$O!"$=$l$,(B EPWING $B$H$$(B
-$B$&5,3J$K=>$C$F$$$k$3$H$r3NG'$7$F2<$5$$!#%Q%C%1!<%8$NN"$K(B EPWING $B$H$$$&%^!<(B
-$B%/$,IU$$$F$$$k$O$:$G$9!#(B
+利用出来る CD-ROM は、一般の書店で購入することが出来ます。大体、数千円か
+ら数万円程度で売っています。これから購入する場合には、それが EPWING とい
+う規格に従っていることを確認して下さい。パッケージの裏に EPWING というマー
+クが付いているはずです。
 
-CD-ROM $B$OE,Ev$J%G%#%l%/%H%j$K%^%&%s%H$7$F$*$$$F2<$5$$!#%G%#%9%/$KM>M5$,(B
-$B$"$k>l9g$K$O!"%O!<%I%G%#%9%/$K%3%T!<$7$F$*$$$F$b9=$$$^$;$s!#$?$@$7!"%3%T!<(B
-$B$,5v$5$l$k$+$I$&$+$OCx:n<T$K8"Mx$,$"$k$N$G!"<-=q$N@bL@=q$rCm0U$7$FFI$s$G(B
-$B2<$5$$!#(B
+CD-ROM は適当なディレクトリにマウントしておいて下さい。ディスクに余裕が
+ある場合には、ハードディスクにコピーしておいても構いません。ただし、コピー
+が許されるかどうかは著作者に権利があるので、辞書の説明書を注意して読んで
+下さい。
 
-$B<-=q$O(B eblook $B$KImB0$N05=L%3%^%s%I$G05=L$7$F$*$/$3$H$b2DG=$G$9!#BgBN!"(B
-1/2 $B!A(B 1/3 $B$N%5%$%:$K$^$G=L>.$5$l$^$9!#(B
+辞書は eblook に附属の圧縮コマンドで圧縮しておくことも可能です。大体、
+1/2 〜 1/3 のサイズにまで縮小されます。
 
 @subsubheading eblook
 
-eblook $B$O<!$N$H$3$m$+$iF~<j2DG=$G$9!#(BUNIX $BHG$H!"(BMS Windows $B$GMxMQ=PMh$k(B
-$B$h$&$K$7$?%P%$%J%j$N>pJs$,F@$i$l$^$9!#(B
+eblook は次のところから入手可能です。UNIX 版と、MS Windows で利用出来る
+ようにしたバイナリの情報が得られます。
 
 @table @asis
 @item eblook
 @url{http://openlab.ring.gr.jp/lookup/eblook/}
 @end table
 
-$B%$%s%9%H!<%k$OE,Ev$J%G%#%l%/%H%j$K9T$J$C$F2<$5$$!#(B
+インストールは適当なディレクトリに行なって下さい。
 
-@subsubheading $B30;zI=<($N=`Hw(B
+@subsubheading 外字表示の準備
 
-Lookup $B$O(B CD-ROM $B=q@R$K4^$^$l$k30;z$NI=<($r%5%]!<%H$7$F$$$^$9!#30;zI=<((B
-$B$r9T$J$&$?$a$N@_Dj$K$D$$$F$O!"(B@ref{Setup Gaiji} $B$r;2>H$7$F2<$5$$!#(B
+Lookup は CD-ROM 書籍に含まれる外字の表示をサポートしています。外字表示
+を行なうための設定については、@ref{Setup Gaiji} を参照して下さい。
 
-$B30;z$rI=<($7$?$/$J$$!"$b$7$/$O$=$l$,IT2DG=$J>l9g$K$O!"(BAppendix $B$H8F$P$l(B
-$B$k30;z$NCV$-49$(%F!<%V%k$rMxMQ$9$k$3$H$G!"30;z$rDL>o$NJ8;zNs$GCV$-49$($k(B
-$B$3$H$b2DG=$G$9!#;THN$N<-=q$KBP1~$7$?$$$/$D$+$N(B Appendix $B$,!"(BEB $B%i%$%V%i(B
-$B%j$N(B Web $B%Z!<%8$G8x3+$5$l$F$$$^$9!#(B
+外字を表示したくない、もしくはそれが不可能な場合には、Appendix と呼ばれ
+る外字の置き換えテーブルを利用することで、外字を通常の文字列で置き換える
+ことも可能です。市販の辞書に対応したいくつかの Appendix が、EB ライブラ
+リの Web ページで公開されています。
 
 @table @asis
 @item Appendix
 @url{http://www.sra.co.jp/people/m-kasahr/eb/}
 @end table
 
-$B$"$k$$$OMxMQ$9$k<-=q$NJd=u%Q%C%1!<%8$,$"$k>l9g$K$O!"$=$3$GFH<+$K30;z$NCV(B
-$B$-49$(%F!<%V%k$,MQ0U$5$l$F$$$k>l9g$,$"$j$^$9!#L\E*$NJd=u%Q%C%1!<%8$,$J$$(B
-$B$+3NG'$7$F$_$F2<$5$$!#(B(@pxref{Setup Package})
+あるいは利用する辞書の補助パッケージがある場合には、そこで独自に外字の置
+き換えテーブルが用意されている場合があります。目的の補助パッケージがない
+か確認してみて下さい。(@pxref{Setup Package})
 
 @node ndeb setup, ndeb dictionary, ndeb prepare, ndeb
-@subsection ndeb $B$N@_Dj(B
+@subsection ndeb の設定
 
-ndeb $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndeb は、次のように設定します。
 
 @lisp
 (ndeb @var{directory})
 @end lisp
 
-@var{directory} $B$K$O<-=q$N$"$k%G%#%l%/%H%j$r;XDj$7$^$9!#(B
+@var{directory} には辞書のあるディレクトリを指定します。
 
-$B<!$N%(!<%8%'%s%H!&%*%W%7%g%s$,MxMQ$G$-$^$9!#(B
+次のエージェント・オプションが利用できます。
 
 @table @code
 @item :appendix
-eblook $B$,MxMQ$9$k(B Appendix $B$N$"$k%G%#%l%/%H(B
-$B%j$r;XDj$7$^$9(B(@inforef{Appendix, , eblook})$B!#>JN,$5$l$?>l9g$K$O!"<-=q%*(B
-$B%W%7%g%s(B @code{:gaiji-table} $B$K=>$C$F30;z$,CV$-49$($i$l$^$9!#(B
+eblook が利用する Appendix のあるディレクト
+リを指定します(@inforef{Appendix, , eblook})。省略された場合には、辞書オ
+プション @code{:gaiji-table} に従って外字が置き換えられます。
 (@pxref{Gaiji Table})
 @item :coding
-eblook $B$KBP$9$k(B process-coding-system$B!#(B
-$B%G%U%)%k%H$O(B @code{euc-jp}$B!#(B
+eblook に対する process-coding-system。
+デフォルトは @code{euc-jp}。
 @end table
 
-$B<!$N<-=q%*%W%7%g%s$,MxMQ$G$-$^$9!#(B
+次の辞書オプションが利用できます。
 
 @table @code
 @item :stop-code
-$B<-=q$N=PNO$N=*N;%3!<%I!#0lIt$N<-=q$G$O!"$3$l$r@_Dj$7$J$$$HI=<($,$*$+$7$/(B
-$B$J$k$3$H$,$"$k!#(BFAQ $B$r;2>H!#(B
+辞書の出力の終了コード。一部の辞書では、これを設定しないと表示がおかしく
+なることがある。FAQ を参照。
 @end table
 
-$BNc$($P<!$N$h$&$K$J$j$^$9!#(B
+例えば次のようになります。
 
 @lisp
 (setq lookup-search-agents
@@ -2723,107 +2723,107 @@ eblook $B$KBP$9$k(B process-coding-system$B!#(B
 @end lisp
 
 @node ndeb dictionary, ndeb customize, ndeb setup, ndeb
-@subsection ndeb $B$N<-=q(B
+@subsection ndeb の辞書
 
-CD-ROM $B=q@R$K4^$^$l$kA4$F$N<-=q$,M-8z$H$J$j$^$9!#<-=q$NL>A0$H%?%$%H%k$O(B
-eblook $B$+$iM?$($i$l$^$9!#(B
+CD-ROM 書籍に含まれる全ての辞書が有効となります。辞書の名前とタイトルは
+eblook から与えられます。
 
-$B8!:wJ}<0$O!V40A40lCW8!:w!W!VA0J}0lCW8!:w!W!V8eJ}0lCW8!:w!W$G$9!#(B
+検索方式は「完全一致検索」「前方一致検索」「後方一致検索」です。
 (@pxref{Search Methods})
 
-ndeb $B$O%a%K%e!<%3%^%s%I$KBP1~$7$F$$$^$9!#(B(@pxref{Specify Dictionary})
+ndeb はメニューコマンドに対応しています。(@pxref{Specify Dictionary})
 
 @node ndeb customize,  , ndeb dictionary, ndeb
-@subsection ndeb $B$N%+%9%?%^%$%:(B
+@subsection ndeb のカスタマイズ
 
 @vindex ndeb-program-name
-$BJQ?t(B @code{ndeb-program-name} $B$K$h$j!"(Beblook $B$N%3%^%s%IL>$r;XDj$7$^$9!#(B
-$B%G%U%)%k%H$G$O(B "eblook" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndeb-program-name} により、eblook のコマンド名を指定します。
+デフォルトでは "eblook" となっています。
 
 @vindex ndeb-prompt-string
-$BJQ?t(B @code{ndeb-prompt-string} $B$K$h$j!"(Beblook $B$N%W%m%s%W%H$r;XDj$7$^$9!#(B
-$B%G%U%)%k%H$G$O(B "eblook> " $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndeb-prompt-string} により、eblook のプロンプトを指定します。
+デフォルトでは "eblook> " となっています。
 
 @node ndtp, ndict, ndeb, Search Agents
 @section ndtp
 
-`ndtp' $B$O!"<g$K%m!<%+%k!&%M%C%H%o!<%/$G6&M-$5$l$?(B CD-ROM $B<-=q$+$i8!:w$r(B
-$B9T$J$&$3$H$rL\E*$H$7$?8!:w%(!<%8%'%s%H$G$9!#(BNDTP(Network Dictionary
-Transport Protocol)$B$N%P!<%8%g%s(B 2 $B$KBP1~$7$?%/%i%$%"%s%H$H$J$C$F$$$^$9!#(B
+`ndtp' は、主にローカル・ネットワークで共有された CD-ROM 辞書から検索を
+行なうことを目的とした検索エージェントです。NDTP(Network Dictionary
+Transport Protocol)のバージョン 2 に対応したクライアントとなっています。
 
-$B<-=q$r6&M-$9$kI,MW$N$J$$>l9g$K$O!"$h$j<j7Z$K@_Dj$G$-$k%(!<%8%'%s%H$H$7$F(B
-ndeb $B$,MxMQ2DG=$G$9!#(B(@pxref{ndeb})
+辞書を共有する必要のない場合には、より手軽に設定できるエージェントとして
+ndeb が利用可能です。(@pxref{ndeb})
 
 @menu
-* ndtp prepare::                ndtp $B$N=`Hw(B
-* ndtp setup::                  ndtp $B$N@_Dj(B
-* ndtp dictionary::             ndtp $B$N<-=q(B
+* ndtp prepare::                ndtp の準備
+* ndtp setup::                  ndtp の設定
+* ndtp dictionary::             ndtp の辞書
 @end menu
 
 @node ndtp prepare, ndtp setup, ndtp, ndtp
-@subsection ndtp $B$N=`Hw(B
+@subsection ndtp の準備
 
-ndtp $B$rMxMQ$9$k$K$O(B NDTP $B%5!<%P$,I,MW$G$9!#<+J,$N%M%C%H%o!<%/$K%5!<%P$,(B
-$BMQ0U$5$l$F$J$$>l9g$K$O!"<+J,$G=`Hw$9$kI,MW$,$"$j$^$9!#(B
+ndtp を利用するには NDTP サーバが必要です。自分のネットワークにサーバが
+用意されてない場合には、自分で準備する必要があります。
 
 @subsubheading NDTP server
 
-NDTP $B%5!<%P$H$7$F!"(Bdserver $B$H(B NDTPD $B$NFs$D$,F~<j2DG=$G$9!#$I$A$i$bEE;R%V%C(B
-$B%/$d(B EPWING $B$K=`5r$7$?(B CD-ROM $B=q@R$r07$&$?$a$N%5!<%P$G$9!#(B
+NDTP サーバとして、dserver と NDTPD の二つが入手可能です。どちらも電子ブッ
+クや EPWING に準拠した CD-ROM 書籍を扱うためのサーバです。
 
-`dserver' $B$O!"0JA0$+$i;H$o$l$F$$$k<-=q%5!<%P$G!"(BNDTP $B$N85$H$J$C$?%W%m%0(B
-$B%i%`$G$9!#<!$N$H$3$m$+$iF~<j2DG=$G$9!#(B
+`dserver' は、以前から使われている辞書サーバで、NDTP の元となったプログ
+ラムです。次のところから入手可能です。
 
 @table @asis
 @item dserver
 @url{ftp://ftp.pu-toyama.ac.jp/pub/misc/}
 @end table
 
-`NDTPD' $B$O!"?7$7$/:n$i$l$F$$$k<-=q%5!<%P$G!"(Bdserver $B$rCV$-49$($i$l$k$h$&(B
-$B3+H/$5$l$F$$$^$9!#<!$N$H$3$m$+$iF~<j2DG=$G$9!#(B
+`NDTPD' は、新しく作られている辞書サーバで、dserver を置き換えられるよう
+開発されています。次のところから入手可能です。
 
 @table @asis
 @item NDTPD
 @url{http://www.sra.co.jp/people/m-kasahr/ndtpd/}
 @end table
 
-$B%5!<%P$N@_Dj$K$D$$$F$O!"$=$l$>$l$N%W%m%0%i%`$KImB0$N%I%-%e%a%s%H$r;2>H(B
-$B$7$F2<$5$$!#(B
+サーバの設定については、それぞれのプログラムに附属のドキュメントを参照
+して下さい。
 
-@subsubheading $B30;zI=<($N=`Hw(B
+@subsubheading 外字表示の準備
 
-NDTP $B%5!<%P$H$7$F(B NDTPD $B%P!<%8%g%s(B 2.0 $B0J9_$rMQ$$$k$H!"<-=q$N30;z>pJs$r(B
-$B07$($k$h$&$K$J$j$^$9!#30;zI=<($N$?$a$N@_Dj$K$D$$$F$O!"(B@ref{Setup Gaiji}
-$B$r;2>H$7$F2<$5$$!#(B
+NDTP サーバとして NDTPD バージョン 2.0 以降を用いると、辞書の外字情報を
+扱えるようになります。外字表示のための設定については、@ref{Setup Gaiji}
+を参照して下さい。
 
 @node ndtp setup, ndtp dictionary, ndtp prepare, ndtp
-@subsection ndtp $B$N@_Dj(B
+@subsection ndtp の設定
 
-ndtp $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndtp は、次のように設定します。
 
 @lisp
 (ndtp @var{server})
 @end lisp
 
-@var{server} $B$K$O(B NDTP $B%5!<%P$N%[%9%HL>$r;XDj$7$^$9!#(B
+@var{server} には NDTP サーバのホスト名を指定します。
 
-$B<!$N%(!<%8%'%s%H!&%*%W%7%g%s$,MxMQ$G$-$^$9!#(B
+次のエージェント・オプションが利用できます。
 
 @table @code
 @item :service
-NDTP $B$N%5!<%S%9L>!#(B
+NDTP のサービス名。
 @item :port
-NDTP $B$N%]!<%HHV9f!#(B
-$B%5!<%S%9L>$H%]!<%HHV9f$NN>J}$r>JN,$7$?>l9g$O!"(B
-$B%5!<%S%9L>$H$7$F(B "ndtp" $B$,MxMQ$5$l$^$9!#(B
+NDTP のポート番号。
+サービス名とポート番号の両方を省略した場合は、
+サービス名として "ndtp" が利用されます。
 @item :account
-$B%5!<%P$X$N%"%+%&%s%H!#$3$l$O%m%0$K;D$k$H$$$&0J>e$N0UL#$O$J$$!#(B
-$B%G%U%)%k%H$O(B "<user>@@<host>")$B!#(B
+サーバへのアカウント。これはログに残るという以上の意味はない。
+デフォルトは "<user>@@<host>")。
 @item :coding
-$B%5!<%P$KBP$9$k(B process-coding-system$B!#%G%U%)%k%H$O(B @code{euc-jp}$B!#(B
+サーバに対する process-coding-system。デフォルトは @code{euc-jp}。
 @end table
 
-$BNc$($P<!$N$h$&$K$J$j$^$9!#(B
+例えば次のようになります。
 
 @lisp
 (setq lookup-search-agents
@@ -2831,46 +2831,46 @@ NDTP $B$N%]!<%HHV9f!#(B
 @end lisp
 
 @node ndtp dictionary,  , ndtp setup, ndtp
-@subsection ndtp $B$N<-=q(B
+@subsection ndtp の辞書
 
-$B%5!<%P$,07$C$F$$$kA4$F$N<-=q$,M-8z$H$J$j$^$9!#<-=q$NL>A0$H%?%$%H%k$O%5!<(B
-$B%P$+$iM?$($i$l$^$9!#(B
+サーバが扱っている全ての辞書が有効となります。辞書の名前とタイトルはサー
+バから与えられます。
 
-$B8!:wJ}<0$O!V40A40lCW8!:w!W!VA0J}0lCW8!:w!W!V8eJ}0lCW8!:w!W$G$9!#(B
+検索方式は「完全一致検索」「前方一致検索」「後方一致検索」です。
 (@pxref{Search Methods})
 
 @node ndict, ndsrd, ndtp, Search Agents
 @section ndict
 
-`ndict' $B$O!"<g$K%$%s%?!<%M%C%H$G8x3+$5$l$F$$$k<-=q%5!<%P$+$i8!:w$r9T$J$&(B
-$B$3$H$rL\E*$H$7$?8!:w%(!<%8%'%s%H$G$9!#$3$l$O(B DICT $B%W%m%H%3%k(B(RFC 2229)$B$K(B
-$BBP1~$7$?%/%i%$%"%s%H$H$J$C$F$$$^$9!#(B
+`ndict' は、主にインターネットで公開されている辞書サーバから検索を行なう
+ことを目的とした検索エージェントです。これは DICT プロトコル(RFC 2229)に
+対応したクライアントとなっています。
 
-DICT $B%5!<%P$N0l$D$G$"$k(B dictd $B8~$1$K%U%j!<$KG[I[$5$l$F$$$k<-=q$O!"(Bndic
-$B%(!<%8%'%s%H$G8!:w$9$k$3$H$b2DG=$G$9!#<j7Z$K8!:w$r;n$7$F$_$?$$J}$O!"$=$A(B
-$B$i$b;2>H$7$F$_$F2<$5$$!#(B(@pxref{ndic})
+DICT サーバの一つである dictd 向けにフリーに配布されている辞書は、ndic
+エージェントで検索することも可能です。手軽に検索を試してみたい方は、そち
+らも参照してみて下さい。(@pxref{ndic})
 
 @menu
-* ndict prepare::               ndict $B$N=`Hw(B
-* ndict setup::                 ndict $B$N@_Dj(B
-* ndict dictionary::            ndict $B$N<-=q(B
+* ndict prepare::               ndict の準備
+* ndict setup::                 ndict の設定
+* ndict dictionary::            ndict の辞書
 @end menu
 
 @node ndict prepare, ndict setup, ndict, ndict
-@subsection ndict $B$N=`Hw(B
+@subsection ndict の準備
 
-ndict $B$O(B DICT $B%W%m%H%3%k$KBP1~$7$?<-=q%5!<%P$K%"%/%;%9$7$^$9!#%5!<%P$K@\(B
-$BB3$G$-$k4D6-$G$"$l$P!"FCJL$J=`Hw$O2?$bI,MW$"$j$^$;$s!#<+J,$G%5!<%P$rF3F~(B
-$B$9$k>l9g$K$O!"(BDICT $B%W%m%8%'%/%H$+$i(B dictd $B$,F~<j2DG=$G$9!#(B
+ndict は DICT プロトコルに対応した辞書サーバにアクセスします。サーバに接
+続できる環境であれば、特別な準備は何も必要ありません。自分でサーバを導入
+する場合には、DICT プロジェクトから dictd が入手可能です。
 
 @table @asis
 @item DICT project
 @url{http://www.dict.org}
 @end table
 
-$BImB0$N%I%-%e%a%s%H$K=>$C$FE,@Z$K<-=q!"5Z$S%5!<%P$rF3F~$7$F2<$5$$!#(Bdictd
-$B$GMxMQ$G$-$k$$$/$D$+$N<-=q$O!">e5-%Z!<%80J30$K$b(B Lookup $B$N%[!<%`%Z!<%8$+(B
-$B$i$bF~<j2DG=$G$9!#(B
+附属のドキュメントに従って適切に辞書、及びサーバを導入して下さい。dictd
+で利用できるいくつかの辞書は、上記ページ以外にも Lookup のホームページか
+らも入手可能です。
 
 @table @asis
 @item Lookup dictionary collection
@@ -2878,52 +2878,52 @@ ndict $B$O(B DICT $B%W%m%H%3%k$KBP1~$7$?<-=q%5!<%P$K%"%/%;%9$7$^$9!#%5!<%P$K@
 @end table
 
 @node ndict setup, ndict dictionary, ndict prepare, ndict
-@subsection ndict $B$N@_Dj(B
+@subsection ndict の設定
 
-ndict $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndict は、次のように設定します。
 
 @lisp
 (ndict @var{server})
 @end lisp
 
-@var{server} $B$K$O(B DICT $B%5!<%P$N%[%9%HL>$r;XDj$7$^$9!#(B
+@var{server} には DICT サーバのホスト名を指定します。
 
-$B<!$N%(!<%8%'%s%H!&%*%W%7%g%s$,MxMQ$G$-$^$9!#(B
+次のエージェント・オプションが利用できます。
 
 @table @code
 @item :service
-DICT $B$N%5!<%S%9L>!#(B
+DICT のサービス名。
 @item :port
-DICT $B$N%]!<%HHV9f!#(B
+DICT のポート番号。
 @vindex ndict-service-name
-$B%5!<%S%9L>$H%]!<%HHV9f$NN>J}$r>JN,$7$?>l9g$O!"(B
-$B%5!<%S%9L>$H$7$FJQ?t(B @code{ndict-service-name} $B$NCM(B("dict")$B$,MxMQ$5$l$^$9!#(B
+サービス名とポート番号の両方を省略した場合は、
+サービス名として変数 @code{ndict-service-name} の値("dict")が利用されます。
 @item :coding
-$B%5!<%P$KBP$9$k(B process-coding-system$B!#(B
-$B%G%U%)%k%H$O(B @code{euc-jp-dos}$B!#(B
+サーバに対する process-coding-system。
+デフォルトは @code{euc-jp-dos}。
 @item :auth
-$B%5!<%P$X$N(B authentication($BG'>Z(B)$B$r;XDj$9$k!#%f!<%6L>$H%Q%9%o!<%I$N(B
-$BAH(B(cons)$B$K$h$C$FI=$o$9!#(B
+サーバへの authentication(認証)を指定する。ユーザ名とパスワードの
+組(cons)によって表わす。
 @item :methods
-$B%5!<%P$,BP1~$7$F$$$k8!:wJ}<0$N%j%9%H$r;XDj$9$k!#%G%U%)%k%H$G$O!"(B
-$B%5!<%P$N%=%U%H%&%'%"$r8+$F8!:wJ}<0$rM=B,$7$F$$$k!#$H$$$&$N$b!"(B
-DICT $B%W%m%H%3%k$G$O8!:wJ}<0$O%5!<%P$,<+M3$K@_$1$k$3$H$,=PMh$k$N$G!"(B
-$B%W%m%0%i%`$+$i$O40A4$J<+F0H=Dj$,=PMh$J$$!#=>$C$F%f!<%6$,BP1~$r;XDj$9$k(B
-$BI,MW$,$"$k!#(Bdictd-1.4.x $B$rIaDL$KMQ$$$k>l9g$K$O!"$3$l$r;XDj$9$k(B
-$BI,MW$O$J$$!#<!$N(B @code{:method-table} $B$b;2>H!#(B
+サーバが対応している検索方式のリストを指定する。デフォルトでは、
+サーバのソフトウェアを見て検索方式を予測している。というのも、
+DICT プロトコルでは検索方式はサーバが自由に設けることが出来るので、
+プログラムからは完全な自動判定が出来ない。従ってユーザが対応を指定する
+必要がある。dictd-1.4.x を普通に用いる場合には、これを指定する
+必要はない。次の @code{:method-table} も参照。
 @item :method-table
-Lookup $B$N8!:wJ}<0$H%5!<%P$N(B strategy $B$H$NBP1~4X78$r(B alist $B$G;XDj$9$k!#(B
-$BNc$($P%5!<%P$,(B dictd-1.4.x $B$G$"$k>l9g!"$3$l$O<+F0E*$K(B
+Lookup の検索方式とサーバの strategy との対応関係を alist で指定する。
+例えばサーバが dictd-1.4.x である場合、これは自動的に
 
 @lisp
 ((keyword . "exact") (prefix . "prefix") (suffix . "suffix")
  (substring . "substring") (exact . "exact") (regexp . "re"))
 @end lisp
 
-$B$N$h$&$K@_Dj$5$l$k!#>e$N(B @code{:methods} $B$bF1;~$K;XDj$9$kI,MW$,$"$k!#(B
+のように設定される。上の @code{:methods} も同時に指定する必要がある。
 @end table
 
-$BNc$($P<!$N$h$&$K$J$j$^$9!#(B
+例えば次のようになります。
 
 @lisp
 (setq lookup-search-agents
@@ -2931,48 +2931,48 @@ Lookup $B$N8!:wJ}<0$H%5!<%P$N(B strategy $B$H$NBP1~4X78$r(B alist $B$G;XDj$
 @end lisp
 
 @node ndict dictionary,  , ndict setup, ndict
-@subsection ndict $B$N<-=q(B
+@subsection ndict の辞書
 
-$B%5!<%P$,07$C$F$$$kA4$F$N<-=q$,M-8z$H$J$j$^$9!#<-=q$NL>A0$H%?%$%H%k$O%5!<(B
-$B%P$+$iM?$($i$l$^$9!#(B($B$7$+$7!"%5!<%P$+$iM?$($i$l$k%?%$%H%k$O$+$J$jD9$$>l(B
-$B9g$,$"$k$N$G!"<+J,$G:F@_Dj$7$?J}$,$h$$$+$b$7$l$^$;$s(B
+サーバが扱っている全ての辞書が有効となります。辞書の名前とタイトルはサー
+バから与えられます。(しかし、サーバから与えられるタイトルはかなり長い場
+合があるので、自分で再設定した方がよいかもしれません
 (@pxref{Dictionary Options}))
 
-$B8!:wJ}<0$OAj<j$N%5!<%P$K0MB8$7$^$9!#%5!<%P$,(B dictd-1.4.x $B$r$=$N$^$^MQ$$(B
-$B$F$$$k>l9g$K$O!"!VA4J88!:w!W0J30$NA4$F$N8!:w$,M-8z$H$J$j$^$9!#$G$J$1$l$P!"(B
-$B!V%-!<%o!<%I8!:w!W$H!VA0J}0lCW8!:w!W$N$_M-8z$H$J$j$^$9!#(B
+検索方式は相手のサーバに依存します。サーバが dictd-1.4.x をそのまま用い
+ている場合には、「全文検索」以外の全ての検索が有効となります。でなければ、
+「キーワード検索」と「前方一致検索」のみ有効となります。
 (@pxref{Search Methods})
 
 @node ndsrd, ndkks, ndict, Search Agents
 @section ndsrd
 
-`ndsrd' $B$O!"%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$r8!:w$9$k8!:w%(!<%8%'%s%H$G(B
-$B$9!#30It%3%^%s%I$H$7$FB@ED=c$5$s:n$N(B CSRD $B$rMQ$$$^$9!#(B
+`ndsrd' は、ランダムハウス英語辞典Windows版を検索する検索エージェントで
+す。外部コマンドとして太田純さん作の CSRD を用います。
 
 @menu
-* ndsrd prepare::               ndsrd $B$N=`Hw(B
-* ndsrd setup::                 ndsrd $B$N@_Dj(B
-* ndsrd dictionary::            ndsrd $B$N<-=q(B
-* ndsrd customize::             ndsrd $B$N%+%9%?%^%$%:(B
+* ndsrd prepare::               ndsrd の準備
+* ndsrd setup::                 ndsrd の設定
+* ndsrd dictionary::            ndsrd の辞書
+* ndsrd customize::             ndsrd のカスタマイズ
 @end menu
 
 @node ndsrd prepare, ndsrd setup, ndsrd, ndsrd
-@subsection ndsrd $B$N=`Hw(B
+@subsection ndsrd の準備
 
-ndsrd $B$O%P!<%8%g%s(B 1.0 $B0J9_$N(B CSRD $B$KBP1~$7$F$$$^$9!#(BCSRD
-$B$O<!$N%5%$%H$+$iF~<j=PMh$^$9!#(B
+ndsrd はバージョン 1.0 以降の CSRD に対応しています。CSRD
+は次のサイトから入手出来ます。
 
 @table @asis
 @item CSRD
 @url{http://openlab.ring.gr.jp/edict/csrd/}
 @end table
 
-CSRD$B$OImB0$N%I%-%e%a%s%H$K=>$C$F%$%s%9%H!<%k$r9T$J$C$F$/$@$5$$!#(B
+CSRDは附属のドキュメントに従ってインストールを行なってください。
 
 @node ndsrd setup, ndsrd dictionary, ndsrd prepare, ndsrd
-@subsection ndsrd $B$N@_Dj(B
+@subsection ndsrd の設定
 
-ndsrd $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndsrd は、次のように設定します。
 
 @lisp
 (ndsrd @var{directory}
@@ -2981,44 +2981,44 @@ ndsrd $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
 @end lisp
 
 @node ndsrd dictionary, ndsrd customize, ndsrd setup, ndsrd
-@subsection ndsrd $B$N<-=q(B
+@subsection ndsrd の辞書
 
-$B%i%s%@%`%O%&%91Q8l<-E5(BWindows$BHG$N<-=q%G!<%?$G$9!#(B
+ランダムハウス英語辞典Windows版の辞書データです。
 
 @node ndsrd customize,  , ndsrd dictionary, ndsrd
-@subsection ndsrd $B$N%+%9%?%^%$%:(B
+@subsection ndsrd のカスタマイズ
 
 @vindex ndsrd-program-name
-$BJQ?t(B @code{ndsrd-program-name} $B$K$h$j!"(BCSRD $B$N%3%^%s%IL>$r;XDj$7$^$9!#(B
-$B%G%U%)%k%H$G$O(B "csrd" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndsrd-program-name} により、CSRD のコマンド名を指定します。
+デフォルトでは "csrd" となっています。
 
 @node ndkks, ndspell, ndsrd, Search Agents
 @section ndkks
 
-`ndkks' $B$O!"8!:w$G$O$J$/F|K\8l$NFI$_$rD4$Y$k$?$a$N8!:w%(!<%8%'%s%H$G$9!#(B
-$B4A;z$N4^$^$l$k8!:w8l$r;XDj$7$?>l9g!"4A;z$+$JJQ49%W%m%0%i%`(B KAKASI $B$rMQ$$(B
-$B$F$=$NFI$_$rD4$Y$FI=<($7$^$9!#(B
+`ndkks' は、検索ではなく日本語の読みを調べるための検索エージェントです。
+漢字の含まれる検索語を指定した場合、漢字かな変換プログラム KAKASI を用い
+てその読みを調べて表示します。
 
 @menu
-* ndkks prepare::               ndkks $B$N=`Hw(B
-* ndkks setup::                 ndkks $B$N@_Dj(B
-* ndkks dictionary::            ndkks $B$N<-=q(B
-* ndkks customize::             ndkks $B$N%+%9%?%^%$%:(B
+* ndkks prepare::               ndkks の準備
+* ndkks setup::                 ndkks の設定
+* ndkks dictionary::            ndkks の辞書
+* ndkks customize::             ndkks のカスタマイズ
 @end menu
 
 @node ndkks prepare, ndkks setup, ndkks, ndkks
-@subsection ndkks $B$N=`Hw(B
+@subsection ndkks の準備
 
-KAKASI $B$O4A;z$+$JJQ49%W%m%0%i%`$G!"<!$N$H$3$m$+$i(B kakasi-2.2.5.tar.gz($BK\(B
-$BBN%U%!%$%k(B)$B$H(B kakasidict.940620.gz($B<-=q%U%!%$%k(B)$B$NL>>N$GF~<j2DG=$G$9!#(B
+KAKASI は漢字かな変換プログラムで、次のところから kakasi-2.2.5.tar.gz(本
+体ファイル)と kakasidict.940620.gz(辞書ファイル)の名称で入手可能です。
 
 @table @asis
 @item KAKASI
 @url{ftp://sunsite.sut.ac.jp/pub/asia-info/japanese-src/packages/}
 @end table
 
-$B?7$7$/%$%s%9%H!<%k$9$k>l9g$K$O!"99$K<!$N$H$3$m$+$iF@$i$l$k>pJs$r85$K%Q%C(B
-$B%A$rEv$F$F$*$$$?J}$,$$$$$G$7$g$&!#(B
+新しくインストールする場合には、更に次のところから得られる情報を元にパッ
+チを当てておいた方がいいでしょう。
 
 @table @asis
 @item KAKASI patch
@@ -3026,70 +3026,70 @@ KAKASI $B$O4A;z$+$JJQ49%W%m%0%i%`$G!"<!$N$H$3$m$+$i(B kakasi-2.2.5.tar.gz($BK
 @end table
 
 @node ndkks setup, ndkks dictionary, ndkks prepare, ndkks
-@subsection ndkks $B$N@_Dj(B
+@subsection ndkks の設定
 
-ndkks $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndkks は、次のように設定します。
 
 @lisp
 (ndkks)
 @end lisp
 
-$B$D$^$j!"$=$l$r(B @code{lookup-search-agents} $B$N%j%9%H$K2C$($k$@$1$G$9!#(B
-$B%*%W%7%g%s$=$NB>$NFCJL$J@_Dj$O$"$j$^$;$s!#(B
+つまり、それを @code{lookup-search-agents} のリストに加えるだけです。
+オプションその他の特別な設定はありません。
 
 @node ndkks dictionary, ndkks customize, ndkks setup, ndkks
-@subsection ndkks $B$N<-=q(B
+@subsection ndkks の辞書
 
-ndkks $B<+BN$,0l$D$N<-=q$H$J$j$^$9!#<-=qL>$OJQ?t(B @code{ndkks-program-name}
-$B$G;XDj$5$l$k(B KAKASI $B%W%m%0%i%`$NL>A0$G$9!#%?%$%H%k$OJQ?t(B
-@code{ndkks-dictionary-title} $B$K$h$jM?$($i$l$^$9!#(B
+ndkks 自体が一つの辞書となります。辞書名は変数 @code{ndkks-program-name}
+で指定される KAKASI プログラムの名前です。タイトルは変数
+@code{ndkks-dictionary-title} により与えられます。
 
-$B%-!<%o!<%I8!:w$K$*$$$F!"4A;z$N4^$^$l$k8!:w8l$,;XDj$5$l$?$H$-=PNO$5$l$^$9!#(B
+キーワード検索において、漢字の含まれる検索語が指定されたとき出力されます。
 
 @node ndkks customize,  , ndkks dictionary, ndkks
-@subsection ndkks $B$N%+%9%?%^%$%:(B
+@subsection ndkks のカスタマイズ
 
 @vindex ndkks-program-name
-$BJQ?t(B @code{ndkks-program-name} $B$K$h$j!"(BKAKASI $B$N%3%^%s%IL>$r;XDj$7$^$9!#(B
-$B%G%U%)%k%H$G$O(B "kakasi" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndkks-program-name} により、KAKASI のコマンド名を指定します。
+デフォルトでは "kakasi" となっています。
 
 @vindex ndkks-dictionary-title
-$BJQ?t(B @code{ndkks-dictionary-title} $B$K$h$j!"(Bndkks $B<-=q$N%?%$%H%k$r;XDj$7(B
-$B$^$9!#%G%U%)%k%H$G$O(B "$B4A;z$+$J<-E5(B" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndkks-dictionary-title} により、ndkks 辞書のタイトルを指定し
+ます。デフォルトでは "漢字かな辞典" となっています。
 
 @vindex ndkks-content-format
-$BJQ?t(B @code{ndkks-content-format} $B$K$h$j!"=PNOFbMF$N%U%)!<%^%C%H$r%j%9%H(B
-$B$G;XDj$7$^$9!#%j%9%H$N3FMWAG$K$O<!$N$b$N$,MxMQ$G$-$^$9!#(B
+変数 @code{ndkks-content-format} により、出力内容のフォーマットをリスト
+で指定します。リストの各要素には次のものが利用できます。
 
 @table @asis
 @item @code{t}
-$B8!:w8l$,A^F~$5$l$k!#(B
-@item $BJ8;zNs(B
-$B$=$l$,$=$N$^$^A^F~$5$l$k!#(B
-@item $BJ8;zNs$N%j%9%H(B
-$B$=$l$r%*%W%7%g%s0z?t$H$7$F(B KAKASI $B$r8F$S=P$7!"$=$N7k2L$,A^F~$5$l$k!#(B
+検索語が挿入される。
+@item 文字列
+それがそのまま挿入される。
+@item 文字列のリスト
+それをオプション引数として KAKASI を呼び出し、その結果が挿入される。
 @end table
 
 @node ndspell, ndcookie, ndkks, Search Agents
 @section ndspell
 
-`ndspell' $B$O!"(BLookup $B$G%9%Z%k%A%'%C%/$r9T$J$&$?$a$N8!:w%(!<%8%'%s%H$G$9!#(B
-$BB>$N%(!<%8%'%s%H$GFH<+$K%9%Z%k%A%'%C%/$r9T$J$o$:$H$b!"(Bndspell $B$,$=$l$r=h(B
-$BM}$7$F<+F0E*$K:F8!:w$r9T$J$C$F$/$l$^$9!#$^$?!"%9%Z%k$N8!:w$b9T$J$($^$9!#(B
+`ndspell' は、Lookup でスペルチェックを行なうための検索エージェントです。
+他のエージェントで独自にスペルチェックを行なわずとも、ndspell がそれを処
+理して自動的に再検索を行なってくれます。また、スペルの検索も行なえます。
 
 @menu
-* ndspell prepare::             ndspell $B$N=`Hw(B
-* ndspell setup::               ndspell $B$N@_Dj(B
-* ndspell dictionary::          ndspell $B$N<-=q(B
-* ndspell customize::           ndspell $B$N%+%9%?%^%$%:(B
+* ndspell prepare::             ndspell の準備
+* ndspell setup::               ndspell の設定
+* ndspell dictionary::          ndspell の辞書
+* ndspell customize::           ndspell のカスタマイズ
 @end menu
 
 @node ndspell prepare, ndspell setup, ndspell, ndspell
-@subsection ndspell $B$N=`Hw(B
+@subsection ndspell の準備
 
-ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(BIspell $B$O(B
-$BBPOC7?$N%9%Z%k%A%'%C%/%3%^%s%I$G!"(Bgrep $B$O8@$o$:$HCN$l$?(B UNIX $B%D!<%k$G$9!#(B
-$B$I$A$i$b(B GNU $B$N(B FTP $B%5%$%H$J$I$+$iF~<j2DG=$G$9!#(B
+ndspell は外部コマンドとして Ispell と grep を利用しています。Ispell は
+対話型のスペルチェックコマンドで、grep は言わずと知れた UNIX ツールです。
+どちらも GNU の FTP サイトなどから入手可能です。
 
 @table @asis
 @item GNU ftp directory
@@ -3097,81 +3097,81 @@ ndspell $B$O30It%3%^%s%I$H$7$F(B Ispell $B$H(B grep $B$rMxMQ$7$F$$$^$9!#(B
 @end table
 
 @node ndspell setup, ndspell dictionary, ndspell prepare, ndspell
-@subsection ndspell $B$N@_Dj(B
+@subsection ndspell の設定
 
-ndspell $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndspell は、次のように設定します。
 
 @lisp
 (ndspell)
 @end lisp
 
-$B$D$^$j!"$=$l$r(B @code{lookup-search-agents} $B$N%j%9%H$K2C$($k$@$1$G$9!#(B
-$B%*%W%7%g%s$=$NB>$NFCJL$J@_Dj$O$"$j$^$;$s!#(B
+つまり、それを @code{lookup-search-agents} のリストに加えるだけです。
+オプションその他の特別な設定はありません。
 
 @node ndspell dictionary, ndspell customize, ndspell setup, ndspell
-@subsection ndspell $B$N<-=q(B
+@subsection ndspell の辞書
 
-ndspell $B<+BN$,0l$D$N<-=q$H$J$j$^$9!#<-=qL>$OJQ?t(B
-@code{ndspell-ispell-program} $B$G;XDj$5$l$k(B Ispell $B%3%^%s%I$NL>A0$G$9!#(B
-$B%?%$%H%k$OJQ?t(B @code{ndspell-dictionary-title} $B$K$h$jM?$($i$l$^$9!#(B
+ndspell 自体が一つの辞書となります。辞書名は変数
+@code{ndspell-ispell-program} で指定される Ispell コマンドの名前です。
+タイトルは変数 @code{ndspell-dictionary-title} により与えられます。
 
-$B<!$N8!:wK!$,M-8z$H$J$j$^$9!#(B
+次の検索法が有効となります。
 
 @table @code
-@item $B%-!<%o!<%I8!:w(B
-$B8!:w8l$r%9%Z%k%A%'%C%/$7!"8m$j$,$"$k>l9g$K$O8uJd$r%(%s%H%j$H$7$F@8@.!#(B
-@item $BA0J}0lCW8!:w(B
-@itemx $B8eJ}0lCW8!:w(B
-@itemx $BItJ,0lCW8!:w(B
-@itemx $B@55,I=8=8!:w(B
-$B%Q%?!<%s$K%^%C%A$9$kC18l$r8!:w$7!"%(%s%H%j$r@8@.!#(B
+@item キーワード検索
+検索語をスペルチェックし、誤りがある場合には候補をエントリとして生成。
+@item 前方一致検索
+@itemx 後方一致検索
+@itemx 部分一致検索
+@itemx 正規表現検索
+パターンにマッチする単語を検索し、エントリを生成。
 @end table
 
-$B$I$N>l9g$b!"@8@.$5$l$?%(%s%H%j$OIaDL$K(B Entry $B%P%C%U%!$K=PNO$5$l!"$=$l$r(B
-$BA*Br$7$FFbMF$rI=<($7$h$&$H$7$?CJ3,$G:F8!:w$,9T$J$o$l$^$9!#<B:]$K;n$7$F$_(B
-$B$F2<$5$$!#(B
+どの場合も、生成されたエントリは普通に Entry バッファに出力され、それを
+選択して内容を表示しようとした段階で再検索が行なわれます。実際に試してみ
+て下さい。
 
 @node ndspell customize,  , ndspell dictionary, ndspell
-@subsection ndspell $B$N%+%9%?%^%$%:(B
+@subsection ndspell のカスタマイズ
 
 @vindex ndspell-ispell-program
-$BJQ?t(B @code{ndspell-ispell-program} $B$K$h$j!"(BIspell $B$N%3%^%s%IL>$r;XDj$7$^(B
-$B$9!#%G%U%)%k%H$G$O(B "ispell" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndspell-ispell-program} により、Ispell のコマンド名を指定しま
+す。デフォルトでは "ispell" となっています。
 
 @vindex ndspell-grep-program
-$BJQ?t(B @code{ndspell-grep-program} $B$K$h$j!"(Bgrep $B$N%3%^%s%IL>$r;XDj$7$^$9!#(B
-$B%G%U%)%k%H$G$O(B "grep" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndspell-grep-program} により、grep のコマンド名を指定します。
+デフォルトでは "grep" となっています。
 
 @vindex ndspell-words-dictionary
-$BJQ?t(B @code{ndspell-words-dictionary} $B$K$h$j!"%9%Z%k$r8!:w$9$k:]$NC18l<-(B
-$B=q$r;XDj$7$^$9!#%G%U%)%k%H$G$O(B @file{/usr/share/dict/words} $B$H$J$C$F$$$^(B
-$B$9!#(B
+変数 @code{ndspell-words-dictionary} により、スペルを検索する際の単語辞
+書を指定します。デフォルトでは @file{/usr/share/dict/words} となっていま
+す。
 
 @vindex ndspell-dictionary-title
-$BJQ?t(B @code{ndspell-dictionary-title} $B$K$h$j!"(Bndspell $B<-=q$N%?%$%H%k$r;X(B
-$BDj$7$^$9!#%G%U%)%k%H$G$O(B "Spell Checker" $B$H$J$C$F$$$^$9!#(B
+変数 @code{ndspell-dictionary-title} により、ndspell 辞書のタイトルを指
+定します。デフォルトでは "Spell Checker" となっています。
 
 @vindex ndspell-search-dictionaries
-$BJQ?t(B @code{ndspell-search-dictionaries} $B$K$h$j!":F8!:w$NBP>]$H$9$k<-=q$r(B
-$B$=$N<-=q(BID $B$N%j%9%H$H$7$F;XDj$7$^$9!#%G%U%)%k%H$G$O(B @code{t} $B$H$J$C$F$*(B
-$B$j!"$3$N>l9g!"A*Br$5$l$F$$$kA4$F$N<-=q$+$i:F8!:w$,9T$J$o$l$^$9!#(B
+変数 @code{ndspell-search-dictionaries} により、再検索の対象とする辞書を
+その辞書ID のリストとして指定します。デフォルトでは @code{t} となってお
+り、この場合、選択されている全ての辞書から再検索が行なわれます。
 
 @node ndcookie,  , ndspell, Search Agents
 @section ndcookie
 
-`ndcookie' $B$O!"(Bcookie $B%U%!%$%k(B($B0zMQ=8(B)$B$+$i8!:w$r9T$J$&$?$a$N8!:w%(!<%8%'(B
-$B%s%H$G$9!#$*$^$1$_$?$$$J$b$s$G$9!#(B
+`ndcookie' は、cookie ファイル(引用集)から検索を行なうための検索エージェ
+ントです。おまけみたいなもんです。
 
 @menu
-* ndcookie prepare::            ndcookie $B$N=`Hw(B
-* ndcookie setup::              ndcookie $B$N@_Dj(B
-* ndcookie dictionary::         ndcookie $B$N<-=q(B
+* ndcookie prepare::            ndcookie の準備
+* ndcookie setup::              ndcookie の設定
+* ndcookie dictionary::         ndcookie の辞書
 @end menu
 
 @node ndcookie prepare, ndcookie setup, ndcookie, ndcookie
-@subsection ndcookie $B$N=`Hw(B
+@subsection ndcookie の準備
 
-$BMxMQ=PMh$k%U%!%$%k$NNc$H$7$F$O!"(BEmacs $B$KImB0$N(B Zippy $B%U%!%$%k$,$"$j$^$9!#(B
+利用出来るファイルの例としては、Emacs に附属の Zippy ファイルがあります。
 
 @table @asis
 @item Zippy
@@ -3179,19 +3179,19 @@ ndspell $B<+BN$,0l$D$N<-=q$H$J$j$^$9!#<-=qL>$OJQ?t(B
 @end table
 
 @node ndcookie setup, ndcookie dictionary, ndcookie prepare, ndcookie
-@subsection ndcookie $B$N@_Dj(B
+@subsection ndcookie の設定
 
-ndcookie $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
+ndcookie は、次のように設定します。
 
 @lisp
 (ndcookie @var{file})
 @end lisp
 
-@var{file} $B$K$O!"MxMQ$9$k(B cookie $B%U%!%$%k$r;XDj$7$^$9!#%U%!%$%k$,AjBP%Q(B
-$B%9$G;XDj$5$l$?>l9g!"JQ?t(B @code{data-directory} $B$+$i$NAjBP%Q%9$H$7$F07$o(B
-$B$l$^$9!#(B
+@var{file} には、利用する cookie ファイルを指定します。ファイルが相対パ
+スで指定された場合、変数 @code{data-directory} からの相対パスとして扱わ
+れます。
 
-$BNc$($P<!$N$h$&$K$J$j$^$9!#(B
+例えば次のようになります。
 
 @lisp
 (setq lookup-search-agents
@@ -3199,12 +3199,12 @@ ndcookie $B$O!"<!$N$h$&$K@_Dj$7$^$9!#(B
 @end lisp
 
 @node ndcookie dictionary,  , ndcookie setup, ndcookie
-@subsection ndcookie $B$N<-=q(B
+@subsection ndcookie の辞書
 
-$B;XDj$7$?(B cookie $B%U%!%$%k$,0l$D$N<-=q$H$J$j$^$9!#<-=qL>$O%U%!%$%kL>$K0lCW(B
-$B$7$^$9!#%?%$%H%k$O@_Dj$5$l$^$;$s!#(B
+指定した cookie ファイルが一つの辞書となります。辞書名はファイル名に一致
+します。タイトルは設定されません。
 
-$BA4$F$N8!:wJ}<0$,M-8z$H$J$j$^$9!#(B(@pxref{Search Methods})
+全ての検索方式が有効となります。(@pxref{Search Methods})
 
 @node Concept Index, Command Index, Search Agents, Top
 @unnumbered Concept Index
