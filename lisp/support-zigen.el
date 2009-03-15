@@ -94,6 +94,8 @@
   (goto-char (point-min))
   (while (re-search-forward "<.+?>" nil t) (replace-match ""))
   (goto-char (point-min))
+  (while (re-search-forward "\n\n+" nil t) (replace-match "\n"))
+  (goto-char (point-min))
   (if (looking-at "$") (delete-region (point-min) (1+ (point-min)))))
 
 (setq lookup-support-options

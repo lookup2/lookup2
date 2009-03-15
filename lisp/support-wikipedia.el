@@ -1,4 +1,4 @@
-;;; support-wikipedia.el --- suport file for "Wikipedia" Summary file.
+;;; support-wikipedia.el --- support for "Wikipedia" Summary XML file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -18,7 +18,7 @@
 ;;; Documentation:
 
 ;; This support-file will search the wikipedia summary file.  You will
-;; need to make the sufary-index by "mksary" program.
+;; need to make the suffix array index by "mksary".
 ;;
 ;; Unfortunately, current English wikipedia summary file exceeds
 ;; 2Gbyte, so you must split it in half (by `split' command, for
@@ -49,6 +49,16 @@
 ;;   end
 ;;   $offset+=line.length
 ;; }
+;;
+;; * In English edition, 6th line should be:
+;;
+;;   if line =~ /^(<title>Wikipedia:&amp;#32;)(.+)<\/title>/ 
+;;
+;; * In French edition, 6th line should be:
+;;
+;;   if line =~ /^(<title>Wikipédia&amp;nbsp;:&amp;#32;)(.+)<\/title>/ 
+;;
+;; etc.
 
 ;;; Code:
 
@@ -85,6 +95,9 @@
   (goto-char (point-min))
   (while (re-search-forward "<title>Wikipedia: " nil t) (replace-match ""))
   (goto-char (point-min))
+  (while (re-search-forward "<title>Wikipedia:&amp;#32;" nil t) (replace-match ""))
+  (goto-char (point-min))
+  (while (re-search-forward "<title>Wikipédia&amp;nbsp;:&amp;#32;" nil t) (replace-match ""))
   (goto-char (point-min))
   (while (re-search-forward "<.+?>" nil t) (replace-match "")))
 
@@ -103,16 +116,22 @@
                              'support-wikipedia-link uri)))
 
 (setq lookup-support-options
-      (list :title (cond ((string-match "/jawiki" lookup-support-dictionary-id)
-                          "Wikipedia 日本語")
-                         ((string-match "/enwiki" lookup-support-dictionary-id)
-                          "Wikipedia English")
-                         ((string-match "/frwiki" lookup-support-dictionary-id)
-                          "Wikipedia Française")
-                         ((string-match "/zhwiki" lookup-support-dictionary-id)
-                          "Wikipedia 中文")
-                         (t "Wikipedia"))
-            :entry-start "<title>Wikipedia: " 
+      (list :title 
+            (cond ((string-match "/jawiki" lookup-support-dictionary-id)
+                   "Wikipedia 日本語")
+                  ((string-match "/enwiki" lookup-support-dictionary-id)
+                   "Wikipedia English")
+                  ((string-match "/frwiki" lookup-support-dictionary-id)
+                   "Wikipédia Française")
+                  ((string-match "/zhwiki" lookup-support-dictionary-id)
+                   "Wikipedia 中文")
+                  (t "Wikipedia"))
+            :entry-start 
+            (cond ((string-match "/enwiki" lookup-support-dictionary-id)
+                   "<title>Wikipedia:&amp;#32;")
+                  ((string-match "/frwiki" lookup-support-dictionary-id)
+                   "<title>Wikipédia&amp;nbsp;:&amp;#32;")
+                  (t "<title>Wikipedia: "))
             :entry-end "</title>"
             :content-start "<doc>" :content-end "</doc>"
             :arranges '((reference support-wikipedia-arrange-structure))

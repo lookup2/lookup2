@@ -43,6 +43,7 @@
         ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-wikipedia")
         ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/frwiki.*-abstract\\.xml" . "support-wikipedia")
+        ("ndsary:.*/zhwiki.*-abstract-.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
