@@ -1,5 +1,6 @@
 ;;; lookup.el --- Search interface to electronic dictionaries
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -243,7 +244,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
     (lookup-exit)
     (when (and (interactive-p)
                (file-exists-p lookup-cache-file)
-               (yes-or-no-p "Do you want to delete cache? "))
+               (y-or-n-p "Delete cache (Warning: module info will be lost.) ? "))
       (delete-file lookup-cache-file)
       (setq lookup-search-modules nil)
       (setq lookup-agent-attributes nil)
@@ -731,9 +732,9 @@ If there is no session, default module will be returned."
 	    (error "No such module: %s" name))
       (car lookup-module-list))))
 
-(defun lookup-get-module (name)
+(defun lookup-get-module (name &optional module-list)
   (car (member-if (lambda (module) (equal (lookup-module-name module) name))
-		  lookup-module-list)))
+		  (or module-list lookup-module-list))))
 
 (defun lookup-get-agent (id)
   (car (member-if (lambda (agent) (equal (lookup-agent-id agent) id))

@@ -103,9 +103,12 @@ Search Methods:
   (define-key lookup-select-mode-map "p" 'previous-line)
   ;; select dictionary
   (define-key lookup-select-mode-map "m" 'lookup-select-dictionary-select)
+  (define-key lookup-select-mode-map "\em" 'lookup-select-dictionary-select-all)
   (define-key lookup-select-mode-map "u" 'lookup-select-dictionary-unselect)
+  (define-key lookup-select-mode-map "U" 'lookup-select-dictionary-unselect-all)
   (define-key lookup-select-mode-map "$" 'lookup-select-dictionary-secondary)
   (define-key lookup-select-mode-map "+" 'lookup-select-dictionary-supplement)
+
   ;; dictionary information
   (define-key lookup-select-mode-map "i" 'lookup-select-dictionary-info)
   (define-key lookup-select-mode-map "M" 'lookup-select-dictionary-menu)
@@ -152,6 +155,14 @@ A \"selected\" dictionary will be used whenever a search is conducted."
   (interactive)
   (lookup-select-dictionary-set-priority t))
 
+(defun lookup-select-dictionary-select-all ()
+  "Select the dictionary on the all line."
+  (interactive)
+  (save-excursion
+    (lookup-select-goto-first)
+    (while (lookup-select-this-dictionary)
+      (lookup-select-dictionary-set-priority t))))
+
 (defun lookup-select-dictionary-unselect ()
   "Unselect the dictionary on the current line.
 An \"unselected\" dictionary will never be used in usual, but may
@@ -159,6 +170,14 @@ be selected later.  An unselected dictionary can also be used
 by the command `\\[lookup-select-dictionary-search]'."
   (interactive)
   (lookup-select-dictionary-set-priority nil))
+
+(defun lookup-select-dictionary-unselect-all ()
+  "Unselect the dictionary on the all line."
+  (interactive)
+  (save-excursion
+    (lookup-select-goto-first)
+    (while (lookup-select-this-dictionary)
+      (lookup-select-dictionary-set-priority nil))))
 
 (defun lookup-select-dictionary-secondary ()
   "Select the dictionary on the current line as a secondary dictionary.

@@ -1,5 +1,6 @@
 ;;; lookup-modules.el --- Lookup modules mode
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -24,10 +25,13 @@
 
 (require 'lookup)
 
+(defvar lookup-modules-killed-modules nil)
+
 ;;;###autoload
 (defun lookup-list-modules ()
   (interactive)
   (with-current-buffer (lookup-get-buffer " *Module List*")
+    (setq lookup-modules-killed-modules nil)
     (lookup-modules-mode)
     (lookup-modules-build-buffer)
     (setq buffer-undo-list nil)
@@ -39,6 +43,7 @@
 (defun lookup-modules-build-buffer ()
   (let ((inhibit-read-only t))
     (erase-buffer)
+    (insert "Lookup Module List\n")
     (insert "Type `c' to create module, `v' to visit, "
 	    "`q' to leave, `?' for help.\n\n")
     (lookup-table-insert
@@ -52,6 +57,12 @@
 		  (list ? (lookup-module-name module)
 			(format "[%d] %s" (length dicts) str))))
 	      lookup-module-list)))))
+
+(defun lookup-modules-update-buffer ()
+  "Update buffer."
+  (let ((line (lookup-current-line)))
+    (lookup-modules-build-buffer)
+    (goto-line line)))
 
 ;;;
 ;;; Modules Mode
@@ -72,6 +83,7 @@
   (define-key lookup-modules-mode-map "p" 'previous-line)
   ;; module management
   (define-key lookup-modules-mode-map "c" 'lookup-modules-create-module)
+  (define-key lookup-modules-mode-map "r" 'lookup-modules-rename-module)
   (define-key lookup-modules-mode-map "\ey" 'lookup-modules-wrap-command)
   (define-key lookup-modules-mode-map "\C-k" 'lookup-modules-wrap-command)
   (define-key lookup-modules-mode-map "\C-y" 'lookup-modules-wrap-command)
@@ -113,12 +125,29 @@
   (setq name (replace-regexp-in-string "[\t ]+$" "" name))
   (if (lookup-get-module name)
       (error "Module `%s' already exists" name))
-  (let ((module (lookup-new-module name t)))
-    (setq lookup-module-list (nconc lookup-module-list
-                                    (list module)))
-    (princ name)
-    (lookup-list-modules)
-    ))
+  (let ((modules lookup-module-list)
+        (module (lookup-modules-this-module))
+        (new-module (lookup-new-module name t)))
+    (if (eq module (car modules))
+        (setq lookup-module-list (cons new-module modules))
+      (while (not (eq module (cadr modules))) (setq modules (cdr modules)))
+      (setcdr modules (cons new-module (cdr modules)))))
+  (lookup-modules-update-buffer))
+
+(defun lookup-modules-rename-module ()
+  "Rename existing module Module with specified name."
+  (interactive)
+  (let* ((module (lookup-modules-this-module))
+         (old-name (lookup-module-name module))
+         (new-name
+          (lookup-read-string
+           (format "Rename module name `%s' to" old-name))))
+    (setq new-name (replace-regexp-in-string "[\x00-\x1f]" "" new-name))
+    (setq new-name (replace-regexp-in-string "[\t ]+$" "" new-name))
+    (if (lookup-get-module new-name)
+      (error "Module `%s' already exists" new-name))
+    (setf (lookup-module-name module) new-name))
+  (lookup-modules-update-buffer))
 
 (defun lookup-modules-wrap-command (arg)
   "Call the corresponding global command with keys and reset dictionaries.
@@ -137,8 +166,8 @@ will be used instead of the usual `kill-ring'."
 	  (call-interactively (key-binding (this-command-keys))))
       (use-local-map lookup-modules-mode-map))
     (setq lookup-modules-kill-ring kill-ring)
-;    (lookup-modules-reset-dictionaries)))
-    ))
+    (lookup-modules-reset-modules)
+    (lookup-modules-update-buffer)))
 
 (defun lookup-modules-update ()
   (interactive)
@@ -160,7 +189,7 @@ will be used instead of the usual `kill-ring'."
 
 (defun lookup-modules-goto-first ()
   (goto-char (point-min))
-  (forward-line 4))
+  (forward-line 5))
 
 (defun lookup-modules-set-mark (mark)
   (let ((inhibit-read-only t))
@@ -170,12 +199,26 @@ will be used instead of the usual `kill-ring'."
   (forward-line))
 
 (defun lookup-modules-this-module ()
+  "Return the current line module or nil.  It also looks from killed-modules."
   (save-excursion
     (beginning-of-line)
     (goto-char (+ (point) 2))
     (let ((lookup-property (plist-get (text-properties-at (point)) 'lookup)))
-      (and lookup-property 
-           (lookup-get-module (elt lookup-property 1))))))
+      (and lookup-property
+           (or (lookup-get-module (elt lookup-property 1))
+               (lookup-get-module (elt lookup-property 1) lookup-modules-killed-modules))))))
+
+(defun lookup-modules-reset-modules ()
+  "Reset the current module settings as of buffer."
+  (save-excursion
+    (lookup-modules-goto-first)
+    (let ((old-modules lookup-module-list) module modules)
+      (while (setq module (lookup-modules-this-module))
+	(setq modules (cons module modules))
+	(forward-line))
+      (setq lookup-modules-killed-modules
+            (set-difference lookup-module-list modules))
+      (setq lookup-module-list (nreverse modules)))))
 
 (provide 'lookup-modules)
 

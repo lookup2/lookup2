@@ -1,4 +1,4 @@
-;;; ndpdic.el --- Lookup `pdic' interface
+;;; ndpdic.el --- Lookup `pdic' interface  -*- coding: utf-8 -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
@@ -166,8 +166,12 @@
 (put 'ndpdic :list 'ndpdic-list)
 (defun ndpdic-list (agent)
   "Return list of dictionary (only one) of AGENT."
-  (list (lookup-new-dictionary
-         agent "pdic")))
+  (let ((location (lookup-agent-location agent)))
+    (if (null (file-exists-p location))
+        (error "PDIC file not found!")
+      (if (> #x500 (ndpdic-file-version location))
+          (error "This version of PDIC file is not supported!")))
+    (list (lookup-new-dictionary agent "pdic"))))
 
 (put 'ndpdic :title 'ndpdic-title)
 (defun ndpdic-title (dictionary)
@@ -296,42 +300,34 @@
 (defun ndpdic-file-index-block (file)
   "Header index_block value for FILE."
   (ndpdic-file-short file 148))
-;; Eijiro では320.
 
 (defun ndpdic-file-header-size (file)
   "Header header_size value for FILE."
   (ndpdic-file-short file 150))
-;; header-size は 1024
 
 (defun ndpdic-file-nword (file)
   "Header nword value for FILE."
   (ndpdic-file-int file 160))
-;; eijiroは、1811121
 
 (defun ndpdic-file-dicorder (file)
   "Header dicorder value for FILE."
   (ndpdic-file-byte file 164))
-;; 0必須
 
 (defun ndpdic-file-dictype (file)
   "Header dictype value for FILE."
   (ndpdic-file-byte file 165))
-;; 9必須
 
 (defun ndpdic-file-os (file)
   "Header os value for FILE."
   (ndpdic-file-byte file 167))
-;; 0x20必須
 
 (defun ndpdic-file-index-blkbit (file)
   "Header index-blkbit value for FILE."
   (ndpdic-file-byte file 182))
-;; 基本は1。
 
 (defun ndpdic-file-extheader (file)
   "Header extheader value for FILE."
   (ndpdic-file-int file 184))
-;; 0必須
 
 (defun ndpdic-file-empty-block (file)
   "Header empty_block value for FILE."
@@ -340,12 +336,10 @@
 (defun ndpdic-file-nindex2 (file)
   "Header nindex2 value for FILE."
   (ndpdic-file-int file 192))
-;; Eijiroでは6876
 
 (defun ndpdic-file-nblock2 (file)
   "Header nblock2 value for FILE."
   (ndpdic-file-int file 196))
-;; Eijiroでは116475
 
 (defun ndpdic-file-crypt (file)
   "Header extheader value for FILE."
@@ -383,6 +377,7 @@ Otherwise, return t."
   (or
    (gethash (expand-file-name file) ndpdic-block-index-hash)
    (let* ((blocks (make-vector (ndpdic-file-nindex2 file) nil))
+          (blkbit (ndpdic-file-index-blkbit file))
           (i 0))
      (with-temp-buffer
        (set-buffer-multibyte nil)
@@ -392,7 +387,9 @@ Otherwise, return t."
        (goto-char (point-min))
        (while (not (eobp))
          (if (< i (length blocks))
-             (aset blocks i (ndpdic-buffer-int)))
+             (aset blocks i
+                   (if (= blkbit 0) (ndpdic-buffer-short)
+                     (ndpdic-buffer-int))))
          (setq i (1+ i))
          (if (null (ndpdic-forward-to-null)) (goto-char (point-max)))
          (unless (eobp) (forward-char))))
@@ -418,8 +415,7 @@ It assumes that current point is at beginning of new entry.  If
 there is no more entries available in this block, then nil is
 returned.  OLD-WORD will be used for decompressing new word.
 Default FIELD-SIZE-LENGTH value would be 2.  If there is a word,
-then it proceeds to next point.  Return list of (word kind
-content-start-point)."
+then it proceeds to next point.  "
   (if (null field-size-length) (setq field-size-length 2))
   (let ((field-size (if (eq field-size-length 2)
                         (ndpdic-buffer-short)

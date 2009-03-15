@@ -7,3 +7,11 @@ when moving history, dont change last-session.
 it will cause a problem in lookup-search-pattern.
 
 * incremental history search by M-r and M-s.
+
+* ndmisc.el .. support for various modern search engines.
+
+* support-sbgy.el
+
+* support-unihan.el
+
+* support-eijiro.el

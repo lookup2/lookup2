@@ -1,5 +1,5 @@
 ;;; lookup-history.el --- Lookup History mode
-;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2000,2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -34,6 +34,7 @@
 
 ;;;###autoload
 (defun lookup-history-display (module)
+  "Display lookup histories of MODULE."
   (with-current-buffer (lookup-get-buffer " *Search History*")
     (lookup-history-mode)
     (let* ((inhibit-read-only t)
@@ -44,9 +45,9 @@
       (while list
 	(insert (format "%3d: " num))
 	(setq num (1+ num) session (car list)
-	      type (lookup-session-type session))
+	      type nil);(lookup-session-type session))
 	(cond
-	 ((eq type 'lookup-search-query)
+	 (t ;(eq type 'lookup-search-query)
 	  (insert "{" (lookup-query-pattern (lookup-session-query session)) "}"
 		  (format " [%d]" (length (lookup-session-entries session))))
 	  (let ((entries (lookup-session-entries session))
@@ -91,7 +92,7 @@
   "*Hook for Lookup History mode.")
 
 (defun lookup-history-mode ()
-  "\\{lookup-history-mode-map}"
+  "\\{lookup-history-mode-map}."
   (interactive)
   (kill-all-local-variables)
   (setq major-mode 'lookup-history-mode)
