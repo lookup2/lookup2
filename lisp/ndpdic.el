@@ -44,58 +44,58 @@
 ;; After index is created, you can try `mksary' and look it up with `ndsary'
 ;; agent.
 
-
 ;; BOCU Decoder
 
 (defun bocu-read-decode-trail-char (reg)
   "BOCU trail char in REG to be decoded."
-  `(read-if (,reg > #x20) (,reg -= 13) ; 0x21 〜 0xff → 0x14 〜 0xF3
-     (if (,reg > #x1c) (,reg -= 12)    ; 0x1C 〜 0x1F → 0x10 〜 0x13
-       (if (,reg >= #x10) (,reg -= 10) ; 0x10 〜 0x19 → 0x06 〜 0x0F
-         (,reg -= 1)))))               ; 0x01 〜 0x06 → 0x00 〜 0x05
+  `(read-if (,reg > #x20) (,reg -= 13) 
+     (if (,reg >= #x1c) (,reg -= 12)   
+       (if (,reg >= #x10) (,reg -= 10) 
+         (,reg -= 1)))))               
 
-(define-ccl-program bocu-to-utf8
+(define-ccl-program decode-bocu
   `(4
     ((r4 = #x40)
+     (r7 = ,(charset-id-internal 'unicode))
      (loop
       (read r0)
       ;; Diff calculation phase
-      (if (r0 <= #x20) (r0 = r0)
-        (if (r0 = #x21)
-            ((r1 = 14161247)  ;; 243^3 - 187660
+      (if (r0 <= #x20) (r1 = r0)
+        (if (r0 == #x21)
+            ((r1 = -14536567)
              ,(bocu-read-decode-trail-char 'r2)
-             (r1 += (r2 * 59049)) ;; 243^2
+             (r1 += (r2 * 59049))
              ,(bocu-read-decode-trail-char 'r2)
              (r1 += (r2 * 243))
              ,(bocu-read-decode-trail-char 'r2)
              (r1 += r2))
           (if (r0 < #x25)
-              ((r1 = 59049 * (r0 - #x25))
+              ((r1 = ((r0 - #x25) * 59049))
                (r1 -= 10513)
                ,(bocu-read-decode-trail-char 'r2)
                (r1 += (r2 * 243))
                ,(bocu-read-decode-trail-char 'r2)
                (r1 += r2))
             (if (r0 < #x50)
-                ((r1 = 243 * (r0 - #x50))
+                ((r1 = ((r0 - #x50) * 243))
                  (r1 -= 64)
                  ,(bocu-read-decode-trail-char 'r2)
                  (r1 += r2))
               (if (r0 < #xd0)
                   (r1 = (r0 - #x90))
                 (if (r0 < #xfb)
-                    ((r1 = 243 * (r0 - #xd0))
+                    ((r1 = ((r0 - #xd0) * 243))
                      (r1 += 64)
                      ,(bocu-read-decode-trail-char 'r2)
                      (r1 += r2))
                   (if (r0 < #xfe)
-                      ((r1 = 59049 * (r0 - #xfb))
+                      ((r1 = ((r0 - #xfb) * 59049))
                        (r1 += 10513)
                        ,(bocu-read-decode-trail-char 'r2)
                        (r1 += (r2 * 243))
                        ,(bocu-read-decode-trail-char 'r2)
                        (r1 += r2))
-                    (if (r0 = #xfe)
+                    (if (r0 == #xfe)
                         ((r1 = 187660)
                          ,(bocu-read-decode-trail-char 'r2)
                          (r1 += (r2 * 59049))
@@ -108,34 +108,23 @@
       ;; output stage
       (if (r0 <= #x20) 
           ((write r0)
-           (if (r0 < #x1f) (r4 = #x40)))
+           (if (r0 < #x20) (r4 = #x40)))
         (if (r0 < #xff)
-            ((r1 += r4) ; #x0 + #x40
+            ((r1 += r4)
              (if (r1 < 0) (r1 = 0)) ; error recovery
-             (if (r1 < #x800) ;; utf-8 output
-                 ((write ((r1 >> 6) | #xC0))
-                  (write ((r1 & #x3F) | #x80)))
-               (if (r1 < #x10000)
-                   ((write ((r1 >> 12) | #xE0))
-                    (write (((r1 & #x0FC0) >> 6) | #x80))
-                    (write ((r1 & #x3F) | #x80)))
-                 ((write ((r1 >> 18) | #xF0))
-                  (write (((r1 >> 12) & #x3F) | #x80))
-                  (write (((r1 >> 6) & #x3F) | #x80))
-                  (write ((r1 & #x3F) | #x80)))
-                 ))
+             (write-multibyte-character r7 r1)
              ;; cp renewal stage
              (if (r1 < #x20) (r4 = #x40) ; reset
-               (if (r1 = #x20) (r4 = r4) ; space → keep
-                 ((r5 = (r1 <= #x309f))
-                  (r6 = (r1 >= #x3040))
-                  (if (r5 and r6) (r4 = #x3070)
-                    ((r5 = (r1 <= #x4e00))
-                     (r6 = (r1 >= #x9fa5))
-                     (if (r5 and r6) (r4 = #x7711)
-                       ((r5 = (r1 <= #xac00))
-                        (r6 = (r1 >= #xd7a3))
-                        (if (r5 and r6) (r4 = #xc1d1)
+               (if (r1 == #x20) (r4 = r4) ; space → keep
+                 ((r5 = (r1 >= #x3040))
+                  (r6 = (r1 <= #x309f))
+                  (if (r5 & r6) (r4 = #x3070)
+                    ((r5 = (r1 >= #x4e00))
+                     (r6 = (r1 <= #x9fa5))
+                     (if (r5 & r6) (r4 = #x7711)
+                       ((r5 = (r1 >= #xac00))
+                        (r6 = (r1 <= #xd7a3))
+                        (if (r5 & r6) (r4 = #xc1d1)
                           ((r5 = (r1 & #xff))
                            (r6 = (r1 & #xffffff00))
                            (if (r5 < #x80) (r4 = (r6 + #x40))
@@ -143,16 +132,8 @@
       (repeat)))))
 
 (defun ndpdic-bocu-to-str (string)
-  "STRING."
-  (apply 'string (nt:bocustr-to-rawcode-list (string-to-vector (string-as-unibyte string)))))
-  ;; taken from nt-bocu.el for now.
-;; test program
-;(defconst bocu-to-utf16 (clean-vector-nil bocu-to-utf16))
-;;(ccl-execute-on-string 'bocu-to-utf8 '[0 0 0 0 0 0 0 0 0] (string 32 #x90 #x90 #x90))
-;(defun ndpdic-bocu-to-str (string)
-;  "Decode BOCU STRING to Emacs String."
-;  (ccl-execute-on-string 'bocu-to-utf8 '[0 0 0 0 0 0 0 0 0] string))
-
+  "Decode BOCU STRING to Emacs String."
+  (ccl-execute-on-string 'decode-bocu '[0 0 0 0 0 0 0 0 0] string))
 
 ;;; Interface Functions
 
@@ -171,7 +152,11 @@
         (error "PDIC file not found!")
       (if (> #x500 (ndpdic-file-version location))
           (error "This version of PDIC file is not supported!")))
-    (list (lookup-new-dictionary agent "pdic"))))
+    (list (lookup-new-dictionary 
+           agent 
+           (downcase (replace-regexp-in-string
+                      "^.+/\\([a-zA-Z]+\\)[^/]+$" "\\1"
+                      (lookup-agent-location agent)))))))
 
 (put 'ndpdic :title 'ndpdic-title)
 (defun ndpdic-title (dictionary)
@@ -286,12 +271,10 @@
 (defun ndpdic-file-lword (file)
   "Header lowrd value for FILE."
   (ndpdic-file-short file 142))
-;; 通常は248, eijiroは1024
 
 (defun ndpdic-file-ljapa (file)
   "Header lowrd value for FILE."
   (ndpdic-file-short file 144))
-;; 通常は3000, eijiro はなぜか0。
 
 (defun ndpdic-file-block-size (file)
   "Header block_size value for FILE."

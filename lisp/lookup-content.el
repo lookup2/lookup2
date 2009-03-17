@@ -1,5 +1,6 @@
 ;;; lookup-content.el --- Lookup Content mode
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -25,16 +26,16 @@
 (require 'lookup)
 
 (defconst lookup-content-mode-help
-  "Lookup Content $B%b!<%I(B:
+  "Lookup Content Mode:
 
-`SPC' - $B%Z!<%8$r?J$a$k(B          `<'   - $B%P%C%U%!$N:G=i$X(B
-`DEL' - $B%Z!<%8$rLa$k(B            `>'   - $B%P%C%U%!$N:G8e$X(B
+`SPC' - Next page               `<'   - Beginning of buffer
+`DEL' - Previous page           `>'   - End of buffer
 
-`TAB' - $B<!$N%j%s%/$X(B            `RET' - $B%j%s%/$rC)$k(B
+`TAB' - Next link               `RET' - Jump to link
 
-`t'   - $B@07A=hM}$r%H%0%k$9$k(B    `w'   - $B%j!<%8%g%s$r0zMQ(B
-`h'   - Entry $B%P%C%U%!$K0\F0(B    `g'   - $B%P%C%U%!$r99?7$9$k(B
-`q'   - $B%P%C%U%!$rH4$1$k(B        `?'   - $B%X%k%W$rI=<((B")
+`t'   - Toggle arrangements     `w'   - Yank region
+`h'   - Move to entris buffer   `g'   - Update buffer
+`q'   - Quit buffer             `?'   - Display help")
 
 (defvar lookup-content-mode-map nil
   "*Keymap for Lookup Content mode.")
@@ -88,7 +89,7 @@
 ;;;
 
 (defun lookup-content-next-link ()
-  "$B<!$N%j%s%/$K0\F0$9$k!#(B"
+  "次のリンクに移動する。"
   (interactive)
   (if (lookup-goto-next-link)
       (message (lookup-entry-id (lookup-get-link (point))))
@@ -100,7 +101,7 @@
 	(error "No link in this buffer")))))
 
 (defun lookup-content-follow-link ()
-  "$B%]%$%s%H0LCV$N%j%s%/$r;2>H$9$k!#(B"
+  "ポイント位置のリンクを参照する。"
   (interactive)
   (let ((entry (lookup-get-link (point))))
     (if entry
@@ -115,22 +116,22 @@
       (error "No link here"))))
 
 (defun lookup-content-mouse-follow (event)
-  "$B%^%&%9$G%/%j%C%/$7$?%j%s%/$r;2>H$9$k!#(B"
+  "マウスでクリックしたリンクを参照する。"
   (interactive "e")
   (mouse-set-point event)
   (lookup-content-follow-link))
 
 (defun lookup-content-toggle-format ()
-  "$BK\J8$N@07A=hM}$r%H%0%k$9$k!#(B"
+  "本文の整形処理をトグルする。"
   (interactive)
   (setq lookup-enable-format (not lookup-enable-format))
   (lookup-content-display lookup-content-entry))
 
 (defun lookup-content-cite-region (start end)
-  "$B%j!<%8%g%s$NFbMF$r%-%k%j%s%0$KJ]B8$9$k!#(B
-$B$=$N:]!"JQ?t(B `lookup-cite-header' $B$^$?$O<-=q%*%W%7%g%s(B `cite-header'
-$B$K$h$j0zMQ;~$N%X%C%@$r!"JQ?t(B `lookup-cite-prefix' $B$^$?$O<-=q%*%W%7%g%s(B
-`cite-prefix' $B$K$h$j0zMQ;~$N%W%l%U%#%/%9$r;XDj$9$k$3$H$,=PMh$k!#(B"
+  "リージョンの内容をキルリングに保存する。
+その際、変数 `lookup-cite-header' または辞書オプション `cite-header'
+により引用時のヘッダを、変数 `lookup-cite-prefix' または辞書オプション
+`cite-prefix' により引用時のプレフィクスを指定することが出来る。"
   (interactive "r")
   (let* ((dictionary (lookup-entry-dictionary lookup-content-entry))
 	 (header (or (lookup-dictionary-option dictionary :cite-header t)
@@ -165,18 +166,18 @@
 		     (buffer-substring start (+ start len)))))))))
 
 (defun lookup-content-entry-window ()
-  "Entry $B%P%C%U%!$K0\F0$9$k!#(B"
+  "Entry バッファに移動する。"
   (interactive)
   (select-window (get-buffer-window (lookup-summary-buffer))))
 
 (defun lookup-content-update ()
-  "$B%-%c%C%7%e$rMQ$$$:$KK\J8$rFI$_D>$9!#(B"
+  "キャッシュを用いずに本文を読み直す。"
   (interactive)
   (let ((lookup-force-update t))
     (lookup-content-display lookup-content-entry)))
 
 (defun lookup-content-leave ()
-  "Content $B%P%C%U%!$rH4$1$k!#(B"
+  "Content バッファを抜ける。"
   (interactive)
   (lookup-hide-buffer (current-buffer))
   (lookup-summary-display-content))
