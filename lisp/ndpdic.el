@@ -56,7 +56,7 @@
 (define-ccl-program decode-bocu
   `(4
     ((r4 = #x40)
-     (r7 = ,(charset-id-internal 'unicode))
+     (r3 = ,(charset-id-internal 'unicode))
      (loop
       (read r0)
       ;; Diff calculation phase
@@ -70,27 +70,23 @@
              ,(bocu-read-decode-trail-char 'r2)
              (r1 += r2))
           (if (r0 < #x25)
-              ((r1 = ((r0 - #x25) * 59049))
-               (r1 -= 10513)
+              ((r1 = (((r0 - #x25) * 59049) - 10513))
                ,(bocu-read-decode-trail-char 'r2)
                (r1 += (r2 * 243))
                ,(bocu-read-decode-trail-char 'r2)
                (r1 += r2))
             (if (r0 < #x50)
-                ((r1 = ((r0 - #x50) * 243))
-                 (r1 -= 64)
+                ((r1 = (((r0 - #x50) * 243) - 64))
                  ,(bocu-read-decode-trail-char 'r2)
                  (r1 += r2))
               (if (r0 < #xd0)
                   (r1 = (r0 - #x90))
                 (if (r0 < #xfb)
-                    ((r1 = ((r0 - #xd0) * 243))
-                     (r1 += 64)
+                    ((r1 = (((r0 - #xd0) * 243) + 64))
                      ,(bocu-read-decode-trail-char 'r2)
                      (r1 += r2))
                   (if (r0 < #xfe)
-                      ((r1 = ((r0 - #xfb) * 59049))
-                       (r1 += 10513)
+                      ((r1 = (((r0 - #xfb) * 59049) + 10513))
                        ,(bocu-read-decode-trail-char 'r2)
                        (r1 += (r2 * 243))
                        ,(bocu-read-decode-trail-char 'r2)
@@ -107,12 +103,12 @@
                          )))))))))
       ;; output stage
       (if (r0 <= #x20) 
-          ((write r0)
+          ((if (r0 != 13) (write r0))
            (if (r0 < #x20) (r4 = #x40)))
         (if (r0 < #xff)
             ((r1 += r4)
              (if (r1 < 0) (r1 = 0)) ; error recovery
-             (write-multibyte-character r7 r1)
+             (write-multibyte-character r3 r1)
              ;; cp renewal stage
              (if (r1 < #x20) (r4 = #x40) ; reset
                (if (r1 == #x20) (r4 = r4) ; space → keep
@@ -188,7 +184,9 @@
       ;;(if (> (length result) ndpdic-max-hits)
       ;;    )
       (mapcar (lambda (x) (lookup-new-entry
-                           'regular dictionary x))
+                           'regular dictionary x
+                           (if (string-match "	" x)
+                               (substring x (match-end 0)))))
               result))))
 
 (put 'ndpdic :content 'ndpdic-content)
@@ -448,9 +446,19 @@ Return the list of entry words.  Result will be cached."
         (setq word (car word-spec))
         (if (null word-spec) (goto-char (point-max))
           (when (equal (car word-spec) entry)
-            (setq content (ndpdic-bocu-to-str (buffer-substring (elt word-spec 2) (point))))
+            (setq content
+                  (ndpdic-adjust-content 
+                   entry (elt word-spec 2) (point)))
             (goto-char (point-max)))))
       content)))
+
+(defun ndpdic-adjust-content (entry from to)
+  (concat
+   (if (string-match "	" entry) 
+       (substring entry (match-end 0)) entry)
+   "\n"
+   (ndpdic-bocu-to-str (buffer-substring from to))))
+  
 
 ;; binary search
 

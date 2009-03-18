@@ -217,7 +217,8 @@ will be used instead of the usual `kill-ring'."
 	(setq modules (cons module modules))
 	(forward-line))
       (setq lookup-modules-killed-modules
-            (set-difference lookup-module-list modules))
+            (nunion lookup-modules-killed-modules
+                    (set-difference lookup-module-list modules)))
       (setq lookup-module-list (nreverse modules)))))
 
 (provide 'lookup-modules)

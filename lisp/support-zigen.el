@@ -17,22 +17,25 @@
 
 ;;; Documentation:
 
-;; This agent will search the the "字源" XML dictionary file for
-;; the character.  File can be downloaded from the following site:
+;; This agent will search the "字源" XML dictionary file for the
+;; character.  File can be downloaded from the following site:
 ;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
 ;; Following Program will make index point file, which then can be
 ;; sorted by 'mksary -s' command.  
 ;;
 ;; #!/usr/bin/env ruby -Ku
-;; # Usage: ruby zigen.rb < all.xml > all.xml.ary
+;; # Usage: ruby zigen.rb all.xml
+;; STDIN.reopen(ARGV[0], "r")
+;; STDOUT.reopen(ARGV[0]+".ary", "w")
 ;; file = $stdin
 ;; $offset=0
 ;; file.each_line{|line|
 ;;   if line =~ /^(.*)(<見出字>).+<\/見出字>/ 
 ;;     print [$offset+$1.length].pack("N")
 ;;     print [$offset+$1.length+$2.length].pack("N")
-;;   elsif line =~ /^(.*)(<見出語>)(.+)<\/見出語>/
+;;   end
+;;   if line =~ /^(.*)(<見出語>)(.+)<\/見出語>/
 ;;     offs = $offset+$1.length
 ;;     print [offs].pack("N")
 ;;     offs = offs+$2.length

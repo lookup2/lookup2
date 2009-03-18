@@ -103,10 +103,10 @@
 ;;;
 
 (defvar ndsary-default-dict-specs
-  '((:name "_" :title "<sary default dict>"
+  '((;; :name "_" :title "<sary default dict>"
      :entry-start nil :entry-end nil
      :content-start nil :contents-end nil
-     :max-hits 50)))
+     :max-hits 50 :coding utf-8)))
 
 ;;;
 ;;; Interface functions
@@ -122,30 +122,48 @@
 
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
+  "Return list of dictionaries of AGENT."
   (if (not (and (executable-find ndsary-sary-program)
                 (file-exists-p (lookup-agent-location agent))
                 (file-exists-p (concat (lookup-agent-location agent) ".ary"))))
       (progn
-        (message 
-         "ndsary configuration is incorrect.  Dictionary(ies) will not be created.") 
+        (message
+         "ndsary configuration is incorrect.  Dictionary(ies) will not be created.")
         nil)
-    (let ((dict-specs (or (lookup-agent-option agent :dict-specs)
-                          ndsary-default-dict-specs)))
-      (mapcar (lambda (dict-spec) 
-                (let* ((dict
-                        (lookup-new-dictionary agent (plist-get dict-spec :name)))
-                       (id 
+    (let* ((dict-specs (or (lookup-agent-option agent :dict-specs)
+                           ndsary-default-dict-specs))
+           (location (lookup-agent-location agent))
+           (location-name
+            (if (string-match "^.+/\\([A-Za-z]+\\)[^/]+$" location)
+                (downcase (match-string 1 location)) "_")))
+      (mapcar (lambda (dict-spec)
+                (let* ((name
+                        (or (plist-get dict-spec :name)
+                            location-name
+                            "_"))
+                       (dict
+                        (lookup-new-dictionary
+                         agent (or (plist-get dict-spec :name)
+                                   location-name)))
+                       (id
                         (lookup-dictionary-id dict)))
-                  (apply 
-                   'lookup-set-dictionary-options 
+                  (apply
+                   'lookup-set-dictionary-options
                    (cons id dict-spec))
                   dict))
               dict-specs))))
 
 (put 'ndsary :title 'ndsary-title)
 (defun ndsary-title (dictionary)
-  ;; it has been already initialized at `ndsary-list' or `support-XXXX' time.
-  (lookup-dictionary-option dictionary :title))
+  "Get title of DICTIONARY."
+  (or (lookup-dictionary-option dictionary :title)
+      (let ((location (lookup-agent-location
+                       (lookup-dictionary-agent dictionary))))
+        (if (string-match
+             "^.+/\\([A-Za-z0-9]+\\)[^/]+$"
+             location)
+          (match-string 1 location)))
+      "[ndsary Dict]"))
 
 (defun ndsary-construct-query-string (query method start end)
   "Costruct search pattern from QUERY string and METHOD.
@@ -259,19 +277,23 @@ REGULAR is t if dictionary does not have duplicate entries."
                         string method entry-start entry-end))
          (max-hits (or (lookup-dictionary-option dictionary :max-hits)
                        lookup-max-hits))
+         (coding (or (lookup-dictionary-option dictionary :coding)
+                     'utf-8))
          (count 0) result)
     (if (null query-string) nil
       (if (/= 0 max-hits)
           ;; count the number of hits
           (dolist (location locations)
             (with-temp-buffer
-              (lookup-with-coding-system 'utf-8
+              (lookup-with-coding-system coding
                 (call-process
                  ndsary-sary-program nil t nil "-c" "-i"
                  query-string location))
               (goto-char (point-min))
               (looking-at "\\([0-9]+\\)")
               (setq count (+ count (string-to-number (match-string 1)))))))
+      (message "debug: entry-start=%s" entry-start)
+      (message "debug: coding=%s" coding)
       (cond ((and (/= 0 max-hits) (< max-hits count))
              (list
               (lookup-new-entry
@@ -281,13 +303,14 @@ REGULAR is t if dictionary does not have duplicate entries."
             ((and (or (null entry-start) (null entry-end))
                   (equal method 'exact))
              ;; no need to search.  Only single entry will be returned.
-             (lookup-new-entry 'regular dictionary string))
+             (list
+              (lookup-new-entry 'regular dictionary string)))
             (t
              ;; extract entries
              (with-temp-buffer
                ;; do all searches
                (dolist (location locations)
-                 (lookup-with-coding-system 'utf-8
+                 (lookup-with-coding-system coding
                    (call-process
                     ndsary-sary-program nil t nil "-i"
                     query-string location)))
@@ -313,6 +336,8 @@ REGULAR is t if dictionary does not have duplicate entries."
   "Return string content of ENTRY."
   (let* ((string     (lookup-entry-code entry))
          (dictionary (lookup-entry-dictionary entry))
+         (coding     (or (lookup-dictionary-option dictionary :coding)
+                         'utf-8))
          (locations (file-expand-wildcards
                      (expand-file-name
                       (lookup-agent-location
@@ -321,7 +346,7 @@ REGULAR is t if dictionary does not have duplicate entries."
          (content-end   (lookup-dictionary-option dictionary :content-end)))
     (if (equal "�" string) string
       (with-temp-buffer
-        (lookup-with-coding-system 'utf-8
+        (lookup-with-coding-system coding
           (dolist (location locations)
             (apply 'call-process
                    `(,ndsary-sary-program nil t nil "-i"

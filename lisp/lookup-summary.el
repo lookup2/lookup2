@@ -1,5 +1,6 @@
 ;;; lookup-summary.el --- Lookup Summary mode
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -195,9 +196,9 @@
 `g f' - use forward module      `g <' - redo prefix
 `g b' - use backward module     `g >' - redo suffix
 
-`r'   - 検索開始バッファに移動  `h'   - Content バッファに移動
-`q'   - バッファを抜ける        `g'   - 検索をやり直す
-`Q'   - Lookup を終了する       `R'   - Lookup を再起動する")
+`r'   - back to original buffer `h'   - move to content buffer
+`q'   - quit buffer             `g'   - redo search
+`Q'   - quit lookup             `R'   - restart lookup")
 
 (defvar lookup-summary-mode-map nil
   "*Keymap for Lookup Summary mode.")
@@ -214,6 +215,8 @@
   (define-key lookup-summary-mode-map ">" 'lookup-summary-end-of-content)
   (define-key lookup-summary-mode-map "n" 'lookup-summary-next-entry)
   (define-key lookup-summary-mode-map "p" 'lookup-summary-previous-entry)
+  (define-key lookup-summary-mode-map "P" 'enlarge-window)
+  (define-key lookup-summary-mode-map "N" 'shrink-window)
   (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-following-entry)
   (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-preceding-entry)
   (define-key lookup-summary-mode-map

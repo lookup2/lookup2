@@ -46,6 +46,7 @@
         ("ndsary:.*/zhwiki.*-abstract-.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
+        ("ndsary:.*\\.sdic" . "support-sdic")
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
         ("ndsary:.*/Unihan" . "support-unihan")
         ;; MISC

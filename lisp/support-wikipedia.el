@@ -17,13 +17,13 @@
 
 ;;; Documentation:
 
-;; This support-file will search the wikipedia summary file.  You will
-;; need to make the suffix array index by "mksary".
+;; This support file provides the ability to instantly search the
+;; wikipedia summary file.  You will need to make the suffix array
+;; index by "mksary".
 ;;
 ;; Unfortunately, current English wikipedia summary file exceeds
 ;; 2Gbyte, so you must split it in half (by `split' command, for
-;; example), to make it less than 2Gbyte to use it.  (sary can not
-;; handle more than 2G file.)
+;; example), to make it less than 2Gbyte to use it.  
 ;;
 ;; Download site:
 ;; http://download.wikipedia.org/enwiki/latest/ (English)
@@ -34,11 +34,15 @@
 ;; does not exeed 2G byte.  In that case, please split the text.)
 ;;
 ;; #!/usr/bin/env ruby -Ku
-;; # Usage: ruby wikipedia.rb < wiki.xml > wiki.xml.ary
+;; # Usage: ruby wiki.rb jawiki-latest-abstract.xml
+;; STDIN.reopen(ARGV[0], "r")
+;; STDOUT.reopen(ARGV[0]+".ary", "w")
 ;; file = $stdin
 ;; $offset=0
 ;; file.each_line{|line|
-;;   if line =~ /^(<title>Wikipedia: )(.+)<\/title>/ 
+;;   if ((line =~ /^(<title>Wikipedia: )(.+)<\/title>/ ) ||
+;;       (line =~ /^(<title>Wikipedia:&amp;#32;)(.+)<\/title>/ ) ||
+;;       (line =~ /^(<title>Wikipédia&amp;nbsp;:&amp;#32;)(.+)<\/title>/ ))
 ;;     print [$offset].pack("N")
 ;;     offs = $offset+$1.length
 ;;     chars=$2.split(//)
@@ -49,37 +53,23 @@
 ;;   end
 ;;   $offset+=line.length
 ;; }
-;;
-;; * In English edition, 6th line should be:
-;;
-;;   if line =~ /^(<title>Wikipedia:&amp;#32;)(.+)<\/title>/ 
-;;
-;; * In French edition, 6th line should be:
-;;
-;;   if line =~ /^(<title>Wikipédia&amp;nbsp;:&amp;#32;)(.+)<\/title>/ 
-;;
-;; etc.
 
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-utils)
 (require 'lookup-content) ; for `lookup-content-mode-map'
-
-(defvar support-wikipedia-link-map nil)
 
 (defun support-wikipedia-arrange-structure (entry)
   "Attach contents of ENTRY a link and remove tags."
   ;; initialization
-  (unless support-wikipedia-link-map
-    (setq support-wikipedia-link-map (copy-keymap lookup-content-mode-map))
-    (define-key support-wikipedia-link-map "\C-m" 'support-wikipedia-follow-link))
   ;; initialization end
   (goto-char (point-min))
   (while (re-search-forward "<url>\\(.+?\\)</url>" nil t)
     (let ((link (match-string 1))
           (start (match-beginning 0)))
       (replace-match "《→リンク》")
-      (support-wikipedia-set-link start (point) link)))
+      (lookup-url-set-link start (point) link)))
   (goto-char (point-min))
   (while (re-search-forward
           (concat "<sublink.+?>.*?"
@@ -89,7 +79,7 @@
           (anchor (match-string 1))
           (link (match-string 2)))
       (replace-match anchor)
-      (support-wikipedia-set-link start (point) link)))
+      (lookup-url-set-link start (point) link)))
   (goto-char (point-min))
   (while (re-search-forward "</?doc>[\t\n]+" nil t) (replace-match ""))
   (goto-char (point-min))
@@ -100,20 +90,6 @@
   (while (re-search-forward "<title>Wikipédia&amp;nbsp;:&amp;#32;" nil t) (replace-match ""))
   (goto-char (point-min))
   (while (re-search-forward "<.+?>" nil t) (replace-match "")))
-
-(defun support-wikipedia-follow-link ()
-  (interactive)
-  (let ((url (get-text-property (point) 'support-wikipedia-link)))
-    (browse-url url)))
-
-(defun support-wikipedia-set-link (start end uri)
-  (add-text-properties start end
-                       (list 'keymap support-wikipedia-link-map
-                             'face 'lookup-reference-face
-                             'mouse-face 'highlight
-                             'help-echo uri
-                             'lookup-tab-stop t
-                             'support-wikipedia-link uri)))
 
 (setq lookup-support-options
       (list :title 
