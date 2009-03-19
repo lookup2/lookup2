@@ -36,13 +36,12 @@
 
 ;;; <<Sample Function>>
 
-;; There is small function to create `index' file for pdic.
-;; You will need `mksary' program to prepare index.
-;; To do so, type M-x ndpdic-create-index-file will make index.
+;; There is a small sample function to create `index' file for PDIC.
+;; To make an index, type M-x ndpdic-create-index-file.
 ;; (You need at least 1G memory, it would take 10 minutes for 2GHz machine.)
 
-;; After index is created, you can try `mksary' and look it up with `ndsary'
-;; agent.
+;; Index is XML-like style, so you can try `mksary' to create and refer
+;; it.
 
 ;; BOCU Decoder
 
@@ -495,13 +494,12 @@ Return value would be (block . next-block)."
 ;; Utility Function
 
 (defun ndpdic-create-index-file (file)
-  "FILE に対するインデックスを作成する.
+  "Create XML-like index file from FILE.
 FILEは `.dic' ファイルとおなじ場所に、拡張子 `.idx' で保存される。
 FILEが、PDIC Unicodeの初期バージョンの場合は、下記のように出力される。
 <entry><word>XXXX</word><block>ZZZZ</block></entry>
 FILEが、PDIC Unicodeの英辞郎バージョンの場合は、下記の様に出力される。
-<entry><word>XXXX</word><head>YYYY</head><block>ZZZZ</block></entry>.
-出力ファイルをndaryに適用すると、部分一致検索が可能になる。"
+<entry><word>XXXX</word><head>YYYY</head><block>ZZZZ</block></entry>."
   (interactive "fPDIC File Name:")
   (let ((index-file (concat (file-name-sans-extension file) ".idx"))
         (block-index (ndpdic-block-index file))
