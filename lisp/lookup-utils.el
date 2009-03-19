@@ -293,28 +293,6 @@
   (if (process-buffer process)
       (kill-buffer (process-buffer process))))
 
-;;; Lookup URL link utilities
-
-(defvar lookup-url-link-map nil)
-
-(defun lookup-url-set-link (start end uri)
-  (unless lookup-url-link-map
-    (setq lookup-url-link-map (copy-keymap lookup-content-mode-map))
-    (define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link))
-  (add-text-properties 
-   start end
-   (list 'keymap lookup-url-link-map
-         'face 'lookup-reference-face
-         'mouse-face 'highlight
-         'help-echo uri
-         'lookup-tab-stop t
-         'lookup-url-link uri)))
-
-(defun lookup-url-follow-link ()
-  (interactive)
-  (let ((url (get-text-property (point) 'lookup-url-link)))
-    (browse-url url)))
-
 ;;; Lookup text utilities
 
 (defconst lookup-superscript-char-table
@@ -348,8 +326,8 @@
     (?θ . ?ᶿ) (?0 . ?⁰) (?i . ?ⁱ) (?4 . ?⁴)
     (?5 . ?⁵) (?6 . ?⁶) (?7 . ?⁷) (?8 . ?⁸)
     (?9 . ?⁹) (?+ . ?⁺) (?− . ?⁻) (?= . ?⁼)
-    (?( . ?⁽) (?) . ?⁾) (?n . ?ⁿ) ("SM" . ?℠)
-    ("TM" . ?™) (?ⵡ . ?ⵯ) (?一 . ?㆒) (?二 . ?㆓)))
+    (?( . ?⁽) (?) . ?⁾) (?n . ?ⁿ) (?ⵡ . ?ⵯ)))
+ ;; ("SM" . ?℠) ("TM" . ?™)
 
 (defsubst lookup-superscript-character (char)
   "Return the superscript character of CHAR if exists."
