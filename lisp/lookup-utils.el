@@ -293,10 +293,32 @@
   (if (process-buffer process)
       (kill-buffer (process-buffer process))))
 
+;;; Lookup URL link utilities
+
+(defvar lookup-url-link-map nil)
+
+(defun lookup-url-set-link (start end uri)
+  (unless lookup-url-link-map
+    (setq lookup-url-link-map (copy-keymap lookup-content-mode-map))
+    (define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link))
+  (add-text-properties 
+   start end
+   (list 'keymap lookup-url-link-map
+         'face 'lookup-reference-face
+         'mouse-face 'highlight
+         'help-echo uri
+         'lookup-tab-stop t
+         'lookup-url-link uri)))
+
+(defun lookup-url-follow-link ()
+  (interactive)
+  (let ((url (get-text-property (point) 'lookup-url-link)))
+    (browse-url url)))
+
 ;;; Lookup text utilities
 
 (defconst lookup-superscript-char-table
-  '((?a . ?ª) (?2 . ?²) (?3 . ?³) (?1 . ?¹)
+  '((?2 . ?²) (?3 . ?³) (?1 . ?¹)
     (?o . ?º) (?h . ?ʰ) (?ɦ . ?ʱ) (?j . ?ʲ)
     (?r . ?ʳ) (?ɹ . ?ʴ) (?ɻ . ?ʵ) (?ʁ . ?ʶ)
     (?w . ?ʷ) (?y . ?ʸ) (?ɣ . ?ˠ) (?l . ?ˡ)
@@ -327,14 +349,24 @@
     (?5 . ?⁵) (?6 . ?⁶) (?7 . ?⁷) (?8 . ?⁸)
     (?9 . ?⁹) (?+ . ?⁺) (?− . ?⁻) (?= . ?⁼)
     (?( . ?⁽) (?) . ?⁾) (?n . ?ⁿ) ("SM" . ?℠)
-    ("TM" . ?™) (?ⵡ . ?ⵯ) (?一 . ?㆒) (?二 . ?㆓)
-    (?三 . ?㆔) (?四 . ?㆕) (?上 . ?㆖) (?中 . ?㆗)
-    (?下 . ?㆘) (?甲 . ?㆙) (?乙 . ?㆚) (?丙 . ?㆛)
-    (?丁 . ?㆜) (?天 . ?㆝) (?地 . ?㆞) (?人 . ?㆟)))
+    ("TM" . ?™) (?ⵡ . ?ⵯ) (?一 . ?㆒) (?二 . ?㆓)))
 
-(defun lookup-superscript-character (char)
+(defsubst lookup-superscript-character (char)
   "Return the superscript character of CHAR if exists."
   (cdr (assq char lookup-superscript-char-table)))
+
+(defun lookup-superscript-string (str)
+  (let ((i (string-to-list str)) chars ch)
+    (while i
+      (if (setq ch (lookup-superscript-character (car i)))
+          (setq chars (cons ch chars) i (cdr i))
+        (setq i nil chars nil)))
+    (if chars (apply 'string (nreverse chars))
+      (put-text-property
+       0 (length str)
+       'display '((raise 0.3) (height 0.8))
+       str)
+      str)))
 
 (defconst lookup-subscript-char-table
   '((?i . ?ᵢ) (?r . ?ᵣ) (?u . ?ᵤ) (?v . ?ᵥ)
@@ -346,9 +378,22 @@
     (?a . ?ₐ) (?e . ?ₑ) (?o . ?ₒ) (?x . ?ₓ)
     (?ə . ?ₔ)))
 
-(defun lookup-subscript-character (char)
+(defsubst lookup-subscript-character (char)
   "Return the subscript character of CHAR if exists."
   (cdr (assq char lookup-subscript-char-table)))
+
+(defun lookup-subscript-string (str)
+  (let ((i (string-to-list str)) chars ch)
+    (while i
+      (if (setq ch (lookup-subscript-character (car i)))
+          (setq chars (cons ch chars) i (cdr i))
+        (setq i nil chars nil)))
+    (if chars (apply 'string (nreverse chars))
+      (put-text-property
+       0 (length str)
+       'display '((raise -0.3) (height 0.8))
+       str)
+      str)))
 
 (provide 'lookup-utils)
 
