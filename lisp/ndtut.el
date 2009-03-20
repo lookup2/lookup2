@@ -1,5 +1,6 @@
 ;;; ndtut.el --- Lookup tutorial agent
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Keywords: dictionary
@@ -41,9 +42,19 @@
 
 (put 'ndtut :content 'ndtut-entry-content)
 (defun ndtut-entry-content (entry)
+  "Display tutorial for dummy ENTRY."
   "Welcome to Lookup!
 
-This is Lookup tutorial program.")
+This is Lookup tutorial program.
+
+If you see this message, you may have not yet set the variable
+`lookup-search-agents'.
+
+Please read the manual, identify your dictionary resources and
+set up variable `lookup-search-agents'.
+
+Thank you for trying Lookup!!
+")
 
 (provide 'ndtut)
 
