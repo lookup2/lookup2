@@ -502,6 +502,14 @@ will be attached to the module 'default'."
 ;; remove-hook if you don't like.
 (add-hook 'lookup-query-string-hook 'lookup-remove-alphabet-accents-query-string)
 
+(defun lookup-remove-accent-search (dictionary query)
+  (let* ((query-string 
+          (downcase 
+           (lookup-remove-alphabet-accents
+            (lookup-query-string query))))
+         (query-strings (list query-string)))
+    (lookup-search-multiple dictionary query-strings)))
+
 (defconst lookup-obarray (make-vector 1511 nil))
 
 (defun lookup-dictionary-search-cache-get (dictionary query)
