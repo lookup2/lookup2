@@ -258,6 +258,7 @@
       encoded-crown-gaiji-table))))
 
 (setq lookup-support-options
-      (list :gaiji-table crown-gaiji-table))
+      (list :gaiji-table crown-gaiji-table
+	    :transformer 'lookup-remove-accent-search))
 
 ;;; support-crown.el ends here
