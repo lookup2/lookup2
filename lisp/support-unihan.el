@@ -18,12 +18,14 @@
 ;;; Documentation:
 
 ;; This support-file will search the Unihan file distributed by
-;; Unicode Consortium.  You will need to make the suffix array index
+;; Unicode Consortium.  It also has an ability to refer Kangxi
+;; Dictionary.
+;;
+;; You may need to make the suffix array index
 ;; by "mksary" program.  (-l option should be attached.)
 ;;
 ;; Download site:
-;; http://www.unicode.org/Unihan
-;; 
+;; http://unicode.org/Public/5.0.0/ucd/Unihan.html
 
 ;;; Code:
 
@@ -37,8 +39,8 @@
     (if (string-match "^[㐀-鿿𠀀-𯿼]" query-string)
         (lookup-search-multiple 
          dictionary 
-         (list (format "U+%X" (car (string-to-list query-string)))))
-      (lookup-search-multiple dictionary (list (lookup-query-string query-string))))))
+         (list (format "U+%X" (elt query-string 0))))
+      (lookup-search-multiple dictionary (list query-string)))))
 
 (defun support-unihan-arrange-structure (entry)
   "Arrange contents of ENTRY."
