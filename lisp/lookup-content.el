@@ -189,7 +189,7 @@
 (defvar lookup-url-link-map (copy-keymap lookup-content-mode-map))
 (define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link)
 
-(defun lookup-url-set-link (start end uri)
+(defun lookup-url-set-link (start end uri &optional object)
   (add-text-properties 
    start end
    (list 'keymap lookup-url-link-map
@@ -197,7 +197,8 @@
          'mouse-face 'highlight
          'help-echo uri
          'lookup-tab-stop t
-         'lookup-url-link uri)))
+         'lookup-url-link uri)
+   object))
 
 (defun lookup-url-follow-link ()
   (interactive)
