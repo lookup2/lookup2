@@ -171,8 +171,6 @@
                     (lookup-dictionary-agent dictionary)))
          (result
           (ndpdic-binary-search location query-string)))
-    (message "debug: query-string=%s" query-string)
-    (message "debug: result=%s" result)
     (when result
       (setq result
             (remove-if
@@ -388,35 +386,37 @@ Return a size of `Field-Length' of the block."
                                     (+ start (* block-num block-size)))
     fl-size))
 
-(defun ndpdic-entries-next-word (old-word &optional field-size-length)
+(defun ndpdic-entries-next-word (prev-word-data &optional field-size-length)
   "Scan the current buffer and return the new word and misc.
-Format is list of (WORD KIND CONTENT-START-POINT).
+Format is a list of (WORD KIND CONTENT-START-POINT WORD-DATA).
 It assumes that current point is at beginning of new entry.  If
 there is no more entries available in this block, then nil is
-returned.  OLD-WORD will be used for decompressing new word.
+returned.  PREV-WORD-DATA will be used for decompressing new word.
 Default FIELD-SIZE-LENGTH value would be 2.  If there is a word,
-then it proceeds to next point.  "
+then it proceeds to next point."
   (if (null field-size-length) (setq field-size-length 2))
   (let ((field-size (if (eq field-size-length 2)
                         (ndpdic-buffer-short)
                       (ndpdic-buffer-int)))
         compress kind start
-        content-start word)
+        content-start word-data)
     (when (/= 0 field-size)
       (setq compress (ndpdic-buffer-byte))
       (setq kind (ndpdic-buffer-byte))
       (setq start (point))
       (ndpdic-forward-to-null)
-      (setq word (ndpdic-bocu-to-str (buffer-substring start (point))))
+      (setq word-data (buffer-substring start (point)))
+      (setq word-data (concat (substring prev-word-data 0 compress) word-data))
       (setq content-start (1+ (point)))
       (goto-char (+ start field-size))
-      (list (concat (substring old-word 0 compress) word) kind content-start))))
+      (list (ndpdic-bocu-to-str word-data)
+            kind content-start word-data))))
 
 (defun ndpdic-entries (file block)
   "Get all entries in FILE at BLOCK.
 Return the list of entry words.  Result will be cached."
   (let ((block-entries-hash (gethash (expand-file-name file) ndpdic-block-entries-hash))
-        fl-size word-spec (word "") words)
+        fl-size word-spec (word-data "") words)
     (when (null block-entries-hash)
       (setq block-entries-hash (make-hash-table))
       (puthash (expand-file-name file) block-entries-hash ndpdic-block-entries-hash))
@@ -427,26 +427,27 @@ Return the list of entry words.  Result will be cached."
        (setq fl-size (ndpdic-insert-block-contents file block))
        (goto-char (+ 2 (point-min)))
        (while (not (eobp))
-         (setq word-spec (ndpdic-entries-next-word word fl-size))
+         (setq word-spec (ndpdic-entries-next-word word-data fl-size))
          (if (null word-spec) (goto-char (point-max))
            (setq words (cons (car word-spec) words))
-           (setq word (car word-spec))))
+           (setq word-data (elt word-spec 3))))
        (puthash block (nreverse words) block-entries-hash)))))
 
 (defun ndpdic-entry-content (file block entry)
   "Get content of FILE, BLOCK, and  ENTRY."
-  (let* (fl-size (word "") word-spec (word "") content)
+  (let* (fl-size word word-spec (word-data "") content)
     (with-temp-buffer
       (set-buffer-multibyte nil)
       (setq fl-size (ndpdic-insert-block-contents file block))
       (goto-char (+ 2 (point-min)))
       (while (not (eobp))
-        (setq word-spec (ndpdic-entries-next-word word fl-size))
+        (setq word-spec (ndpdic-entries-next-word word-data fl-size))
         (setq word (car word-spec))
+        (setq word-data (elt word-spec 3))
         (if (null word-spec) (goto-char (point-max))
           (when (equal (car word-spec) entry)
             (setq content
-                  (ndpdic-adjust-content 
+                  (ndpdic-adjust-content
                    entry (elt word-spec 2) (point)))
             (goto-char (point-max)))))
       content)))
