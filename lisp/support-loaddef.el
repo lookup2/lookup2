@@ -50,6 +50,7 @@
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
         ("ndsary:.*/Unihan" . "support-unihan")
         ("ndsary:.*/JMdict" . "support-jmdict")
+        ("ndsary:.*/chinadat\\.csv" . "support-chinakan")
         ;; MISC
         ("ndsrd:" . "support-srd")
 	("/foldoc" . "support-foldoc")
