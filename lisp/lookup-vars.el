@@ -189,19 +189,19 @@ Dictionary option `cite-prefix' overrides this variable."
   "Additional features."
   :group 'lookup)
 
-(defcustom lookup-kakasi-program "kakasi"
-  "*Program name of KAKASI."
+(defcustom lookup-mecab-program "mecab"
+  "*Program name of MECAB."
   :type 'string
   :group 'lookup-additional-features)
 
-(defcustom lookup-kakasi-coding-system lookup-process-coding-system
-  "*Coding system for KAKASI."
+(defcustom lookup-mecab-coding-system lookup-process-coding-system
+  "*Coding system for MECAB."
   :type 'symbol
   :group 'lookup-additional-features)
 
-(defcustom lookup-use-kakasi
-  (if (executable-find lookup-kakasi-program) t)
-  "*Non-nil enables Kanji extraction by using KAKASI."
+(defcustom lookup-use-mecab
+  (if (executable-find lookup-mecab-program) t)
+  "*Non-nil enables Kanji extraction by using MECAB."
   :type 'boolean
   :group 'lookup-additional-features)
 

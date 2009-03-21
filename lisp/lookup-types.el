@@ -469,7 +469,7 @@ will be attached to the module 'default'."
 
 (defun lookup-kana-search (dictionary query)
   (let ((query-strings 
-         (lookup-kanji-get-readings (lookup-query-string query))))
+         (lookup-text-get-readings (lookup-query-string query))))
     (lookup-search-multiple dictionary query-strings)))
 
 (defun lookup-decompose-alphabet-chars (chars)

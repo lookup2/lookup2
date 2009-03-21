@@ -24,6 +24,7 @@
 
 (require 'cl)
 (require 'lookup-vars)
+(require 'lookup-text)
 
 ;; alist by assq
 
@@ -212,23 +213,24 @@
      (progn (skip-syntax-forward "w") (point)))))
 
 (defun lookup-current-word-japanese ()
-  (if (not lookup-use-kakasi)
+  (if (not lookup-use-mecab)
       (lookup-current-word-general)
-    (let ((temp-buffer (lookup-temp-buffer))
-	  (start (point)) (n 1) regexp)
-      (lookup-with-coding-system lookup-kakasi-coding-system
-	(call-process-region
-	 (progn (skip-syntax-backward "w") (point))
-	 (progn (skip-syntax-forward "w") (point))
-	 lookup-kakasi-program nil temp-buffer nil "-w"))
-      (with-current-buffer temp-buffer
-	(goto-char (point-min))
-	(while (search-forward " " nil t)
-	  (replace-match "\\)\\(" nil t))
-	(setq regexp (concat "\\(" (buffer-string) "\\)"))
-	(kill-buffer (current-buffer)))
+    (let* ((start (point))
+           (wakati 
+            (lookup-text-wakati
+             (buffer-substring (progn (skip-syntax-backward "w") (point))
+                               (progn (skip-syntax-forward "w") (point)))))
+           (regexp
+            (concat "\\(" 
+                    (mapconcat 
+                     'identity 
+                     (split-string wakati " " t)
+                     "\\)\\(" )
+                    "\\)"))
+           (n 1))
       (re-search-backward regexp)
       (while (and (match-end n) (<= (match-end n) start))
+        (message "debug: data=%s" (match-string n))
 	(setq n (1+ n)))
       (buffer-substring-no-properties (match-beginning n) (match-end n)))))
 
