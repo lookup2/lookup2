@@ -314,9 +314,9 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (defun lookup-summary-display-content ()
-  "$B%]%$%s%H9T$N%(%s%H%j$NK\J8$rI=<($9$k!#(B
-Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
-$B%*!<%W%s$9$k!#%(%s%H%j$,%j%U%!%l%s%9$N>l9g$K$O!"$=$l$r;2>H$9$k!#(B"
+  "ポイント行のエントリの本文を表示する。
+Overview モードになっている場合にはそれを解除し、Content バッファを
+オープンする。エントリがリファレンスの場合には、それを参照する。"
   (interactive)
   (lookup-summary-goto-link)
   (let ((entry (lookup-summary-this-entry)))
@@ -326,14 +326,14 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
       (if lookup-summary-autobook-mode (lookup-summary-bookmark)))))
 
 (defun lookup-summary-mouse-follow (event)
-  "$B%^%&%9$G%/%j%C%/$7$?%(%s%H%j$NK\J8$rI=<($9$k!#(B"
+  "マウスでクリックしたエントリの本文を表示する。"
   (interactive "e")
   (mouse-set-point event)
   (lookup-summary-display-content))
 
 (defun lookup-summary-next-page ()
-  "$B%(%s%H%jK\J8$NI=<($r0l%Z!<%8?J$a$k!#(B
-$B%P%C%U%!$N=*$o$j$^$GC#$7$?$i!"<!$N%(%s%H%j$K0\F0$9$k!#(B"
+  "エントリ本文の表示を一ページ進める。
+バッファの終わりまで達したら、次のエントリに移動する。"
   (interactive)
   (cond
    ((not (lookup-summary-this-entry)) nil)
@@ -344,8 +344,8 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
    (t (lookup-summary-next-entry))))
 
 (defun lookup-summary-previous-page ()
-  "$B%(%s%H%jK\J8$NI=<($r0l%Z!<%8La$9!#(B
-$B%P%C%U%!$N;O$a$^$GC#$7$?$i!"A0$N%(%s%H%j$K0\F0$9$k!#(B"
+  "エントリ本文の表示を一ページ戻す。
+バッファの始めまで達したら、前のエントリに移動する。"
   (interactive)
   (cond
    ((not (lookup-summary-this-entry)) (lookup-summary-previous-entry))
@@ -356,7 +356,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
    (t (lookup-summary-previous-entry))))
 
 (defun lookup-summary-scroll-up-content (&optional arg)
-  "$B%(%s%H%jK\J8$r%W%l%U%#%9%/$N9T?t$@$1%9%/%m!<%k!&%"%C%W$9$k!#(B"
+  "エントリ本文をプレフィスクの行数だけスクロール・アップする。"
   (interactive "p")
   (if (lookup-summary-content-visible-p)
       (lookup-with-buffer-and-window (lookup-content-buffer)
@@ -364,7 +364,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
     (lookup-summary-display-content)))
 
 (defun lookup-summary-scroll-down-content (&optional arg)
-  "$B%(%s%H%jK\J8$r%W%l%U%#%9%/$N9T?t$@$1%9%/%m!<%k!&%@%&%s$9$k!#(B"
+  "エントリ本文をプレフィスクの行数だけスクロール・ダウンする。"
   (interactive "p")
   (if (lookup-summary-content-visible-p)
       (lookup-with-buffer-and-window (lookup-content-buffer)
@@ -372,7 +372,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
     (lookup-summary-display-content)))
 
 (defun lookup-summary-beginning-of-content ()
-  "$B%(%s%H%jK\J8$NI=<($r@hF,$^$GLa$9!#(B"
+  "エントリ本文の表示を先頭まで戻す。"
   (interactive)
   (if (lookup-summary-content-visible-p)
       (lookup-with-buffer-and-window (lookup-content-buffer)
@@ -380,7 +380,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
     (lookup-summary-display-content)))
 
 (defun lookup-summary-end-of-content ()
-  "$B%(%s%H%jK\J8$NI=<($rKvHx$^$G?J$a$k!#(B"
+  "エントリ本文の表示を末尾まで進める。"
   (interactive)
   (if (lookup-summary-content-visible-p)
       (lookup-with-buffer-and-window (lookup-content-buffer)
@@ -389,7 +389,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
     (lookup-summary-display-content)))
 
 (defun lookup-summary-next-entry (&optional arg)
-  "$B<!$N%(%s%H%j$rI=<($9$k!#%W%l%U%#%/%9$N?t$@$1?J$`!#(B"
+  "次のエントリを表示する。プレフィクスの数だけ進む。"
   (interactive "p")
   (if (eobp)
       (progn (message "End of buffer") (ding))
@@ -401,7 +401,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
       (lookup-summary-display-content))))
 
 (defun lookup-summary-previous-entry (&optional arg)
-  "$BA0$N%(%s%H%j$rI=<($9$k!#%W%l%U%#%/%9$N?t$@$1La$k!#(B"
+  "前のエントリを表示する。プレフィクスの数だけ戻る。"
   (interactive "p")
   (beginning-of-line)
   (if (bobp)
@@ -414,7 +414,7 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
       (lookup-summary-display-content))))
 
 (defun lookup-summary-info ()
-  "$B%(%s%H%j$N>pJs$r=PNO$9$k!#(B"
+  "エントリの情報を出力する。"
   (interactive)
   (let ((entry (lookup-summary-this-entry)))
     (with-current-buffer (lookup-get-buffer "*Entry Information*")
@@ -501,13 +501,13 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
   (lookup-summary-update-mark))
 
 (defun lookup-summary-entry-open ()
-  "$B%(%s%H%jK\J8$rJL%W%m%0%i%`$GI=<($9$k!#(B"
+  "エントリ本文を別プログラムで表示する。"
   (interactive)
   (unless (lookup-entry-open (lookup-summary-this-entry))
     (error "This entry doesn't have a open command")))
 
 (defun lookup-summary-toggle-format ()
-  "$B%(%s%H%jK\J8$N@07A=hM}$r%H%0%k$9$k!#(B"
+  "エントリ本文の整形処理をトグルする。"
   (interactive)
   (with-current-buffer (lookup-content-buffer)
     (lookup-content-toggle-format)))
@@ -526,9 +526,9 @@ Overview $B%b!<%I$K$J$C$F$$$k>l9g$K$O$=$l$r2r=|$7!"(BContent $B%P%C%U%!$r(B
   (force-mode-line-update))
 
 (defun lookup-summary-toggle-overview ()
-  "Overview $B%b!<%I$KF~$k!#(B
-Cotent $B%P%C%U%!$,%/%m!<%:$5$l!"(B`n' $B$H(B `p' $B$,C1$K%]%$%s%H0\F0$@$1$r(B
-$B9T$J$&$h$&$K$J$k!#(B"
+  "Overview モードに入る。
+Cotent バッファがクローズされ、`n' と `p' が単にポイント移動だけを
+行なうようになる。"
   (interactive)
   (if (setq lookup-summary-overview-mode (not lookup-summary-overview-mode))
       (lookup-hide-buffer (lookup-content-buffer))
@@ -536,13 +536,13 @@ Cotent $B%P%C%U%!$,%/%m!<%:$5$l!"(B`n' $B$H(B `p' $B$,C1$K%]%$%s%H0\F0$@$1$
   (force-mode-line-update))
 
 (defun lookup-summary-isearch-content (&optional rexexp-p)
-  "Content $B%P%C%U%!$G(B isearch-forward $B$r<B9T$9$k!#(B"
+  "Content バッファで isearch-forward を実行する。"
   (interactive "P")
   (lookup-with-buffer-and-window (lookup-content-buffer)
     (isearch-forward rexexp-p)))
 
 (defun lookup-summary-cite-content ()
-  "$B%(%s%H%jK\J8$r%-%k%j%s%0$KJ]B8$9$k!#(B
+  "エントリ本文をキルリングに保存する。
 See also `lookup-content-cite-region'."
   (interactive)
   (unless (lookup-summary-content-visible-p)
@@ -554,7 +554,7 @@ See also `lookup-content-cite-region'."
 	     (lookup-entry-heading (lookup-summary-this-entry)))))
 
 (defun lookup-summary-dictionary-menu ()
-  "$B<-=q$,%a%K%e!<$KBP1~$7$F$$$k>l9g!"$=$l$r;2>H$9$k!#(B"
+  "辞書がメニューに対応している場合、それを参照する。"
   (interactive)
   (let ((entry (lookup-summary-this-entry)))
     (when entry
@@ -567,7 +567,7 @@ See also `lookup-content-cite-region'."
 	  (error "This dictionary doesn't have a menu"))))))
 
 (defun lookup-summary-list-references ()
-  "$B%(%s%H%jK\J8$K4^$^$l$k%j%U%!%l%s%9$r0lMw$9$k!#(B"
+  "エントリ本文に含まれるリファレンスを一覧する。"
   (interactive)
   (unless (lookup-summary-content-visible-p)
     (lookup-summary-display-content))
@@ -579,7 +579,7 @@ See also `lookup-content-cite-region'."
       (error "No valid reference in this entry"))))
 
 (defun lookup-summary-content-window ()
-  "Content $B%P%C%U%!$K0\F0$9$k!#(B"
+  "Content バッファに移動する。"
   (interactive)
   (unless (lookup-summary-content-visible-p)
     (lookup-summary-display-content))
@@ -590,7 +590,7 @@ See also `lookup-content-cite-region'."
 ;;;
 
 (defun lookup-summary-redo (&optional module)
-  "$B:#2s$HF1$88!:w8l$G!"%(%s%H%j$r:F8!:w$9$k!#(B"
+  "今回と同じ検索語で、エントリを再検索する。"
   (interactive (list (if current-prefix-arg (lookup-input-module))))
   (let ((query (lookup-session-query (lookup-current-session))))
     (if (not (eq (lookup-query-method query) 'reference))
@@ -643,7 +643,7 @@ which indicates the number of the dictionary."
     (lookup-search-query module query)))
 
 (defun lookup-summary-update-content ()
-  "$B%(%s%H%jK\J8$r:FI=<($9$k!#@07A=hM}$bA4$F$d$jD>$5$l$k!#(B"
+  "エントリ本文を再表示する。整形処理も全てやり直される。"
   (interactive)
   (let ((lookup-force-update t))
     (lookup-summary-display-content)))
