@@ -1,7 +1,9 @@
 ;;; ndic.el --- Lookup by free dictionaries
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Author: KAWABATA, Taichi <kawabata.taichi@gmail.com>
 ;; Keywords: dictionary
 
 ;; This file is part of Lookup.
@@ -36,6 +38,8 @@
   "*Program name of dictzip."
   :type 'string
   :group 'ndic)
+
+(defvar ndic-coding-system 'utf-8)
 
 
 ;;;
@@ -171,7 +175,9 @@
 ;;;
 
 (defun ndic-dictd-init (dictionary file)
-  (let* ((index (concat (file-name-sans-extension file) ".index"))
+  (let* ((index (concat ;; remove ".dz.index"
+                 (file-name-sans-extension
+                  (file-name-sans-extension file)) ".index"))
 	 (buffer (get-buffer-create (concat " *ndic " index "*"))))
     (with-current-buffer buffer (insert-file-contents index))
     (unless (file-exists-p index)
@@ -204,30 +210,33 @@
       (with-current-buffer (ndic-dictionary-object dictionary)
 	(goto-char (point-min))
 	(while (re-search-forward regexp nil t)
-	  (setq string (buffer-substring (line-beginning-position)
-					 (1- (search-forward "\t"))))
-	  (when (looking-at "\\([^\t]+\\)\t\\(.*\\)")
-	    (setq code (concat (match-string 1) ":" (match-string 2)))
+          (goto-char (line-beginning-position))
+	  (when (looking-at "\\([^\t\n]+\\)\t\\([^\t\n]+\\)\t\\(.+\\)")
+            (setq string (match-string 1)) 
+	    (setq code (concat (match-string 2) ":" (match-string 3)))
 	    (setq entries
 		  (cons (lookup-new-entry 'regular dictionary code string)
-			entries))))
+			entries)))
+          (goto-char (line-end-position)))
 	(nreverse entries)))))
 
 (defun ndic-dictd-content (entry)
   (let ((code (lookup-entry-code (lookup-entry-substance entry)))
 	(dict (lookup-get-property
 	       (lookup-entry-dictionary entry) 'ndic-dict)))
-    (string-match ":" code)
-    (setq code (cons (substring code 0 (match-beginning 0))
-		     (substring code (match-end 0))))
-    (with-temp-buffer
-      (if (string-match "\\.dz$" dict)
-	  (call-process ndic-dictzip-program nil t nil
-			"-cdk" "-S" (car code) "-E" (cdr code) dict)
-	(let ((offset (ndic-b64-decode (car code)))
-	      (length (ndic-b64-decode (cdr code))))
-	  (insert-file-contents dict nil offset (+ offset length))))
-      (buffer-string))))
+    (if (null (string-match ":" code))
+        (error "ndic internal error.")
+      (setq code (cons (substring code 0 (match-beginning 0))
+                       (substring code (match-end 0))))
+      (lookup-with-coding-system ndic-coding-system
+        (with-temp-buffer
+          (if (string-match "\\.dz$" dict)
+              (call-process ndic-dictzip-program nil t nil
+                            "-cdk" "-S" (car code) "-E" (cdr code) dict)
+            (let ((offset (ndic-b64-decode (car code)))
+                  (length (ndic-b64-decode (cdr code))))
+              (insert-file-contents dict nil offset (+ offset length))))
+          (buffer-string))))))
 
 (defconst ndic-b64-table
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")

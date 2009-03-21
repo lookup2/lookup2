@@ -112,7 +112,7 @@
   (interactive)
   (beginning-of-line)
   (when (looking-at " *\\([0-9]+\\)")
-    (let ((position (string-to-int (match-string 1))))
+    (let ((position (string-to-number (match-string 1))))
       (setf (lookup-history-position lookup-search-history) position)
       (lookup-session-display (lookup-history-ref lookup-search-history))
       (princ position))))

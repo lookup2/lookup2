@@ -289,7 +289,7 @@ Nil means it has not been checked yet.")
       (set-process-coding-system ndeb-process
 				 ndeb-process-coding-system
 				 ndeb-process-coding-system)
-      (process-kill-without-query ndeb-process)
+      (set-process-query-on-exit-flag ndeb-process nil)
       (with-current-buffer buffer
         (set-buffer-multibyte t)
 	(catch 'started

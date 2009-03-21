@@ -438,7 +438,7 @@ Overview モードになっている場合にはそれを解除し、Content バ
       (beginning-of-line)
       (delete-char 1)
       (insert "*")))
-  (if lookup-summary-overview-mode (next-line 1)))
+  (if lookup-summary-overview-mode (forward-line 1)))
 
 (defun lookup-summary-unmark ()
   (interactive)
@@ -454,7 +454,7 @@ Overview モードになっている場合にはそれを解除し、Content バ
 	(lookup-hide-buffer memo)
 	(if (not lookup-summary-overview-mode)
 	    (lookup-summary-display-content)))
-      (if lookup-summary-overview-mode (next-line 1)))))
+      (if lookup-summary-overview-mode (forward-line 1)))))
 
 (defun lookup-summary-bookmark ()
   (interactive)
@@ -468,6 +468,7 @@ Overview モードになっている場合にはそれを解除し、Content バ
 	(lookup-summary-update-mark)))))
 
 (defvar lookup-summary-memorandum-entry nil)
+(make-variable-buffer-local 'lookup-summary-memorandum-entry)
 
 (defun lookup-summary-memorandum ()
   (interactive)
@@ -482,7 +483,6 @@ Overview モードになっている場合にはそれを解除し、Content バ
     (with-current-buffer (lookup-get-buffer "*Entry Memorandum*")
       (erase-buffer)
       (text-mode)
-      (make-variable-buffer-local 'lookup-summary-memorandum-entry)
       (setq lookup-summary-memorandum-entry entry)
       (local-set-key "\C-c\C-c" 'lookup-summary-memorandum-save)
       (insert (if (stringp memo) memo
