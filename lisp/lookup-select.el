@@ -110,7 +110,7 @@ Search Methods:
   (define-key lookup-select-mode-map "+" 'lookup-select-dictionary-supplement)
 
   ;; dictionary information
-  (define-key lookup-select-mode-map "i" 'lookup-select-dictionary-info)
+  ;(define-key lookup-select-mode-map "i" 'lookup-select-dictionary-info)
   (define-key lookup-select-mode-map "M" 'lookup-select-dictionary-menu)
   (define-key lookup-select-mode-map "F" 'lookup-select-dictionary-search)
   ;; dictionary management
@@ -201,10 +201,10 @@ have found some entries, which means this dictionary cannot appear alone."
       (lookup-select-set-mark
        (lookup-assq-get lookup-select-priority-marks value)))))
 
-(defun lookup-select-dictionary-info ()
-  (interactive)
-  (lookup-display-menu (lookup-current-module)
-		       (lookup-select-this-dictionary)))
+;(defun lookup-select-dictionary-info ()
+;  (interactive)
+;  (lookup-display-menu (lookup-current-module)
+;		       (lookup-select-this-dictionary)))
 
 (defun lookup-select-dictionary-menu ()
   (interactive)
