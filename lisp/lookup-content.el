@@ -66,6 +66,7 @@
 
 (make-variable-buffer-local 'lookup-content-entry)
 (make-variable-buffer-local 'lookup-content-line-heading)
+(make-variable-buffer-local 'line-move-ignore-invisible)
 
 ;;;###autoload
 (defun lookup-content-mode ()
@@ -79,7 +80,6 @@
 	'("Lookup:%b {" lookup-content-line-heading "}"))
   (setq lookup-help-message lookup-content-mode-help)
   (setq buffer-read-only t)
-  (make-variable-buffer-local 'line-move-ignore-invisible)
   (setq line-move-ignore-invisible t)
   (use-local-map lookup-content-mode-map)
   (run-hooks 'lookup-content-mode-hook))
