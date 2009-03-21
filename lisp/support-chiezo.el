@@ -1,4 +1,4 @@
-;;; chiezo.el --- support file for $B!XCN7CB"#1#9#9#7!Y(B
+;;; chiezo.el --- support file for 『知恵蔵１９９７』
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -21,19 +21,19 @@
 
 (defconst chiezo-gaiji-table
   (lookup-new-gaiji-table
-   '(("ha621" "*") ("ha622" ",00(B") ("ha623" ",Aa(B") ("ha624" ",Ai(B") ("ha625" ",As(B")
-     ("ha626" ",A`(B") ("ha627" ",Ah(B") ("ha628" ",Ab(B") ("ha629" ",Aj(B") ("ha62a" ",An(B")
-     ("ha62b" ",At(B") ("ha62c" ",Ad(B") ("ha62d" ",Ak(B") ("ha62e" ",Av(B") ("ha62f" ",A|(B")
-     ("ha630" ",Aq(B") ("ha634" ",Am(B") ("ha637" ",A{(B") ("ha638" ",Az(B")
+   '(("ha621" "*") ("ha622" "œ") ("ha623" "á") ("ha624" "é") ("ha625" "ó")
+     ("ha626" "à") ("ha627" "è") ("ha628" "â") ("ha629" "ê") ("ha62a" "î")
+     ("ha62b" "ô") ("ha62c" "ä") ("ha62d" "ë") ("ha62e" "ö") ("ha62f" "ü")
+     ("ha630" "ñ") ("ha634" "í") ("ha637" "û") ("ha638" "ú")
      ("ha63d" nil "2") ("ha63e" nil "3") ("ha63f" nil "0") ("ha640" nil "1")
      ("ha641" nil "2") ("ha642" nil "3") ("ha643" nil "4") ("ha644" nil "5")
      ("ha645" nil "6") ("ha646" nil "8") ("ha647" nil "1") ("ha648" nil "4")
      ("ha649" nil "5") ("ha64a" nil "7") ("ha64b" nil "8") ("ha64c" nil "9")
      ("ha64d" nil "a") ("ha64e" nil "G") ("ha64f" nil "P") ("ha652" nil "+")
      ("ha653" nil "-") ("ha654" nil "+") ("ha657" nil "0") ("ha658" nil "6")
-     ("ha659" ",AE(B") ("ha65a" nil "n")
-     ("za423" "$B"N(B") ("za424" nil "[TEL]") ("za428" "(R)") ("za43f" "(C)")
-     ("za44a" "[$B3$(B]") ("za44b" "[$B?7(B]") ("za460" "$B"e(B2"))))
+     ("ha659" "Å") ("ha65a" nil "n")
+     ("za423" "⇔") ("za424" nil "[TEL]") ("za428" "(R)") ("za43f" "(C)")
+     ("za44a" "[海]") ("za44b" "[新]") ("za460" "√2"))))
 
 (defun chiezo-arrange-structure (entry)
   (lookup-arrange-structure entry)

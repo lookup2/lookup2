@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.1 2009/03/20 19:52:44 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.3 2009/03/21 20:58:09 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -29,7 +29,7 @@
 
 ;;; Code:
 
-(require 'lookup)
+(require 'lookup-text)
 
 
 
@@ -85,7 +85,7 @@ CHARSET, URL and ENCODING may be a function.")
                (url        (elt entry 2))
                (encoding   (elt entry 3))
                (url-suffix (elt entry 4)))
-          (when (ndmisc-string-charsetp string charset)
+          (when (lookup-text-string-charsetp string charset)
             (setq menu-items
                   (cons (list item-no title
                               (concat (if (functionp url) (funcall url string)
@@ -114,22 +114,6 @@ CHARSET, URL and ENCODING may be a function.")
 ;;;
 ;;; Utility Functions
 ;;;
-
-(defun ndmisc-string-charsetp (string charset)
-  "Determines if STRING belongs to CHARSET.
-If CHARSET if function, then result of applying the function to
-the string will be returned."
-  (let ((chars (string-to-list string)) (flag t))
-    (or (and (charsetp charset)
-             (progn
-               (while chars
-                 (if (or (encode-char (car chars) charset)
-                         (< (car chars) #x80))
-                     (setq chars (cdr chars))
-                   (setq chars nil flag nil)))
-               flag))
-        (and (functionp charset)
-             (funcall charset string)))))
 
 ;; exceprted from mm-url.el
 
@@ -163,11 +147,11 @@ applying function to the string will be returned."
 ;;;
 
 (defun ndmisc-glyphwiki-charsetp (string)
-  (or (ndmisc-string-charsetp string 'ascii)
+  (or (lookup-text-string-charsetp string 'ascii)
       (string-match "^[⿰-⿻㐀-鿿豈-﫿𠀀-𯿿]+$" string)))
 
 (defun ndmisc-glyphwiki-encode (string)
-  (if (ndmisc-string-charsetp string 'ascii) string
+  (if (lookup-text-string-charsetp string 'ascii) string
     (mapconcat (lambda (x) (format "u%x" x)) string "-")))
 
 (provide 'ndmisc)

@@ -128,7 +128,8 @@
                 (file-exists-p (concat (lookup-agent-location agent) ".ary"))))
       (progn
         (message
-         "ndsary configuration is incorrect.  Dictionary(ies) will not be created.")
+         "ndsary configuration is incorrect.  \
+Dictionary(ies) for % will not be created." (lookup-agent-location agent))
         nil)
     (let* ((dict-specs (or (lookup-agent-option agent :dict-specs)
                            ndsary-default-dict-specs))
@@ -290,10 +291,9 @@ REGULAR is t if dictionary does not have duplicate entries."
                  ndsary-sary-program nil t nil "-c" "-i"
                  query-string location))
               (goto-char (point-min))
-              (looking-at "\\([0-9]+\\)")
-              (setq count (+ count (string-to-number (match-string 1)))))))
-      (message "debug: entry-start=%s" entry-start)
-      (message "debug: coding=%s" coding)
+              (if (looking-at "\\([0-9]+\\)")
+                  (setq count (+ count (string-to-number (match-string 1))))
+                0))))
       (cond ((and (/= 0 max-hits) (< max-hits count))
              (list
               (lookup-new-entry

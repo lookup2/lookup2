@@ -1,4 +1,4 @@
-;;; ndpdic.el --- Lookup `pdic' interface  -*- coding: utf-8 -*-
+;;; ndpdic.el --- Lookup `PDIC' interface  -*- coding: utf-8 -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
@@ -22,7 +22,7 @@
 
 ;;; Documentation:
 
-;; This is agent program for `pdic' format.
+;; This is agent program for `PDIC' format.
 
 ;;; Usage
 ;; 
@@ -129,6 +129,22 @@
 (defun ndpdic-bocu-to-str (string)
   "Decode BOCU STRING to Emacs String."
   (ccl-execute-on-string 'decode-bocu '[0 0 0 0 0 0 0 0 0] string))
+
+(defvar ndpdic-attribute-mask
+  '((#x0f . vocabulary-level)
+    (#x10 . extended-attributes)
+    (#x20 . memorize-word)
+    (#x40 . modified-word)))
+
+(defvar ndpdic-extended-attribute
+  '((#x01 . usage)
+    (#x02 . pronunciation)
+    (#x03 . undefined)
+    (#x04 . link)
+    (#x10 . binary-data)
+    (#x20 . undefined)
+    (#x40 . compressed)
+    (#x80 . end-of-extension)))
 
 ;;; Interface Functions
 

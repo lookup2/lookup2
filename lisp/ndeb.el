@@ -56,7 +56,7 @@
   :group 'ndeb)
 
 (defcustom ndeb-gaiji-size 16
-  "$B%G%U%)%k%H$G;HMQ$9$k30;z$N%5%$%:!#;XDj$7$?%5%$%:$N30;z$,B8:_$7$J$$>l9g$O;XDjCM$r1[$($J$$:GBg%5%$%:$r!"$=$l$bB8:_$7$J$$>l9g$O(B16$B%I%C%H$N30;z$r;HMQ$9$k!#(B"
+  "デフォルトで使用する外字のサイズ。指定したサイズの外字が存在しない場合は指定値を越えない最大サイズを、それも存在しない場合は16ドットの外字を使用する。"
   :type '(choice :tag "size"
 		 (const 16)
 		 (const 24)
@@ -65,7 +65,7 @@
   :group 'ndeb)
 
 (defcustom ndeb-minimum-indent 1
-  "$B;XDj$7$??t;z$r1[$($?J,$@$1;z2<$2=hM}$r9T$&!#DL>o$O(B0$B$^$?$O(B1$B!#(B"
+  "指定した数字を越えた分だけ字下げ処理を行う。通常は0または1。"
   :type 'integer
   :group 'ndeb)
 
@@ -155,7 +155,7 @@
 (put 'ndeb :media-pattern '())
 (put 'ndeb :media     #'ndeb-dictionary-media)
 
-(put 'ndeb :reference-pattern '("<reference>\\($B"*(B?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
+(put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
 ;(put'ndeb :font      nil)
 
@@ -277,7 +277,7 @@ Nil means it has not been checked yet.")
       (ndeb-process-require (format "unset %s" var)))))
 
 (defun ndeb-process-open ()
-  "eblook$B$,5/F0$7$F$$$J$1$l$P5/F0$9$k!#(B"
+  "eblookが起動していなければ起動する。"
   (unless (and (processp ndeb-process)
 	       (eq (process-status ndeb-process) 'run))
     (let ((buffer (or (lookup-open-process-buffer " *ndeb*")
@@ -387,14 +387,14 @@ Nil means it has not been checked yet.")
        ((eq method 'keyword)
 	(let (qstring)
 	  (setq qstring string)
-	  (while (string-match "[ \t$B!!(B]+" qstring)
+	  (while (string-match "[ \t　]+" qstring)
 	    (setq qstring (replace-match "=" nil t qstring)))
 	  (setq cmd 
 		(format "set search-method keyword\nsearch \"=%s\"\n"
 			(ndeb-escape-query qstring)))
 	  
 	  (setq qstring string)
-	  (while (string-match "[ \t$B!!(B]+" qstring)
+	  (while (string-match "[ \t　]+" qstring)
 	    (setq qstring (replace-match "&" nil t qstring)))
 	  (setq cmd 
 		(concat cmd (format "set search-method cross\nsearch \"&%s\""
@@ -405,7 +405,7 @@ Nil means it has not been checked yet.")
 	  (setq method 'wild
 		string (concat "*" string "*")))
 	(unless (eq method last)
-	  ;; $BI,MW$N$"$k$H$-$@$1(B search-method $B$r@_Dj$9$k!#(Bndeb-dict $B$KF1$8!#(B
+	  ;; 必要のあるときだけ search-method を設定する。ndeb-dict に同じ。
 	  (ndeb-process-require-set "search-method"
 			    (lookup-assq-ref 'ndeb-method-table method))
 	  (lookup-put-property ndeb-current-agent 'ndeb-method method))
@@ -415,8 +415,8 @@ Nil means it has not been checked yet.")
 	  (let (code heading dupchk entry entries)
 	    (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)\t\\(.*\\)" nil t)
 	      (setq code (match-string 1) heading (match-string 2))
-	      ;; $BF1$8%(%s%H%j$,$"$k$+%A%'%C%/$9$k!#(B
-	      ;; $B$3$l$,$1$C$3$&$"$k$s$@!&!&(B
+	      ;; 同じエントリがあるかチェックする。
+	      ;; これがけっこうあるんだ・・
 	      (unless (member (cons code heading) dupchk)
 		(setq entries (cons (ndeb-new-entry 'regular code heading) entries))
 		(setq dupchk (cons (cons code heading) dupchk))))
@@ -532,7 +532,7 @@ Nil means it has not been checked yet.")
 (defun ndeb-arrange-squeezed-references (entry)
   (if (lookup-dictionary-option
        (lookup-entry-dictionary entry) ':squeezed nil)
-      (while (search-forward-regexp "$B"*""(B\\(#0001\\|<gaiji:z0001>\\)?" nil t)
+      (while (search-forward-regexp "→□\\(#0001\\|<gaiji:z0001>\\)?" nil t)
 	(replace-match ""))))
 
 (defun ndeb-arrange-no-newline (entry)
@@ -556,8 +556,8 @@ Nil means it has not been checked yet.")
 (defun ndeb-arrange-prev-next (entry)
   (while (re-search-forward "\\(<prev>\\|<next>\\)" nil t)
     (if (equal (match-string 0) "<prev>")
-	(replace-match "\n($BA09`L\"M(B")
-      (replace-match "($B<!9`L\"M(B"))
+	(replace-match "\n(前項目⇒")
+      (replace-match "(次項目⇒"))
     (if (re-search-forward "\\(</prev>\\|</next>\\)" nil t)
 	(replace-match ")"))))
 

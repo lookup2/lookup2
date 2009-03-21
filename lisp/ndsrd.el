@@ -1,4 +1,4 @@
-;;; ndsrd.el --- search agent for $B>.3X4[!X%i%s%@%`%O%&%91Q8l<-E5!Y(B
+;;; ndsrd.el --- search agent for 小学館『ランダムハウス英語辞典』
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -37,7 +37,7 @@
   :type 'string
   :group 'ndsrd)
 
-(defcustom ndsrd-dictionary-title "$B%i%s%@%`%O%&%91Q8l<-E5(B"
+(defcustom ndsrd-dictionary-title "ランダムハウス英語辞典"
   "*Title of ndsrd dictionary."
   :type 'string
   :group 'ndsrd)
@@ -53,7 +53,7 @@
 ;;;
 
 (put 'ndsrd :methods '(exact prefix suffix substring wildcard keyword))
-(put 'ndsrd :reference-pattern '("$B"*(B\\([A-Z]*\\)" 0 1 lookup-dynamic-search))
+(put 'ndsrd :reference-pattern '("→\\([A-Z]*\\)" 0 1 lookup-dynamic-search))
 (put 'ndsrd :stemmer 'stem-english)
 
 
@@ -92,12 +92,12 @@
 	 (lookup-with-coding-system ndsrd-process-coding-system
 	   (apply 'call-process ndsrd-program-name nil t nil opts)))))
     (let (start heading entry entries)
-      (while (looking-at "$B""(B \\([^\[\n]*\\)")
+      (while (looking-at "□ \\([^\[\n]*\\)")
 	(setq start (point) heading (match-string 1))
-	(while (string-match "[$B!&!-!.(B/]\\| $" heading)
+	(while (string-match "[・´｀/]\\| $" heading)
 	  (setq heading (replace-match "" t t heading)))
 	(forward-line)
-	(if (re-search-forward "^$B""(B" nil 0)
+	(if (re-search-forward "^□" nil 0)
 	    (goto-char (match-beginning 0)))
 	(setq entry (lookup-new-entry 'regular dictionary heading heading))
 	(lookup-put-property entry 'ndsrd-content

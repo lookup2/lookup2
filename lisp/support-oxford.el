@@ -1,4 +1,4 @@
-;;; oxford.el --- suport file for "Oxford Dictionary/Thesaurus"
+;;; support-oxford.el --- suport file for "Oxford Dictionary/Thesaurus"
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -382,4 +382,4 @@
 	    :arranges '((structure oxford-arrange-structure))
 	    :transformer 'lookup-stem-english-search))
 
-;;; oxford.el ends here
+;;; support-oxford.el ends here

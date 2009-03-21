@@ -1,4 +1,4 @@
-;;; comp.el --- support file for $B!X1QOB%3%s%T%e!<%?MQ8l<-E5!Y(B
+;;; comp.el --- support file for 『英和コンピュータ用語辞典』
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -20,6 +20,6 @@
 (require 'lookup)
 
 (setq lookup-support-options
-      (list :title "$B1QOB%3%s%T%e!<%?MQ8l<-E5(B"))
+      (list :title "英和コンピュータ用語辞典"))
 
 ;;; comp.el ends here

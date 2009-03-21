@@ -3,7 +3,7 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'lookup-kanji)
+(require 'lookup-text)
 
 (let 
   ((encoded-zhongri-gaiji-table
@@ -3579,8 +3579,8 @@
 
 (defun zhongri-pinyin-kana-string (str)
   (remove-if 'null 
-             (cons (lookup-kanji-get-pinyin str)
-                   (lookup-kanji-get-readings str))))
+             (cons (lookup-text-get-pinyin str)
+                   (lookup-text-get-readings str))))
 
 (defun zhongri-pinyin-kana-search (dictionary query)
   (let* ((query-string (lookup-query-string query))

@@ -69,10 +69,10 @@
   :group 'ndest)
 
 (defcustom ndest-max-text 2048
-  "*$B8!:w;~$KI=<($9$k%(%s%H%jK\J8$N:GBgD9!#(B
-0 $B$r;XDj$9$k$H!"(Bestcmd$B$N%G%U%)%k%H$K=>$&!#(B
-nil$B$N>l9g$O(B `lookup-max-text' $B$NCM$r;2>H$9$k!#(B
-estcall$B;HMQ;~$OL58z!#(B"
+  "*検索時に表示するエントリ本文の最大長。
+0 を指定すると、estcmdのデフォルトに従う。
+nilの場合は `lookup-max-text' の値を参照する。
+estcall使用時は無効。"
   :type '(choice (const nil) integer)
   :group 'ndest)
 
@@ -308,8 +308,8 @@ estcall$B;HMQ;~$OL58z!#(B"
 		       (lookup-query-string query)))))
     (setq uri (url-generic-parse-url
 	       (concat (lookup-dictionary-code dictionary) arg)))
-    ;; URL$B$K4^$^$l$?%f!<%6L>(B/$B%Q%9%o!<%I$O;H$o$J$$$h$&$J$N$G(B
-    ;; $BD>@\(B url-http-real-basic-auth-storage $B$KF~$l$F$$$k!#(B
+    ;; URLに含まれたユーザ名/パスワードは使わないようなので
+    ;; 直接 url-http-real-basic-auth-storage に入れている。
     (let ((auth (or (lookup-dictionary-option dictionary ':auth t)
 		    ndest-default-auth))
 	  ;;(url-http-real-basic-auth-storage url-http-real-basic-auth-storage)
@@ -436,19 +436,19 @@ estcall$B;HMQ;~$OL58z!#(B"
 	  (delete-region start end)
 	  (goto-char start)
 	  (cond
-	   ;; $B%U%l!<%:8!:w(B
+	   ;; フレーズ検索
 	   ((string-match "^\".*\"$" word)
 	    (insert-string (substring word 1 -1)))
-	   ;; $B%o%$%k%I%+!<%I8!:w(B
+	   ;; ワイルドカード検索
 	   ((string-match "^\\*.*\\*$" word)
 	    (insert-string (concat "[RX] " (substring word 1 -1))))
-	   ;; $BA0J}0lCW8!:w(B
+	   ;; 前方一致検索
 	   ((string-match "^\\*" word)
 	    (insert-string (concat "[BW] " (substring word 1))))
-	   ;; $B8eJ}0lCW8!:w(B
+	   ;; 後方一致検索
 	   ((string-match "\\*$" word)
 	    (insert-string (concat "[EW] " (substring word 0 -1))))
-	   ;; $BDL>o8!:w(B
+	   ;; 通常検索
 	   (t (insert-string word)))
 	  (unless (re-search-forward "[ |&!]+" nil t)
 	    (throw ':done t))
@@ -458,13 +458,13 @@ estcall$B;HMQ;~$OL58z!#(B"
 	  (delete-region start end)
 	  (goto-char start)
 	  (cond
-	   ;; OR$B8!:w(B
+	   ;; OR検索
 	   ((string-match "|" word)
 	    (insert-string " OR "))
-	   ;; ANDNOT$B8!:w(B
+	   ;; ANDNOT検索
 	   ((string-match "!" word)
 	    (insert-string " ANDNOT "))
-	   ;; AND$B8!:w(B
+	   ;; AND検索
 	   (t (insert-string " AND "))))))
     (buffer-string)))
 
@@ -524,7 +524,7 @@ estcall$B;HMQ;~$OL58z!#(B"
       (ndest-follow-link-default uri file))))
 
 (defun ndest-show-uri (&optional arg)
-  "$B%+!<%=%k0LCV$N%j%s%/@h$N(BURI$B$rI=<($7!"(Bkill-ring$B$KJ]B8$9$k!#(Bprefix argument$B$,$"$j!"(BURI$B$,(Bfile://$B$G;O$^$k>l9g$O%Q%9L>$,J]B8$5$l$k!#(B"
+  "カーソル位置のリンク先のURIを表示し、kill-ringに保存する。prefix argumentがあり、URIがfile://で始まる場合はパス名が保存される。"
   (interactive "P")
   (let* ((links (ndest-get-link (point)))
 	 (uri (lookup-assq-ref links 'uri)))
@@ -537,11 +537,11 @@ estcall$B;HMQ;~$OL58z!#(B"
     (kill-new uri)))
 
 (defun ndest-uri-is-file (uri)
-  "uri$B$,(Bfile://$B$G;O$^$k>l9g$O(Bnon-nil$B$r!"$=$l0J30$N>l9g$O(Bnil$B$rJV$9!#(B"
+  "uriがfile://で始まる場合はnon-nilを、それ以外の場合はnilを返す。"
   (string-match "^file://" uri))
 
 (defun ndest-uri-to-filepath (uri)
-  "uri$B$,(Bfile://$B$G;O$^$k>l9g$O%Q%9L>$KJQ49$9$k!#$=$&$G$J$$>l9g$O(Bnil$B$rJV$9!#(B"
+  "uriがfile://で始まる場合はパス名に変換する。そうでない場合はnilを返す。"
   (when (ndest-uri-is-file uri)
     (with-temp-buffer
       (insert-string uri)
@@ -559,7 +559,7 @@ estcall$B;HMQ;~$OL58z!#(B"
       (decode-coding-string (buffer-string) 'utf-8))))
 
 (defun ndest-follow-link-with-mime-view (uri file)
-  "rfc822$B7A<0$N%U%!%$%k$r(Bmime-view-buffer$B%3%^%s%I$r;H$C$FI=<($9$k!#(BSEMI$B$,I,MW!#(B"
+  "rfc822形式のファイルをmime-view-bufferコマンドを使って表示する。SEMIが必要。"
   (require 'mime-view)
   (unless (assq 'lookup-content-mode mime-preview-quitting-method-alist)
     (setq mime-preview-quitting-method-alist
@@ -584,11 +584,11 @@ estcall$B;HMQ;~$OL58z!#(B"
   (switch-to-buffer lookup-entry-buffer))
 
 (defun ndest-follow-link-with-fiber (uri file)
-  "link$B@h$NI=<($K(Bfiber$B$r5/F0$9$k!#(B"
+  "link先の表示にfiberを起動する。"
   (start-process nil nil "fiber" (or file uri)))
 
 (defun ndest-follow-link-with-navi2ch (uri file)
-  "link$B@h$NI=<($K(Bnavi2ch$B$rMxMQ$9$k!#(B"
+  "link先の表示にnavi2chを利用する。"
   (require 'navi2ch)
   (require 'navi2ch-bookmark)
   (unless navi2ch-bookmark-list
@@ -598,7 +598,7 @@ estcall$B;HMQ;~$OL58z!#(B"
     (message "Local file is only supported.")))
 
 (defun ndest-follow-link-with-w3m (uri file)
-  "link$B@h$NI=<($K(Bw3m$B$rMxMQ$9$k!#(B"
+  "link先の表示にw3mを利用する。"
   (require 'w3m)
   (if file 
       (w3m-find-file file)

@@ -1,4 +1,4 @@
-;;; support-chinakan.el --- support file for "China-Kan" data file.
+;;; support-chinakan.el --- support file for 「支那文のための漢字典」 data file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -18,7 +18,9 @@
 ;;; Documentation:
 
 ;; This support-file will search the 「支那文のための漢字典」 data
-;; file distributed by Seiwatei Kangojuku (青蛙亭漢語塾).
+;; file distributed by Seiwatei Kangojuku (青蛙亭漢語塾), and jumps to
+;; the corresponding page image specified by
+;; `support-chinakan-url-format'.
 ;;
 ;; You may need to make the suffix array index
 ;; by "mksary" program.  (No option should be attached.)
