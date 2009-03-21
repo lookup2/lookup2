@@ -120,14 +120,14 @@
 			(lookup-module-name module) alist)))
   (lookup-dump-list 'lookup-module-attributes 3))
 
-(defun lookup-dump-module-attributes--session (session)
-  (let ((type (lookup-session-type session)))
-    (cond ((eq type 'lookup-select-session) (list type))
-	  ((eq type 'lookup-search-query)
-	   (let ((query (lookup-session-query session)))
-	     (cons type (list (lookup-query-method query)
-			      (lookup-query-string query)
-			      (lookup-query-pattern query))))))))
+;(defun lookup-dump-module-attributes--session (session)
+;  (let ((type (lookup-session-type session)))
+;    (cond ((eq type 'lookup-select-session) (list type))
+;	  ((eq type 'lookup-search-query)
+;	   (let ((query (lookup-session-query session)))
+;	     (cons type (list (lookup-query-method query)
+;			      (lookup-query-string query)
+;			      (lookup-query-pattern query))))))))
 
 (defun lookup-restore-module-attributes (module)
   (let ((alist (lookup-assoc-ref 'lookup-module-attributes
