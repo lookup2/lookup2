@@ -1,4 +1,4 @@
-;;; ndsary.el --- Lookup `sary' interface
+;;; ndsary.el --- Lookup `sary' interface -*- coding: utf-8 -*-
 
 ;; Keywords: dictionary
 
@@ -57,32 +57,30 @@
 ;; `:entry-start's check or entry duplication check will be performed,
 ;; so that it would be a little faster.
 ;;
-;; All the above options can be provided by the agent option
-;; `:dict-specs'.  If multiple option lists are provided by the
-;; `:dict-specs', then that number of virtual dictionaries will be
-;; created by the agent by the name specified by `:name'.
-;;
-;; One `ndsary' agent can only handle one text file.  If you want
-;; multiple text to be searched, please prepare multiple `ndsary'
-;; agents.  Dictionary `support-xxxxx' files can only provide 
-;; the options for each dictionary.
-;; 
+;; All the above options can also be provided as the agent option.
+;; In this case, all dictionaries may inherit such options.
 
 ;;; Usage:
+;;
+;;  Specify the directory with XXX.ary files.  If you want to specify
+;;  the specs common to all dictionaries in the folder, specify as so.
 ;;
 ;;  Example:
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsary "~/edicts/wikipedia/jawiki-20090124-abstract.xml"
-;;            :dict-specs ((:name "jawiki" :title "Wikipedia 日本語"
-;;                          :entry-start "<title>Wikipedia: " 
-;;                          :entry-end "</title>"
-;;                          :content-start "<doc>" :content-end "</doc>"))
+;;           (ndsary "~/edicts/wikipedia"
+;;            :entry-start "<title>Wikipedia: " 
+;;            :entry-end "</title>"
+;;            :content-start "<doc>" :content-end "</doc>"
 ;;            :arranges ((replace remove-xml-tag-entry))
 ;;            )
 ;;           ....
 ;;           ))
+;;
+;;  If you want to give multiple search methods to singel XML file, 
+;;  then please make a hard-link copy of them and create purpose-specific
+;;  ".ary" files individually.
 
 ;;; Code:
 
@@ -103,8 +101,7 @@
 ;;;
 
 (defvar ndsary-default-dict-specs
-  '((;; :name "_" :title "<sary default dict>"
-     :entry-start nil :entry-end nil
+  '((:entry-start nil :entry-end nil
      :content-start nil :contents-end nil
      :max-hits 50 :coding utf-8)))
 
@@ -114,64 +111,37 @@
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
 (defun ndsary-dictionary-methods (dictionary)
-  (if (or (and (lookup-dictionary-option dictionary :entry-start)
-               (lookup-dictionary-option dictionary :entry-end))
-          (lookup-dictionary-option dictionary :entry-start-end-pairs))
+  (if (or (and (lookup-dictionary-option dictionary :entry-start t)
+               (lookup-dictionary-option dictionary :entry-end t))
+          (lookup-dictionary-option dictionary :entry-start-end-pairs t))
       '(exact prefix suffix substring keyword)
     '(exact prefix)))
 
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
   "Return list of dictionaries of AGENT."
-  (if (not (and (executable-find ndsary-sary-program)
-                (file-exists-p (lookup-agent-location agent))
-                (file-exists-p (concat (lookup-agent-location agent) ".ary"))))
-      (progn
-        (message
-         "ndsary configuration is incorrect.  \
-Dictionary(ies) for % will not be created." (lookup-agent-location agent))
-        nil)
-    (let* ((dict-specs (or (lookup-agent-option agent :dict-specs)
-                           ndsary-default-dict-specs))
-           (location (lookup-agent-location agent))
-           (location-name
-            (if (string-match "^.+/\\([A-Za-z]+\\)[^/]+$" location)
-                (downcase (match-string 1 location)) "_")))
-      (mapcar (lambda (dict-spec)
-                (let* ((name
-                        (or (plist-get dict-spec :name)
-                            location-name
-                            "_"))
-                       (dict
-                        (lookup-new-dictionary
-                         agent (or (plist-get dict-spec :name)
-                                   location-name)))
-                       (id
-                        (lookup-dictionary-id dict)))
-                  (apply
-                   'lookup-set-dictionary-options
-                   (cons id dict-spec))
-                  dict))
-              dict-specs))))
+  (let* ((files (directory-files 
+                 (expand-file-name (lookup-agent-location agent))
+                 nil "\\.ary\\'")))
+    (mapcar (lambda (name) 
+              (lookup-new-dictionary agent (file-name-sans-extension name)))
+            files)))
 
 (put 'ndsary :title 'ndsary-title)
 (defun ndsary-title (dictionary)
   "Get title of DICTIONARY."
   (or (lookup-dictionary-option dictionary :title)
-      (let ((location (lookup-agent-location
-                       (lookup-dictionary-agent dictionary))))
-        (if (string-match
-             "^.+/\\([A-Za-z0-9]+\\)[^/]+$"
-             location)
-          (match-string 1 location)))
-      "[ndsary Dict]"))
+      (let ((name (lookup-dictionary-name dictionary)))
+        (file-name-sans-extension name))))
 
 (defun ndsary-construct-query-string (query method start end)
   "Costruct search pattern from QUERY string and METHOD.
 If START tag is provided, then that will be attached.
 If END tag is provided, then that will also be attached."
   (if (and (or (null start) (null end))
-           (or (equal method 'suffix) (equal method 'substring) (equal method 'keyword)))
+           (or (equal method 'suffix)
+               (equal method 'substring) 
+               (equal method 'keyword)))
       nil
     (concat (if (or (equal method 'exact)
                     (equal method 'prefix))
@@ -184,10 +154,11 @@ If END tag is provided, then that will also be attached."
 (put 'ndsary :search 'ndsary-dictionary-search)
 (defun ndsary-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((entry-start (lookup-dictionary-option dictionary :entry-start))
-        (entry-end   (lookup-dictionary-option dictionary :entry-end))
-        (entry-pairs (lookup-dictionary-option dictionary :entry-start-end-pairs))
-        (regular     (lookup-dictionary-option dictionary :regular)))
+  (let ((entry-start (lookup-dictionary-option dictionary :entry-start t))
+        (entry-end   (lookup-dictionary-option dictionary :entry-end t))
+        (entry-pairs (lookup-dictionary-option dictionary 
+                                               :entry-start-end-pairs t))
+        (regular     (lookup-dictionary-option dictionary :regular t)))
     (if entry-pairs
         (progn
           (if (functionp entry-pairs)
@@ -265,35 +236,35 @@ Entries will be a list of (quote . string)."
                          result)))
     result))
   
-(defun ndsary-dictionary-search-each (dictionary query entry-start entry-end regular)
+(defun ndsary-dictionary-search-each
+  (dictionary query entry-start entry-end regular)
   "Return entry list of DICTIONARY QUERY for ENTRY-START and ENTRY-END.
 REGULAR is t if dictionary does not have duplicate entries."
   (let* ((method   (lookup-query-method query))
          (string   (lookup-query-string query))
-         (locations (file-expand-wildcards
-                     (expand-file-name
-                      (lookup-agent-location
-                       (lookup-dictionary-agent dictionary)))))
+         (dir      (lookup-agent-location
+                    (lookup-dictionary-agent dictionary)))
+         (file     (expand-file-name
+                    (lookup-dictionary-name dictionary) dir))
          (query-string (ndsary-construct-query-string
                         string method entry-start entry-end))
-         (max-hits (or (lookup-dictionary-option dictionary :max-hits)
+         (max-hits (or (lookup-dictionary-option dictionary :max-hits t)
                        lookup-max-hits))
-         (coding (or (lookup-dictionary-option dictionary :coding)
+         (coding (or (lookup-dictionary-option dictionary :coding t)
                      'utf-8))
          (count 0) result)
     (if (null query-string) nil
       (if (/= 0 max-hits)
           ;; count the number of hits
-          (dolist (location locations)
-            (with-temp-buffer
-              (lookup-with-coding-system coding
-                (call-process
-                 ndsary-sary-program nil t nil "-c" "-i"
-                 query-string location))
-              (goto-char (point-min))
-              (if (looking-at "\\([0-9]+\\)")
-                  (setq count (+ count (string-to-number (match-string 1))))
-                0))))
+          (with-temp-buffer
+            (lookup-with-coding-system coding
+              (call-process
+               ndsary-sary-program nil t nil "-c" "-i"
+               query-string file))
+            (goto-char (point-min))
+            (if (looking-at "\\([0-9]+\\)")
+                (setq count (+ count (string-to-number (match-string 1))))
+              0)))
       (cond ((and (/= 0 max-hits) (< max-hits count))
              (list
               (lookup-new-entry
@@ -308,12 +279,10 @@ REGULAR is t if dictionary does not have duplicate entries."
             (t
              ;; extract entries
              (with-temp-buffer
-               ;; do all searches
-               (dolist (location locations)
-                 (lookup-with-coding-system coding
-                   (call-process
-                    ndsary-sary-program nil t nil "-i"
-                    query-string location)))
+               (lookup-with-coding-system coding
+                 (call-process
+                  ndsary-sary-program nil t nil "-i"
+                  query-string file))
                (setq result
                      (if (and entry-start entry-end)
                          (ndsary-extract-entries
@@ -336,29 +305,27 @@ REGULAR is t if dictionary does not have duplicate entries."
   "Return string content of ENTRY."
   (let* ((string     (lookup-entry-code entry))
          (dictionary (lookup-entry-dictionary entry))
-         (coding     (or (lookup-dictionary-option dictionary :coding)
+         (coding     (or (lookup-dictionary-option dictionary :coding t)
                          'utf-8))
-         (locations (file-expand-wildcards
-                     (expand-file-name
-                      (lookup-agent-location
-                       (lookup-dictionary-agent dictionary)))))
-         (content-start (lookup-dictionary-option dictionary :content-start))
-         (content-end   (lookup-dictionary-option dictionary :content-end)))
+         (dir  (lookup-agent-location
+                (lookup-dictionary-agent dictionary)))
+         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (content-start (lookup-dictionary-option dictionary :content-start t))
+         (content-end   (lookup-dictionary-option dictionary :content-end t)))
     (if (equal "�" string) string
       (with-temp-buffer
         (lookup-with-coding-system coding
-          (dolist (location locations)
-            (apply 'call-process
-                   `(,ndsary-sary-program nil t nil "-i"
-                     ,@(if (stringp content-start) (list "-s" content-start)
-                         (if (integerp content-start)
-                             (list "-A" (number-to-string content-start))
-                           (list "-A" "0")))
-                     ,@(if (stringp content-end) (list "-e" content-end)
-                         (if (integerp content-end)
-                             (list "-B" (number-to-string content-end))
-                           (list "-B" "0")))
-                     ,string ,location))))
+          (apply 'call-process
+                 `(,ndsary-sary-program nil t nil "-i"
+                   ,@(if (stringp content-start) (list "-s" content-start)
+                       (if (integerp content-start)
+                           (list "-A" (number-to-string content-start))
+                         (list "-A" "0")))
+                   ,@(if (stringp content-end) (list "-e" content-end)
+                       (if (integerp content-end)
+                           (list "-B" (number-to-string content-end))
+                         (list "-B" "0")))
+                   ,string ,file)))
         (buffer-string)))))
 
 (provide 'ndsary)

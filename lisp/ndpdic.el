@@ -24,12 +24,12 @@
 
 ;; This is agent program for `PDIC' format.
 
-;;; Usage
+;;; Usage: Put the XXX.dic files into a folder and specify that folder for ndpdic agent.
 ;; 
 ;; (setq lookup-search-agents
 ;;       '(
 ;;         ....
-;;        (ndpdic "~/edicts/eijiro/Eijiro112.dic")
+;;        (ndpdic "~/edicts/eijiro")
 ;;         ....
 ;;         ))
 
@@ -150,6 +150,8 @@
 
 (defvar ndpdic-max-hits 150)
 
+(defvar ndpdic-extension-regexp "\\.dic\\'")
+
 (put 'ndpdic :methods 'ndpdic-dictionary-methods)
 (defun ndpdic-dictionary-methods (dictionary)
   "Return methods of DICTIONARY."
@@ -157,24 +159,25 @@
 
 (put 'ndpdic :list 'ndpdic-list)
 (defun ndpdic-list (agent)
-  "Return list of dictionary (only one) of AGENT."
-  (let ((location (lookup-agent-location agent)))
-    (if (null (file-exists-p location))
-        (error "PDIC file not found!")
-      (if (> #x500 (ndpdic-file-version location))
-          (error "This version of PDIC file is not supported!")))
-    (list (lookup-new-dictionary 
-           agent 
-           (downcase (replace-regexp-in-string
-                      "^.+/\\([a-zA-Z]+\\)[^/]+$" "\\1"
-                      (lookup-agent-location agent)))))))
+  "Return a list of dictionary of AGENT."
+  (let* ((dir (lookup-agent-location agent))
+         (files (directory-files (expand-file-name dir)
+                                 nil ndpdic-extension-regexp))
+         dicts file)
+    (dolist (file files)
+      (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
+          (message "Version of PDIC `%s' file is old and not supported!" file)
+        (setq dicts
+              (cons (lookup-new-dictionary agent file)
+                    dicts))))
+    (nreverse dicts)))
 
 (put 'ndpdic :title 'ndpdic-title)
 (defun ndpdic-title (dictionary)
   "Return title of DICTIONARY."
   (replace-regexp-in-string
    "^.*/\\([^/]+\\)$" "\\1"
-   (lookup-agent-location (lookup-dictionary-agent dictionary))))
+   (lookup-dictionary-name dictionary)))
 
 (put 'ndpdic :search 'ndpdic-dictionary-search)
 (defun ndpdic-dictionary-search (dictionary query)
@@ -183,17 +186,18 @@
          (query-string
           (concat (lookup-query-string query)
                   (if (eq query-method 'exact) "\\(	\\|$\\)")))
-         (location (lookup-agent-location
-                    (lookup-dictionary-agent dictionary)))
+         (dir (lookup-agent-location 
+               (lookup-dictionary-agent dictionary)))
+         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
          (result
-          (ndpdic-binary-search location query-string)))
+          (ndpdic-binary-search file query-string)))
     (when result
       (setq result
             (remove-if
              (lambda (x) (null (string-match
                                 (concat "^" query-string) x)))
-             (append (ndpdic-entries location (car result))
-                     (ndpdic-entries location (cdr result)))))
+             (append (ndpdic-entries file (car result))
+                     (ndpdic-entries file (cdr result)))))
       ;;(if (> (length result) ndpdic-max-hits)
       ;;    )
       (mapcar (lambda (x) (lookup-new-entry
@@ -207,10 +211,11 @@
   "Content of ENTRY."
   (let* ((code (lookup-entry-code entry))
          (dictionary (lookup-entry-dictionary entry))
-         (location (lookup-agent-location
-                    (lookup-dictionary-agent dictionary)))
-         (result (car (ndpdic-binary-search location code))))
-    (ndpdic-entry-content location result code)))
+         (dir (lookup-agent-location
+               (lookup-dictionary-agent dictionary)))
+         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (result (car (ndpdic-binary-search file code))))
+    (ndpdic-entry-content file result code)))
 
 ;; Hash variables 
 ;; (in future, move them to lookup hash tables)
