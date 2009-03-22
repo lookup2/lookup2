@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.3 2009/03/21 20:58:09 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.4 2009/03/22 23:07:59 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -97,6 +97,8 @@ CHARSET, URL and ENCODING may be a function.")
       (lookup-table-insert
        " → %c. %-10t     %-18t \n"
        (nreverse menu-items))
+      (goto-char (point-min))
+      (while (re-search-forward " +$" nil t) (replace-match ""))
       (buffer-string))))
 
 (put 'ndmisc :arrange-table

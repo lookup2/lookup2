@@ -159,7 +159,7 @@
       (setq ndspell-process
 	    (start-process "ndspell" buffer ndspell-aspell-program
 			   "-a" "-m" "-C"))
-      (set-process-query-on-exit-flag nil)
+      (set-process-query-on-exit-flag ndspell-process nil)
       (accept-process-output ndspell-process)
       (let ((coding ndspell-process-coding-system))
 	(when coding

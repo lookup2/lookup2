@@ -31,7 +31,8 @@
 
 (setq lookup-support-options
       (list :title "FOLDOC"
-	    :reference-pattern foldoc-reference-pattern
-	    :arranges '((replace foldoc-arrange-replace))))
+;;	    :reference-pattern foldoc-reference-pattern
+;;	    :arranges '((replace foldoc-arrange-replace))))
+            ))
 
 ;;; foldoc.el ends here

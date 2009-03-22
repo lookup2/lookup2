@@ -37,8 +37,8 @@
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsary "/path/to/chinadat.csv")
-;;           ....)
+;;           (ndsary "/path/to/dir_of_chinadat.csv")
+;;           ....))
 
 ;;; Code:
 

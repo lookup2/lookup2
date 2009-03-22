@@ -130,23 +130,18 @@
   "Decode BOCU STRING to Emacs String."
   (ccl-execute-on-string 'decode-bocu '[0 0 0 0 0 0 0 0 0] string))
 
-(defvar ndpdic-attribute-mask
-  '((#x0f . vocabulary-level)
-    (#x10 . extended-attributes)
-    (#x20 . memorize-word)
-    (#x40 . modified-word)))
+;;;
+;;; Variables
+;;;
 
-(defvar ndpdic-extended-attribute
-  '((#x01 . usage)
-    (#x02 . pronunciation)
-    (#x03 . undefined)
-    (#x04 . link)
-    (#x10 . binary-data)
-    (#x20 . undefined)
-    (#x40 . compressed)
-    (#x80 . end-of-extension)))
+(defvar ndpdic-extended-attributes
+  '((0 . (lambda (x) (concat (ndpdic-bocu-to-str x) "\n")))
+    (1 . (lambda (x) (concat "【用例】" (ndpdic-bocu-to-str x) "\n")))
+    (2 . (lambda (x) (concat "【発音】" (ndpdic-bocu-to-str x) "\n")))))
 
+;;;
 ;;; Interface Functions
+;;;
 
 (defvar ndpdic-max-hits 150)
 
@@ -228,7 +223,9 @@
   (make-hash-table :test 'equal)
   "Hash table for file -> (block -> entries) table.")
 
-;; basic functions
+;;;
+;;; Basic Functions
+;;;
 
 (defun ndpdic-file-content (file from to)
   "Unibyte string of FILE from FROM to TO."
@@ -469,16 +466,60 @@ Return the list of entry words.  Result will be cached."
           (when (equal (car word-spec) entry)
             (setq content
                   (ndpdic-adjust-content
-                   entry (elt word-spec 2) (point)))
+                   entry (elt word-spec 1)
+                   (elt word-spec 2) (point)))
             (goto-char (point-max)))))
       content)))
 
-(defun ndpdic-adjust-content (entry from to)
-  (concat
-   (if (string-match "	" entry) 
-       (substring entry (match-end 0)) entry)
-   "\n"
-   (ndpdic-bocu-to-str (buffer-substring from to))))
+(defun ndpdic-adjust-content (entry kind from to &optional field-size-length)
+  "Retrieve ENTRY contents of KIND from FROM to TO buffer.
+Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
+  (let ((word-level (logand #x0f kind))
+        (extended   (logand #x10 kind))
+        (memorize   (logand #x20 kind))
+        (modified   (logand #x40 kind))
+        extended-data start ext-val binary-data)
+    ;; Parse Extended Data
+    (when (/= extended 0)
+      (save-restriction
+        (unless field-size-length (setq field-size-length 2))
+        (narrow-to-region from to)
+        (goto-char (point-min))
+        (ndpdic-forward-to-null)
+        (setq extended-data
+              (list (cons 0 (buffer-substring from (point)))))
+        (if (and (char-after (point))
+                 (= 0 (char-after (point)))) (forward-char))
+        (while (not (eobp))
+          (setq ext-val (ndpdic-buffer-byte))
+          (setq start (point))
+          (if (/= 0 (logand #x40 ext-val))
+              ;; binary
+              (let ((length (if (eq field-size-length 2)
+                                (ndpdic-buffer-short)
+                              (ndpdic-buffer-int))))
+                (goto-char (+ start length)))
+            ;; text
+            (ndpdic-forward-to-null))
+          (setq extended-data
+                (cons (cons ext-val (buffer-substring start (point)))
+                      extended-data))
+          (if (and (char-after (point))
+                   (= 0 (char-after (point)))) (forward-char)))
+        (setq extended-data (nreverse extended-data))))
+    ;; Contents for Display
+    (concat
+     ;; entry part
+     (if (string-match "	" entry)
+         (substring entry (match-end 0)) entry)
+     "\n"
+     (if (= extended 0)
+         (ndpdic-bocu-to-str (buffer-substring from to))
+       (mapconcat (lambda (x)
+                    (if (assq (car x) ndpdic-extended-attributes)
+                        (apply (cdr (assq (car x) ndpdic-extended-attributes))
+                               (list (cdr x)))))
+                  extended-data "")))))
   
 
 ;; binary search
