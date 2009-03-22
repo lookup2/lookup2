@@ -1,4 +1,4 @@
-;;; support-jmdict.el --- support file for "jmdict" file.
+;;; support-JMDict.el --- support file for "JMDict" file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -24,7 +24,11 @@
 ;; Download site:
 ;; http://www.csse.monash.edu.au/~jwb/jmdict.html
 ;;
-;; Sample Index Point Generator for JMdict
+;; Sample Index Point Generator for JMdict.  If you do not need
+;; specific language support, remoeve specific line from the following
+;; program.  If you want to handle each langauge differently, then
+;; `hard-link' copy the JMdict file for each languages and create
+;; language-specific suffix array indexes individually.
 ;;
 ;; #!/usr/bin/env ruby -Ku
 ;; # Usage: ruby jmdict.rb JMdict
@@ -52,6 +56,8 @@
 
 (require 'lookup)
 
+;;; Customizable variables
+
 (defvar support-jmdict-search-tags
   '(("<gloss xml:lang=\"rus\">" . "</gloss>")
     ("<gloss xml:lang=\"ger\">" . "</gloss>")
@@ -60,7 +66,7 @@
     ("<reb>" . "</reb>")
     ("<keb>" . "</keb>"))
   "Tags to be searched.  You may edit the variables to reduce the
-search speed.")
+searching time.")
 
 (defvar support-jmdict-replace-tags
   '(("<gloss xml:lang=\"rus\">" . "ロシア語：")
@@ -73,6 +79,124 @@ search speed.")
     ("<ke_inf>" . "漢字情報コード：")
     ("<ke_pri>" . "漢字重要度：")))
 
+(defvar support-jmdict-replace-entities
+  '(
+    ("MA" . "martial arts term")
+    ("X" . "rude or X-rated term (not displayed in educational software)")
+    ("abbr" . "abbreviation")
+    ("adj-i" . "adjective (keiyoushi)")
+    ("adj-na" . "adjectival nouns or quasi-adjectives (keiyodoshi)")
+    ("adj-no" . "nouns which may take the genitive case particle `no'")
+    ("adj-pn" . "pre-noun adjectival (rentaishi)")
+    ("adj-t" . "`taru' adjective")
+    ("adj-f" . "noun or verb acting prenominally")
+    ("adj" . "former adjective classification (being removed)")
+    ("adv" . "adverb (fukushi)")
+    ("adv-to" . "adverb taking the `to' particle")
+    ("arch" . "archaism")
+    ("ateji" . "ateji (phonetic) reading")
+    ("aux" . "auxiliary")
+    ("aux-v" . "auxiliary verb")
+    ("aux-adj" . "auxiliary adjective")
+    ("Buddh" . "Buddhist term")
+    ("chem" . "chemistry term")
+    ("chn" . "children's language")
+    ("col" . "colloquialism")
+    ("comp" . "computer terminology")
+    ("conj" . "conjunction")
+    ("ctr" . "counter")
+    ("derog" . "derogatory")
+    ("eK" . "exclusively kanji")
+    ("ek" . "exclusively kana")
+    ("exp" . "Expressions (phrases, clauses, etc.)")
+    ("fam" . "familiar language")
+    ("fem" . "female term or language")
+    ("food" . "food term")
+    ("geom" . "geometry term")
+    ("gikun" . "gikun (meaning) reading")
+    ("hon" . "honorific or respectful (sonkeigo) language")
+    ("hum" . "humble (kenjougo) language")
+    ("iK" . "word containing irregular kanji usage")
+    ("id" . "idiomatic expression")
+    ("ik" . "word containing irregular kana usage")
+    ("int" . "interjection (kandoushi)")
+    ("io" . "irregular okurigana usage")
+    ("iv" . "irregular verb")
+    ("ling" . "linguistics terminology")
+    ("m-sl" . "manga slang")
+    ("male" . "male term or language")
+    ("male-sl" . "male slang")
+    ("math" . "mathematics")
+    ("mil" . "military")
+    ("n" . "noun (common) (futsuumeishi)")
+    ("n-adv" . "adverbial noun (fukushitekimeishi)")
+    ("n-suf" . "noun, used as a suffix")
+    ("n-pref" . "noun, used as a prefix")
+    ("n-t" . "noun (temporal) (jisoumeishi)")
+    ("num" . "numeric")
+    ("oK" . "word containing out-dated kanji")
+    ("obs" . "obsolete term")
+    ("obsc" . "obscure term")
+    ("ok" . "out-dated or obsolete kana usage")
+    ("on-mim" . "onomatopoeic or mimetic word")
+    ("pn" . "pronoun")
+    ("poet" . "poetical term")
+    ("pol" . "polite (teineigo) language")
+    ("pref" . "prefix")
+    ("prt" . "particle")
+    ("physics" . "physics terminology")
+    ("rare" . "rare")
+    ("sens" . "sensitive")
+    ("sl" . "slang")
+    ("suf" . "suffix")
+    ("uK" . "word usually written using kanji alone")
+    ("uk" . "word usually written using kana alone")
+    ("v1" . "Ichidan verb")
+    ("v2a-s" . "Nidan verb with 'u' ending (archaic)")
+    ("v4h" . "Yondan verb with `hu/fu' ending (archaic)")
+    ("v4r" . "Yondan verb with `ru' ending (archaic)")
+    ("v5" . "Godan verb (not completely classified)")
+    ("v5aru" . "Godan verb - -aru special class")
+    ("v5b" . "Godan verb with `bu' ending")
+    ("v5g" . "Godan verb with `gu' ending")
+    ("v5k" . "Godan verb with `ku' ending")
+    ("v5k-s" . "Godan verb - Iku/Yuku special class")
+    ("v5m" . "Godan verb with `mu' ending")
+    ("v5n" . "Godan verb with `nu' ending")
+    ("v5r" . "Godan verb with `ru' ending")
+    ("v5r-i" . "Godan verb with `ru' ending (irregular verb)")
+    ("v5s" . "Godan verb with `su' ending")
+    ("v5t" . "Godan verb with `tsu' ending")
+    ("v5u" . "Godan verb with `u' ending")
+    ("v5u-s" . "Godan verb with `u' ending (special class)")
+    ("v5uru" . "Godan verb - Uru old class verb (old form of Eru)")
+    ("v5z" . "Godan verb with `zu' ending")
+    ("vz" . "Ichidan verb - zuru verb (alternative form of -jiru verbs)")
+    ("vi" . "intransitive verb")
+    ("vk" . "Kuru verb - special class")
+    ("vn" . "irregular nu verb")
+    ("vr" . "irregular ru verb, plain form ends with -ri")
+    ("vs" . "noun or participle which takes the aux. verb suru")
+    ("vs-s" . "suru verb - special class")
+    ("vs-i" . "suru verb - irregular")
+    ("kyb" . "Kyoto-ben")
+    ("osb" . "Osaka-ben")
+    ("ksb" . "Kansai-ben")
+    ("ktb" . "Kantou-ben")
+    ("tsb" . "Tosa-ben")
+    ("thb" . "Touhoku-ben")
+    ("tsug" . "Tsugaru-ben")
+    ("kyu" . "Kyuushuu-ben")
+    ("rkb" . "Ryuukyuu-ben")
+    ("vt" . "transitive verb")
+    ("vulg" . "vulgar expression or word")))
+
+(defvar support-jmdict-replace-entities-regexp
+  (concat "&\\("
+          (regexp-opt
+           (mapcar 'car support-jmdict-replace-entities))
+          "\\);"))
+
 (defun support-jmdict-arrange-structure (entry)
   (let ((tags support-jmdict-replace-tags))
     (while tags
@@ -84,7 +208,12 @@ search speed.")
     (while (re-search-forward "<.+?>" nil t)
       (replace-match ""))
     (goto-char (point-min))
+    (while (re-search-forward support-jmdict-replace-entities-regexp nil t)
+      (replace-match 
+       (cdr (assoc (match-string 1) support-jmdict-replace-entities))))
+    (goto-char (point-min))
     (if (looking-at "\n") (delete-region (point-min) (1+ (point-min))))
+    (goto-char (point-min))
     (while (re-search-forward "\\([ 	]*\n\\)+" nil t)
       (replace-match "\n"))))
 
