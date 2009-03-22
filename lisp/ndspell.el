@@ -32,8 +32,8 @@
   "Lookup spell checker."
   :group 'lookup-search-agents)
 
-(defcustom ndspell-ispell-program "ispell"
-  "*Program name of Ispell."
+(defcustom ndspell-aspell-program "aspell"
+  "*Program name of Aspell."
   :type 'string
   :group 'ndspell)
 
@@ -44,8 +44,7 @@
 
 (defcustom ndspell-words-dictionary
   (if (file-exists-p "/usr/dict/words")
-      "/usr/dict/words"
-    "/usr/share/dict/words")
+      "/usr/dict/words")
   "*Dictionary file."
   :type 'file
   :group 'ndspell)
@@ -56,7 +55,7 @@
   :group 'ndspell)
 
 (defcustom ndspell-process-coding-system lookup-process-coding-system
-  "*Coding system for Ispell process."
+  "*Coding system for Aspell process."
   :type 'symbol
   :group 'ndspell)
 
@@ -74,7 +73,7 @@
 
 (put 'ndspell :list 'ndspell-list)
 (defun ndspell-list (agent)
-  (list (lookup-new-dictionary agent ndspell-ispell-program)))
+  (list (lookup-new-dictionary agent ndspell-aspell-program)))
 
 (put 'ndspell :title ndspell-dictionary-title)
 
@@ -136,18 +135,19 @@
       (split-string (substring output (match-end 0)) "[,\n] ?" t)))))
 
 (defun ndspell-search-spelling (regexp)
-  (with-temp-buffer
-    (call-process ndspell-grep-program nil t nil
-		  regexp ndspell-words-dictionary)
-    (let ((candidates nil))
-      (while (not (bobp))
-	(setq candidates (cons (buffer-substring-no-properties
-				(1- (point)) (progn (forward-line -1) (point)))
-			       candidates)))
-      candidates)))
+  (if (file-exists-p ndspell-words-dictionary)
+      (with-temp-buffer
+        (call-process ndspell-grep-program nil t nil
+                      regexp ndspell-words-dictionary)
+        (let ((candidates nil))
+          (while (not (bobp))
+            (setq candidates (cons (buffer-substring-no-properties
+                                    (1- (point)) (progn (forward-line -1) (point)))
+                                   candidates)))
+          candidates))))
 
 ;;;
-;;; Ispell process
+;;; Aspell process
 ;;;
 
 (defvar ndspell-process nil)
@@ -157,9 +157,9 @@
     (if ndspell-process (lookup-process-kill ndspell-process))
     (let ((buffer (lookup-open-process-buffer " *ndspell*")))
       (setq ndspell-process
-	    (start-process "ndspell" buffer ndspell-ispell-program
+	    (start-process "ndspell" buffer ndspell-aspell-program
 			   "-a" "-m" "-C"))
-      (process-kill-without-query ndspell-process)
+      (set-process-query-on-exit-flag nil)
       (accept-process-output ndspell-process)
       (let ((coding ndspell-process-coding-system))
 	(when coding
