@@ -3577,19 +3577,21 @@
                       (- (string-to-int (match-string 2 code) 16) 128)))))
     (goto-char (point-min))))
 
-(defun zhongri-pinyin-kana-string (str)
+(defun zhongri-pinyin-string (str)
   (remove-if 'null 
-             (cons (lookup-text-get-pinyin str)
-                   (lookup-text-get-readings str))))
+             (list (lookup-text-get-pinyin str) str)))
 
-(defun zhongri-pinyin-kana-search (dictionary query)
+(defun zhongri-pinyin-search (dictionary query)
   (let* ((query-string (lookup-query-string query))
-         (query-strings (zhongri-pinyin-kana-string query-string)))
+         (query-strings (zhongri-pinyin-string query-string)))
   (lookup-search-multiple dictionary query-strings)))
 
+;; If you use "EB Kanji Indexer" 
+;; (http://www31.ocn.ne.jp/~h_ishida/EBKIdx.html), you can search 
+;; EBXA-C dictionaries with Japanese Kanji.
 (setq lookup-support-options
       (list :gaiji-table   zhongri-gaiji-table
             :arranges '((gaiji zhongri-dictionary-arrange-gaiji))
-            :transformer   #'zhongri-pinyin-kana-search))
+            :transformer   #'zhongri-pinyin-search))
 
 ;;; support-zhongri.el ends here
