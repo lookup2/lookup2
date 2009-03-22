@@ -27,6 +27,7 @@
         ("/CROWN_DJ\\'" . "support-crown")
         ("/CROWN_FJ\\'" . "support-crown")
         ("/KOJIEN" . "support-kojien")
+        ("/DAIJIRIN" . "support-daijirin")
 	("/GENIUS\\'" . "support-genius")
 	("/COLLOC\\'" . "support-colloc")
         ("^[^2]+/PLUS\\'" . "support-plus")
@@ -38,7 +39,6 @@
 	("/SRD-FPW\\'" . "support-srd-fpw")
         ("/MWSEDIC\\'" . "support-mwsedic")
         ("/CEBD\\'" . "support-cebd")
-        ("/SKP\\'" . "support-skp")
         ;; ndsary
         ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-wikipedia")
         ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")

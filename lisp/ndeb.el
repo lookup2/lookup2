@@ -104,8 +104,6 @@
 
 ;; lookup entry command
 (put 'ndeb :content   #'ndeb-entry-content)
-(put 'ndeb :following #'ndeb-entry-following)
-(put 'ndeb :preceding #'ndeb-entry-preceding)
 
 ;; lookup agent command
 (put 'ndeb :list      #'ndeb-list)
@@ -130,7 +128,6 @@
                   ndeb-arrange-scripts
                   ndeb-arrange-faces
                   ndeb-arrange-no-newline
-                  ndeb-arrange-prev-next
                   ndeb-arrange-decode-entity
                   )
        (gaiji     lookup-arrange-gaijis)
@@ -140,6 +137,7 @@
                   ndeb-arrange-squeezed-references
                   lookup-arrange-references)
        (structure 
+                  ndeb-arrange-prev-next ; to obtain prev/next entry.
                   ndeb-arrange-indent
                   lookup-arrange-structure
                   )
@@ -228,6 +226,7 @@ Nil means it has not been checked yet.")
 
 (put 'ndeb-with-agent 'lisp-indent-function 1)
 (defmacro ndeb-with-agent (agent &rest body)
+  "Switch eblook's context to AGENT and execute BODY."
   `(let (book appendix)
      (ndeb-process-open)
      (unless (eq ,agent ndeb-current-agent)
@@ -464,6 +463,8 @@ Nil means it has not been checked yet.")
 (defun ndeb-entry-content (entry)
   (or (lookup-get-property entry 'ndeb-content)
       (ndeb-with-dictionary (lookup-entry-dictionary entry)
+        (if lookup-max-text 
+            (ndeb-process-require-set "max-text" lookup-max-text))
         ;; processing `stop-code' if necessary.
         (let ((stop (lookup-dictionary-option dictionary ':stop-code t))
               (last (lookup-get-property ndeb-current-agent 'ndeb-stop)))
@@ -480,18 +481,6 @@ Nil means it has not been checked yet.")
           (ndeb-process-require-set "decorate-mode" "off")
           return))))
 
-;; <:preceding>
-(defun ndeb-entry-preceding (entry)
-  (let ((content (ndeb-entry-content entry)))
-    (if (string-match "<prev>.*reference=\\([^>]+\\)>.*</prev>")
-        (let ((ref (match-string 1)))))))
-
-;; <:following>
-(defun ndeb-entry-following (entry)
-  (let ((content (ndeb-entry-content entry)))
-    (if (string-match "<next>.*reference=\\([^>]+\\)>.*</next>")
-        (let ((ref (match-string 1)))))))
-	  
 ;;;
 ;;; Internal functions
 ;;;
@@ -556,7 +545,10 @@ Nil means it has not been checked yet.")
 (defun ndeb-arrange-prev-next (entry)
   (while (re-search-forward "\\(<prev>\\|<next>\\)" nil t)
     (if (equal (match-string 0) "<prev>")
-	(replace-match "\n(前項目⇒")
+        (progn
+          (lookup-put-property entry :preceding (lookup-get-link (point)))
+          (replace-match "\n(前項目⇒"))
+      (lookup-put-property entry :following (lookup-get-link (point)))
       (replace-match "(次項目⇒"))
     (if (re-search-forward "\\(</prev>\\|</next>\\)" nil t)
 	(replace-match ")"))))

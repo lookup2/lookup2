@@ -230,7 +230,6 @@
            (n 1))
       (re-search-backward regexp)
       (while (and (match-end n) (<= (match-end n) start))
-        (message "debug: data=%s" (match-string n))
 	(setq n (1+ n)))
       (buffer-substring-no-properties (match-beginning n) (match-end n)))))
 

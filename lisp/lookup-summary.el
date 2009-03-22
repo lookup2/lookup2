@@ -184,8 +184,8 @@
 `L'(inks)  - list references    `S'(elect)   - select dictionaries
 `M'(enu)   - display the menu   `B'(ookmark) - display the bookmarks
 
-`f'(ind)
-`c'(ontinuous)
+`f'(ind)                        `,' - previous dictionary entry
+`c'(ontinuous)                  `.' - next dictionary entry
 
 `t f' - toggle format
 `t g' - toggle gaiji
@@ -217,8 +217,8 @@
   (define-key lookup-summary-mode-map "p" 'lookup-summary-previous-entry)
   (define-key lookup-summary-mode-map "P" 'enlarge-window)
   (define-key lookup-summary-mode-map "N" 'shrink-window)
-  (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-following-entry)
-  (define-key lookup-summary-mode-map "\M-N" 'lookup-summary-preceding-entry)
+  (define-key lookup-summary-mode-map "," 'lookup-summary-preceding-entry)
+  (define-key lookup-summary-mode-map "." 'lookup-summary-following-entry)
   (define-key lookup-summary-mode-map
     (if (featurep 'xemacs) 'button2 [mouse-2]) 'lookup-summary-mouse-follow)
   ;; entry management
@@ -412,6 +412,39 @@ Overview モードになっている場合にはそれを解除し、Content バ
       (or (pos-visible-in-window-p (save-excursion (forward-line -1) (point)))
 	  (recenter 1))
       (lookup-summary-display-content))))
+
+;; TODO この２つと、lookup-content-follow-link はコード重複が多いので、整理する必要がある。
+(defun lookup-summary-following-entry ()
+  "辞書上の次のエントリに進む。"
+  (interactive)
+  (let* ((entry (lookup-summary-this-entry))
+         (target-entry (lookup-get-property entry :following)))
+    (if target-entry
+	(let ((entries (lookup-entry-substance target-entry)))
+	  (if (setq entries (if entries
+				(list entries)
+			      (lookup-entry-references target-entry)))
+	      (let* ((heading (lookup-entry-heading target-entry))
+		     (query (lookup-new-query 'reference heading)))
+		(lookup-display-entries (lookup-current-module) query entries))
+	    (error "This link is torn off")))
+      (error "No link here"))))
+
+(defun lookup-summary-preceding-entry ()
+  "辞書上の前のエントリに進む。"
+  (interactive)
+  (let* ((entry (lookup-summary-this-entry))
+         (target-entry (lookup-get-property entry :preceding)))
+    (if target-entry
+	(let ((entries (lookup-entry-substance target-entry)))
+	  (if (setq entries (if entries
+				(list entries)
+			      (lookup-entry-references target-entry)))
+	      (let* ((heading (lookup-entry-heading target-entry))
+		     (query (lookup-new-query 'reference heading)))
+		(lookup-display-entries (lookup-current-module) query entries))
+	    (error "This link is torn off")))
+      (error "No link here"))))
 
 (defun lookup-summary-info ()
   "エントリの情報を出力する。"
