@@ -75,9 +75,18 @@ searching time.")
     ("<gloss>" . "英語：")
     ("<reb>" . "かな：")
     ("<keb>" . "漢字：")
+    ("<bib_txt>" . "書誌情報：")
+    ("<etym>" . "語源：")
     ("<ent_seq>" . "語彙番号：")
     ("<ke_inf>" . "漢字情報コード：")
-    ("<ke_pri>" . "漢字重要度：")))
+    ("<ke_pri>" . "漢字重要度：")
+    ("<dial>" . "方言：")
+    ("<example>" . "用例：")))
+
+
+(defvar support-jmdict-replace-tags-regexp
+  (regexp-opt
+   (mapcar 'car support-jmdict-replace-tags)))
 
 (defvar support-jmdict-replace-entities
   '(
@@ -198,24 +207,28 @@ searching time.")
           "\\);"))
 
 (defun support-jmdict-arrange-structure (entry)
-  (let ((tags support-jmdict-replace-tags))
-    (while tags
-      (goto-char (point-min))
-      (while (re-search-forward (caar tags) nil t)
-        (replace-match (cdar tags)))
-      (setq tags (cdr tags)))
-    (goto-char (point-min))
-    (while (re-search-forward "<.+?>" nil t)
-      (replace-match ""))
-    (goto-char (point-min))
-    (while (re-search-forward support-jmdict-replace-entities-regexp nil t)
-      (replace-match 
-       (cdr (assoc (match-string 1) support-jmdict-replace-entities))))
-    (goto-char (point-min))
-    (if (looking-at "\n") (delete-region (point-min) (1+ (point-min))))
-    (goto-char (point-min))
-    (while (re-search-forward "\\([ 	]*\n\\)+" nil t)
-      (replace-match "\n"))))
+  "Arrange Structure of ENTRY."
+  (goto-char (point-min))
+  (while (re-search-forward support-jmdict-replace-tags-regexp nil t)
+    (replace-match
+     (cdr (assoc (match-string 0) support-jmdict-replace-tags))))
+  (goto-char (point-min))
+  (while (re-search-forward support-jmdict-replace-entities-regexp nil t)
+    (replace-match
+     (cdr (assoc (match-string 1) support-jmdict-replace-entities))))
+  (goto-char (point-min))
+  (while (re-search-forward "<.+?>" nil t)
+    (replace-match ""))
+  (goto-char (point-min))
+  (if (looking-at "\n") (delete-region (point-min) (1+ (point-min))))
+  (goto-char (point-min))
+  (while (re-search-forward "\\([ 	]*\n\\)+" nil t)
+    (replace-match "\n"))
+  (goto-char (point-min))
+  (while (re-search-forward "語彙番号：[0-9]+" nil t)
+    (lookup-make-region-heading (match-beginning 0) (match-end 0) 1))
+  )
+    
 
 (defun support-jmdict-heading-func (code dictionary)
   (let ((entry-start (lookup-dictionary-option dictionary :entry-start)))

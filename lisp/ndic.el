@@ -22,6 +22,20 @@
 ;; along with Lookup; if not, write to the Free Software Foundation,
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+;;; Documentation
+
+;; `ndic' agent provides an ability to access `dictd'-based dictionaries.
+;; Tools for `dictd' dictionaries are distributed from http://www.dict.org/.
+;; Some internet dictionaries, such as the ones distributed by `freedict'
+;; project, are based on this format.
+;;
+;; `dict' dictionaries may be distributed in either compressed
+;; (`**.dict.dz' extension) or non-compressed (`**.dict') format, AND
+;; index file (`**.index') in either case.  You need `dictzip' tool
+;; installed on your system to use compressed format.
+;; 
+;; This agent no longer supports `sdic' format.  (Use `ndsary' or etc. instead)
+
 ;;; Code:
 
 (require 'lookup)
@@ -43,158 +57,43 @@
 
 
 ;;;
-;;; types
+;;; Arrange table
 ;;;
 
 (put 'ndic :arrange-table '((fill lookup-arrange-nofill)))
-
-;; ndic agent:
-;;
-;;   "ndic:DIRECTORY"
-;;
-;; DIRECTORY - dictionary directory
-
-;; ndic dictionary:
-;;
-;; NAME  - filename without directory and extension
-;;
-;; [property]
-;; ndic-type   - `sdic' or `dictd'
-;; ndic-object - [SDIC]  sdic object
-;;               [dictd] the buffer of .index file
-;; ndic-dict   - [dictd] .dict file name
-
-(defun ndic-dictionary-init (dictionary)
-  (let* ((dir (lookup-agent-location (lookup-dictionary-agent dictionary)))
-	 (file (expand-file-name (lookup-dictionary-name dictionary) dir))
-	 type object)
-    (cond ((string-match "\\.sdic\\(\\.[gb]z2?\\)?\\'" file)
-	   (setq type 'sdic object (ndic-sdic-init dictionary file)))
-	  ((string-match "\\.dict\\(\\.dz\\)?\\'" file)
-	   (setq type 'dictd object (ndic-dictd-init dictionary file)))
-	  (t (error "Invalid dictionary type: %s" file)))
-    (lookup-put-property dictionary 'ndic-type type)
-    (lookup-put-property dictionary 'ndic-object object)))
-
-(defun ndic-dictionary-type (dictionary)
-  (or (lookup-get-property dictionary 'ndic-type)
-      (progn (ndic-dictionary-init dictionary)
-	     (lookup-get-property dictionary 'ndic-type))))
-
-(defun ndic-dictionary-object (dictionary)
-  (lookup-get-property dictionary 'ndic-object))
-
-;; ndic entry:
-;;
-;; CODE    - [SDIC]  entry returned by sdic-search
-;;           [dictd] entry position as string "START:LENGTH"
-;; HEADING - headword
 
 
 ;;;
 ;;; Interface functions
 ;;;
 
-(defconst ndic-dictionary-regexp
-  "\\.\\(sdic\\(\\.\\(gz\\|bz2\\)\\)?\\|dict\\(\\.dz\\)?\\)\\'")
+(defconst ndic-dictionary-regexp "\\.\\(dict\\(\\.dz\\)?\\)\\'")
+
+(defconst ndic-dictionary-uncompressed-regexp "\\.dict\\'")
 
 (put 'ndic :list 'ndic-list)
 (defun ndic-list (agent)
   (mapcar (lambda (name) (lookup-new-dictionary agent name))
-	  (directory-files (expand-file-name (lookup-agent-location agent))
-			   nil ndic-dictionary-regexp)))
+	  (ndic-directory-files (lookup-agent-location agent))))
 
 (put 'ndic :title 'ndic-dictionary-title)
 (defun ndic-dictionary-title (dictionary)
-  (let ((type (ndic-dictionary-type dictionary)))
-    (cond ((eq type 'sdic) (ndic-sdic-title dictionary))
-	  ((eq type 'dictd) (ndic-dictd-title dictionary)))))
-
-(defconst ndic-sdic-methods lookup-search-methods)
-(defconst ndic-dictd-methods (delq 'text lookup-search-methods))
-
-(put 'ndic :methods 'ndic-dictionary-methods)
-(defun ndic-dictionary-methods (dictionary)
-  (let ((type (ndic-dictionary-type dictionary)))
-    (cond ((eq type 'sdic) ndic-sdic-methods)
-	  ((eq type 'dictd) ndic-dictd-methods))))
-
-(put 'ndic :search 'ndic-dictionary-search)
-(defun ndic-dictionary-search (dictionary query)
-  (let ((type (ndic-dictionary-type dictionary)))
-    (cond ((eq type 'sdic) (ndic-sdic-search dictionary query))
-	  ((eq type 'dictd) (ndic-dictd-search dictionary query)))))
-
-(put 'ndic :clear 'ndic-dictionary-clear)
-(defun ndic-dictionary-clear (dictionary)
-  (let ((type (ndic-dictionary-type dictionary))
-	(obj (ndic-dictionary-object dictionary)))
-    (cond ((eq type 'sdic) (sdicf-close obj))
-	  ((eq type 'dictd) (kill-buffer obj)))))
-
-(put 'ndic :content 'ndic-entry-content)
-(defun ndic-entry-content (entry)
-  (let ((type (ndic-dictionary-type (lookup-entry-dictionary entry))))
-    (cond ((eq type 'sdic) (ndic-sdic-content entry))
-	  ((eq type 'dictd) (ndic-dictd-content entry)))))
-
-
-;;;
-;;; SDIC
-;;;
-
-(defun ndic-sdic-init (dictionary file)
-  (require 'sdicf)
-  (sdicf-open file))
-
-(defun ndic-sdic-title (dictionary)
-  (let ((name (lookup-dictionary-name dictionary)))
-    (if (string-match "\\.sdic\\(\\.[gb]z2?\\)?\\'" name)
-	(substring name 0 (match-beginning 0)))))
-
-(defun ndic-sdic-search (dictionary query)
-  (let ((method (lookup-query-method query))
-	(string (lookup-query-string query)))
-    (cond ((or (eq method 'substring) (eq method 'keyword))
-	   (setq method 'text))
-	  ((eq method 'wildcard)
-	   (setq method 'regexp string (lookup-query-to-regexp query))))
-    (mapcar (lambda (entry)
-	      (lookup-new-entry 'regular dictionary entry
-				(sdicf-entry-headword entry)))
-	    (sdicf-search (ndic-dictionary-object dictionary) method string))))
-
-(defun ndic-sdic-content (entry)
-  (setq entry (lookup-entry-code entry))
-  (format "%s\n\n    %s\n"
-	  (sdicf-entry-headword entry) (sdicf-entry-text entry)))
-
-
-;;;
-;;; dictd
-;;;
-
-(defun ndic-dictd-init (dictionary file)
-  (let* ((index (concat ;; remove ".dz.index"
-                 (file-name-sans-extension
-                  (file-name-sans-extension file)) ".index"))
-	 (buffer (get-buffer-create (concat " *ndic " index "*"))))
-    (with-current-buffer buffer (insert-file-contents index))
-    (unless (file-exists-p index)
-      (error "No .index file for `%s'" index))
-    (lookup-put-property dictionary 'ndic-dict file)
-    buffer))
-
-(defun ndic-dictd-title (dictionary)
   (let* ((query (lookup-new-query 'exact "00-database-short"))
-	 (title (ndic-dictd-search dictionary query)))
+	 (title (ndic-dictionary-search dictionary query)))
     (when title
       (setq title (ndic-dictd-content (car title)))
       (if (string-match "\n *\\(.*\\)\n" title)
 	  (setq title (match-string 1 title)))
       title)))
 
-(defun ndic-dictd-search (dictionary query)
+(defconst ndic-dictd-methods (delq 'text lookup-search-methods))
+
+(put 'ndic :methods 'ndic-dictionary-methods)
+(defun ndic-dictionary-methods (dictionary)
+  ndic-dictd-methods)
+
+(put 'ndic :search 'ndic-dictionary-search)
+(defun ndic-dictionary-search (dictionary query)
   (let* ((method (lookup-query-method query))
 	 (string (lookup-query-string query))
 	 (regexp (regexp-quote string)))
@@ -207,7 +106,7 @@
 		((eq method 'regexp) string)
 		((eq method 'keyword) (concat "^[^\t]*\\<" regexp "\\>"))))
     (let ((case-fold-search t) code entries)
-      (with-current-buffer (ndic-dictionary-object dictionary)
+      (with-current-buffer (ndic-dictionary-buffer dictionary)
 	(goto-char (point-min))
 	(while (re-search-forward regexp nil t)
           (goto-char (line-beginning-position))
@@ -220,7 +119,13 @@
           (goto-char (line-end-position)))
 	(nreverse entries)))))
 
-(defun ndic-dictd-content (entry)
+(put 'ndic :clear 'ndic-dictionary-clear)
+(defun ndic-dictionary-clear (dictionary)
+  (let ((obj (ndic-dictionary-buffer dictionary)))
+    (kill-buffer obj)))
+
+(put 'ndic :content 'ndic-entry-content)
+(defun ndic-entry-content (entry)
   (let ((code (lookup-entry-code (lookup-entry-substance entry)))
 	(dict (lookup-get-property
 	       (lookup-entry-dictionary entry) 'ndic-dict)))
@@ -237,6 +142,46 @@
                   (length (ndic-b64-decode (cdr code))))
               (insert-file-contents dict nil offset (+ offset length))))
           (buffer-string))))))
+
+
+;;;
+;;; dictd
+;;;
+
+(defun ndic-dictionary-buffer (dictionary)
+  (unless (lookup-get-property dictionary 'ndic-buffer)
+    (ndic-dictionary-init dictionary))
+  (lookup-get-property dictionary 'ndic-buffer))
+
+(defun ndic-dictionary-init (dictionary)
+  "Initialize DICTIONARY.  Set up file and buffer."
+  (let* ((dir (lookup-agent-location (lookup-dictionary-agent dictionary)))
+	 (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (index (ndic-index-file file))
+         (buffer (get-buffer-create (concat " *ndic "index "*")))
+	 object)
+    (with-current-buffer buffer (insert-file-contents index))
+    (lookup-put-property dictionary 'ndic-dict file)
+    (lookup-put-property dictionary 'ndic-buffer buffer)))
+
+(defun ndic-directory-files (dir)
+  "Get valid `dict' files in the directory DIR."
+  (let ((dicts
+         (directory-files
+          dir nil (if (executable-find ndic-dictzip-program)
+                      ndic-dictionary-regexp
+                    ndic-dictionary-uncompressed-regexp)))
+        valid-dicts)
+    (dolist (dict dicts)
+      (if (file-exists-p
+           (expand-file-name (ndic-index-file dict) dir))
+          (setq valid-dicts (cons dict valid-dicts))))
+    (nreverse valid-dicts)))
+
+(defun ndic-index-file (original-file)
+  "Get corresponding index file of ORIGINAL-FILE."
+  (concat (file-name-sans-extension ; remove .dz.index
+           (file-name-sans-extension original-file)) ".index"))
 
 (defconst ndic-b64-table
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
