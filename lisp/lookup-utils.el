@@ -222,10 +222,8 @@
                                (progn (skip-syntax-forward "w") (point)))))
            (regexp
             (concat "\\(" 
-                    (mapconcat 
-                     'identity 
-                     (split-string wakati " " t)
-                     "\\)\\(" )
+                    (mapconcat 'identity (split-string wakati "[ \n]" t)
+                               "\\)\\(" )
                     "\\)"))
            (n 1))
       (re-search-backward regexp)

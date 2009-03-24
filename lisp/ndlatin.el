@@ -2,7 +2,7 @@
 ;; Copyright (C) 2007 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: KAWABATA, Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: ndlatin.el,v 1.2 2009/03/07 17:34:07 kawabata Exp $
+;; Version: $Id: ndlatin.el,v 1.3 2009/03/24 23:02:09 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -94,6 +94,7 @@ Windows/Linux version (ver 1.97), it should be '~'"
 (put 'ndlatin :kill     #'ndlatin-kill)
 (put 'ndlatin :title    #'ndlatin-dictionary-title)
 (put 'ndlatin :methods  '(exact))
+(put 'ndlatin :charsets '(ascii))
 (put 'ndlatin :search   #'ndlatin-dictionary-search)
 (put 'ndlatin :content  #'ndlatin-entry-content)
 

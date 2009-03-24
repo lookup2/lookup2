@@ -426,14 +426,17 @@ will be attached to the module 'default'."
       entries)))
 
 (defun lookup-dictionary-search-internal (dictionary query search)
-  (let (entries)
-    (unless lookup-force-update
-      (setq entries (lookup-dictionary-search-cache-get dictionary query)))
-    (unless entries
-      (setq entries (or (funcall search dictionary query) 'no-exists))
-      (lookup-dictionary-search-cache-put dictionary query entries))
-    (unless (eq entries 'no-exists)
-      entries)))
+  (let ((string (lookup-query-string query))
+        (charsets (lookup-dictionary-option dictionary :charsets t))
+        entries)
+    (when (lookup-text-charsetsp string charsets)
+      (unless lookup-force-update
+        (setq entries (lookup-dictionary-search-cache-get dictionary query)))
+      (unless entries
+        (setq entries (or (funcall search dictionary query) 'no-exists))
+        (lookup-dictionary-search-cache-put dictionary query entries))
+      (unless (eq entries 'no-exists)
+        entries))))
 
 (defun lookup-regular-search (dictionary query)
   (lookup-dictionary-command dictionary :search query))

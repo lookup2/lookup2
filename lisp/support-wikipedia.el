@@ -58,12 +58,21 @@
 
 (require 'lookup)
 (require 'lookup-utils)
-(require 'lookup-content) ; for `lookup-content-mode-map'
+
+(defvar support-wikipedia-replace-entities
+  '(
+    ("amp" . "&")
+    ("lt" . "<")
+    ("gt" . ">")))
+
+(defvar support-wikipedia-replace-entities-regexp
+  (concat "&\\("
+          (regexp-opt
+           (mapcar 'car support-wikipedia-replace-entities))
+          "\\);"))
 
 (defun support-wikipedia-arrange-structure (entry)
   "Attach contents of ENTRY a link and remove tags."
-  ;; initialization
-  ;; initialization end
   (goto-char (point-min))
   (while (re-search-forward "<url>\\(.+?\\)</url>" nil t)
     (let ((link (match-string 1))
@@ -89,7 +98,12 @@
   (goto-char (point-min))
   (while (re-search-forward "<title>Wikipédia&amp;nbsp;:&amp;#32;" nil t) (replace-match ""))
   (goto-char (point-min))
-  (while (re-search-forward "<.+?>" nil t) (replace-match "")))
+  (while (re-search-forward "<.+?>" nil t) (replace-match ""))
+  (goto-char (point-min))
+  (while (re-search-forward support-wikipedia-replace-entities-regexp nil t)
+    (replace-match
+     (cdr (assoc (match-string 1) support-wikipedia-replace-entities))))
+)
 
 (setq lookup-support-options
       (list :title 
@@ -102,7 +116,7 @@
                   ((string-match "/zhwiki" lookup-support-dictionary-id)
                    "Wikipedia 中文")
                   (t "Wikipedia"))
-            :entry-start 
+            :entry-start
             (cond ((string-match "/enwiki" lookup-support-dictionary-id)
                    "<title>Wikipedia:&amp;#32;")
                   ((string-match "/frwiki" lookup-support-dictionary-id)
@@ -111,6 +125,16 @@
             :entry-end "</title>"
             :content-start "<doc>" :content-end "</doc>"
             :arranges '((reference support-wikipedia-arrange-structure))
+            :charsets
+            (cond ((string-match "/enwiki" lookup-support-dictionary-id)
+                   '(ascii))
+                  ((string-match "/jawiki" lookup-support-dictionary-id)
+                   '(ascii japanese-jisx0208))
+                  ((string-match "/frwiki" lookup-support-dictionary-id)
+                   '(iso-8859-1))
+                  ((string-match "/zhwiki" lookup-support-dictionary-id)
+                   '(ascii chinese-gb2312))
+                  (t nil))
             :max-hits 100 :regular t))
 
 ;;; support-wikipedia.el ends here

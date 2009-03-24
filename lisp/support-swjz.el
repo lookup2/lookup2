@@ -1,4 +1,4 @@
-;;; support-swjz.el --- suport file for "説文解字注"
+;;; support-swjz.el --- suport file for "説文解字注" -*- coding: utf-8 -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -17,15 +17,19 @@
 
 ;;; Documentation:
 
-;; This agent will search the the "字源" XML dictionary file for
-;; the character.
+;; This agent will search the the "説文解字注" XML dictionary file for
+;; the head-word character.  The dictionary can be downloaded from the
+;; following URL.
+;;
+;; http://kanji-database.sourceforge.net/dict/swjz/index.html
 ;;
 ;; Following Program will make index point file, which then can be
-;; sorted by 'mksary -s' command.  (Please make sure that your text
-;; does not exeed 2G byte.  In that case, please split the text.
+;; sorted by 'mksary -s' command.  
 ;;
 ;; #!/usr/bin/env ruby -Ku
-;; # Usage: ruby swjz.rb < all.xml > all.xml.ary
+;; # Usage: ruby swjz.rb swjz.xml
+;; STDIN.reopen(ARGV[0], "r")
+;; STDOUT.reopen(ARGV[0]+".ary", "w")
 ;; file = $stdin
 ;; $offset=0
 ;; file.each_line{|line|
@@ -63,7 +67,7 @@
   (goto-char (point-min))
   (while (re-search-forward "<wordhead.+?</wordhead>" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
-                         '(display ((height 4.0)) face lookup-heading-2-face)))
+                         '(display ((height 2.0)) face lookup-heading-2-face)))
   (goto-char (point-min))
   (while (re-search-forward "<explanation.+?</explanation>" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
@@ -80,8 +84,10 @@
       (list :title "説文解字注"
             :entry-start-end-pairs '((">" . "</wordhead>")
                                      (">" . "</img></wordhead>")
-                                     ("id=\"" . "\""))
+                                     ;;("id=\"" . "\""))
+                                     )
             :content-start "<shuowen>" :content-end "</shuowen>"
+            :charsets 'lookup-text-cjk-p
             :arranges '((replace support-swjz-arrange-structure))))
 
 ;;; support-swjz.el ends here

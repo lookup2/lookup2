@@ -155,6 +155,8 @@
 
 (put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
+(put 'ndeb :charsets '(ascii japanese-jisx0208))
+
 ;(put'ndeb :font      nil)
 
 ;(put'ndeb :heading   nil)
@@ -377,6 +379,7 @@ Nil means it has not been checked yet.")
 
 ;; <:search>
 (defun ndeb-dictionary-search (dictionary query)
+  "Search EB DICTIONARY for QUERY."
   (ndeb-with-dictionary dictionary
     (let ((method (lookup-query-method query))
 	  (string (lookup-query-string query))
@@ -388,14 +391,14 @@ Nil means it has not been checked yet.")
 	  (setq qstring string)
 	  (while (string-match "[ \t　]+" qstring)
 	    (setq qstring (replace-match "=" nil t qstring)))
-	  (setq cmd 
+	  (setq cmd
 		(format "set search-method keyword\nsearch \"=%s\"\n"
 			(ndeb-escape-query qstring)))
 	  
 	  (setq qstring string)
 	  (while (string-match "[ \t　]+" qstring)
 	    (setq qstring (replace-match "&" nil t qstring)))
-	  (setq cmd 
+	  (setq cmd
 		(concat cmd (format "set search-method cross\nsearch \"&%s\""
 				    (ndeb-escape-query qstring))))
 	  (lookup-put-property ndeb-current-agent 'ndeb-method "cross")))

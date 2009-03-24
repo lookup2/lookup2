@@ -57,18 +57,36 @@
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsimple "/path/to/gene.sdic")
+;;           (ndsimple "/path/to/dir_of_sdic")
 ;;           ....)
 
 ;;; Code:
 
 (require 'lookup)
 
+(defvar support-sdic-replace-entities
+  '(
+    ("amp" . "&")
+    ("lt" . "<")
+    ("gt" . ">")
+    ("lf" . "\n")))
+
+(defvar support-sdic-replace-entities-regexp
+  (concat "&\\("
+          (regexp-opt
+           (mapcar 'car support-sdic-replace-entities))
+          "\\);"))
+
 (defun support-sdic-arrange-structure (entry)
   "Arrange content of ENTRY."
   (goto-char (point-min))
+  (while (re-search-forward support-sdic-replace-entities-regexp nil t)
+    (replace-match
+     (cdr (assoc (match-string 1) support-sdic-replace-entities))))
+  (goto-char (point-min))
   (while (re-search-forward "^.*<H>\\(.+\\)</H>.*<K>.+</K>\\(.*\\)" nil t)
     (replace-match "\\1\n\\2\n" t))
+  (goto-char (point-min))
   (while (re-search-forward "^.*<K>\\(.+\\)</K>\\(.*\\)" nil t)
     (replace-match "\\1\n\\2\n" t)))
 

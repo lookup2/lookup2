@@ -1,4 +1,4 @@
-;;; support-chinakan.el --- support file for 「支那文のための漢字典」 data file.
+;;; support-chinakan.el --- support file for 「支那文を讀む爲の漢字典」 data file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
 
 ;;; Documentation:
 
-;; This support-file will search the 「支那文のための漢字典」 data
+;; This support-file will search the 「支那文を讀む爲の漢字典」 data
 ;; file distributed by Seiwatei Kangojuku (青蛙亭漢語塾), and jumps to
 ;; the corresponding page image specified by
 ;; `support-chinakan-url-format'.
@@ -37,7 +37,7 @@
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsary "/path/to/dir_of_chinadat.csv")
+;;           (ndsary "/path/to/dir_of_`chinadat.csv'")
 ;;           ....))
 
 ;;; Code:
