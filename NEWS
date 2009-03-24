@@ -1,6 +1,6 @@
 Lookup NEWS						-*- outline -*-
 
-* GNU Emacs 21 & XEmacs 21 のみサポート。
+* GNU Emacs 23 のみサポート。
 
 古いバージョンの Emacs では動作しない。
 
@@ -18,3 +18,37 @@ Lookup NEWS						-*- outline -*-
 * 外字サポートが標準で有効となった。
 
 * 補助ファイルは自動的に読み込まれるようになった。
+
+* PDICフォーマット（ver.5.0以降）に対応した。（'ndpdic'）
+
+* Suffix Array ツールに対応した。('ndsary')
+
+* WORDS for Latin ツールに対応した。('ndlatin')
+
+* ndic のサポートからsdicを外し、ndsary へ移行した。('support-sdic')
+
+* ndebを lookup1.4-media から移植した。
+
+* ndmiscで、様々なサイトでの検索が可能になった。
+
+* 分かち書きの解析ツールなどを、kakasiからmecabに変更した。(ndkks → ndmecab その他)
+
+* 辞書毎に検索対象となる文字集合を :charsets で指定できるようにした。
+
+* エージェントに、辞書エントリの前後を移動する機能がある場合、Summaryバッファで辞書の
+  前後のエントリに`.', `,' で移動できるようになった。
+
+* 補助ファイルの外字情報を大幅に強化した。
+
+* 下記の辞書用の補助ファイルを新設した。
+
+** JMdict 
+** 大辞林（第二版・EPWING版）
+** 角川・字源
+** Monier-Williams Sanskrit English Dictionary (EPWING版)
+   （Devanagari <-> Kyoto-Harvard 変換が可能）
+** 説文解字注
+** Unihan.txt （康煕字典画像ファイルへのリンク機能あり）
+** 支那文を讀む爲の漢字典（画像ファイルへのリンク機能あり）
+** Wikipedia Summary （日・英・仏・中国語）
+** 中日・日中辞典（EBXA-C）
