@@ -353,20 +353,13 @@
      (* (ndpdic-file-block-size file) ; 1024
         (+ (ndpdic-file-index-block file) block))))
 
-(defun ndpdic-forward-to-null ()
-  "Forward to next point of null character.
-If it encounters continuous null or eobp, then return nil.
-Otherwise, return t."
+(defun ndpdic-proceed-to-null ()
+  "Proceed to next point of null character or eobp.
+`char-before' a new point should be null character."
   (interactive)
-  (if (eobp) nil
-    (if (and (equal (char-after (point)) 0)
-             (progn
-               (forward-char)
-               (equal (char-after (point)) 0))) nil
-      (while (not (or (eobp)
-                      (eq (char-after (point)) 0)))
-        (forward-char))
-      (if (eobp) nil t))))
+  (if (not (eobp)) (forward-char))
+  (while (not (or (eobp) (eq (char-before (point)) 0)))
+    (forward-char)))
 
 (defun ndpdic-block-index (file)
   "Construct Block Index of FILE.  Result will be cached."
@@ -382,13 +375,13 @@ Otherwise, return t."
         (ndpdic-file-data-start file))
        (goto-char (point-min))
        (while (not (eobp))
-         (if (< i (length blocks))
-             (aset blocks i
-                   (if (= blkbit 0) (ndpdic-buffer-short)
-                     (ndpdic-buffer-int))))
-         (setq i (1+ i))
-         (if (null (ndpdic-forward-to-null)) (goto-char (point-max)))
-         (unless (eobp) (forward-char))))
+         (when (< i (length blocks))
+           (aset blocks i
+                 (if (= blkbit 0) (ndpdic-buffer-short)
+                   (ndpdic-buffer-int)))
+           (setq i (1+ i)))
+         (if (= (char-after (point)) 0) (goto-char (point-max))
+           (ndpdic-proceed-to-null))))
      (puthash (expand-file-name file) blocks ndpdic-block-index-hash)
      blocks)))
 
@@ -422,10 +415,10 @@ then it proceeds to next point."
       (setq compress (ndpdic-buffer-byte))
       (setq kind (ndpdic-buffer-byte))
       (setq start (point))
-      (ndpdic-forward-to-null)
-      (setq word-data (buffer-substring start (point)))
+      (ndpdic-proceed-to-null)
+      (setq word-data (buffer-substring start (1- (point))))
       (setq word-data (concat (substring prev-word-data 0 compress) word-data))
-      (setq content-start (1+ (point)))
+      (setq content-start (point))
       (goto-char (+ start field-size))
       (list (ndpdic-bocu-to-str word-data)
             kind content-start word-data))))
@@ -478,18 +471,16 @@ Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
         (extended   (logand #x10 kind))
         (memorize   (logand #x20 kind))
         (modified   (logand #x40 kind))
-        extended-data start ext-val binary-data)
+        extended-data start ext-val data-item)
     ;; Parse Extended Data
     (when (/= extended 0)
       (save-restriction
         (unless field-size-length (setq field-size-length 2))
         (narrow-to-region from to)
         (goto-char (point-min))
-        (ndpdic-forward-to-null)
+        (ndpdic-proceed-to-null)
         (setq extended-data
-              (list (cons 0 (buffer-substring from (point)))))
-        (if (and (char-after (point))
-                 (= 0 (char-after (point)))) (forward-char))
+              (list (cons 0 (buffer-substring from (1- (point))))))
         (while (not (eobp))
           (setq ext-val (ndpdic-buffer-byte))
           (setq start (point))
@@ -498,14 +489,13 @@ Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
               (let ((length (if (eq field-size-length 2)
                                 (ndpdic-buffer-short)
                               (ndpdic-buffer-int))))
-                (goto-char (+ start length)))
+                (goto-char (+ start length))
+                (setq data-item (buffer-substring start (point))))
             ;; text
-            (ndpdic-forward-to-null))
-          (setq extended-data
-                (cons (cons ext-val (buffer-substring start (point)))
-                      extended-data))
-          (if (and (char-after (point))
-                   (= 0 (char-after (point)))) (forward-char)))
+            (ndpdic-proceed-to-null)
+            (setq data-item (buffer-substring start (1- (point)))))
+          (setq extended-data (cons (cons ext-val data-item)
+                                    extended-data)))
         (setq extended-data (nreverse extended-data))))
     ;; Contents for Display
     (concat
