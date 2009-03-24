@@ -63,17 +63,13 @@
   :group 'ndmecab)
 
 
-;;;
-;;; Internal variables
-;;;
-
-(defconst ndmecab-valid-charsets '(japanese-jisx0208))
-
-(put 'ndmecab :methods '(exact))
 
 ;;;
 ;;; Interface functions
 ;;;
+
+(put 'ndmecab :charsets '(ascii japanese-jisx0208))
+(put 'ndmecab :methods '(exact))
 
 (put 'ndmecab :list 'ndmecab-list)
 (defun ndmecab-list (agent)
@@ -93,7 +89,6 @@
 (defun ndmecab-entry-content (entry)
   (let ((string (lookup-entry-code entry)))
     (mapconcat (lambda (element)
-                 (message "debug: element=%s" element)
                  (cond ((eq element t) string)
                        ((eq element 'readings)
                         (mapconcat 

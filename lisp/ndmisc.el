@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.4 2009/03/22 23:07:59 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.5 2009/03/24 23:00:56 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -39,14 +39,21 @@
 
 (defvar ndmisc-settings
   '(
-    (ascii	   	"Google (English)"	"http://www.google.com/search?q=" utf-8)
-    (japanese-jisx0208	"Google (日本語)"	"http://www.google.co.jp/search?q=" utf-8)
-    (japanese-jisx0208	"Wikipedia (日本語)"	"http://ja.wikipedia.org/wiki/" utf-8)
-    (ascii		"Wikipedia (English)"	"http://en.wikipedia.org/wiki/" utf-8)
-    (japanese-jisx0208	"2ch スレッドタイトル"	"http://find.2ch.net/search?STR="  euc-jp "&SORT=MODIFIED")
-    (ndmisc-glyphwiki-charsetp	"GlyphWiki"	"http://glyphwiki.org/wiki/" ndmisc-glyphwiki-encode)
-    (ascii		"RFC"		"http://www.rfc-editor.org/cgi-bin/rfcsearch.pl?searchwords=" utf-8))
-  "A set of lists of CHARSET, TITLE, URL, ENCODING and URL-SUFFIX (optional).
+    ("Google (English)"	(ascii)
+     "http://www.google.com/search?q=" utf-8)
+    ("Google (日本語)"	(ascii japanese-jisx0208)
+     "http://www.google.co.jp/search?q=" utf-8)
+    ("Wikipedia (日本語)" (ascii japanese-jisx0208)
+     "http://ja.wikipedia.org/wiki/" utf-8)
+    ("Wikipedia (English)" (ascii)
+     "http://en.wikipedia.org/wiki/" utf-8)
+    ("2ch スレッドタイトル" (ascii japanese-jisx0208)
+     "http://find.2ch.net/search?STR=" euc-jp "&SORT=MODIFIED")
+    ("GlyphWiki" ndmisc-glyphwiki-charsetp
+     "http://glyphwiki.org/wiki/" ndmisc-glyphwiki-encode)
+    ("RFC" (ascii)
+     "http://www.rfc-editor.org/cgi-bin/rfcsearch.pl?searchwords=" utf-8))
+  "A set of lists of TITLE, CHARSETS, URL, ENCODING and URL-SUFFIX (optional).
 CHARSET, URL and ENCODING may be a function.")
 
 ;;;
@@ -80,12 +87,12 @@ CHARSET, URL and ENCODING may be a function.")
     (with-temp-buffer
       (insert string "\n")
       (dolist (entry ndmisc-settings)
-        (let* ((charset    (elt entry 0))
-               (title      (elt entry 1))
+        (let* ((title      (elt entry 0))
+               (charsets   (elt entry 1))
                (url        (elt entry 2))
                (encoding   (elt entry 3))
                (url-suffix (elt entry 4)))
-          (when (lookup-text-string-charsetp string charset)
+          (when (lookup-text-charsetsp string charsets)
             (setq menu-items
                   (cons (list item-no title
                               (concat (if (functionp url) (funcall url string)
@@ -104,7 +111,6 @@ CHARSET, URL and ENCODING may be a function.")
 (put 'ndmisc :arrange-table
      '((reference   ndmisc-jump-reference)))
 (defun ndmisc-jump-reference (entry)
-  (message "debug: entered!")
   (while (re-search-forward "\\(→ .\\.\\) \\(.+?\\)     \\(.+\\)" nil t)
     (let ((url (elt (get-text-property (1- (point)) 'lookup) 2)))
       (lookup-url-set-link (match-beginning 1) (match-end 1) url)
@@ -149,11 +155,11 @@ applying function to the string will be returned."
 ;;;
 
 (defun ndmisc-glyphwiki-charsetp (string)
-  (or (lookup-text-string-charsetp string 'ascii)
+  (or (lookup-text-charsetsp string '(ascii))
       (string-match "^[⿰-⿻㐀-鿿豈-﫿𠀀-𯿿]+$" string)))
 
 (defun ndmisc-glyphwiki-encode (string)
-  (if (lookup-text-string-charsetp string 'ascii) string
+  (if (lookup-text-charsetsp string '(ascii)) string
     (mapconcat (lambda (x) (format "u%x" x)) string "-")))
 
 (provide 'ndmisc)

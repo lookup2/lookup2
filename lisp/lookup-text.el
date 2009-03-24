@@ -4,7 +4,7 @@
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: lookup-text.el,v 1.3 2009/03/22 23:09:29 kawabata Exp $
+;; Version: $Id: lookup-text.el,v 1.4 2009/03/24 23:00:56 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -136,7 +136,7 @@ Emacsの配布に含まれているものを使用する。"
 (defun lookup-text-get-readings (str)
   "STR を漢字ひらがな変換して得られた結果のリストを返す関数.
 変換できない文字が含まれていた場合は、nilを返す。"
-  (if (and (lookup-text-string-charsetp str 'japanese-jisx0208)
+  (if (and (lookup-text-charsetsp str '(japanese-jisx0208))
            (string-match "^[あ-んア-ンー一-鿿]+$" str))
       (let ((readings (gethash str lookup-text-reading-hash)))
         (unless readings
@@ -178,24 +178,32 @@ If ANY kanji failed to be converted, then nil will be returned."
     (unless (memq nil pys) (apply 'concat pys))))
 
 ;;;
-;;; Charsetp Function
+;;; Charsetsp Function
 ;;;
 
-(defun lookup-text-string-charsetp (string charset)
-  "Determines if STRING belongs to CHARSET.
-If CHARSET if function, then result of applying the function to
-the string will be returned."
-  (let ((chars (string-to-list string)) (flag t))
-    (or (and (charsetp charset)
-             (progn
-               (while chars
-                 (if (or (encode-char (car chars) charset)
-                         (< (car chars) #x80))
-                     (setq chars (cdr chars))
-                   (setq chars nil flag nil)))
-               flag))
-        (and (functionp charset)
-             (funcall charset string)))))
+(defun lookup-text-charsetsp (string charsets)
+  "Determines if all of chars in STRING belongs to any of CHARSETS list.
+If CHARSETS if function, then result of applying the function to
+the string will be returned.  If CHARSETS is null, it returns t."
+  (if (null charsets) t
+    (if (functionp charsets) (funcall charsets string)
+      (let ((flag t) (chars (string-to-list string)) charsets-2)
+        (while (and flag chars)
+          (setq charsets-2 charsets flag nil)
+          (while (and (null flag) charsets-2)
+            (if (encode-char (car chars) (car charsets-2))
+                (setq flag t)
+              (setq charsets-2 (cdr charsets-2))))
+          (setq chars (cdr chars)))
+        flag))))
+
+(defun lookup-text-cjk-p (string)
+  "Determines if STRING consists of CJK Unified Ideogrphs."
+  (if (string-match "^[㐀-鿿𠀀-𯟿]+$" string) t))
+
+(defun lookup-text-single-cjk-p (string)
+  "Determines if STRING is one single CJK Unified Ideogrph."
+  (if (string-match "^[㐀-鿿𠀀-𯟿]$" string) t))
 
 ;;
 ;; 日本の旧字・新字の対応
