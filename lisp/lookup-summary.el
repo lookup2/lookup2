@@ -427,7 +427,8 @@ Overview モードになっている場合にはそれを解除し、Content バ
 	      (let* ((heading (lookup-entry-heading target-entry))
 		     (query (lookup-new-query 'reference heading)))
 		(lookup-display-entries (lookup-current-module) query entries))
-	    (error "This link is torn off"))))))
+	    (error "This link is torn off")))
+      "No following entry.")))
 
 (defun lookup-summary-preceding-entry ()
   "辞書上の前のエントリに進む。"
@@ -442,7 +443,8 @@ Overview モードになっている場合にはそれを解除し、Content バ
 	      (let* ((heading (lookup-entry-heading target-entry))
 		     (query (lookup-new-query 'reference heading)))
 		(lookup-display-entries (lookup-current-module) query entries))
-	    (error "This link is torn off"))))))
+	    (error "This link is torn off")))
+      "No preceding entry.")))
 
 (defun lookup-summary-info ()
   "エントリの情報を出力する。"
