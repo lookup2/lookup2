@@ -81,7 +81,7 @@
   (let* ((query (lookup-new-query 'exact "00-database-short"))
 	 (title (ndic-dictionary-search dictionary query)))
     (when title
-      (setq title (ndic-dictd-content (car title)))
+      (setq title (ndic-entry-content (car title)))
       (if (string-match "\n *\\(.*\\)\n" title)
 	  (setq title (match-string 1 title)))
       title)))
