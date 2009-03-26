@@ -662,7 +662,8 @@ candidates."
       (setq start (point))
       (end-of-line)
       (if (> (current-column) fill-column)
-	  (fill-region start (point)))
+          (save-excursion
+            (fill-region start (point))))
       (forward-line))))
 
 (defun lookup-arrange-fill-paragraphs (entry)
