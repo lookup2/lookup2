@@ -6,12 +6,12 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el \
 	ndspell.el ndsrd.el ndtut.el \
 	support-loaddef.el support-cebd.el support-chiezo.el \
 	support-chinakan.el support-chujiten.el support-colloc.el \
-	support-comp.el support-crown.el support-daijirin.el \
+	support-comp.el support-crown.el support-daijirin.el a\
 	support-foldoc.el support-genius.el support-iwakoku.el \
 	support-jargon.el support-jmdict.el support-kojien.el \
 	support-mwsedic.el support-mypaedia.el support-nhd.el \
 	support-oxford.el support-plus.el support-plusv2.el \
-	support-rfc1983.el support-rika.el \
+	support-rfc1983.el support-rika.el support-sbgy.el \
 	support-sdic.el support-srd.el support-srd-fpw.el \
 	support-swjz.el support-unihan.el support-vera.el \
 	support-wikipedia.el support-zhongri.el support-zigen.el
