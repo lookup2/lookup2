@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.5 2009/03/24 23:00:56 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.7 2009/04/02 16:03:55 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -156,7 +156,8 @@ applying function to the string will be returned."
 
 (defun ndmisc-glyphwiki-charsetp (string)
   (or (lookup-text-charsetsp string '(ascii))
-      (string-match "^[⿰-⿻㐀-鿿豈-﫿𠀀-𯿿]+$" string)))
+      (lookup-text-single-cjk-p string)
+      (string-match "^[⿰-⿻][⿰-⿻㐀-鿿豈-﫿𠀀-𯿿]+$" string)))
 
 (defun ndmisc-glyphwiki-encode (string)
   (if (lookup-text-charsetsp string '(ascii)) string
