@@ -4,11 +4,13 @@
 @settitle Lookup User's Manual
 @footnotestyle end
 @setchapternewpage odd
+@documentencoding utf-8
 @c %**end of header
 
-@set UPDATED 2000-07-07
-@set EDITION 1.99.0
+@set UPDATED 2009-03-14
+@set EDITION 1.99.8
 @set VERSION 2.0
+@set HOMEPAGE http://lookup.sourceforge.net/
 
 @ifinfo
 @dircategory The Emacs editor and associated tools
@@ -19,6 +21,7 @@
 This file documents Lookup, a search interface.
 
 Copyright @copyright{} 1997-2000 Nishida Keisuke
+Copyright @copyright{} 2009 Lookup Development Team
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -45,7 +48,7 @@ approved by the Free Software Foundation.
 @titlepage
 @title Lookup User's Manual
 @subtitle for Lookup @value{VERSION}
-@author Nishida Keisuke
+@author Nishida Keisuke (Updated by KAWABATA Taichi)
 
 @page
 @vskip 0pt plus 1filll
@@ -53,7 +56,7 @@ Edition @value{EDITION} @*
 Updated for Lookup @value{VERSION} @*
 @value{UPDATED} @*
 
-Copyright @copyright{} 1997-2000 Nishida Keisuke
+Copyright @copyright{} 1997-2000 Nishida Keisuke, 2009 KAWABATA Taichi
 
 Permission is granted to make and distribute verbatim copies of this
 manual provided the copyright notice and this permission notice are
@@ -76,8 +79,8 @@ approved by the Free Software Foundation.
 @top Lookup User's Manual
 
 Lookup は Emacs エディタで利用できる辞書検索インターフェースです。市販の
-CD-ROM 辞書やネットワークの辞書サーバを始め、様々な情報源から簡単な操作
-と設定で辞書検索が行なえます。
+CD-ROM 辞書やネットワークの辞書サーバ、オンラインの辞書など、様々な
+情報源から簡単な操作と設定で辞書検索が行なえます。
 
 このマニュアルは Lookup @value{VERSION} について説明します。
 
@@ -93,24 +96,25 @@ CD-ROM 辞書やネットワークの辞書サーバを始め、様々な情報�
 * Command Index::               コマンド一覧
 * Variable Index::              変数一覧
 
+@ignore
 @detailmenu
- --- The Detailed Node Listing ---
+ --- ノードリストの詳細 ---
 
-Getting Started
+何はともあれ使ってみる
 
-* Quick Prepare::               
-* Quick Setup::                 
-* Quick Example::               
-* Quick Startup::               
-* Quick Search::                
-* Quick View::                  
+* Quick Prepare::               辞書の準備
+* Quick Setup::                 設定すべきこと
+* Quick Example::               簡単な設定例
+* Quick Startup::               起動するには
+* Quick Search::                検索してみよう
+* Quick View::                  結果を見ていく
 
 Dictionary Setup
 
-* Free Dictionary::             Using free distributed dictionaries.      
-* CD-ROM Dictionary::           Using CD-ROM dictionaries on the market.  
-* Network Dictionary::          Using online dictionaries on the network.
-* Miscellaneous Dictionary::    Using spell checker, fortune cookies, ...
+* Free Dictionary::             ネットワーク上の無料の辞書の設定
+* CD-ROM Dictionary::           市販CD-ROM辞書の設定
+* Network Dictionary::          ネットワーク辞書の設定
+* Miscellaneous Dictionary::    スペルチェッカやフォーチュンクッキーを使う。
 
 Free Dictionary
 
@@ -132,7 +136,7 @@ CD-ROM Dictionary
 Miscellaneous Dictionary
 
 * ndnmz agent::                 Namazu
-* ndkks agent::                 日本語の読みを調べる
+* ndmecab agent::                 日本語の読みを調べる
 * ndspell agent::               スペルチェックとスペル検索
 * ndcookie agent::              今日の運勢をチェックする
 
@@ -167,8 +171,8 @@ Miscellaneous Dictionary
 初期化ファイルの設定例
 
 * Initialization::              初期化プロセスの概要
-* ~/.emacs::                    @file{~/.emacs} の設定
-* ~/.lookup::                   @file{~/.lookup} の設定
+* ~/.emacs.el::                 @file{~/.emacs.el} の設定
+* ~/.lookup/init.el::           @file{~/.lookup/init.el} の設定
 * site-start.el::               サイト毎の共通設定
 
 Advanced Features
@@ -208,12 +212,12 @@ Customization
 
 検索エージェント一覧
 
-* ndic::                        フリー辞書から検索する
+* ndic::                        dictd用の辞書から検索する
 * ndeb::                        CD-ROM 辞書から検索する
 * ndtp::                        NDTP サーバから検索する
 * ndict::                       DICT サーバから検索する
 * ndsrd::                       ランダムハウス英語辞典Windows版を検索する
-* ndkks::                       日本語の読みを調べる
+* ndmecab::                     日本語の読みを調べる
 * ndspell::                     スペルチェックとスペル検索
 * ndcookie::                    cookie ファイルから検索する
 
@@ -250,12 +254,12 @@ ndsrd
 * ndsrd dictionary::            ndsrd の辞書
 * ndsrd customize::             ndsrd のカスタマイズ
 
-ndkks
+ndmecab
 
-* ndkks prepare::               ndkks の準備
-* ndkks setup::                 ndkks の設定
-* ndkks dictionary::            ndkks の辞書
-* ndkks customize::             ndkks のカスタマイズ
+* ndmecab prepare::             ndmecab の準備
+* ndmecab setup::               ndmecab の設定
+* ndmecab dictionary::          ndmecab の辞書
+* ndmecab customize::           ndmecab のカスタマイズ
 
 ndspell
 
@@ -271,18 +275,19 @@ ndcookie
 * ndcookie dictionary::         ndcookie の辞書
 
 @end detailmenu
+@end ignore
 @end menu
 
 @node Getting Started, Dictionary Setup, Top, Top
-@chapter Getting Started
+@chapter 何はともあれ使ってみる
 
 @menu
-* Quick Prepare::               
-* Quick Setup::                 
-* Quick Example::               
-* Quick Startup::               
-* Quick Search::                
-* Quick View::                  
+* Quick Prepare::               辞書の準備
+* Quick Setup::                 設定すべきこと
+* Quick Example::               簡単な設定例
+* Quick Startup::               起動するには
+* Quick Search::                検索してみよう
+* Quick View::                  結果を見ていく
 @end menu
 
 @node Quick Prepare, Quick Setup, Getting Started, Getting Started
@@ -293,8 +298,8 @@ ndcookie
 用意しているという方は、本節は読み飛ばして次へ進んで下さい。
 
 もしこれから辞書を探そうと思っている、あるいはどの辞書を選べばいいか迷っ
-ているという方は、Lookup のホームページや配布物に含まれる FAQ にいくつか
-アドバイスがありますので、参考にして下さい。
+ているという方は、Lookup のホームページや配布物に含まれる FAQ にいくつ
+かアドバイスがありますので、参考にして下さい。
 
 あるいは、「辞書はいらないから、とにかく Lookup を使ってみたいんだっ!」
 という奇特な方も中にはおられるかもしれません。そのような方のために一つ、
@@ -318,9 +323,15 @@ Lookup を手っ取り早く試すための材料として、Emacs に附属の 
 
 @table @code
 @item ndic
-フリー辞書からの直接検索 (@pxref{ndic})
+dictdフォーマット辞書からの直接検索 (@pxref{ndic})
 @item ndeb
 EPWING などに準拠した CD-ROM 書籍の個人利用 (@pxref{ndeb})
+@item ndpdic
+PDIC仕様に準拠した辞書データの利用 (@pxref{ndpdic})
+@item ndsary
+Suffix Array ツールを利用した、テキスト辞書の検索 (@pxref{ndsary})
+@item ndsimple
+テキスト辞書を直接バッファに読み込んでの検索 (@pxref{ndsimple})
 @item ndtp
 NDTP サーバを用いた、ネットワーク辞書の利用 (@pxref{ndtp})
 @item ndict
@@ -332,26 +343,25 @@ DICT サーバを用いた、ネットワーク辞書の利用 (@pxref{ndict})
 @table @code
 @item ndsrd
 ランダムハウス英語辞典Windows版を検索する (@pxref{ndsrd})
-@item ndcookie
-cookie ファイルから検索 (@pxref{ndcookie})
 @end table
 
 @subheading 補助的なエージェント
 
 @table @code
-@item ndkks
-日本語の読みを調べる (@pxref{ndkks})
+@item ndmecab
+日本語の読みや品詞を調べる (@pxref{ndmecab})
 @item ndspell
 スペルチェックやスペル検索 (@pxref{ndspell})
+@item ndcookie
+cookie ファイルから検索 (@pxref{ndcookie})
 @end table
 
+利用するエージェントが決まったら、説明に従って準備を整えて下さい。辞書
+の設定やインストール、外部プログラムが必要になることもあります。Emacs
+の設定についても例も挙げられているはずですから、自分の場合の設定内容を
+把握して下さい。
 
-利用するエージェントが決まったら、説明に従って準備を整えて下さい。辞書の
-設定やインストール、外部プログラムが必要になることもあります。Emacs の設
-定についても例も挙げられているはずですから、自分の場合の設定内容を把握し
-て下さい。
-
-以上が終われば、@file{~/.emacs} ファイルに設定を書き込みます。基本的には
+以上が終われば、@file{~/.emacs.el} ファイルに設定を書き込みます。基本的には
 変数 @code{lookup-search-agents} をセットするだけです。利用したい検索エー
 ジェントの数だけ、設定を並べることが出来ます。
 
@@ -367,7 +377,7 @@ cookie ファイルから検索 (@pxref{ndcookie})
 
 さあ、辞書の設定は終わりました。しかし実際には、管理者の方が特別に設定を
 行なってでもいない限り、他にもいくつかの設定が必要となります。実用上、
-@file{~/.emacs} には次のように書いておくとよいでしょう。
+@file{~/.emacs.el} には次のように書いておくとよいでしょう。
 
 @lisp
 ;;;
@@ -377,12 +387,17 @@ cookie ファイルから検索 (@pxref{ndcookie})
 ;; オートロードの設定
 (autoload 'lookup "lookup" nil t)
 (autoload 'lookup-region "lookup" nil t)
-(autoload 'lookup-pattern "lookup" nil t)
+(autoload 'lookup-word "lookup" nil t)
+(autoload 'lookup-select-dictionaries "lookup" nil t)
 
 ;; キーバインドの設定
+(global-set-key "\M-\?" 'lookup-word)
+(global-set-key "\M-\"" 'lookup-select-dictionaries))
+@ignore
 (define-key ctl-x-map "l" 'lookup)              ; C-x l - lookup
 (define-key ctl-x-map "y" 'lookup-region)       ; C-x y - lookup-region
 (define-key ctl-x-map "\C-y" 'lookup-pattern)   ; C-x C-y - lookup-pattern
+@end ignore
 
 ;; 検索エージェントの設定
 (setq lookup-search-agents '((ndtp "dserver") (ndeb "/cdrom")))
@@ -400,6 +415,11 @@ cookie ファイルから検索 (@pxref{ndcookie})
 最後の段落では、利用する検索エージェントを設定しています。これは前節で説
 明した通りです。各自のものに合わせて設定して下さい。
 
+なお、Lookupの設定は @file{~/.lookup/init.el} にも記述することができま
+す。autoload と キー設定をのぞく全てのlookupに関する設定は、このファイ
+ルに記述することが推奨されます。
+
+@ignore
 As you have seen in the previous chapters, all you have to do in the
 Emacs level to use Lookup is to install program files, to load autoloads
 files (if you are not a XEmacs user), and to specify what agents you
@@ -413,7 +433,6 @@ this:
 
 ;; If you installed Lookup by install.el
 (load "lookup-autoloads")
-(load "lookup-customs")
 
 ;; Key binding for major commands
 (define-key ctl-x-map "l" 'lookup)              ; C-x l - lookup
@@ -438,11 +457,13 @@ sections.
 
 The last paragraph is specification of what agents you want to use.
 
-You can use the file @file{~/.lookup} for setting of Lookup by default.
-Most of settings of Lookup, except autoloads and key bindings as above,
-are designed to be defined in @file{~/.lookup}.  
+You can use the file @file{~/.lookup/init.el} for setting of Lookup by
+default.  Most of settings of Lookup, except autoloads and key
+bindings as above, are designed to be defined in
+@file{~/.lookup/init.el}.
 
 [ mention about supplement file ]
+@end ignore
 
 @node Quick Startup, Quick Search, Quick Example, Getting Started
 @section 起動するには
@@ -460,9 +481,9 @@ Type `m' to select, `u' to unselect, `?' for help.
 
 % Identifier          Title                Method
 - ----------          -----                ------
-* ndtp+dserver:KOKUGO 国語辞典             =<>
-* ndeb+/cdrom:EIWA    英和辞典             =<>
-* ndeb+/cdrom:WAEI    和英辞典             =<>
+* ndtp:dserver/KOKUGO 国語辞典               =<>...
+* ndeb:/cdrom/EIWA    英和辞典               =<>...
+* ndeb:/cdrom/WAEI    和英辞典               =<>...
 
 
 
@@ -497,7 +518,7 @@ Type `m' to select, `u' to unselect, `?' for help.
 @samp{Identifier} とあるコラムには、辞書を特定するための名称が表示されて
 います。これは利用している検索エージェント(@var{agent})と、辞書の所在
 (@var{location})、及び辞書名(@var{name})とを組み合わせて、
-@samp{@var{agent+location:name}} という形で表わされます。本書ではこれを
+@samp{@var{agent:location/name}} という形で表わされます。本書ではこれを
 @dfn{辞書ID} と呼び、@samp{@var{name}} で表わされる @dfn{辞書名} とは区
 別します。また同様に、@samp{@var{agent+location}} の部分は @dfn{エージェ
 ントID} と呼びます。
@@ -656,69 +677,90 @@ OK です。@kbd{h} を連打すれば、Entry バッファと Content バッフ
 次章以降で、それらを含む Lookup の完全な機能について説明します。
 
 @node Dictionary Setup, How to Lookup, Getting Started, Top
-@chapter Dictionary Setup
+@chapter 辞書の準備を整える
 
+@ignore
 You need to make your dictionaries available from Lookup before you can
 start using them.  This chapter describes briefly how to install
 dictionaries in your computer and how to prepare for them.  We explain
 the process in a quick and short matter in this chapter in order to let
 the user try using the dictionary as soon as possible.  We will explain
 more details later on. (@xref{Search Agents} and @ref{Dictionary Types}.)
+@end ignore
+
+Lookupを使用する前に、辞書を用意する必要あります。本章では、辞書のイン
+ストール方法および準備の方法を簡単に説明します。本章ではユーザがすぐに
+辞書が使えるよう、詳細の説明はしません。
+
+@ignore
+詳細については、@xref{Search Agents}と@{Dictionary Types}を参照してくだ
+さい。
+@end ignore
 
 @menu
-* Free Dictionary::             Using free distributed dictionaries.      
-* CD-ROM Dictionary::           Using CD-ROM dictionaries on the market.  
-* Network Dictionary::          Using online dictionaries on the network.
-* Miscellaneous Dictionary::    Using spell checker, fortune cookies, ...
+* Free Dictionaries::           ネットワークで配布されている辞書を利用する。
+* CD-ROM Dictionaries::         市販されているCD-ROM辞書を利用する。
+* Network Dictionary::          ネットワーク上の辞書を利用する。
+* Miscellaneous Dictionaries::  スペルチェッカやフォーチュンクッキーを使用する。
 @end menu
 
-@node Free Dictionary, CD-ROM Dictionary, Dictionary Setup, Dictionary Setup
-@section Free Dictionary
+@node Free Dictionaries, CD-ROM Dictionaries, Dictionary Setup, Dictionary Setup
+@section 無料の辞書
 
+@ignore
 Lookup encourages free dictionaries being distributed on the Internet.
 The list of those dictionaries is available from the @uref{Dictionary
-Collection, @value{HOMEPAGE}dicts/} of the Lookup web page.
+Collection, @value{HOMEPAGE}info/dictionaries.shtml} of the Lookup web page.
 
 At the present, three types of dictionaries are available with Lookup:
 SDIC, dictd, and FreePWING.
+@end ignore
+
+Lookupは、ネットワークで配布されているフリーな辞書の活用を積極的に推奨
+しています。無料辞書の一覧は、LookupのWebページの@uref{Dictionary
+Collection, @value{HOMEPAGE}info/dictionaries.shtml} に一覧されています。
 
 @menu
-* SDIC Dictionary::             A simple dictionary format.
-* dictd Dictionary::            Dictionaries available for dictd.
-* FreePWING Dictionary::        Free dictionaries compatible with EPWING.
+* SDIC Dictionaries::           SDICフォーマットの辞書。
+* dictd Dictionaries::          dictdフォーマットの辞書。
+* FreePWING Dictionaries::      無料のEPWINGフォーマットの辞書。
+* PDIC Dictionaries::           無料のPDICフォーマットの辞書。
+* Other XML Dictionaries::      他のXMLフォーマットなどの無料辞書
 @end menu
 
-@node SDIC Dictionary, dictd Dictionary, Free Dictionary, Free Dictionary
-@subsection SDIC Dictionary
+@node SDIC Dictionaries, dictd Dictionaries, Free Dictionaries, Free Dictionaries
+@subsection SDIC Dictionaries
 
 @dfn{SDIC フォーマット} とは、Emacs で使えるシンプルな辞書検索ソフト
 @uref{http://pine.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html, SDIC}
-で採用されている行指向の辞書形式です。grep 一つで高速に検索を行なえるのが
-特徴です。
+で採用されている行指向の辞書形式です。
+@ignore
+grep 一つで高速に検索を行なえるのが特徴です。
+@end ignore
 
 @subsubheading SDIC 辞書の準備
 
 SDIC 辞書は @file{.sdic} を拡張子に持つ単一のファイルからなります。
-単純ゆえの柔軟性で、要求に応じて三つの検索方式が用意されています。
+単純ゆえの柔軟性で、三つの検索方式で利用することができます。
 
 @enumerate
 @item
-direct 方式
+直接読み込み方式 (ndsimpleエージェント)
 
 辞書を Emacs のバッファに読み込んで、直接検索を行なう方式です。
 メモリを圧迫するなどのデメリットもありますが、Emacs 以外の外部コマンドを
 必要としないため Windows ユーザにも手軽に利用出来るという利点があります。
 
 @item
-grep 方式
+grep 方式 (ndgrepエージェント)
 
 外部コマンドとして @code{fgrep} もしくは @code{grep} を用いて
 検索を行なう方式です。十分に高速で便利なため、通常はこれを利用します。
 
 @item
-array 方式
+suffix array 方式 (ndsary エージェント)
 
-外部コマンドとして @uref{http://cactus.aist-nara.ac.jp/lab/nlt/ss/, SUFARY}
+外部コマンドとして @uref{http://www.namazu.org/sary/, Sary}
 というソフトウェアを用いて検索を行なう方式です。
 これはあらかじめ特別なインデックスを生成することで検索を高速化します。
 5MB を超えるような大きなサイズの辞書を用いる場合には、こちらの利用が
@@ -727,25 +769,27 @@ array 方式
 
 grep 方式を用いるには、外部コマンドとして @code{fgrep} もしくは
 @code{grep} を実行パスに置いて下さい。一般的な UNIX システムであれば
-標準で附属しています。array 方式を用いるには、SUFARY をインストールして
-@code{mkary} でインデックスを生成して下さい。
+標準で附属しています。array 方式を用いるには、Sary をインストールして
+@code{mksary} でインデックス（拡張子@file{.ary}のファイル）を生成して下さい。
 
 辞書は好きなディレクトリに置いて構いません。direct 方式を用いる場合は、
 Emacs 19.34 以降なら辞書を @code{gzip} などで圧縮しておくことも出来ます。
-@file{~/.emacs} で @code{(auto-compression-mode t)} としておいて下さい。
+@file{~/.emacs.el} で @code{(auto-compression-mode t)} としておいて下さい。
 
 @subsubheading SDIC 辞書の利用
 
-SDIC 辞書は、Lookup の ndic エージェントで利用することが出来ます。
+SDIC 辞書は、Lookup の ndsimple, ndgrep または ndsary エージェントで
+利用することが出来ます。
 辞書を置いたディレクトリを引数にして、例えば次のように設定して下さい。
 
 @lisp
-(setq lookup-search-agents '((ndic "/usr/local/dict")))
+(setq lookup-search-agents '((ndsary "/usr/local/dict")))
 @end lisp
 
-ディレクトリに含まれる全ての @file{.sdic} ファイルが辞書として認識されます。
+この場合は、ディレクトリに含まれる全ての @file{.sdic.ary} 拡張子を持つ @file{.sdic} ファイルが辞書として認識されます。
 
-@node dictd Dictionary, FreePWING Dictionary, SDIC Dictionary, Free Dictionary
+
+@node dictd Dictionaries, FreePWING Dictionaries, SDIC Dictionaries, Free Dictionaries
 @subsection dictd Dictionary
 
 @dfn{dictd フォーマット} とは、DICT プロトコル(@sc{RFC 2229})に対応した
@@ -759,7 +803,9 @@ dictd 辞書は、@file{.index} を拡張子に持つインデックス・ファ
 両方のファイルを適当な同じディレクトリに置いて下さい。
 
 @file{.dict} ファイルは dictd に附属の @code{dictzip} というコマンドで
-圧縮することが出来ます。詳しくは dictd のマニュアルを参照して下さい。
+圧縮することが出来ます。圧縮されたファイルは、多くの場合、
+@file{.dict.dz}という拡張子を持っています。詳しくは dictd のマニュアル
+を参照して下さい。
 
 @subsubheading dictd 辞書の利用
 
@@ -792,34 +838,41 @@ ndict を用いる場合
 (setq lookup-search-agents '((ndict "dict-server")))
 @end lisp
 
-DICT サーバの立ち上げについては、@ref{DICT server} を参照して下さい。
+DICT サーバの立ち上げについては、@ref{DICT Server} を参照して下さい。
 @end enumerate
 
-@node FreePWING Dictionary,  , dictd Dictionary, Free Dictionary
-@subsection FreePWING Dictionary
+@node FreePWING Dictionaries, PDIC Dictionaries, dictd Dictionaries, Free Dictionaries
+@subsection FreePWING Dictionaries
 
-@uref{FreePWING, http://www.sra.co.jp/people/m-kasahr/freepwing/} is a
-free implementation of generating dictionaries compatible with EPWING.
-@xref{EPWING dictionary}.
+@uref{FreePWING, http://www.sra.co.jp/people/m-kasahr/freepwing/}
+は、EPWING互換の辞書を生成する無償のツールです。このツールを使った多数のフリーな辞書が配布されています。
+@ignore
+is free implementation of generating dictionaries compatible with EPWING.
+@end ignore
+@xref{EB/EPWING Dictionary}.
 
-@node CD-ROM Dictionary, Network Dictionary, Free Dictionary, Dictionary Setup
-@section CD-ROM Dictionary
+@node PDIC Dictionaries, Other XML Dictionaries, FreePWING Dictionaries, Free Dictionaries
+@subsection PDIC辞書
+
+@node Other XML Dictionaries,  , PDIC Dictionaries, Free Dictionaries
+@subsection その他のXML辞書
+
+@node CD-ROM Dictionaries, , Free Dictionaries, Dictionary Setup
+@section CD-ROM 辞書
 
 Lookup では多くの市販の CD-ROM 辞書を利用することが出来ます。利用可能な
-辞書の一覧が、@uref{http://openlab.ring.gr.jp/lookup/dicts/, 辞書データベース}
+辞書の一覧が、@uref{http://lookup.sourceforge.net/info/dictionaries.shtml, 辞書データベース}
 のページにまとめられているので参照して下さい。
-
 Lookup は標準で、電子ブックや EPWING 規約に準拠した CD-ROM 書籍の利用に
 対応しています。別配布の専用プログラムを用意することで、独自フォーマット
 の CD-ROM 辞書についても利用出来るものがあります。
 
 @menu
-* EB/EPWING Dictionary::        E-Book/EPWING dictionary.
-* Original Dictionary::         Original format dictionary.
-* Gaiji Installation::          Display Gaiji by using bitmap.
+* EB/EPWING Dictionary::        E-Book/EPWING 辞書
+* Original Dictionary::         独自フォーマットの辞書
 @end menu
 
-@node EB/EPWING Dictionary, Original Dictionary, CD-ROM Dictionary, CD-ROM Dictionary
+@node EB/EPWING Dictionary, Original Dictionary, CD-ROM Dictionaries, CD-ROM Dictionaries
 @subsection E-Book/EPWING Dictionary
 
 電子ブックや EPWING 規約は、日本で一般的な電子辞書の共通規格です。
@@ -871,17 +924,18 @@ ndtp を用いる場合
 (setq lookup-search-agents '((ndtp "dserver")))
 @end lisp
 
-NDTP サーバの立ち上げについては、@ref{NDTP server} を参照して下さい。
+NDTP サーバの立ち上げについては、@ref{NDTP Server} を参照して下さい。
 @end enumerate
 
-@node Original Dictionary, Gaiji Installation, EB/EPWING Dictionary, CD-ROM Dictionary
-@subsection Original Format Dictionary
+@node Original Dictionary,  , EB/EPWING Dictionary, CD-ROM Dictionaries
+@subsection 独自フォーマットの辞書
 
 現在、小学館の「ランダムハウス英語辞典」から検索が行なえるようになって
-いますが、まだ開発段階にあります。興味のある方は、
+います。興味のある方は、
 @uref{http://openlab.ring.gr.jp/edict/, 電子辞書オープンラボ}
 の edict ML で尋ねて下さい。
 
+@ignore
 @node Gaiji Installation,  , Original Dictionary, CD-ROM Dictionary
 @subsection Gaiji Installation
 
@@ -906,7 +960,7 @@ bitmap-mule の準備が出来たら、次のいずれかの方法で準備が�
 @item
 Lookup の起動前に bitmap-mule をロードする。
 
-例えば @file{~/.emacs} に @code{(require 'bitmap)} と書いておいて下さい。
+例えば @file{~/.emacs.el} に @code{(require 'bitmap)} と書いておいて下さい。
 
 @item
 @vindex lookup-use-bitmap
@@ -925,8 +979,9 @@ XEmacs の場合:
 @vindex lookup-enable-gaiji
 逆に、外字を表示させたくない場合には、変数 @code{lookup-enable-gaiji} を 
 @code{nil} に設定して下さい。これはデフォルトで @code{t} となっています。
+@end ignore
 
-@node Network Dictionary, Miscellaneous Dictionary, CD-ROM Dictionary, Dictionary Setup
+@node Network Dictionary, Miscellaneous Dictionaries, , Dictionary Setup
 @section ネットワーク辞書を利用する
 
 電子辞書をネットワークで共有して利用したい場合は、辞書サーバを立ち上げて
@@ -950,7 +1005,7 @@ CD-ROM 辞書をネットワークで利用するための検索用プロトコ�
 
 @subsubheading Preparing NDTP Server
 
-NDTP サーバとしては、現在
+NDTP サーバのソフトウェアとしては、現在
 @uref{http://www.sra.co.jp/people/m-kasahr/ndtpd/, NDTPD}
 が主に用いられています。附属のドキュメントを参照して、
 インストール、及び設定を行なって下さい。
@@ -986,53 +1041,53 @@ dictd が公開されています。附属のドキュメントを参照して�
 (setq lookup-search-agents '((ndict "dict.org")))
 @end example
 
-@node Miscellaneous Dictionary,  , Network Dictionary, Dictionary Setup
-@section Miscellaneous Dictionary
+@node Miscellaneous Dictionaries,  , Network Dictionary, Dictionary Setup
+@section その他の辞書
 
 Lookup では他にも、次のような特殊な検索エージェントが標準で利用可能です。
 好みに応じて準備を整えて下さい。
 
 @menu
 * ndnmz agent::                 Namazu
-* ndkks agent::                 日本語の読みを調べる
+* ndmecab agent::               日本語の読みを調べる
 * ndspell agent::               スペルチェックとスペル検索
 * ndcookie agent::              今日の運勢をチェックする
 @end menu
 
-@node ndnmz agent, ndkks agent, Miscellaneous Dictionary, Miscellaneous Dictionary
-@subsection 
+@node ndnmz agent, ndmecab agent, Miscellaneous Dictionaries, Miscellaneous Dictionaries
+@subsection Namazuで全文検索を行う
 
-@node ndkks agent, ndspell agent, ndnmz agent, Miscellaneous Dictionary
+@node ndmecab agent, ndspell agent, ndnmz agent, Miscellaneous Dictionaries
 @subsection 日本語の読みを調べる
 
-`ndkks' は、日本語の漢字の読みを調べるための検索エージェントです。漢字を
-含む検索語が指定された場合、漢字かな変換プログラム KAKASI を用いてその
+`ndmecab' は、日本語の漢字の読みを調べるための検索エージェントです。漢字を
+含む検索語が指定された場合、漢字かな変換プログラム Mecab を用いてその
 読みを調べます。
 
-漢字の含まれる検索語を指定した場合、漢字かな変換プログラム KAKASI を用い
+漢字の含まれる検索語を指定した場合、漢字かな変換プログラム Mecab を用い
 てその読みを調べて表示します。
 
-KAKASI は次のところから @file{kakasi-2.2.5.tar.gz}(本体ファイル)と
-@file{kakasidict.940620.gz}(辞書ファイル)の名称で入手可能です。
+Mecab は次のところからという名称で入手可能です。IPA辞書と同時に
+インストールして、mecabコマンドをパスに通すようにしてください。
 
 @example
-@url{ftp://sunsite.sut.ac.jp/pub/asia-info/japanese-src/packages/}
+@url{http://mecab.sourceforge.net/}
 @end example
 
 次のように設定して下さい。
 
 @lisp
-(setq lookup-search-agents '((ndkks)))
+(setq lookup-search-agents '((ndmecab)))
 @end lisp
 
-@node ndspell agent, ndcookie agent, ndkks agent, Miscellaneous Dictionary
+@node ndspell agent, ndcookie agent, ndmecab agent, Miscellaneous Dictionaries
 @subsection スペルチェックとスペル検索
 
 `ndspell' は、Lookup でスペルチェックを行なうための検索エージェントです。
 もし検索語を普通に検索して何も見付からなかった場合、スペルチェックを
 行なってからもう一度再検索を試みます。
 
-ndspell は外部コマンドとして Ispell と grep を利用しています。Ispell は
+ndspell は外部コマンドとして Aspell と grep を利用しています。Aspell は
 対話型のスペルチェックコマンドで、grep は言わずと知れた UNIX ツールです。
 どちらも GNU の FTP サイトなどから入手可能です。
 
@@ -1047,7 +1102,7 @@ ndspell は外部コマンドとして Ispell と grep を利用しています�
 (setq lookup-search-agents '((ndic "/usr/local/dict") (ndspell)))
 @end lisp
 
-@node ndcookie agent,  , ndspell agent, Miscellaneous Dictionary
+@node ndcookie agent,  , ndspell agent, Miscellaneous Dictionaries
 @subsection 今日の運勢をチェックする
 
 `ndcookie' は、検索時に cookie ファイル(引用集)から一句抜き出して表示する
@@ -1197,7 +1252,7 @@ Lookup で @dfn{オプション} とは、名前付きパラメータのこと�
 
 ただし、これは関数なので、Lookup のプログラム・ファイルをロードしてから
 でないと利用出来ません。そこでプログラムのロード直後に設定が完了するよう、
-Lookup 専用の初期化ファイル @file{~/.lookup} を用いることが出来ます。こ
+Lookup 専用の初期化ファイル @file{~/.lookup/init.el} を用いることが出来ます。こ
 れは後でまた詳しく説明します。(@pxref{Setup Example})
 
 @vindex lookup-default-dictionary-options
@@ -1314,9 +1369,14 @@ Lookup では様々な種類の辞書を扱いますが、各エージェント�
 がより見やすく整形されたり、不足する設定が補われたりと、使い勝手が良くな
 ることは期待出来ます。
 
+補助パッケージは、@file{support-XXXX.el} というファイル名で提供されてお
+り、使用する辞書に応じて自動的に読み込まれて設定されます。各補助パッケー
+ジのファイルには、詳細な利用方法がコメントでかかれている場合があります
+ので必要に応じて参照ください。
+
+@ignore
 いくつかの辞書に対応した補助パッケージが Lookup のホームページに用意され
 ているので、自分の辞書に対応したものがないか探してみて下さい
-(@pxref{How To Get})。
 もし期待のものが見付かれば、次のようにして準備して下さい。
 
 @cindex パッケージ・ディレクトリ
@@ -1327,7 +1387,7 @@ Lookup では様々な種類の辞書を扱いますが、各エージェント�
 パッケージ・ディレクトリに移動しても構いません。
 また、生成されたディレクトリの名前を @dfn{パッケージ名} と呼びます。
 
-次に、初期化ファイル(@file{~/.lookup}; @pxref{Setup Example}) で
+次に、初期化ファイル(@file{~/.lookup/init.el}; @pxref{Setup Example}) で
 次のように設定します。
 
 @lisp
@@ -1353,12 +1413,13 @@ Lookup では様々な種類の辞書を扱いますが、各エージェント�
 
 手持ちの辞書のパッケージが存在しない場合、それを自分で作ることも出来ます。
 (@pxref{Supplement Package})
+@end ignore
 
 @node Setup Command, Setup Others, Setup Agent, How to Lookup
-@section 新しい検索コマンドを作る
+@section 新しい検索エージェントを作る
 
 既存のソースを参考にしてください。もし分からないことがあれば、
-メイリングリスト ( @email{lookup-ja@@ring.gr.jp} ) 
+メイリングリスト ( @email{lookup-list@@lists.sourceforge.net} )
 に質問してみるとよいかもしれません。
 
 @node Setup Others, Setup Example, Setup Command, How to Lookup
@@ -1378,7 +1439,7 @@ Lookup では様々な種類の辞書を扱いますが、各エージェント�
 @menu
 * Stemming::                    単語の語尾を取り除く
 * Spell Checking::              スペルチェックを行なう
-* Kanji-Kana Expansion::        漢字ひらがな拡張検索
+@c * Kanji-Kana Expansion::        漢字ひらがな拡張検索
 * Universal Query Expansion::   任意の拡張検索
 @end menu
 
@@ -1430,7 +1491,7 @@ stemming ではそのようなケースに対応することは出来ません�
 これは大したコストではありません。よってあらかじめ厳格なスペルチェックを
 行なうよりも、この方式を用いる方が、効率的に自動補正を行なえます。
 
-@node Spell Checking, Kanji-Kana Expansion, Stemming, Setup Query Expansion
+@node Spell Checking, Universal Query Expansion, Stemming, Setup Query Expansion
 @subsubheading スペルチェックを行なう
 
 語尾だけの問題ではなく、綴りそのものを間違えたのでは何も見付かりません。
@@ -1459,8 +1520,9 @@ Lookup のスペルチェック機能は、検索エージェント `ndspell' �
 で @kbd{g} を押して再検索を行なうことで、ndspell にスペルチェックを強制
 することも可能です。より詳しくは、@ref{ndspell} を参照して下さい。
 
+@ignore
 @node Kanji-Kana Expansion, Universal Query Expansion, Spell Checking, Setup Query Expansion
-@subsubheading 漢字ひらがな拡張検索の準備
+@c@subsubheading 漢字ひらがな拡張検索の準備
 
 辞書によっては、漢字を含む検索語を用いて検索することができず、漢字をひら
 がなに変換する必要がある場合があります。辞書オプション :hiragana を設定
@@ -1485,10 +1547,11 @@ Lookup のスペルチェック機能は、検索エージェント `ndspell' �
 得られたエントリを、漢字列を用いてフィルタリングする。
 @end enumerate
 
-漢字ひらがな拡張検索機能を利用するためには、KAKASI がインストールされて
-いる必要があります。@xref{ndkks prepare}.
+漢字ひらがな拡張検索機能を利用するためには、Mecab がインストールされて
+いる必要があります。@xref{ndmecab prepare}.
+@end ignore
 
-@node Universal Query Expansion,  , Kanji-Kana Expansion, Setup Query Expansion
+@node Universal Query Expansion,  , Spell Checking, Setup Query Expansion
 @subsubheading 任意の拡張検索
 
 辞書の性質によっては、ユーザーが任意の置き換えを定義したい場合があるかも
@@ -1530,19 +1593,19 @@ Lookup のスペルチェック機能は、検索エージェント `ndspell' �
 @section 初期化ファイルの設定例
 
 @vindex lookup-init-file
-以下は、Lookup の具体的な設定例です。設定はすべて @file{~/.emacs} で行な
+以下は、Lookup の具体的な設定例です。設定はすべて @file{~/.emacs.el} で行な
 うことも可能ですが、専用の初期化ファイルとして @code{lookup-init-file}
-(@file{~/.lookup}) が Lookup 起動時に読み込まれるので、これを用いること
+(@file{~/.lookup/init.el}) が Lookup 起動時に読み込まれるので、これを用いること
 にします。
 
 @menu
 * Initialization::              初期化プロセスの概要
-* ~/.emacs::                    @file{~/.emacs} の設定
-* ~/.lookup::                   @file{~/.lookup} の設定
+* ~/.emacs.el::                 @file{~/.emacs.el} の設定
+* ~/.lookup/init.el::           @file{~/.lookup/init.el} の設定
 * site-start.el::               サイト毎の共通設定
 @end menu
 
-@node Initialization, ~/.emacs, Setup Example, Setup Example
+@node Initialization, ~/.emacs.el, Setup Example, Setup Example
 @subsection 初期化プロセスの概要
 
 まず Lookup の実行過程について大まかに説明します。
@@ -1551,37 +1614,37 @@ Lookup のスペルチェック機能は、検索エージェント `ndspell' �
 @item
 Emacs の起動
 @item
-@file{~/.emacs} の読み込み
+@file{~/.emacs.el} の読み込み
 @item
 Lookup の起動
 @item
 Lookup プログラム・ファイル(@file{*.elc})の読み込み
 @item
-Lookup 初期化ファイル(@file{~/.lookup})の読み込み (存在すれば)
+Lookup 初期化ファイル(@file{~/.lookup/init.el})の読み込み (存在すれば)
 @item
 @code{lookup-load-hook} の実行
 @item
 Lookup 初期化開始
 @end enumerate
 
-このように Lookup のプログラム・ファイルは @file{~/.emacs} よりも後から
+このように Lookup のプログラム・ファイルは @file{~/.emacs.el} よりも後から
 読み込まれるため、これまで説明したオプションやパッケージの設定用関数を
 用いるには、通常、次のいずれかの方法を用います。
 
 @enumerate
 @item
-@file{~/.lookup} を用いる。
+@file{~/.lookup/init.el} を用いる。
 
-これが一番、普通のやり方です。@file{~/.lookup} を利用すれば、
+これが一番、普通のやり方です。@file{~/.lookup/init.el} を利用すれば、
 余計なことを気にせずに全ての設定を行なえます。
 
 @item
 @vindex lookup-load-hook
 @code{lookup-load-hook} を用いる。
 
-サイトで共通の設定を行なうような場合、@file{~/.lookup} を用いるわけには
-いきません。あるいは、全てを @file{~/.emacs} で行うというポリシーの人も
-いるかもしれません。そのような目的のために、@file{~/.lookup} と同様の
+サイトで共通の設定を行なうような場合、@file{~/.lookup/init.el} を用いるわけには
+いきません。あるいは、全てを @file{~/.emacs.el} で行うというポリシーの人も
+いるかもしれません。そのような目的のために、@file{~/.lookup/init.el} と同様の
 タイミングで初期化を行なうための hook @code{lookup-load-hook} を用いる
 ことが出来ます。次のようにします。
 
@@ -1598,11 +1661,11 @@ Lookup 初期化開始
 @end lisp
 @end enumerate
 
-@node ~/.emacs, ~/.lookup, Initialization, Setup Example
-@subsection @file{~/.emacs} の設定
+@node ~/.emacs.el, ~/.lookup/init.el, Initialization, Setup Example
+@subsection @file{~/.emacs.el} の設定
 
-@file{~/.lookup} を用いるにしても、キーバインドの設定等、いくつかのものは
-@file{~/.emacs} で行なうことが必要です。以下にその例を示します。
+@file{~/.lookup/init.el} を用いるにしても、キーバインドの設定等、いくつかのものは
+@file{~/.emacs.el} で行なうことが必要です。以下にその例を示します。
 
 @lisp
 ;;;
@@ -1625,10 +1688,10 @@ Lookup 初期化開始
 (setq lookup-init-file "~/.lookup")
 @end lisp
 
-@node ~/.lookup, site-start.el, ~/.emacs, Setup Example
-@subsection @file{~/.lookup} の設定
+@node ~/.lookup/init.el, site-start.el, ~/.emacs.el, Setup Example
+@subsection @file{~/.lookup/init.el} の設定
 
-@file{~/.lookup} で辞書の設定を行ないます。これまで説明した通りです。
+@file{~/.lookup/init.el} で辞書の設定を行ないます。これまで説明した通りです。
 
 @lisp
 ;;; .lookup --- setup for Lookup                -*- emacs-lisp -*-
@@ -1649,7 +1712,7 @@ Lookup 初期化開始
 ;;; .lookup ends here
 @end lisp
 
-@node site-start.el,  , ~/.lookup, Setup Example
+@node site-start.el,  , ~/.lookup/init.el, Setup Example
 @subsection サイト毎の共通設定
 
 Lookup の設定をサイトで共有するのであれば、@file{site-start.el} ファイル
@@ -1683,7 +1746,7 @@ Lookup の設定をサイトで共有するのであれば、@file{site-start.el
 
 @table @asis
 @item @code{lookup-init-file}
-Lookup の初期化ファイル名。デフォルトは @file{~/.lookup}。
+Lookup の初期化ファイル名。デフォルトは @file{~/.lookup/init.el}。
 このファイルは @file{lookup.el} のロード直後に読み込まれる。
 
 @item @code{lookup-load-hook}
@@ -1800,7 +1863,7 @@ Lookup を抜けたとき、変数 @code{lookup-save-configuration} の値が
 @findex lookup-restart
 Lookup の初期化ファイルを書き換えたときには、コマンド
 @kbd{M-x lookup-restart} が利用出来ます。これは Lookup をいったん終了
-させた後、@file{~/.lookup} を読み直して再初期化を行ないます。これは通常
+させた後、@file{~/.lookup/init.el} を読み直して再初期化を行ないます。これは通常
 @kbd{R} に割り当てられています。
 
 @node Search String, See Result, Startup Commands, Advanced Features
@@ -1826,9 +1889,9 @@ Lookup 標準の検索コマンドには、代表して次の五つのものが�
 ミニバッファからの入力を検索語に検索を開始します。
 デフォルトの検索語として、ポイント位置の単語が取り出されます。
 
-@vindex lookup-use-kakasi
-この時、変数 @code{lookup-use-kakasi} の値が @code{non-nil} であれば、
-KAKASI プログラムを利用して日本語の単語もそれなりに切り出します。
+@vindex lookup-use-mecab
+この時、変数 @code{lookup-use-mecab} の値が @code{non-nil} であれば、
+Mecab プログラムを利用して日本語の単語もそれなりに切り出します。
 これはデフォルトでは @code{nil} になっています。
 
 最近の Emacs であれば、デフォルトの検索語はミニバッファで @kbd{M-n}
@@ -2137,11 +2200,13 @@ Entry バッファに一覧します。単一のリファレンスのみ参照�
 移動した後、@key{RET} とすればそれを辿ることが出来ます。あるいは目的のリ
 ンクを直接、マウスの中ボタンでクリックしても構いません。
 
+@ignore
 用いる辞書や検索エージェントによっては、リンクが見辛かったり、リンクを
 辿ると一覧の見出しがおかしくなるなどの不満があるかもしれません。これは
 辞書毎の差異に Lookup がデフォルトでは対応しきれないためです。リンクを
 より見やすくするためには、@ref{Reference Pattern} を参照して各自で設定を
 行なって下さい。
+@end ignore
 
 @node Cite Contents,  , Make Reference, See Result
 @subsection 本文を引用する
@@ -2220,8 +2285,8 @@ gaiji-table で指定された代替文字。(@code{plain})
 @section 特定の辞書を利用する
 
 Lookup の設定後、最初に @kbd{M-x lookup} とするか、あるいは検索開始後に
-Entry バッファ(@pxref{Entry Mode})で @kbd{S} とすることで、Select モード
-に入ります。
+Entry バッファ @c (@pxref{Entry Buffer})
+で @kbd{S} とすることで、Select モードに入ります。
 
 このバッファには利用可能な辞書の一覧が表示されます。@samp{%} とある列に
 は辞書の選択状態が示されており、@samp{*} が選択、空白(@samp{ })が未選択
@@ -2328,18 +2393,20 @@ Entry バッファ等のウィンドウの高さ。
 non-nil を指定すると、Lookup を抜けたときに画面の状態が
 検索開始時のものに戻される。
 
+@ignore
 @item lookup-use-bitmap
 non-nil に指定すると、bitmap-mule を利用した外字表示を行なうようになりま
 す。bitmap-mule が既にロードされていれば自動的に @code{t} になります。
-@ref{Setup Gaiji} を参照して下さい。
-
-@item lookup-use-kakasi
-non-nil に指定すると、KAKASI を用いて日本語の検索語の切り出しを行なうよ
-うになります。@ref{Search Commands} を参照して下さい。
+@ref{Gaiji Installation} を参照して下さい。
 
 @item lookup-enable-gaiji
-nil に指定すると、外字の表示を行なわなくなります。@ref{Setup Gaiji} を参
+nil に指定すると、外字の表示を行なわなくなります。@ref{Gaiji Installation} を参
 照して下さい。
+@end ignore
+
+@item lookup-use-mecab
+non-nil に指定すると、Mecab を用いて日本語の検索語の切り出しを行なうよ
+うになります。@ref{Search Commands} を参照して下さい。
 
 @item lookup-max-hits
 @item lookup-max-text
@@ -2362,9 +2429,9 @@ Lookup ではフェイス(文字装飾)の設定に Custom パッケージの @c
 を用いています。これをカスタマイズするには、@kbd{M-x customize-group
 @key{RET} lookup-faces @key{RET}} などとして設定を行なって下さい。
 
-Mule を利用しているなど、Custom がインストールされてない場合には、Lookup
-の初期化ファイル(@file{~/.lookup})で設定を行なう必要があります。これは
-次のようにして行ないます。
+Mule を利用しているなど、Custom がインストールされてない場合には、
+Lookupの初期化ファイル(@file{~/.lookup/init.el})で設定を行なう必要
+があります。これは次のようにして行ないます。
 
 @lisp
 ;; lookup-heading-1-face の設定
@@ -2463,14 +2530,14 @@ Mule を利用しているなど、Custom がインストールされてない�
 @table @code
 @item :title
 辞書のタイトルを指定する。
-@item :stemmer
-stemming 関数を指定する。これは複数形など単語の語尾を取り除いて元の単語
-を推測するための関数で、文字列を受け取り候補となる文字列のリストを返さね
-ばならない。次のように設定する。
-
+@item :transformer
+入力語の変換を指定する。これは複数形など単語の語尾を取り除いて元の単語
+を推測stemmingや、漢字の検索語をひらがなにするための関数で、文字列を受
+け取り候補となる文字列のリストを返さねばならない。次のように設定する。
 @lisp
-(lookup-set-dictionary-option "agent:DICT" ':stemmer 'stem-english)
+(lookup-set-dictionary-option "agent:DICT" :transformer 'transformer-function)
 @end lisp
+@ignore
 @item :hiragana
 漢字ひらがな拡張検索を行うように指定する。:expander オプション及び
 :expand-filter オプションを上書きする。@xref{Kanji-Kana Expansion}.
@@ -2478,29 +2545,30 @@ stemming 関数を指定する。これは複数形など単語の語尾を取�
 expander 関数を指定する。これは検索語を適当な他の検索語に置き換えるための
 関数で、文字列を受取り、文字列のリストを返さなければらならない。次のよう
 に設定する。
-
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expander 'lookup-kanji-get-readings)
 @end lisp
-
 :hiragana オプションと同時に指定することはできない。@xref{Universal Query Expansion}.
 @item :expand-filter
 expand-filter 関数を指定する。expander 関数によって検索語が拡張されると、
 検索結果に多くの無駄なエントリが含まれるようになる。この関数は、そのよう
 なエントリを元々の検索語を用いてフィルタリングするための関数である。次の
 ように設定する。
-
 @lisp
 (lookup-set-dictionary-option "agent:DICT" ':expand-filter 'lookup-kanji-filter)
 @end lisp
-
 :hiragana オプションと同時に指定することはできない。@xref{Universal Query Expansion}.
+@end ignore
 @item :arranges
-arrange 関数のリスト。(@pxref{Format Contents})
-@item :adjusts
+arrange 関数のリスト（追加用）。@c (@pxref{Format Contents})
+@item :arrange-table
+arrange 関数のリスト（置換用）。@c (@pxref{Format Contents})
+@ignore
+@item :adjust
 adjust 関数のリスト。(@pxref{Format Contents})
+@end ignore
 @item :gaiji-table
-外字の置き換えテーブル。(@pxref{Gaiji Table})
+外字の置き換えテーブル。 @c (@pxref{Gaiji Installation})
 @item :cite-style
 @itemx :cite-header
 @itemx :cite-prefix
@@ -2535,10 +2603,13 @@ adjust 関数のリスト。(@pxref{Format Contents})
 @menu
 * ndic::                        フリー辞書から検索する
 * ndeb::                        CD-ROM 辞書から検索する
+* ndpdic::                      PDIC 辞書から検索する
+* ndsary::                      Suffix Arrayを使って検索する
+* ndsimple::                    バッファ内のテキスト辞書を検索する
 * ndtp::                        NDTP サーバから検索する
 * ndict::                       DICT サーバから検索する
 * ndsrd::                       ランダムハウス英語辞典Windows版を検索する
-* ndkks::                       日本語の読みを調べる
+* ndmecab::                     日本語の読みを調べる
 * ndspell::                     スペルチェックとスペル検索
 * ndcookie::                    cookie ファイルから検索する
 @end menu
@@ -2613,7 +2684,7 @@ ndic は次のように設定します。
 出します。変数 @code{ndic-dictzip-program} により、そのプログラム名を指
 定します。デフォルトでは "dictzip" になっています。
 
-@node ndeb, ndtp, ndic, Search Agents
+@node ndeb, ndpdic, ndic, Search Agents
 @section ndeb
 
 `ndeb' は、電子ブックや EPWING 規約に準拠した CD-ROM 書籍の個人利用に向
@@ -2664,15 +2735,17 @@ eblook は次のところから入手可能です。UNIX 版と、MS Windows で
 
 インストールは適当なディレクトリに行なって下さい。
 
+@ignore
 @subsubheading 外字表示の準備
 
 Lookup は CD-ROM 書籍に含まれる外字の表示をサポートしています。外字表示
-を行なうための設定については、@ref{Setup Gaiji} を参照して下さい。
+を行なうための設定については、@ref{Gaiji Installation} を参照して下さい。
 
 外字を表示したくない、もしくはそれが不可能な場合には、Appendix と呼ばれ
 る外字の置き換えテーブルを利用することで、外字を通常の文字列で置き換える
 ことも可能です。市販の辞書に対応したいくつかの Appendix が、EB ライブラ
 リの Web ページで公開されています。
+@end ignore
 
 @table @asis
 @item Appendix
@@ -2701,7 +2774,7 @@ ndeb は、次のように設定します。
 eblook が利用する Appendix のあるディレクト
 リを指定します(@inforef{Appendix, , eblook})。省略された場合には、辞書オ
 プション @code{:gaiji-table} に従って外字が置き換えられます。
-(@pxref{Gaiji Table})
+@c (@pxref{Gaiji Installation})
 @item :coding
 eblook に対する process-coding-system。
 デフォルトは @code{euc-jp}。
@@ -2744,7 +2817,16 @@ ndeb はメニューコマンドに対応しています。(@pxref{Specify Dicti
 変数 @code{ndeb-prompt-string} により、eblook のプロンプトを指定します。
 デフォルトでは "eblook> " となっています。
 
-@node ndtp, ndict, ndeb, Search Agents
+@node ndpdic, ndsary, ndeb, Search Agents
+@section ndpdic
+
+@node ndsary, ndsimple, ndpdic, Search Agents
+@section ndpdic
+
+@node ndsimple, ndtp, ndsary, Search Agents
+@section ndpdic
+
+@node ndtp, ndict, ndsimple, Search Agents
 @section ndtp
 
 `ndtp' は、主にローカル・ネットワークで共有された CD-ROM 辞書から検索を
@@ -2790,11 +2872,13 @@ NDTP サーバとして、dserver と NDTPD の二つが入手可能です。ど
 サーバの設定については、それぞれのプログラムに附属のドキュメントを参照
 して下さい。
 
+@ignore
 @subsubheading 外字表示の準備
 
 NDTP サーバとして NDTPD バージョン 2.0 以降を用いると、辞書の外字情報を
-扱えるようになります。外字表示のための設定については、@ref{Setup Gaiji}
+扱えるようになります。外字表示のための設定については、@ref{Gaiji Installation}
 を参照して下さい。
+@end ignore
 
 @node ndtp setup, ndtp dictionary, ndtp prepare, ndtp
 @subsection ndtp の設定
@@ -2943,7 +3027,7 @@ Lookup の検索方式とサーバの strategy との対応関係を alist で�
 「キーワード検索」と「前方一致検索」のみ有効となります。
 (@pxref{Search Methods})
 
-@node ndsrd, ndkks, ndict, Search Agents
+@node ndsrd, ndmecab, ndict, Search Agents
 @section ndsrd
 
 `ndsrd' は、ランダムハウス英語辞典Windows版を検索する検索エージェントで
@@ -2992,73 +3076,65 @@ ndsrd は、次のように設定します。
 変数 @code{ndsrd-program-name} により、CSRD のコマンド名を指定します。
 デフォルトでは "csrd" となっています。
 
-@node ndkks, ndspell, ndsrd, Search Agents
-@section ndkks
+@node ndmecab, ndspell, ndsrd, Search Agents
+@section ndmecab
 
-`ndkks' は、検索ではなく日本語の読みを調べるための検索エージェントです。
-漢字の含まれる検索語を指定した場合、漢字かな変換プログラム KAKASI を用い
+`ndmecab' は、検索ではなく日本語の読みを調べるための検索エージェントです。
+漢字の含まれる検索語を指定した場合、漢字かな変換プログラム Mecab を用い
 てその読みを調べて表示します。
 
 @menu
-* ndkks prepare::               ndkks の準備
-* ndkks setup::                 ndkks の設定
-* ndkks dictionary::            ndkks の辞書
-* ndkks customize::             ndkks のカスタマイズ
+* ndmecab prepare::             ndmecab の準備
+* ndmecab setup::               ndmecab の設定
+* ndmecab dictionary::          ndmecab の辞書
+* ndmecab customize::           ndmecab のカスタマイズ
 @end menu
 
-@node ndkks prepare, ndkks setup, ndkks, ndkks
-@subsection ndkks の準備
+@node ndmecab prepare, ndmecab setup, ndmecab, ndmecab
+@subsection ndmecab の準備
 
-KAKASI は漢字かな変換プログラムで、次のところから kakasi-2.2.5.tar.gz(本
-体ファイル)と kakasidict.940620.gz(辞書ファイル)の名称で入手可能です。
-
-@table @asis
-@item KAKASI
-@url{ftp://sunsite.sut.ac.jp/pub/asia-info/japanese-src/packages/}
-@end table
-
-新しくインストールする場合には、更に次のところから得られる情報を元にパッ
-チを当てておいた方がいいでしょう。
+Mecab は漢字かな変換プログラムで、次のところから mecab-0.98.tar.gz(本
+体ファイルおよびIPA辞書ファイル)の名称で入手可能です。
 
 @table @asis
-@item KAKASI patch
-@url{http://www.kusastro.kyoto-u.ac.jp/~baba/wais/index.html}
+@item mecab
+@url{http://mecab.sourceforge.net/}
 @end table
 
-@node ndkks setup, ndkks dictionary, ndkks prepare, ndkks
-@subsection ndkks の設定
+@node ndmecab setup, ndmecab dictionary, ndmecab prepare, ndmecab
+@subsection ndmecab の設定
 
-ndkks は、次のように設定します。
+ndmecab は、次のように設定します。
 
 @lisp
-(ndkks)
+(ndmecab)
 @end lisp
 
 つまり、それを @code{lookup-search-agents} のリストに加えるだけです。
 オプションその他の特別な設定はありません。
 
-@node ndkks dictionary, ndkks customize, ndkks setup, ndkks
-@subsection ndkks の辞書
+@node ndmecab dictionary, ndmecab customize, ndmecab setup, ndmecab
+@subsection ndmecab の辞書
 
-ndkks 自体が一つの辞書となります。辞書名は変数 @code{ndkks-program-name}
-で指定される KAKASI プログラムの名前です。タイトルは変数
-@code{ndkks-dictionary-title} により与えられます。
+ndmecab 自体が一つの辞書となります。辞書名は変数 @code{ndmecab-program-name}
+で指定される Mecab プログラムの名前です。タイトルは変数
+@code{ndmecab-dictionary-title} により与えられます。
 
 キーワード検索において、漢字の含まれる検索語が指定されたとき出力されます。
 
-@node ndkks customize,  , ndkks dictionary, ndkks
-@subsection ndkks のカスタマイズ
+@node ndmecab customize,  , ndmecab dictionary, ndmecab
+@subsection ndmecab のカスタマイズ
 
-@vindex ndkks-program-name
-変数 @code{ndkks-program-name} により、KAKASI のコマンド名を指定します。
-デフォルトでは "kakasi" となっています。
+@vindex ndmecab-program-name
+変数 @code{ndmecab-program-name} により、Mecab のコマンド名を指定します。
+デフォルトでは "mecab" となっています。
 
-@vindex ndkks-dictionary-title
-変数 @code{ndkks-dictionary-title} により、ndkks 辞書のタイトルを指定し
+@vindex ndmecab-dictionary-title
+変数 @code{ndmecab-dictionary-title} により、ndmecab 辞書のタイトルを指定し
 ます。デフォルトでは "漢字かな辞典" となっています。
 
-@vindex ndkks-content-format
-変数 @code{ndkks-content-format} により、出力内容のフォーマットをリスト
+@vindex ndmecab-content-format
+変数 @code{ndmecab-content-format} により、出力内容のフォーマットをリスト
 で指定します。リストの各要素には次のものが利用できます。
 
 @table @asis
@@ -3067,10 +3143,10 @@ ndkks 自体が一つの辞書となります。辞書名は変数 @code{ndkks-p
 @item 文字列
 それがそのまま挿入される。
 @item 文字列のリスト
-それをオプション引数として KAKASI を呼び出し、その結果が挿入される。
+それをオプション引数として Mecab を呼び出し、その結果が挿入される。
 @end table
 
-@node ndspell, ndcookie, ndkks, Search Agents
+@node ndspell, ndcookie, ndmecab, Search Agents
 @section ndspell
 
 `ndspell' は、Lookup でスペルチェックを行なうための検索エージェントです。
