@@ -51,12 +51,14 @@
         ("ndsary:.*/Unihan" . "support-unihan")
         ("ndsary:.*/JMdict" . "support-jmdict")
         ("ndsary:.*/chinadat\\.csv" . "support-chinakan")
-        ;; MISC
+        ;; ndsimple
+        ("ndsimple:.*/rfc4949\\.txt" . "support-rfc4949")
+	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
+        ;; misc
         ("ndsrd:" . "support-srd")
 	("/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
 	("/vera" . "support-vera")
-	("/rfc1983" . "support-rfc1983")
 	("/nhd" . "support-nhd")))
 
 ;;; support-defs.el ends here

@@ -1,4 +1,4 @@
-;;; support-rfc1983.el --- support file for "RFC1983"
+;;; support-rfc4949.el --- support file for "RFC4949"
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 ;; Copyright (C) 2009 Taichi KAWABATA <kawabata.taichi@gmail.com>
 
@@ -18,18 +18,13 @@
 
 ;;; Documentation
 
-;; This reference utility should be applied to internet glossary of RFC 1983. 
-;; (RFC 1983 may be applicable, too.)
-;; This is based on `rfc1983.el'.  
-;;
-;; pattern 1: See: XXXX, YYYY.
-;; pattern 2: See: xxxxx under "XXXX", yyyyy under "YYYY".
+;; This reference utility should be applied to internet glossary of RFC 4949. 
+;; You should use this with `ndsary' or `ndsimple' agent.
 
 ;;; Code:
 
-(require 'lookup)
-
-(defun support-rfc1983-arrange-references (entry)
+;; identitcal to support-rfc1983-arrange-references.
+(defun support-rfc4949-arrange-references (entry)
   (goto-char (point-min))
   (while (re-search-forward "See\\(?:[ \n]+also\\)?:\\([^.]+\\)\\." nil t)
     (save-restriction
@@ -47,10 +42,10 @@
       (goto-char (match-end 0)))))
 
 (setq lookup-support-options
-      (list :title "RFC1983"
-            :entry-start "\n   "
-            :content-end "\n\n"
+      (list :title "RFC4949"
+            :entry-start "  $ "
+            :content-start "$" :content-end "$"
             :charsets '(ascii)
-	    :arranges '((reference support-rfc1983-arrange-references))))
+	    :arranges '((references support-rfc4949-arrange-references))))
 
-;;; support-rfc1983.el ends here
+;;; support-rfc4949.el ends here
