@@ -46,6 +46,6 @@
             :entry-start "  $ "
             :content-start "$" :content-end "$"
             :charsets '(ascii)
-	    :arranges '((references support-rfc4949-arrange-references))))
+	    :arranges '((reference support-rfc4949-arrange-references))))
 
 ;;; support-rfc4949.el ends here

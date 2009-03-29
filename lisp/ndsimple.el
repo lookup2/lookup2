@@ -108,7 +108,6 @@
                                entry-pairs)))
             (ndsimple-file-entries
              file string method entry-start entry-end regular)))
-    (message "debug: result=%s" result)
     (if (> (length result) max-hits)
         (list (lookup-new-entry
                'regular dictionary "�"
@@ -162,7 +161,6 @@ Extractions are done in accordance with follows."
   (let ((regexp (ndsimple-query-regexp
                  string method entry-start entry-end))
         result buffer)
-    (message "regexp=%s" regexp)
     (with-current-buffer (find-file-noselect file)
       (goto-char (point-min))
       (while (re-search-forward regexp nil t)
