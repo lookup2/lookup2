@@ -219,30 +219,30 @@ matches START-tag, and END-tag respectively."
 ;; B. forward-backward-search
 ;; (1) search forward for `[string]-<end>'
 ;; (2) search backward for '<start>-[string]'
-  (let ((fwd-regexp (if (null start) "^\\(\\)"
+  (let ((start-regexp (if (null start) "^\\(\\)"
                       (concat "\\(" (regexp-quote start) "\\)")))
-        (back-regexp (if (null end)  "\\(\\)$"
+        (end-regexp (if (null end)  "\\(\\)$"
                        (concat "\\(" (regexp-quote end) "\\)")))
         (regexp     (regexp-quote string)))
     ;; forward-search only
     (if (equal method 'exact)
-        (cons (concat fwd-regexp regexp back-regexp) nil)
+        (cons (concat start-regexp regexp end-regexp) nil)
       (if (equal method 'keyword)
-          (cons (concat fwd-regexp ".+?" back-regexp) nil)
+          (cons (concat start-regexp ".+?" end-regexp) nil)
         (if regular
             (if (equal method 'prefix)
-                (cons (concat fwd-regexp regexp ".*?" back-regexp) nil)
+                (cons (concat start-regexp regexp ".*?" end-regexp) nil)
               (if (equal method 'postfix)
-                  (cons (concat fwd-regexp ".*?" regexp back-regexp) nil)
+                  (cons (concat start-regexp ".*?" regexp end-regexp) nil)
                 ;; method = 'substring
-                (cons (concat fwd-regexp ".*?" regexp ".*?" back-regexp) nil)))
+                (cons (concat start-regexp ".*?" regexp ".*?" end-regexp) nil)))
           ;; forward-backward-search
           (if (equal method 'prefix)
               (setq start-regexp (concat start-regexp regexp))
             (if (equal method 'suffix)
                 (setq end-regexp (concat regexp end-regexp))
               ;; method = 'substring
-              (setq end-regexp (concat regexp ".*?" end-regexp))))
+              (setq start-regexp (concat regexp ".*?" end-regexp))))
           (cons end-regexp start-regexp))))))
 
 (defun ndsary-file-search
@@ -325,7 +325,7 @@ Entries will be a list of (code . heading)."
           (progn
             (setq word-end (match-beginning 1)
                   entry-end (match-end 1))
-            (if (re-search-backward backward-reggexp
+            (if (re-search-backward backward-regexp
                                  (line-beginning-position) t)
                 (setq entry-start (match-beginning 1)
                       word-start (match-end 1)
@@ -333,7 +333,8 @@ Entries will be a list of (code . heading)."
                                            entry-start entry-end)
                                           (buffer-substring-no-properties
                                             word-start word-end))
-                                    entries))))
+                                    entries)))
+            (goto-char entry-end))
         ;; forward-search-only
         (setq entries (cons (cons (buffer-substring (match-beginning 1) (match-end 2))
                                   (buffer-substring (match-end 1) (match-beginning 2)))

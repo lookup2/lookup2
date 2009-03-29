@@ -66,7 +66,6 @@
 
 ;;; Code:
 
-(require 'lookup)
 (require 'ndsary)
 
 
@@ -189,17 +188,14 @@
   (while (re-search-forward "<key type=\"ソート用かな\">.+?</key>" nil t)
     (replace-match ""))
   (goto-char (point-min))
-  (while (re-search-forward "<headword type=\"\\(.+?\\)\".*?>\\(.+?\\)</headword>" nil t)
+  (while (re-search-forward "<\\(?:span\\|headword\\) type=\"\\(.+?\\)\".*?>\\(.+?\\)</.+?>" nil t)
     (replace-match "\\1:\\2" t))
   (goto-char (point-min))
-  (while (re-search-forward "<span type=\"\\(.+?\\)\".*?>\\(.+?\\)</span>" nil t)
-    (replace-match "\\1:\\2" t))
-  (goto-char (point-min))
-  (while (re-search-forward "<p type=\"\\(.+?\\)\".*?>\\(.+?\\)</p>" nil t)
-    (replace-match "\\1:\\2" t))
-  (goto-char (point-min))
-  (while (re-search-forward "<div type=\"\\(.+?\\)\".*?>\\(.+?\\)</p>" nil t)
-    (replace-match "\\1:\\2" t))
+  (while (re-search-forward "<\\(?:p\\|div\\) type=\"\\(.+?\\)\".*?>" nil t)
+    (replace-match "\\1:" t))
+  ;;(goto-char (point-min))
+  ;;(while (re-search-forward "<\\(?:p\\|div\\).*?>" nil t)
+  ;;  (replace-match "　　" t))
   (goto-char (point-min))
   (while (re-search-forward "<.+?>" nil t)
     (replace-match ""))
