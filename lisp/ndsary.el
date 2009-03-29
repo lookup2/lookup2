@@ -111,11 +111,7 @@
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
 (defun ndsary-dictionary-methods (dictionary)
-  (if (or (and (lookup-dictionary-option dictionary :entry-start t)
-               (lookup-dictionary-option dictionary :entry-end t))
-          (lookup-dictionary-option dictionary :entry-start-end-pairs t))
-      '(exact prefix suffix substring keyword)
-    '(exact prefix)))
+  '(exact prefix suffix substring keyword))
 
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
@@ -134,142 +130,138 @@
       (let ((name (lookup-dictionary-name dictionary)))
         (file-name-sans-extension name))))
 
-(defun ndsary-construct-query-string (query method start end)
-  "Costruct search pattern from QUERY string and METHOD.
-If START tag is provided, then that will be attached.
-If END tag is provided, then that will also be attached."
-  (if (and (or (null start) (null end))
-           (or (equal method 'suffix)
-               (equal method 'substring) 
-               (equal method 'keyword)))
-      nil
-    (concat (if (or (equal method 'exact)
-                    (equal method 'prefix))
-                start)
-            query
-            (if (or (equal method 'exact)
-                    (equal method 'suffix))
-                end))))
-
 (put 'ndsary :search 'ndsary-dictionary-search)
 (defun ndsary-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
   (let ((entry-start (lookup-dictionary-option dictionary :entry-start t))
         (entry-end   (lookup-dictionary-option dictionary :entry-end t))
-        (entry-pairs (lookup-dictionary-option dictionary 
+        (entry-pairs (lookup-dictionary-option dictionary
                                                :entry-start-end-pairs t))
-        (regular     (lookup-dictionary-option dictionary :regular t)))
-    (if entry-pairs
-        (progn
-          (if (functionp entry-pairs)
-              (setq entry-pairs (funcall entry-pairs query)))
-          (apply 'nconc
-                 (mapcar (lambda (x)
-                           (ndsary-dictionary-search-each
-                            dictionary query (car x) (cdr x) regular))
-                         entry-pairs)))
-      (ndsary-dictionary-search-each
-       dictionary query entry-start entry-end regular))))
+        (string      (lookup-query-string query))
+        (method      (lookup-query-method query))
+        (regular     (lookup-dictionary-option dictionary :regular t))
+        (file        (expand-file-name
+                      (lookup-dictionary-name dictionary)
+                      (lookup-agent-location
+                       (lookup-dictionary-agent dictionary))))
+        (header-func (lookup-dictionary-option dictionary :header-func t))
+        (coding      (or (lookup-dictionary-option dictionary :coding t)
+                         'utf-8))
+        (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
+                         lookup-max-hits
+                         100)))
+    (mapcar
+     (lambda (x) (lookup-new-entry
+                  'regular dictionary (car x)
+                  (if header-func (funcall header-func x query)
+                    (cdr x))))
+     (if entry-pairs
+         (progn
+           (if (functionp entry-pairs)
+               (setq entry-pairs (funcall entry-pairs query)))
+           (apply 'nconc
+                  (mapcar (lambda (x)
+                            (ndsary-file-search
+                             file string method (car x) (cdr x) regular coding max-hits))
+                          entry-pairs)))
+       (ndsary-file-search
+        file string method entry-start entry-end regular coding max-hits)))))
 
-(defun ndsary-extract-entries (method string entry-start entry-end regular)
-  "Extract entries in accordance with METHOD, STRING, ENTRY-START and ENTRY-END.
-If REGULAR is t, then no duplicate start-tag in single line is assumed.
-Extraction are done in accordance with follows.
-  * exact, keyword:  No need to extract.  Just use query-string.
-  * suffix:    <start>.....|[str]</end>
-  * substring: <start>...|[str]..</end>
-  * prefix:    <start>[str].....</end>.
-Entries will be a list of (quote . string)."
-  (goto-char (point-min))
-  (if (equal method 'exact) (list (cons (concat entry-start string entry-end)
-                                        string))
-    (if (equal method 'keyword) (list (cons string string))
-      (let* ((entry-start-re (regexp-quote entry-start))
-             (forward-regexp
-              (concat entry-start-re "\\("
-                      (if (or (eq method 'suffix) (eq method 'substring)) ".*?")
-                      "\\(" (regexp-quote string) "\\)"
-                      (if (or (eq method 'prefix) (eq method 'substring)) ".*?")
-                      "\\)" (regexp-quote entry-end)))
-             start end start1 end1 result)
-        (while (re-search-forward forward-regexp nil t)
-          (setq end (match-end 0)
-                end1 (match-end 1))
-          (if (and (null regular)
-                   (or (eq method 'suffix) (eq method 'substring)))
-              ;; backward double check
-              (progn
-                (goto-char (match-beginning 2))
-                (re-search-backward entry-start-re nil t)
-                (setq start (match-beginning 0)
-                      start1 (match-end 0)))
-            (setq start (match-beginning 0)
-                  start1 (match-beginning 1)))
-          (setq result (cons (cons (buffer-substring-no-properties start end)
-                                   (buffer-substring-no-properties start1 end1))
-                             result))
-          (goto-char end))
-        result))))
+(put 'ndsary :content 'ndsary-entry-content)
+(defun ndsary-entry-content (entry)
+  "Return string content of ENTRY."
+  (let* ((string         (lookup-entry-code entry))
+         (dictionary     (lookup-entry-dictionary entry))
+         (coding         (or (lookup-dictionary-option dictionary :coding t)
+                             'utf-8))
+         (file           (expand-file-name
+                          (lookup-dictionary-name dictionary)
+                          (lookup-agent-location
+                           (lookup-dictionary-agent dictionary))))
+         (content-start (lookup-dictionary-option dictionary :content-start t))
+         (content-end   (lookup-dictionary-option dictionary :content-end t)))
+    (ndsary-file-content file string content-start content-end coding)))
 
-(defun ndsary-extract-entries-2 (method string entry-start entry-end)
-  "Extract entries in accordance with METHOD, STRING, ENTRY-START and ENTRY-END.
-Both ENTRY-START or ENTRY-END can be null.
-Extraction are done in accordance with follows.
-  * exact:     (start)[str](/end)
-  * prefix:    (start)[str].....(/end).
-Entries will be a list of (quote . string)."
-  (if (not (or (equal method 'exact)
-               (equal method 'prefix)))
-      (error "Method not supported"))
-  (let ((forward-regexp
-         (concat (if entry-start (regexp-quote entry-start))
-                 "\\(" (regexp-quote string)
-                 (if (equal method 'prefix) ".*?")
-                 "\\)"
-                 (if entry-end (regexp-quote entry-end))))
-        result)
-    (while (re-search-forward forward-regexp nil t)
-      (setq result (cons (cons (buffer-substring-no-properties
-                                (match-beginning 0) (match-end 0))
-                               (buffer-substring-no-properties
-                                (match-beginning 1) (match-end 1)))
-                         result)))
-    result))
-  
-(defun ndsary-dictionary-search-each
-  (dictionary query entry-start entry-end regular)
-  "Return entry list of DICTIONARY QUERY for ENTRY-START and ENTRY-END.
-REGULAR is t if dictionary does not have duplicate entries."
-  (let* ((method   (lookup-query-method query))
-         (string   (lookup-query-string query))
-         (dir      (lookup-agent-location
-                    (lookup-dictionary-agent dictionary)))
-         (file     (expand-file-name
-                    (lookup-dictionary-name dictionary) dir))
-         (query-string (ndsary-construct-query-string
-                        string method entry-start entry-end))
-         (max-hits (or (lookup-dictionary-option dictionary :max-hits t)
-                       lookup-max-hits))
-         (coding (or (lookup-dictionary-option dictionary :coding t)
-                     'utf-8))
+;;;
+;;; Main Program
+;;;
+
+(defun ndsary-pattern (string method start end)
+  "Costruct search pattern from query STRING and METHOD for `sary'.
+If START tag is provided, then that will be attached.
+If END tag is provided, then that will also be attached."
+  (if (and (or (null start) (null end))
+           (or (equal method 'suffix)
+               (equal method 'substring)
+               (equal method 'keyword)))
+      nil
+    (concat (if (or (equal method 'exact)
+                    (equal method 'prefix))
+                start)
+            string
+            (if (or (equal method 'exact)
+                    (equal method 'suffix))
+                end))))
+
+(defun ndsary-regexp-pair (string method start end regular)
+  "Construct regexp-pair for filtering the hit from STRING and METHOD.
+START and END tag shold also be provided.
+Return value should be (FWD-SEARCH . BACK-SEARCH).
+If REGULAR is t, then no BACK-SEARCH would be necessary in any case.
+BACK-SEARCH may be nil if not necessary (in this case, 1st match
+string should be entry.
+FWD-SEARCH's 1st match is END-tag, BACK-SEARCH's 1st match is START-tag.
+If BACK-SEARCH is nil, FWD-SEARCH's first, and second match
+matches START-tag, and END-tag respectively."
+;; .....<start>...[string]...<end>......[string?]....
+;; A. forward-search-only
+;; <string>...[string]...<end> will be searched.
+;; B. forward-backward-search
+;; (1) search forward for `[string]-<end>'
+;; (2) search backward for '<start>-[string]'
+  (let ((fwd-regexp (if (null start) "^\\(\\)"
+                      (concat "\\(" (regexp-quote start) "\\)")))
+        (back-regexp (if (null end)  "\\(\\)$"
+                       (concat "\\(" (regexp-quote end) "\\)")))
+        (regexp     (regexp-quote string)))
+    ;; forward-search only
+    (if (equal method 'exact)
+        (cons (concat fwd-regexp regexp back-regexp) nil)
+      (if (equal method 'keyword)
+          (cons (concat fwd-regexp ".+?" back-regexp) nil)
+        (if regular
+            (if (equal method 'prefix)
+                (cons (concat fwd-regexp regexp ".*?" back-regexp) nil)
+              (if (equal method 'postfix)
+                  (cons (concat fwd-regexp ".*?" regexp back-regexp) nil)
+                ;; method = 'substring
+                (cons (concat fwd-regexp ".*?" regexp ".*?" back-regexp) nil)))
+          ;; forward-backward-search
+          (if (equal method 'prefix)
+              (setq start-regexp (concat start-regexp regexp))
+            (if (equal method 'suffix)
+                (setq end-regexp (concat regexp end-regexp))
+              ;; method = 'substring
+              (setq end-regexp (concat regexp ".*?" end-regexp))))
+          (cons end-regexp start-regexp))))))
+
+(defun ndsary-file-search
+  (file string method entry-start entry-end regular coding max-hits)
+  "Return entry list of FILE STRING of METHOD for ENTRY-START and ENTRY-END.
+REGULAR is t if dictionary does not have duplicate entries.
+CODING specifies file's coding system.
+If more than MAX-HITS is hit, then error response query will be returned.
+Returned list will be a list of (entry . heading)."
+  (let* ((pattern (ndsary-pattern
+                   string method entry-start entry-end))
          (count 0) result)
-    (if (null query-string) nil
+    (if (null pattern) nil
       (if (/= 0 max-hits)
-          ;; count the number of hits
-          (with-temp-buffer
-            (lookup-with-coding-system coding
-              (call-process
-               ndsary-sary-program nil t nil "-c" "-i"
-               query-string file))
-            (goto-char (point-min))
-            (if (looking-at "\\([0-9]+\\)")
-                (setq count (+ count (string-to-number (match-string 1))))
-              0)))
+          (setq count (ndsary-file-match-count file pattern)))
       (cond ((and (/= 0 max-hits) (< max-hits count))
              (list
-              (lookup-new-entry
-               'regular dictionary "�"
-               (format "Error. More than %s hits. (%d)" max-hits count))))
+              (cons "�"
+                    (format "Error. More than %s hits. (%d)" max-hits count))))
             ((and (= 0 count)) nil) ;; no hit at all.
             ((and (or (null entry-start) (null entry-end))
                   (equal method 'exact))
@@ -277,41 +269,80 @@ REGULAR is t if dictionary does not have duplicate entries."
              (list
               (lookup-new-entry 'regular dictionary string)))
             (t
-             ;; extract entries
+             ;; execute program.
              (with-temp-buffer
                (lookup-with-coding-system coding
                  (call-process
-                  ndsary-sary-program nil t nil "-i"
-                  query-string file))
+                  ndsary-sary-program nil t nil "-i" pattern file))
+               ;; extract entries
                (setq result
-                     (if (and entry-start entry-end)
-                         (ndsary-extract-entries
-                          method string entry-start entry-end regular)
-                       (ndsary-extract-entries-2
-                        method string entry-start entry-end)))
+                     (ndsary-extract-entries
+                      string method entry-start entry-end regular))
+               ;; remove duplicate entries
                (unless regular
                  (setq result
                        (remove-duplicates
                         result
                         :test (lambda (x y) (equal (car x) (car y))))))
-               (mapcar (lambda (x)
-                         (lookup-new-entry
-                          'regular dictionary
-                          (concat (car x)) (cdr x)))
-                       result)))))))
+               result))))))
 
-(put 'ndsary :content 'ndsary-entry-content)
-(defun ndsary-entry-content (entry)
-  "Return string content of ENTRY."
-  (let* ((string     (lookup-entry-code entry))
-         (dictionary (lookup-entry-dictionary entry))
-         (coding     (or (lookup-dictionary-option dictionary :coding t)
-                         'utf-8))
-         (dir  (lookup-agent-location
-                (lookup-dictionary-agent dictionary)))
-         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
-         (content-start (lookup-dictionary-option dictionary :content-start t))
-         (content-end   (lookup-dictionary-option dictionary :content-end t)))
+(defun ndsary-file-match-count (file pattern)
+  "Return the number of match in FILE for PATTERN."
+  (with-temp-buffer
+    (lookup-with-coding-system coding
+      (call-process
+       ndsary-sary-program nil t nil "-c" "-i"
+       pattern file))
+    (goto-char (point-min))
+    (if (looking-at "\\([0-9]+\\)")
+        (setq count (+ count (string-to-number (match-string 1))))
+      0)))
+
+(defun ndsary-extract-entries (string method entry-start entry-end regular)
+  "Extract entries in accordance with STRING, METHOD, ENTRY-START and ENTRY-END.
+If REGULAR is t, then no duplicate start-tag in single line is assumed.
+Extraction are done in accordance with follows.
+  * exact, keyword:  No need to extract.  Just use query-string.
+  * suffix:    <start>.....|[str]<end>
+  * substring: <start>...|[str]..<end>
+  * prefix:    <start>[str]......<end>.
+Entries will be a list of (code . heading)."
+  ;; Additional Note.
+  ;; METHOD and STRING is needed to filter out `outside-entry match'.
+  ;; Backward Checking is also needed.
+  ;; For example, if start-tag='>' and end-tag is '</entry>' and text is
+  ;; "<item><entry id="xxx">XXXX</entry>", then
+  ;; need to avoid hit "><entry id="xxxx">XXXX</entry>" instead of ">XXXX</entry>".
+  (goto-char (point-min))
+  (let* ((filter-regexp-pair
+          (ndsary-regexp-pair string method entry-start entry-end regular))
+         (forward-regexp (car filter-regexp-pair))
+         (backward-regexp (cdr filter-regexp-pair))
+         word-start entry-start word-end entry-end entries)
+    (while (re-search-forward forward-regexp nil t)
+      (if backward-regexp
+          ;; forward-backward-search
+          (progn
+            (setq word-end (match-beginning 1)
+                  entry-end (match-end 1))
+            (if (re-search-backward backward-reggexp
+                                 (line-beginning-position) t)
+                (setq entry-start (match-beginning 1)
+                      word-start (match-end 1)
+                      entries (cons (cons (buffer-substring-no-properties
+                                           entry-start entry-end)
+                                          (buffer-substring-no-properties
+                                            word-start word-end))
+                                    entries))))
+        ;; forward-search-only
+        (setq entries (cons (cons (buffer-substring (match-beginning 1) (match-end 2))
+                                  (buffer-substring (match-end 1) (match-beginning 2)))
+                            entries))))
+    entries))
+      
+
+(defun ndsary-file-content (file string content-start content-end &optional coding)
+  (let ((coding (if (null coding) 'utf-8 coding)))
     (if (equal "�" string) string
       (with-temp-buffer
         (lookup-with-coding-system coding
@@ -327,6 +358,7 @@ REGULAR is t if dictionary does not have duplicate entries."
                          (list "-B" "0")))
                    ,string ,file)))
         (buffer-string)))))
+
 
 (provide 'ndsary)
 
