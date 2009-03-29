@@ -19,6 +19,7 @@
 
 ;; This agent will search the "字源" XML dictionary file for the
 ;; character.  File can be downloaded from the following site:
+;;
 ;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
 ;; Following Program will make index point file, which then can be

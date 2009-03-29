@@ -1,4 +1,4 @@
-;;; support-JMDict.el --- support file for "JMDict" file.
+;;; support-jmdict.el --- support file for "JMDict" file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
