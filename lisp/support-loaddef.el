@@ -51,6 +51,8 @@
         ("ndsary:.*/Unihan" . "support-unihan")
         ("ndsary:.*/JMdict" . "support-jmdict")
         ("ndsary:.*/chinadat\\.csv" . "support-chinakan")
+        ;; ndbtonic
+        ("ndbtonic:.*/onmusic/" . "support-onmusic")
         ;; ndsimple
         ("ndsimple:.*/rfc4949\\.txt" . "support-rfc4949")
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
