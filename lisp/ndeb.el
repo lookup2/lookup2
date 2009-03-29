@@ -1,4 +1,4 @@
-;;; ndeb.el --- Another eblook interface
+;;; ndeb.el --- eblook interface
 ;; Copyright (C) 2006 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
