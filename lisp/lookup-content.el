@@ -183,6 +183,29 @@
   (lookup-summary-display-content))
 
 ;;;
+;;; URL Link
+;;;
+
+(defvar lookup-url-link-map (copy-keymap lookup-content-mode-map))
+(define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link)
+
+(defun lookup-url-set-link (start end uri &optional object)
+  (add-text-properties 
+   start end
+   (list 'keymap lookup-url-link-map
+         'face 'lookup-reference-face
+         'mouse-face 'highlight
+         'help-echo uri
+         'lookup-tab-stop t
+         'lookup-url-link uri)
+   object))
+
+(defun lookup-url-follow-link ()
+  (interactive)
+  (let ((url (get-text-property (point) 'lookup-url-link)))
+    (browse-url url)))
+
+;;;
 ;;; Useful functions
 ;;;
 
