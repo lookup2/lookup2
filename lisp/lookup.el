@@ -588,6 +588,9 @@ candidates."
 ;; reference
 
 (defun lookup-arrange-references (entry)
+  "Arrange reference of ENTRY.  
+:reference-pattern should be (regexp link-item heading code).
+link-item, heading, or code may be integer or function."
   (let* ((dict (lookup-entry-dictionary entry))
 	 (pattern (lookup-dictionary-reference-pattern dict)))
     (when pattern
@@ -705,6 +708,27 @@ candidates."
 	 (or (get-text-property p 'lookup-reference)
 	     (setq p (previous-single-property-change p 'lookup-reference)))
 	 (goto-char p))))
+
+;; url link
+
+(defvar lookup-url-link-map (copy-keymap lookup-content-mode-map))
+(define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link)
+
+(defun lookup-url-set-link (start end uri &optional object)
+  (add-text-properties 
+   start end
+   (list 'keymap lookup-url-link-map
+         'face 'lookup-reference-face
+         'mouse-face 'highlight
+         'help-echo uri
+         'lookup-tab-stop t
+         'lookup-url-link uri)
+   object))
+
+(defun lookup-url-follow-link ()
+  (interactive)
+  (let ((url (get-text-property (point) 'lookup-url-link)))
+    (browse-url url)))
 
 
 ;;;
