@@ -251,7 +251,7 @@ matches START-tag, and END-tag respectively."
 REGULAR is t if dictionary does not have duplicate entries.
 CODING specifies file's coding system.
 If more than MAX-HITS is hit, then error response query will be returned.
-Returned list will be a list of (entry . heading)."
+Returned list will be a list of (code . heading)."
   (let* ((pattern (ndsary-pattern
                    string method entry-start entry-end))
          (count 0) result)
@@ -267,7 +267,7 @@ Returned list will be a list of (entry . heading)."
                   (equal method 'exact))
              ;; no need to search.  Only single entry will be returned.
              (list
-              (lookup-new-entry 'regular dictionary string)))
+              (cons string string)))
             (t
              ;; execute program.
              (with-temp-buffer

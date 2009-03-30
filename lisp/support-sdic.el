@@ -93,6 +93,7 @@
 (setq lookup-support-options
       (list :entry-start "<K>" :entry-end "</K>"
             :title "SDIC"
+            :regular t
             :arranges '((replace support-sdic-arrange-structure))
             :coding 'euc-jp))
 

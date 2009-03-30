@@ -44,7 +44,7 @@
 (setq lookup-support-options
       (list :title "RFC4949"
             :entry-start "  $ "
-            :content-start "$" :content-end "$"
+            :content-start "  $" :content-end "$"
             :charsets '(ascii)
 	    :arranges '((reference support-rfc4949-arrange-references))))
 

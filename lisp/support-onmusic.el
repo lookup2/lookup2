@@ -28,13 +28,11 @@
 ;; (setq lookup-search-agent
 ;;       '(
 ;;         ....
-;;         (ndsary "/path_to/onmusic")
+;;         (ndbtonic "/path_to/onmusic")
 ;;         ....
 ;;        ))
 
 ;;; Code:
-
-;;; Customizable variables
 
 (setq lookup-support-options
       (list :title "新編音楽中辞典"))
