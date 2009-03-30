@@ -6,7 +6,7 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el \
 	ndsimple.el ndspell.el ndsrd.el ndtut.el \
 	support-loaddef.el support-cebd.el support-chiezo.el \
 	support-chinakan.el support-chujiten.el support-colloc.el \
-	support-comp.el support-crown.el support-daijirin.el a\
+	support-comp.el support-crown.el support-daijirin.el \
 	support-foldoc.el support-genius.el support-iwakoku.el \
 	support-jargon.el support-jmdict.el support-kojien.el \
 	support-mwsedic.el support-mypaedia.el support-nhd.el \
