@@ -138,9 +138,9 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'boolean
   :group 'lookup-general-options)
 
-(defcustom lookup-max-image-size 1048576
+(defcustom lookup-max-image-size 67108864
   "検索時に表示する画像の最大サイズ (バイト)。
-デフォルトは 1MB。nil を指定すると、無制限になる。"
+デフォルトは 64MB。nil を指定すると、無制限になる。"
   :type 'integer
   :group 'lookup-general-options)
 
