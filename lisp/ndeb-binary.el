@@ -2,7 +2,7 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.7 2009/03/22 23:09:29 kawabata Exp $
+;; Version: $Id: ndeb-binary.el,v 1.9 2009/04/02 16:03:55 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -43,6 +43,12 @@
       (bmp ("fiber" "-s"))
       (xbm ("fiber" "-s"))
       (jpeg ("fiber" "-s"))))
+   ((eq window-system 'ns) ; Macintosh
+    '((wave ("open" "-W"))
+      (mpeg ("open" "-W"))
+      (bmp ("open" "-W"))
+      (jpeg ("open" "-W"))
+      (xbm ("open" "-W"))))
    ((functionp 'play-sound-file)
     '((wave ndeb-binary-play-sound-file)))
    (t nil))
@@ -51,14 +57,14 @@ Each element is like a property list of the following form:
 
   (TYPE PROGRAM [KEY VALUE ...])
 
-Where TYPE is a symbol that represents the binary type. At this time
+Where TYPE is a symbol that represents the binary type.  At this time
 `xbm', `bmp', `jpeg', `wave' and `mpeg' are recognized.
 
-PROGRAM is eigher a program name or a list of command-line parametrs
+PROGRAM is eigher a program name or a list of `command-line' parametrs
 or symbol of function to play a binary of this TYPE.
 
 The rest, pairs of KEY and VALUE, are optional properties to control
-how to invoke PROGRAM. Valid properties are:
+how to invoke PROGRAM.  Valid properties are:
 
   :directory-separator STRING
       Convert directory separators (/) in the binary filename to
@@ -69,7 +75,7 @@ how to invoke PROGRAM. Valid properties are:
       temporary file used by PROGRAM.
 
   :direct BOOLEAN
-      For mpeg only. If non-nil, do not make temporary file.
+      For mpeg only.  If non-nil, do not make temporary file.
       PROGRAM accesses original data."
   :type '(repeat
 	  (list
@@ -401,7 +407,7 @@ command defined in `ndeb-binary-extract-commands'."
     name))
 
 (defun ndeb-binary-unbind-temporary-file (file)
-  (setq file (lookup-expand-file-name file))
+  (setq file (expand-file-name file))
   (let ((lock (lookup-assoc-ref 'ndeb-binary-files file)))
     (when lock
       (if (>= lock 2)
@@ -479,7 +485,7 @@ corresponding eblook commands."
     (if (null program)
 	(call-interactively 'ndeb-binary-extract-link)
       (if (or (null (and (eq type 'mpeg)
-			 (lookup-plist-get (cdr program) :direct)))
+			 (plist-get (cdr program) :direct)))
 	      (string-match "^ebnet://"
 			    (lookup-agent-location
 			     (lookup-dictionary-agent dictionary))))
@@ -499,7 +505,7 @@ corresponding eblook commands."
 	    (progn
 	      (string-match "^.+$" file)
 	      ;; On Windows, eblook return BS separated filename.
-	      (setq file (lookup-expand-file-name (match-string 0 file))))
+	      (setq file (expand-file-name (match-string 0 file))))
 	  (message "Error occuerd in mpeg_path command")
 	  (setq file (ndeb-binary-bind-temporary-file
 		      dictionary type target parameters))))
@@ -518,7 +524,7 @@ corresponding eblook commands."
   "Internal use. Play binary with external original mpeg movie file directly."
   (let* ((params (car program))
 	 (program (cdr program))
-	 (sep (lookup-plist-get program :directory-separator))
+	 (sep (plist-get program :directory-separator))
 	 process)
     (if (stringp params)
 	(setq params (list params)))
@@ -536,7 +542,7 @@ corresponding eblook commands."
 				 (cdr params))
 			  (error "Invalid process object")))
       (error (message "%s" err)))
-    (if (lookup-plist-get program :disable-sentinel)
+    (if (plist-get program :disable-sentinel)
 	(progn
 	  (sit-for 3)
 	  (ndeb-binary-unbind-temporary-file file))
@@ -785,7 +791,7 @@ Using this function with :snd-autoplay option is not recommendable."
 	  (lookup-img-file-insert file type start end)
 	(insert ?\n)
 	(lookup-img-file-insert file type)
-        (error "hoge")
+        ;;(error "hoge")
 	(unless (= (following-char) ?\n)
 	  (insert ?\n)))
       (ndeb-binary-unbind-temporary-file file))
@@ -859,7 +865,8 @@ Using this function with :snd-autoplay option is not recommendable."
 		(if inline
 		    (ndeb-binary-insert-color-image dictionary 'jpeg target
 						    start (point))
-		  (ndeb-binary-insert-color-image dictionary 'jpeg target))))
+		  (ndeb-binary-insert-color-image dictionary 'jpeg target)
+                  )))
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-wave (entry)
