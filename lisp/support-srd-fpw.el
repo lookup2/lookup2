@@ -21,7 +21,7 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'poem)
+;(require 'poem)
 
 (defvar srd-fpw-data-directory "/usr/local/dict/srd"
   "img.dat, srdra.bnd のある場所。")
@@ -174,6 +174,7 @@
 	  (delete al srd-fpw-process-file-alist))))
 
 (setq lookup-support-options
-      (list :arranges '((structure srd-fpw-arrange-structure))))
+      ;(list :arranges '((structure srd-fpw-arrange-structure)))
+      )
 
 ;;; srd-fpw.el ends here
