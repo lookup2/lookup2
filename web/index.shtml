@@ -26,16 +26,17 @@ effective manner.</p>
   </li>
 </ul>
 
-<h1>Salvage Release</h1>
+<h1>Lookup 2.0 Release</h1>
+<p>Lookup 2.0 is fully-unicode capable, Emacs 23-savvy software.</p>
 <ul>
-  <li>Unstable version:
-  <a href="http://sourceforge.net/cvs/?group_id=893">Lookup 1.99.4</a>
-  </li>
+  <li>Beta quality version:
+    <a href="http://downloads.sourceforge.net/lookup/lookup-1.99.6.tar.gz">Lookup 1.99.6</a> (for Emacs 23.0.92) </li>
+  <li><a href="http://sourceforge.net/cvs/?group_id=893">CVS Repository</a> for newest version.</li>
 </ul>
 
 <hr/>
 <address>
-Last modified: $Date: 2009/03/08 01:20:03 $<br/>
+Last modified: $Date: 2009/04/01 11:33:12 $<br/>
 </address>
 
 <hr/>
