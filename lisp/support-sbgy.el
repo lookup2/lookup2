@@ -29,7 +29,6 @@
 ;; #!/usr/bin/env ruby -Ku
 ;; # Usage: ruby sbgy.rb sbgy.xml
 ;; #        mksary -s sbgy.xml
-;; #        sary --start="<voice_part" --end="</voice_part>" ">中" sbgy.xml
 ;; STDIN.reopen(ARGV[0], "r")
 ;; STDOUT.reopen(ARGV[0]+".ary", "w")
 ;; file = $stdin
