@@ -31,7 +31,7 @@
 (unless lookup-byte-compiling
   (load "lookup-autoloads"))
 
-(defconst lookup-version "1.99.3"
+(defconst lookup-version "1.99.6"
   "The version numbers of Lookup.")
 
 
@@ -898,12 +898,15 @@ If there is no session, default module will be returned."
   (lookup-assoc-set 'lookup-support-alist id file))
 
 ;;;
-;;; Lookup Auto
+;;; Auto-Lookup
 ;;;
 
 (defvar lookup-auto-lookup-mode nil)
 (defvar lookup-auto-lookup-timer nil)
 (defvar lookup-auto-lookup-word "")
+
+(defvar lookup-auto-lookup-interval 1.00)
+(defvar lookup-auto-lookup-open-function 'lookup-other-window)
 
 (defun lookup-toggle-auto-lookup()
   (interactive)
@@ -920,7 +923,7 @@ If there is no session, default module will be returned."
   (setq lookup-auto-lookup-mode t)
   (setq lookup-auto-lookup-timer
         (run-with-idle-timer
-         1 t
+         lookup-auto-lookup-interval t
          'lookup-auto-lookup)))
 
 (defun lookup-deactivate-auto-lookup ()
@@ -943,7 +946,7 @@ If there is no session, default module will be returned."
     (save-selected-window
       (let ((lookup-edit-input nil)
             (word (lookup-current-word))
-            (lookup-open-function 'lookup-other-window))
+            (lookup-open-function lookup-auto-lookup-open-function))
         (when (not (equal lookup-auto-lookup-word word))
           (lookup-word word (lookup-get-module "auto"))
           (setq lookup-auto-lookup-word word))))))
