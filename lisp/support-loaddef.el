@@ -36,7 +36,6 @@
 	("/COMP\\'" . "support-comp")
 	("/OXFORD\\'" . "support-oxford")
         ("/ZHONG_RI\\'" . "support-zhongri")
-	("/SRD-FPW\\'" . "support-srd-fpw")
         ("/MWSEDIC\\'" . "support-mwsedic")
         ("/CEBD\\'" . "support-cebd")
         ;; ndsary
@@ -56,8 +55,9 @@
         ;; ndsimple
         ("ndsimple:.*/rfc4949\\.txt" . "support-rfc4949")
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
-        ;; misc
+        ;; ndsrd
         ("ndsrd:" . "support-srd")
+        ;; misc.
 	("/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
 	("/vera" . "support-vera")
