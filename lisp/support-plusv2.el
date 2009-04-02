@@ -359,7 +359,8 @@
      ("zb121" . "━")
      ("zb14f" . "æ̀")
      ("zb150" . "ǽ")
-     ("zb155" . "æ"))))
+     ("zb155" . "æ")
+     ("zb262" . "拼"))))
 
 (setq lookup-support-options
       (list :gaiji-table readers-plus-v2-gaiji-table))
