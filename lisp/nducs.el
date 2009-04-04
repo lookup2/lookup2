@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'descr-text)
 
 
 
