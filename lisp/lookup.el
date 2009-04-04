@@ -124,20 +124,30 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
     (nth pos lookup-module-list)))
 
 (defun lookup-forward-module (arg)
-  "Forward default module by ARG.
-When current session is active, then new session will immediately
-begin, except during `lookup-select-mode', in such case only the
-session module will be changed.  If there is no session, then new
-session with empty query will be created."
+  "Forward current module by ARG.
+New session begins if there is a session.  If called from 
+`lookup-select-mode' or `lookup-modules-mode', then default
+module will be changed."
   (interactive "p")
-  (let ((module (lookup-nth-module arg (lookup-current-module)))
-        (session (lookup-current-session)) query)
-    (if (eq major-mode 'lookup-select-mode)
+  (let ((session (lookup-current-session)) 
+        module query)
+    (if (or (eq major-mode 'lookup-select-mode)
+            (eq major-mode 'lookup-modules-mode)
+            (null session))
         (progn
-          (if (null session)
-              (setq lookup-current-session (lookup-new-session module nil nil))
-            (setf (lookup-session-module session) module))
-          (lookup-select-dictionaries module))
+          (dotimes (x (mod arg (length lookup-module-list)))
+            (setq lookup-module-list (nconc (cdr lookup-module-list)
+                                            (list (car lookup-module-list)))))
+          (setq module (car lookup-module-list))
+          (cond ((eq major-mode 'lookup-select-mode)
+                 (setf (lookup-session-module session) module)
+                 (lookup-select-dictionaries module))
+                ((eq major-mode 'lookup-modules-mode)
+                 (setf (lookup-session-module session) module)
+                 (lookup-list-modules))
+                (t (message "Current module in this buffer is %s" 
+                            (lookup-current-module)))))
+      (setq module (lookup-nth-module arg (lookup-current-module)))
       (setq query (lookup-session-query session))
       (if (not (eq (lookup-query-method query) 'reference))
           (lookup-search-query module query)
@@ -944,12 +954,15 @@ If there is no session, default module will be returned."
              (not (eq (current-buffer) (get-buffer " *Search History*")))
              (not (eq (current-buffer) (get-buffer " *Module List*"))))
     (save-selected-window
-      (let ((lookup-edit-input nil)
-            (word (lookup-current-word))
-            (lookup-open-function lookup-auto-lookup-open-function))
-        (when (not (equal lookup-auto-lookup-word word))
-          (lookup-word word (lookup-get-module "auto"))
-          (setq lookup-auto-lookup-word word))))))
+      (save-match-data
+        (save-excursion
+          (save-restriction
+            (let ((lookup-edit-input nil)
+                  (word (lookup-current-word))
+                  (lookup-open-function lookup-auto-lookup-open-function))
+              (when (not (equal lookup-auto-lookup-word word))
+                (lookup-word word (lookup-get-module "auto"))
+                (setq lookup-auto-lookup-word word)))))))))
 
 
 ;;;
