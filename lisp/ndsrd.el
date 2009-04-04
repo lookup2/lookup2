@@ -166,7 +166,8 @@ It should be set by preference file specifid by `:fmt' option."
 
 (put 'ndsrd :kill #'ndsrd-kill)
 (defun ndsrd-kill (agent)
-  (mapc #'delete-file ndsrd-audio-files))
+  (mapc #'delete-file ndsrd-audio-files)
+  (setq ndsrd-audio-files nil))
 
 ;;;
 ;;; Sound and Image Processing
