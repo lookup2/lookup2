@@ -4,7 +4,7 @@
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: lookup-text.el,v 1.4 2009/03/24 23:00:56 kawabata Exp $
+;; Version: $Id: lookup-text.el,v 1.5 2009/04/04 14:43:38 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -48,10 +48,9 @@
   :type 'list
   :group 'lookup-text)
 
-(defcustom lookup-text-pinyin-file 
-  (expand-file-name "~/cvs/emacs/leim/MISC-DIC/pinyin.map")
+(defcustom lookup-text-pinyin-file (expand-file-name "~/cvs/emacs/leim/MISC-DIC/pinyin.map")
   "*漢字ピンイン変換に使用するデータがあるファイル。
-Emacsの配布に含まれているものを使用する。"
+Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
   :type 'string
   :group 'lookup-text)
 
@@ -161,21 +160,22 @@ Emacsの配布に含まれているものを使用する。"
 (defun lookup-text-get-pinyin (str)
   "Convert Kanji STR to Pinyin.
 If ANY kanji failed to be converted, then nil will be returned."
-  (unless lookup-text-pinyin-table
-    (setq lookup-text-pinyin-table (make-hash-table :test 'equal))
-    (with-temp-buffer
-      (let ((coding-system-for-read 'euc-china)
-            pinyin)
-        (insert-file-contents lookup-text-pinyin-file)
-        (goto-char (point-min))
-        (while (re-search-forward "^\\([a-z]+\\)	\\(.+\\)" nil t)
-          (setq pinyin (match-string 1))
-          (dolist (char (string-to-list (match-string 2)))
-            (puthash char pinyin lookup-text-pinyin-table))))))
-  (let* ((chars (string-to-list str))
-         (pys (mapcar (lambda (x) (gethash x lookup-text-pinyin-table))
-                      chars)))
-    (unless (memq nil pys) (apply 'concat pys))))
+  (when (file-exists-p lookup-text-pinyin-file)
+    (unless lookup-text-pinyin-table
+      (setq lookup-text-pinyin-table (make-hash-table :test 'equal))
+      (with-temp-buffer
+        (let ((coding-system-for-read 'euc-china)
+              pinyin)
+          (insert-file-contents lookup-text-pinyin-file)
+          (goto-char (point-min))
+          (while (re-search-forward "^\\([a-z]+\\)	\\(.+\\)" nil t)
+            (setq pinyin (match-string 1))
+            (dolist (char (string-to-list (match-string 2)))
+              (puthash char pinyin lookup-text-pinyin-table))))))
+    (let* ((chars (string-to-list str))
+           (pys (mapcar (lambda (x) (gethash x lookup-text-pinyin-table))
+                        chars)))
+      (unless (memq nil pys) (apply 'concat pys)))))
 
 ;;;
 ;;; Charsetsp Function
