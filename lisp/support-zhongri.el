@@ -3590,8 +3590,9 @@
 ;; (http://www31.ocn.ne.jp/~h_ishida/EBKIdx.html), you can search 
 ;; EBXA-C dictionaries with Japanese Kanji.
 (setq lookup-support-options
-      (list :gaiji-table   zhongri-gaiji-table
-            :arranges '((gaiji zhongri-dictionary-arrange-gaiji))
-            :transformer   #'zhongri-pinyin-search))
+      `(:gaiji-table   zhongri-gaiji-table
+        :arranges ((gaiji zhongri-dictionary-arrange-gaiji))
+        ,@(when (file-exists-p lookup-text-pinyin-file)
+            (list :transformer  #'zhongri-pinyin-search))))
 
 ;;; support-zhongri.el ends here
