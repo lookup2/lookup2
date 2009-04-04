@@ -43,7 +43,7 @@
 (defun lookup-modules-build-buffer ()
   (let ((inhibit-read-only t))
     (erase-buffer)
-    (insert "Lookup Module List\n")
+    (insert "Lookup Module List  (First module in list will be default module)\n")
     (insert "Type `c' to create module, `v' to visit, "
 	    "`q' to leave, `?' for help.\n\n")
     (lookup-table-insert
