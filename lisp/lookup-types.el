@@ -355,6 +355,8 @@ will be attached to the module 'default'."
           (lookup-dictionary-option dictionary :arranges))
          (dict-arrange-table  
           (lookup-dictionary-option dictionary :arrange-table))
+         (agent-arranges
+          (lookup-dictionary-ref dictionary :arranges))
          (agent-arrange-table 
           (lookup-dictionary-ref dictionary :arrange-table))
          funcs)
@@ -363,6 +365,7 @@ will be attached to the module 'default'."
             (append
              funcs
              (cdr (assoc kind dict-arranges))
+             (cdr (assoc kind agent-arranges))
              (cdr (or (assoc kind dict-arrange-table)
                       (assoc kind agent-arrange-table)
                       (assoc kind lookup-arrange-table))))))
