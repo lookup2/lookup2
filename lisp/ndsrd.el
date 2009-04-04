@@ -1,7 +1,9 @@
 ;;; ndsrd.el --- search agent for 小学館『ランダムハウス英語辞典』
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
 ;; Keywords: dictionary
 
 ;; This file is part of Lookup.
@@ -20,9 +22,17 @@
 ;; along with Lookup; if not, write to the Free Software Foundation,
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+;;; Documentation
+
+;; Sound Play
+;; If you want to enable sound play, please install `realplayer' and 
+;; in your csrd.fmt file, specify "SND" to be "@snd".
+
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-content)
+(require 'ndeb-binary)
 
 ;;;
 ;;; Customizable variables
@@ -47,7 +57,50 @@
   :type 'symbol
   :group 'ndsrd)
 
+;; Make sure that RealPlayer 11 or later is installed (Windows).
+;; Macintosh RealPlayer can not play old realaudio (`dnet') format, 
+;; so you may need to install other player (such as `mplayer').
+(defcustom ndsrd-sound-player 
+  (cond ((equal system-type 'darwin)
+         "mplayer")
+        (t "realplayer"))
+  "*Sound Player of ndsrd dictionary. 
+It must be able to play `.au' format sound."
+  :type 'string
+  :group 'ndsrd)
+
+(defcustom ndsrd-image-converter "convert - png:-"
+  "shell command to convert compressed BMP to PNG.
+It must convert the stdin stream to stdout stream."
+  :type 'string
+  :group 'ndsrd)
+
+(defcustom ndsrd-sound-header "@snd"
+  "*Sound Data Indicator of ndsrd dictionary. 
+It should be set by preference file specifid by `:fmt' option."
+  :type 'string
+  :group 'ndsrd)
+
+(defcustom ndsrd-image-header "@img"
+  "*Image Data Indicator of ndsrd dictionary.
+It should be set by preference file specifid by `:fmt' option."
+  :type 'string
+  :group 'ndsrd)
+
 
+;;;
+;;; Internal Variables
+;;;
+
+(defvar ndsrd-audio-files nil)
+
+(defvar ndsrd-link-map nil)
+(unless ndsrd-link-map
+  (setq ndsrd-link-map (copy-keymap lookup-content-mode-map))
+  (define-key ndsrd-link-map "\C-m" 'ndsrd-follow-link)
+  (define-key ndsrd-link-map "e" 'ndsrd-extract-link)
+  (define-key ndsrd-link-map [mouse-2] 'ndesrd-mouse-follow))
+
 ;;;
 ;;; types
 ;;;
@@ -55,6 +108,7 @@
 (put 'ndsrd :methods '(exact prefix suffix substring wildcard keyword))
 (put 'ndsrd :reference-pattern '("→\\([A-Z]*\\)" 0 1 lookup-dynamic-search))
 (put 'ndsrd :stemmer 'stem-english)
+(put 'ndsrd :arranges '((structure ndsrd-arrange-structure)))
 
 
 ;;;
@@ -109,6 +163,112 @@
 (put 'ndsrd :content #'ndsrd-entry-content)
 (defun ndsrd-entry-content (entry)
   (or (lookup-get-property entry 'ndsrd-content) "(forgot)"))
+
+(put 'ndsrd :kill #'ndsrd-kill)
+(defun ndsrd-kill (agent)
+  (mapc #'delete-file ndsrd-audio-files))
+
+;;;
+;;; Sound and Image Processing
+;;;
+
+(defun ndsrd-image-file (agent)
+  (let ((location (lookup-agent-location agent)))
+    (expand-file-name
+     (concat location "/img.dat"))))
+
+(defun ndsrd-sound-file (agent)
+  (let ((location (lookup-agent-location agent)))
+    (expand-file-name
+     (concat location "/srdra.bnd"))))
+
+(defun ndsrd-arrange-structure (entry)
+  "Arrange sound and image portion of ENTRY."
+  (interactive)
+  (let ((agent (lookup-dictionary-agent 
+                (lookup-entry-dictionary entry)))
+        file offset size start end)
+    (while (re-search-forward 
+            (concat ndsrd-sound-header 
+                    "\\([0-9a-f]+\\),\\([0-9a-f]+\\)\n")
+            nil t)
+      (setq file   (ndsrd-sound-file agent)
+            offset (string-to-int (match-string 1) 16)
+            size   (string-to-int (match-string 2) 16)
+            start  (match-beginning 0)
+            end    (match-end 0))
+      (ndsrd-sound-set-link start end file offset size))
+    (goto-char (point-min))
+    (while (re-search-forward 
+            (concat ndsrd-image-header 
+                    "\\([0-9a-f]+\\),\\([0-9a-f]+\\)$")
+            nil t)
+      (setq file   (ndsrd-image-file agent)
+            offset (string-to-int (match-string 1) 16)
+            size   (string-to-int (match-string 2) 16)
+            start  (match-beginning 0)
+            end    (match-end 0))
+      (ndsrd-insert-image start end file offset size))))
+
+(defun ndsrd-sound-set-link (start end file offset size)
+  (save-restriction
+    (narrow-to-region start end)
+    (delete-region (point-min) (point-max))
+    (insert "《音声》")
+    (add-text-properties 
+     (point-min) (point-max)
+     (list 'keymap ndsrd-link-map
+           'face 'ndeb-sound-caption-face
+           'mouse-face 'highlight
+           'help-echo "[sound] mouse-2: play, e:extract"
+           'lookup-tab-stop t
+           'ndsrd-sound (list file offset size)))))
+
+(defun ndsrd-insert-image (start end file offset size)
+  (let ((image
+         (create-image
+          (with-temp-buffer
+            (set-buffer-multibyte nil)
+            (insert-file-contents-literally
+             file nil offset (+ size offset))
+            (shell-command-on-region 
+             (point-min) (point-max)
+             ndsrd-image-converter
+             nil t "*Messages*" lookup-enable-debug)
+            (buffer-string))
+          'png t)))
+    (save-restriction
+      (narrow-to-region start end)
+      (delete-region start end)
+      (insert-image image "《画像》"))))
+
+(defun ndsrd-audio-file (file offset size)
+  "Create unique temporary file for FILE-OFFSET-SIZE audio data.
+If it already exists, just return file name."
+  (let ((temp-file-name
+         (expand-file-name
+          (concat temporary-file-directory "/ndsrd:"
+                  (replace-regexp-in-string "/" ":" file)
+                  (format ":%08X:%04X.ra" offset size)))))
+    (unless (file-exists-p temp-file-name)
+      (with-temp-file temp-file-name
+        (insert-file-contents-literally
+         file nil offset (+ size offset)))
+      (setq ndsrd-audio-files (cons temp-file-name
+                                    ndsrd-audio-files)))
+    temp-file-name))
+
+(defun ndsrd-follow-link ()
+  "Play the sound at point."
+  (message "entering!")
+  (interactive)
+  (let* ((data (get-text-property (point) 'ndsrd-sound))
+         file)
+    (when data
+      (setq file (ndsrd-audio-file (elt data 0)
+                                   (elt data 1)
+                                   (elt data 2)))
+      (call-process ndsrd-sound-player nil nil nil file))))
 
 (provide 'ndsrd)
 
