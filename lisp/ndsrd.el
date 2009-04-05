@@ -33,6 +33,7 @@
 (require 'lookup)
 (require 'lookup-content)
 (require 'ndeb-binary)
+(require 'hmac-md5)
 
 ;;;
 ;;; Customizable variables
@@ -58,7 +59,7 @@
   :group 'ndsrd)
 
 ;; Make sure that RealPlayer 11 or later is installed (Windows).
-;; Macintosh RealPlayer can not play old realaudio (`dnet') format, 
+;; Macintosh RealPlayer can not play old RealAudio (`dnet') format, 
 ;; so you may need to install other player (such as `mplayer').
 (defcustom ndsrd-sound-player 
   (cond ((equal system-type 'darwin)
@@ -66,6 +67,13 @@
         (t "realplayer"))
   "*Sound Player of ndsrd dictionary. 
 It must be able to play `.au' format sound."
+  :type 'string
+  :group 'ndsrd)
+
+(defcustom ndsrd-temporary-directory
+  (expand-file-name
+   (concat temporary-file-directory "/ndsrd"))
+  "*Temporary Directory for SRD Sound file."
   :type 'string
   :group 'ndsrd)
 
@@ -92,7 +100,7 @@ It should be set by preference file specifid by `:fmt' option."
 ;;; Internal Variables
 ;;;
 
-(defvar ndsrd-audio-files nil)
+(defvar ndsrd-temp-files nil)
 
 (defvar ndsrd-link-map nil)
 (unless ndsrd-link-map
@@ -166,8 +174,10 @@ It should be set by preference file specifid by `:fmt' option."
 
 (put 'ndsrd :kill #'ndsrd-kill)
 (defun ndsrd-kill (agent)
-  (mapc #'delete-file ndsrd-audio-files)
-  (setq ndsrd-audio-files nil))
+  (mapc (lambda (x)
+          (if (file-exists-p x) (delete-file x)))
+        ndsrd-temp-files)
+  (setq ndsrd-temp-files nil))
 
 ;;;
 ;;; Sound and Image Processing
@@ -243,33 +253,57 @@ It should be set by preference file specifid by `:fmt' option."
       (delete-region start end)
       (insert-image image "《画像》"))))
 
-(defun ndsrd-audio-file (file offset size)
-  "Create unique temporary file for FILE-OFFSET-SIZE audio data.
-If it already exists, just return file name."
+(defun ndsrd-create-temporary-file (directory key extension)
+  "Create unique temp-file name for DIRECTORY, KEY, and EXTENSION.
+DATA may be any valid lisp expression."
   (let ((temp-file-name
          (expand-file-name
-          (concat temporary-file-directory "/ndsrd:"
-                  (replace-regexp-in-string "/" ":" file)
-                  (format ":%08X:%04X.ra" offset size)))))
+          (concat
+           directory "/"
+           (encode-hex-string
+            (hmac-md5 (format "%s" key) (make-string 16 ?\x0b)))
+           extension))))
+    (unless (file-directory-p ndsrd-temporary-directory)
+      (make-directory ndsrd-temporary-directory t)
+      (set-file-modes ndsrd-temporary-directory 448))
     (unless (file-exists-p temp-file-name)
-      (with-temp-file temp-file-name
-        (insert-file-contents-literally
-         file nil offset (+ size offset)))
-      (setq ndsrd-audio-files (cons temp-file-name
-                                    ndsrd-audio-files)))
+      (setq ndsrd-temp-files (cons temp-file-name
+                                   ndsrd-audio-files)))
     temp-file-name))
+
+(defun ndsrd-save-temporary-file (file offset size temp-file)
+  "Save contents of FILE of OFFSET, SIZE to TEMP-FILE."
+  (with-temp-file temp-file
+    (insert-file-contents-literally
+     file nil offset (+ size offset))))
 
 (defun ndsrd-follow-link ()
   "Play the sound at point."
-  (message "entering!")
   (interactive)
-  (let* ((data (get-text-property (point) 'ndsrd-sound))
-         file)
+  (let ((data (get-text-property (point) 'ndsrd-sound)))
     (when data
-      (setq file (ndsrd-audio-file (elt data 0)
-                                   (elt data 1)
-                                   (elt data 2)))
-      (call-process ndsrd-sound-player nil nil nil file))))
+      (let* ((file (elt data 0))
+             (offset (elt data 1))
+             (size (elt data 2))
+             (temp-file
+              (ndsrd-create-temporary-file
+               ndsrd-temporary-directory (list file offset size) ".ra")))
+        (unless (file-exists-p temp-file)
+          (ndsrd-save-temporary-file file offset size temp-file))
+        (call-process ndsrd-sound-player nil nil nil temp-file)))))
+
+(defun ndsrd-extract-link ()
+  "Extract the sound at point"
+  (interactive)
+  (let ((data (get-text-property (point) 'ndsrd-sound)))
+    (when data
+      (let* ((file (elt data 0))
+             (offset (elt data 1))
+             (size (elt data 2)))
+        (with-temp-file
+            (read-file-name (format "Save realaudio into file: "))
+          (insert-file-contents-literally
+           file nil offset (+ offset size)))))))
 
 (provide 'ndsrd)
 
