@@ -107,7 +107,7 @@ It should be set by preference file specifid by `:fmt' option."
   (setq ndsrd-link-map (copy-keymap lookup-content-mode-map))
   (define-key ndsrd-link-map "\C-m" 'ndsrd-follow-link)
   (define-key ndsrd-link-map "e" 'ndsrd-extract-link)
-  (define-key ndsrd-link-map [mouse-2] 'ndesrd-mouse-follow))
+  (define-key ndsrd-link-map [mouse-2] 'ndsrd-mouse-follow))
 
 ;;;
 ;;; types
@@ -268,7 +268,7 @@ DATA may be any valid lisp expression."
       (set-file-modes ndsrd-temporary-directory 448))
     (unless (file-exists-p temp-file-name)
       (setq ndsrd-temp-files (cons temp-file-name
-                                   ndsrd-audio-files)))
+                                   ndsrd-temp-files)))
     temp-file-name))
 
 (defun ndsrd-save-temporary-file (file offset size temp-file)
@@ -276,6 +276,11 @@ DATA may be any valid lisp expression."
   (with-temp-file temp-file
     (insert-file-contents-literally
      file nil offset (+ size offset))))
+
+(defun ndsrd-mouse-follow ()
+  (interactive "e")
+  (mouse-set-point event)
+  (ndsrd-follow-link))
 
 (defun ndsrd-follow-link ()
   "Play the sound at point."
