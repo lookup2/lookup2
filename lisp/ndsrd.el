@@ -24,7 +24,8 @@
 
 ;;; Documentation
 
-;; Sound Play
+;; If you want to display image, please specify "IMG" to be "@img" in 
+;; your csrd.fmt file.
 ;; If you want to enable sound play, please install `realplayer' and 
 ;; in your csrd.fmt file, specify "SND" to be "@snd".
 
@@ -66,7 +67,7 @@
          "mplayer")
         (t "realplayer"))
   "*Sound Player of ndsrd dictionary. 
-It must be able to play `.au' format sound."
+It must be able to play `.ra' format (`dnet'-type) sound."
   :type 'string
   :group 'ndsrd)
 
@@ -277,7 +278,7 @@ DATA may be any valid lisp expression."
     (insert-file-contents-literally
      file nil offset (+ size offset))))
 
-(defun ndsrd-mouse-follow ()
+(defun ndsrd-mouse-follow (event)
   (interactive "e")
   (mouse-set-point event)
   (ndsrd-follow-link))
