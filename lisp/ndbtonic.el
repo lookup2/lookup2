@@ -161,6 +161,14 @@
      '("<ref idref=\"\\([0-9]+\\)\">\\([^<]+\\)</ref>" 2 2 1))
 
 ;;;
+;;; Internal Variables
+;;;
+
+(defvar ndbtonic-mojikyo-table
+  '((4095 . ?𠹚)
+    (65325 . ?𢢫)
+    (58234 . ?嚮)))
+;;;
 ;;; Main Program
 ;;;
 
