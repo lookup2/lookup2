@@ -1,54 +1,67 @@
 Lookup NEWS						-*- outline -*-
 
-* GNU Emacs 23 $B$N$_%5%]!<%H!#(B
+* GNU Emacs 23 のみサポート。
 
-$B8E$$%P!<%8%g%s$N(B Emacs $B$G$OF0:n$7$J$$!#(B
+古いバージョンの Emacs では動作しない。
 
-* $B=i4|2=%U%!%$%k$NJQ99!#(B
+* 初期化ファイルの変更。
 
-`lookup-init-directory' $B$G!"=i4|2=%U%!%$%k$N%G%#%l%/%H%j$r;XDj$9$k!#(B
-$B%G%U%)%k%H$G$O(B ~/.lookup/
+** `lookup-init-directory' で、初期化ファイルのディレクトリを指定する。
+  デフォルトでは ~/.lookup/
 
-`lookup-init-file' $B$G!"(BLookup $B$N=i4|2=%U%!%$%k$r;XDj$9$k!#(B
-$B%G%U%)%k%H$G$O(B ~/.lookup/init.el
+**`lookup-init-file' で、Lookup の初期化ファイルを指定する。
+  デフォルトでは ~/.lookup/init.el
 
-`lookup-cache-file' $B$G!"(BLookup $B$N%-%c%C%7%e%U%!%$%k$r;XDj$9$k!#(B
-$B%G%U%)%k%H$G$O(B ~/.lookup/cache.el
+** `lookup-cache-file' で、Lookup のキャッシュファイルを指定する。
+  デフォルトでは ~/.lookup/cache.el
 
-* $B30;z%5%]!<%H$,I8=`$GM-8z$H$J$C$?!#(B
+* 外字サポートが標準で有効となった。
 
-* $BJd=u%U%!%$%k$O<+F0E*$KFI$_9~$^$l$k$h$&$K$J$C$?!#(B
+* 補助ファイルは自動的に読み込まれるようになった。
 
-* PDIC$B%U%)!<%^%C%H!J(Bver.5.0$B0J9_!K$KBP1~$7$?!#!J(B'ndpdic'$B!K(B
+* PDICフォーマット（ver.5.0以降）に対応した。（'ndpdic'）
 
-* Suffix Array $B%D!<%k$KBP1~$7$?!#(B('ndsary')
+* Suffix Array ツールに対応した。('ndsary')
 
-* WORDS for Latin $B%D!<%k$KBP1~$7$?!#(B('ndlatin')
+* WORDS for Latin ツールに対応した。('ndlatin')
 
-* ndic $B$N%5%]!<%H$+$i(Bsdic$B$r30$7!"(Bndsary $B$X0\9T$7$?!#(B('support-sdic')
+* BTONIC フォーマットに対応した。('ndbtonic')
 
-* ndeb$B$r(B lookup1.4-media $B$+$i0\?"$7$?!#(B
+* ndic のサポートからsdicを外し、ndsary へ移行した。('support-sdic')
 
-* ndmisc$B$G!"MM!9$J%5%$%H$G$N8!:w$,2DG=$K$J$C$?!#(B
+* ndebを lookup1.4-media から移植した。
 
-* $BJ,$+$A=q$-$N2r@O%D!<%k$J$I$r!"(Bkakasi$B$+$i(Bmecab$B$KJQ99$7$?!#(B(ndkks $B"*(B ndmecab $B$=$NB>(B)
+* ndmiscで、様々なサイトでの検索が可能になった。
 
-* $B<-=qKh$K8!:wBP>]$H$J$kJ8;z=89g$r(B :charsets $B$G;XDj$G$-$k$h$&$K$7$?!#(B
+* ndsrd が、標準で音声・画像をサポートするようになった。これによって、EPWING変換版の
+  サポートを休止した。
 
-* $B%(!<%8%'%s%H$K!"<-=q%(%s%H%j$NA08e$r0\F0$9$k5!G=$,$"$k>l9g!"(BSummary$B%P%C%U%!$G<-=q$N(B
-  $BA08e$N%(%s%H%j$K(B`.', `,' $B$G0\F0$G$-$k$h$&$K$J$C$?!#(B
+* 分かち書きの解析ツールなどを、kakasiからmecabに変更した。(ndkks → ndmecab その他)
 
-* $BJd=u%U%!%$%k$N30;z>pJs$rBgI}$K6/2=$7$?!#(B
+* 辞書毎に検索対象となる文字集合を :charsets で指定できるようにした。
 
-* $B2<5-$N<-=qMQ$NJd=u%U%!%$%k$r?7@_$7$?!#(B
+* エージェントに、辞書エントリの前後を移動する機能がある場合、Summaryバッファで辞書の
+  前後のエントリに`.', `,' で移動できるようになった。
+
+* 補助ファイルの外字情報を大幅に強化した。
+
+* 下記の辞書用の補助ファイルを新設した。
 
 ** JMdict 
-** $BBg<-NS!JBhFsHG!&(BEPWING$BHG!K(B
-** $B3Q@n!&;z8;(B
-** Monier-Williams Sanskrit English Dictionary (EPWING$BHG(B)
-   $B!J(BDevanagari <-> Kyoto-Harvard $BJQ49$,2DG=!K(B
-** $B@bJ82r;zCm(B
-** Unihan.txt $B!J9/_f;zE52hA|%U%!%$%k$X$N%j%s%/5!G=$"$j!K(B
-** $B;YFaJ8$rl&$``*$N4A;zE5!J2hA|%U%!%$%k$X$N%j%s%/5!G=$"$j!K(B
-** Wikipedia Summary $B!JF|!&1Q!&J)!&Cf9q8l!K(B
-** $BCfF|!&F|Cf<-E5!J(BEBXA-C$B!K(B
+
+** 大辞林（第二版・EPWING版）
+
+** 角川・字源
+
+** Monier-Williams Sanskrit English Dictionary (EPWING版)
+   （Devanagari <-> Kyoto-Harvard 変換が可能）
+
+** 説文解字注
+
+** Unihan.txt （康煕字典画像ファイルへのリンク機能あり）
+
+** 支那文を讀む爲の漢字典（画像ファイルへのリンク機能あり）
+
+** Wikipedia Summary （日・英・仏・中国語）
+
+** 中日・日中辞典（EBXA-C）
