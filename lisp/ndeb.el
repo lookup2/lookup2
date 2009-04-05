@@ -323,6 +323,10 @@ Nil means it has not been checked yet.")
 
 ;; <:list>
 (defun ndeb-list (agent)
+  (let ((gaiji-file (lookup-agent-option agent :gaiji-file)))
+    (if gaiji-file
+        (setf (lookup-agent-option agent :gaiji-table)
+              (ndeb-parse-gaiji-file gaiji-file))))
   (ndeb-with-agent agent
    (ndeb-process-require "list"
      (lambda (process)
@@ -487,6 +491,25 @@ Nil means it has not been checked yet.")
 ;;;
 ;;; Internal functions
 ;;;
+
+(defun ndeb-parse-gaiji-file (gaiji-file)
+  "Return lookup-gaiji-table from specified EBStudio-style GAIJI-FILE."
+  (let ((gaiji-data))
+    (with-temp-buffer
+      (insert-file-contents-literally gaiji-file)
+      (goto-char (point-min))
+      (while (re-search-forward
+              "^\\([hz][A-F][0-9A-F]+\\)	\\([u0-9A-F,]+\\)" nil t)
+        (let* ((gaiji (match-string 1))
+               (ucs (match-string 2))
+               (ucs (mapconcat (lambda (x)
+                                 (char-to-string
+                                  (string-to-number x 16)))
+                               (split-string ucs "[u,]" t)
+                               "")))
+          (setq gaiji-data (cons (list (downcase gaiji) ucs)
+                                 gaiji-data)))))
+    (lookup-new-gaiji-table gaiji-data)))
 
 (defun ndeb-agent-kill-process (agent)
   (let ((process (lookup-get-property agent 'ndeb-process)))
