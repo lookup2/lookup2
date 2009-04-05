@@ -50,7 +50,7 @@
 
 (put 'nducs :list 'nducs-list)
 (defun nducs-list (agent)
-  (list (lookup-new-dictionary agent "_")))
+  (list (lookup-new-dictionary agent "ucs")))
 
 (put 'nducs :title 'nducs-title)
 (defun nducs-title (dictionary)
@@ -58,16 +58,19 @@
 
 (put 'nducs :search 'nducs-dictionary-search)
 (defun nducs-dictionary-search (dictionary query)
+  "Search nducs DICTIONARY for QUERY."
   (let ((regexp (lookup-query-to-regexp query))
         entries)
     (dolist (ucs-name (ucs-names))
       (if (string-match regexp (car ucs-name))
-          (setq entries (cons (lookup-new-entry 
-                               'regular dictionary 
+          (setq entries (cons (lookup-new-entry
+                               'regular dictionary
                                (char-to-string (cdr ucs-name)) (car ucs-name))
                               entries))))
     (if (> (length entries) lookup-max-hits)
-        (message "Too many hits! %s" (length entries))
+        (progn
+          (message "Too many hits! %s" (length entries))
+          nil)
       entries)))
 
 (put 'nducs :content 'nducs-entry-content)
@@ -75,7 +78,7 @@
   "Return string content of ENTRY."
   (let* ((char (string-to-char (lookup-entry-code entry))))
     (with-temp-buffer
-      (insert char "   ")
+      (insert (format "%c  [U+%04X]\n" char char))
       (dolist (elt describe-char-unidata-list)
         (let ((val (get-char-code-property char elt))
               description)
