@@ -38,6 +38,8 @@
         ("/ZHONG_RI\\'" . "support-zhongri")
         ("/MWSEDIC\\'" . "support-mwsedic")
         ("/CEBD\\'" . "support-cebd")
+        ("/SKP\\'" . "support-skp")
+        ("/PDH\\'" . "support-pdh")
         ;; ndsary
         ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-wikipedia")
         ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")
