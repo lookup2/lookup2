@@ -43,6 +43,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-content)
 
 (defvar support-chinakan-url-format
   "http://www.seiwatei.net/chinakan/%s.gif")
