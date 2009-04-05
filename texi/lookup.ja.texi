@@ -76,26 +76,25 @@ approved by the Free Software Foundation.
 @contents
 
 @node Top, Getting Started, (dir), (dir)
-@top Lookup User's Manual
+@top Lookup ユーザマニュアル
 
-`Lookup' is dictionary-lookup tool written in Emacs Lisp.  It can
-easily search various information resources including commercial
-CD-ROM dictionary, on-line dictionary server, or freely-available
-on-line dictionaries.
+Lookup は Emacs エディタで利用できる辞書検索インターフェースです。市販の
+CD-ROM 辞書やネットワークの辞書サーバ、オンラインの辞書など、様々な
+情報源から簡単な操作と設定で辞書検索が行なえます。
 
-This manual describes Lookup @value{VERSION}.
+このマニュアルは Lookup @value{VERSION} について説明します。
 
 @menu
-* Getting Started::
-* Dictionary Setup::
-* How to Lookup::
-* Advanced Features::
-* Customization::
-* Information::  
-* Search Agents::
-* Concept Index::
-* Command Index::
-* Variable Index::
+* Getting Started::             何はともあれ使ってみる
+* Dictionary Setup::            辞書の準備を整える
+* How to Lookup::               それでは検索してみよう
+* Advanced Features::           より高度な使い方
+* Customization::               自分好みにカスタマイズ
+* Information::                 更なる情報を得るには
+* Search Agents::               検索エージェント一覧
+* Concept Index::               コンセプト一覧
+* Command Index::               コマンド一覧
+* Variable Index::              変数一覧
 
 @ignore
 @detailmenu
@@ -283,16 +282,16 @@ ndcookie
 @chapter 何はともあれ使ってみる
 
 @menu
-* Quick Prepare::               
-* Quick Setup::                 
-* Quick Example::               
-* Quick Startup::               
-* Quick Search::                
-* Quick View::                  
+* Quick Prepare::               辞書の準備
+* Quick Setup::                 設定すべきこと
+* Quick Example::               簡単な設定例
+* Quick Startup::               起動するには
+* Quick Search::                検索してみよう
+* Quick View::                  結果を見ていく
 @end menu
 
 @node Quick Prepare, Quick Setup, Getting Started, Getting Started
-@section Quick Prepare
+@section 辞書の準備
 
 まず、何はなくとも辞書が必要です。とはいえたぶん、このプログラムを使おう
 と思われた時点で既に、利用したい辞書は決まっているでしょうね。辞書をもう
@@ -2357,7 +2356,6 @@ Entry バッファ @c (@pxref{Entry Buffer})
 @menu
 * Customize General::           一般的なカスタマイズ
 * Customize Option::            辞書とエージェントのカスタマイズ
-* Modules Setting::             辞書のモジュール化と切り替え
 @end menu
 
 @node Customize General, Customize Option, Customization, Customization
@@ -2477,7 +2475,7 @@ Lookupの初期化ファイル(@file{~/.lookup/init.el})で設定を行なう必
 フェイスを下線付きにする。
 @end table
 
-@node Customize Option, Modules Setting , Customize General, Customization
+@node Customize Option, Modules Seting , Customize General, Customization
 @section 辞書とエージェントのカスタマイズ
 
 @menu
@@ -2515,11 +2513,6 @@ Lookupは、モジュールの設定を、@kbd{M-x lookup-exit} のタイミン�
 うと、現在のセッションのモジュールを切り替え、検索語をあらためて新しい
 モジュールで検索し直します。それ以外の場合では、デフォルトモジュールを
 切り替えます。
-
-@menu
-* Agent Options::               エージェント・オプション一覧
-* Dictionary Options::          辞書オプション一覧
-@end menu
 
 @node Agent Options, Dictionary Options, Customize Option, Customize Option
 @subsection エージェント・オプション一覧
