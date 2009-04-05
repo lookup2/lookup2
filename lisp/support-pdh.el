@@ -5,13 +5,13 @@
 
 ;;; Code:
 
+(require 'ndeb)
+
 (defvar support-pdh-gaiji-file nil
   "Location of EBStudio-style Gaiji File `pdh_gaiji.map'.")
 
 (if (and support-pdh-gaiji-file (file-exists-p support-pdh-gaiji-file))
     (setq lookup-support-options
           (list ':gaiji-table (ndeb-parse-gaiji-file support-pdh-gaiji-file))))
-
-(require 'lookup)
 
 ;;; support-pdh.el ends here
