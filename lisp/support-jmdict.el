@@ -39,6 +39,7 @@
 ;; file.each_line{|line|
 ;;   if ((line =~ /^(.*)(<keb>)(.+)<\/keb>/ ) ||
 ;;       (line =~ /^(.*)(<reb[^>]*>)(.+)<\/reb>/ ) ||
+;;       (line =~ /^(.*)(<ent_seq[^>]*>)(.+)<\/ent_seq>/ ) ||
 ;;       (line =~ /^(.*)(<gloss[^>]*>)(.+)<\/gloss>/ ))
 ;;     offs = $offset+$1.length
 ;;     print [offs].pack("N")
@@ -246,6 +247,7 @@ searching time.")
             :arranges '((reference support-jmdict-arrange-structure))
             :entry-start-end-pairs 
             support-jmdict-search-tags
+            :id-start "<ent_seq>" :id-end "</ent_seq>"
             :content-start "<entry>" :content-end "</entry>"
             :heading 'support-jmdict-heading-func
             :max-hits 100 :regular t))

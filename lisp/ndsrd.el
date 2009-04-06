@@ -178,7 +178,12 @@ It should be set by preference file specifid by `:fmt' option."
   (mapc (lambda (x)
           (if (file-exists-p x) (delete-file x)))
         ndsrd-temp-files)
-  (setq ndsrd-temp-files nil))
+  (setq ndsrd-temp-files nil)
+  (if (and (file-directory-p ndsrd-temporary-directory)
+           (null (set-difference 
+             (directory-files ndsrd-temporary-directory)
+             '("." "..") :test 'equal)))
+      (delete-directory ndsrd-temporary-directory)))
 
 ;;;
 ;;; Sound and Image Processing

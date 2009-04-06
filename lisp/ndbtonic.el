@@ -101,9 +101,11 @@
   "Return entry list of DICTIONARY for QUERY."
   (let ((entry-pairs '(("<key>" . "</key>")
                        (">" . "</headword>")))
+        (id-start    "<dic-item id=\"")
+        (id-end      "\">")
         (string      (lookup-query-string query))
         (method      (lookup-query-method query))
-        (regular     t)
+        (regular     nil)
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
@@ -119,7 +121,8 @@
      (apply 'nconc
             (mapcar (lambda (x)
                       (ndsary-file-search
-                       file string method (car x) (cdr x) regular coding max-hits))
+                       file string method (car x) (cdr x) id-start id-end 
+                       regular coding max-hits))
                     entry-pairs)))))
 
 (put 'ndbtonic :content 'ndbtonic-entry-content)
