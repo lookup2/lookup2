@@ -45,7 +45,7 @@
 ;;       print [offs].pack("N")
 ;;       offs = offs+char.length
 ;;     }
-;;   elsif (( line =~ /^(.*)<dic-item id=".+?">/ ))
+;;   elsif (( line =~ /^(.*)<dic-item/ ))
 ;;     offs = $offset+$1.length
 ;;     print [offs].pack("N")
 ;;   end
