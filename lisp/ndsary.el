@@ -43,10 +43,9 @@
 ;; pairs, then they can be provided by `:entry-start-end-pairs'
 ;; option instead of `:entry-start' and `entry-end'.
 ;;
-;; If `:id-start' and `:id-end' is provided, then entry code will be
-;; represented by this pair.  To use `:id-start' and `:id-end', they
-;; MUST be provided with `:entry-start' and `:entry-end' pair, and
-;; MUST precede `:entry-start'.
+;; If `:entry-func' is provided, then the region between
+;; `:content-start' and `:entry-end' will be passed to that function
+;; (as a form of restricted current buffer with min-point set.)
 ;;
 ;; If `:content-start' is not provided, then start of the line would
 ;; be considered as beginning of the contents.  If `:contents-end' is
@@ -142,8 +141,8 @@
         (entry-end   (lookup-dictionary-option dictionary :entry-end t))
         (entry-pairs (lookup-dictionary-option dictionary
                                                :entry-start-end-pairs t))
-        (id-start    (lookup-dictionary-option dictionary :id-start t))
-        (id-end      (lookup-dictionary-option dictionary :id-end t))
+        (entry-func  (lookup-dictionary-option dictionary :entry-func t))
+        (content-start (lookup-dictionary-option dictionary :content-start t))
         (string      (lookup-query-string query))
         (method      (lookup-query-method query))
         (regular     (lookup-dictionary-option dictionary :regular t))
@@ -151,7 +150,6 @@
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
                        (lookup-dictionary-agent dictionary))))
-        (header-func (lookup-dictionary-option dictionary :header-func t))
         (coding      (or (lookup-dictionary-option dictionary :coding t)
                          'utf-8))
         (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
@@ -163,17 +161,13 @@
       (if (functionp entry-pairs)
           (setq entry-pairs (funcall entry-pairs query))))
     (setq entries
-          (apply 'nconc
-                 (mapcar (lambda (x)
-                           (ndsary-file-search
-                            file string method (car x) (cdr x) 
-                            id-start id-end regular coding max-hits))
-                         entry-pairs)))
+          (ndsary-file-searches
+           file string method entry-pairs
+           regular coding max-hits 
+           entry-func content-start))
     (mapcar
      (lambda (x) (lookup-new-entry
-                  'regular dictionary (car x)
-                  (if header-func (funcall header-func x query)
-                    (cdr x))))
+                  'regular dictionary (car x) (cdr x)))
      entries)))
 
 (put 'ndsary :content 'ndsary-entry-content)
@@ -254,16 +248,34 @@ matches START-tag, and END-tag respectively."
               (setq start-regexp (concat regexp ".*?" end-regexp))))
           (cons end-regexp start-regexp))))))
 
+(defun ndsary-file-searches
+  (file string method entry-pairs regular coding max-hits
+   &optional entry-func content-start )
+  "Return entry list of FILE STRING of METHOD for ENTRY-PAIRS."
+  (sort
+   (remove-duplicates
+    (apply 'nconc
+           (mapcar (lambda (x)
+                     (ndsary-file-search
+                      file string method (car x) (cdr x)
+                      regular coding max-hits
+                      'ndbtonic-entry-function
+                      ndbtonic-content-start
+                      ))
+                   entry-pairs))
+    :test (lambda (x y) (equal (car x) (car y))))
+   (lambda (x y) (string< (cdr x) (cdr y)))))
+
 (defun ndsary-file-search
-  (file string method entry-start entry-end id-start id-end
-   regular coding max-hits)
+  (file string method entry-start entry-end regular coding max-hits
+   &optional entry-func content-start )
   "Return entry list of FILE STRING of METHOD for ENTRY-START and ENTRY-END.
-If ID-START and ID-END is specified, then these pair will be returend as
-entry code.
-REGULAR is t if dictionary does not have duplicate entries.
 CODING specifies file's coding system.
 If more than MAX-HITS is hit, then error response query will be returned.
-Returned list will be a list of (code . heading)."
+Returned list will be a list of (code . heading).
+If ENTRY-FUNC and CONTENT-START is provided, the region between
+CONTENT-START to ENTRY-END will be passed to create the ENTRY
+value (code heading)."
   (let* ((pattern (ndsary-pattern
                    string method entry-start entry-end))
          (count 0) result)
@@ -284,16 +296,18 @@ Returned list will be a list of (code . heading)."
              ;; execute program.
              (with-temp-buffer
                (lookup-with-coding-system coding
-                 (if (and id-start entry-end)
+                 (if (and entry-func content-start entry-end)
                      (call-process
-                      ndsary-sary-program nil t nil "-i" "-s" id-start "-e" entry-end pattern file)
+                      ndsary-sary-program nil t nil "-i"
+                      "-s" content-start "-e" entry-end 
+                      pattern file)
                    (call-process
                     ndsary-sary-program nil t nil "-i" pattern file)))
                ;; extract entries
-               (message "debug: %s" (buffer-string))
                (setq result
                      (ndsary-extract-entries
-                      string method entry-start entry-end id-start id-end regular))
+                      string method entry-start entry-end regular
+                      entry-func content-start))
                ;; remove duplicate entries
                (unless regular
                  (setq result
@@ -314,8 +328,9 @@ Returned list will be a list of (code . heading)."
         (setq count (+ count (string-to-number (match-string 1))))
       0)))
 
-(defun ndsary-extract-entries 
-  (string method entry-start entry-end id-start id-end regular)
+(defun ndsary-extract-entries
+  (string method entry-start entry-end regular
+   &optional entry-func content-start)
   "Extract entries in accordance with STRING, METHOD, ENTRY-START and ENTRY-END.
 If ID-START and ID-END are specified, they will be used as entry code.
 If REGULAR is t, then no duplicate start-tag in single line is assumed.
@@ -324,7 +339,9 @@ Extraction are done in accordance with follows.
   * suffix:    <start>.....|[str]<end>
   * substring: <start>...|[str]..<end>
   * prefix:    <start>[str]......<end>.
-Entries will be a list of (code . heading)."
+Entries will be a list of (code . heading).
+If ENTRY-FUNC is provided, it will be called to  extract headr (code . heading).
+from the region CONTENT-START and ENTRY-END."
   ;; Additional Note.
   ;; METHOD and STRING is needed to filter out `outside-entry match'.
   ;; Backward Checking is also needed.
@@ -336,42 +353,45 @@ Entries will be a list of (code . heading)."
           (ndsary-regexp-pair string method entry-start entry-end regular))
          (forward-regexp (car filter-regexp-pair))
          (backward-regexp (cdr filter-regexp-pair))
-         word-start entry-start word-end entry-end 
+         word-start word-end code-start code-end
          entry entries)
     (while (re-search-forward forward-regexp nil t)
       (if backward-regexp
           ;; forward-backward-search
           (progn
             (setq word-end (match-beginning 1)
-                  entry-end (match-end 1))
+                  code-end (match-end 1))
             (if (re-search-backward backward-regexp
                                  (line-beginning-position) t)
-                (setq entry-start (match-beginning 1)
+                (setq code-start (match-beginning 1)
                       word-start (match-end 1)
                       entry (cons (buffer-substring-no-properties
-                                   entry-start entry-end)
+                                   code-start code-end)
                                   (buffer-substring-no-properties
                                    word-start word-end))))
-            (goto-char entry-end))
+            (goto-char code-end))
         ;; forward-search-only
         (setq entry (cons (buffer-substring (match-beginning 1) (match-end 2))
                           (buffer-substring (match-end 1) (match-beginning 2)))))
-      ;; id-start search
-      (when id-start
+      ;; entry-func search
+      (when (and entry-func content-start)
         (save-excursion
-          (if (and (progn (search-backward id-start nil t)
-                          (setq entry-start (match-beginning 0)))
-                   (progn (search-forward id-end nil t)
-                          (setq entry-end (match-end 0))))
-              (setq entry (cons (buffer-substring-no-properties
-                                 entry-start entry-end)
-                                (cdr entry)))
-            (setq entry nil))))
+          (save-restriction
+            (if (and (progn (search-backward content-start nil t)
+                            (setq code-start (match-beginning 0)))
+                     (progn (search-forward entry-end nil t)
+                            (setq code-end (match-end 0))))
+                (progn
+                  (narrow-to-region code-start code-end)
+                  (goto-char (point-min))
+                  (setq entry (funcall entry-func)))
+              (setq entry nil)))))
       ;; entry accumulation
       (setq entries (cons entry entries)))
     entries))
 
-(defun ndsary-file-content (file string content-start content-end &optional coding)
+(defun ndsary-file-content 
+  (file string content-start content-end &optional coding)
   (let ((coding (if (null coding) 'utf-8 coding)))
     (if (equal "�" string) string
       (with-temp-buffer

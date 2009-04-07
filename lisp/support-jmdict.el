@@ -230,26 +230,22 @@ searching time.")
     (lookup-make-region-heading (match-beginning 0) (match-end 0) 1))
   )
     
-
-(defun support-jmdict-heading-func (code dictionary)
-  (let ((entry-start (lookup-dictionary-option dictionary :entry-start)))
-    (cond ((string-match "<gloss>" entry-start)
-           (concat "[英語]" code))
-          ((string-match "<gloss xml:lang=\"rus\">" entry-start)
-           (concat "[ロシア語]" code))
-          ((string-match "<gloss xml:lang=\"fre\">" entry-start)
-           (concat "[フランス語]" code))
-          ((string-match "<gloss xml:lang=\"ger\">" entry-start)
-           (concat "[ドイツ語]" code)))))
+(defun support-jmdict-entry-function ()
+  (let ((heading "??") code)
+    (if (re-search-forward "<ent_seq>\\(.+\\)</ent_seq>")
+        (setq code (match-string 1)))
+    (if (re-search-forward "<keb>\\(.+\\)</keb>" nil t)
+        (setq heading (match-string 1))
+      (if (re-search-forward "<reb>\\(.+\\)</reb>" nil t)
+          (setq heading (match-string 1))))
+    (cons code heading)))
 
 (setq lookup-support-options
       (list :title "JMDict"
             :arranges '((reference support-jmdict-arrange-structure))
-            :entry-start-end-pairs 
-            support-jmdict-search-tags
-            :id-start "<ent_seq>" :id-end "</ent_seq>"
+            :entry-start-end-pairs support-jmdict-search-tags
             :content-start "<entry>" :content-end "</entry>"
-            :heading 'support-jmdict-heading-func
-            :max-hits 100 :regular t))
+            :entry-func 'support-jmdict-entry-function
+            :max-hits 100 :regular nil))
 
 ;;; support-jmdict.el ends here
