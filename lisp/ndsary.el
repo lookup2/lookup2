@@ -251,7 +251,8 @@ matches START-tag, and END-tag respectively."
 (defun ndsary-file-searches
   (file string method entry-pairs regular coding max-hits
    &optional entry-func content-start )
-  "Return entry list of FILE STRING of METHOD for ENTRY-PAIRS."
+  "Return entry list of FILE STRING of METHOD for ENTRY-PAIRS.
+For the rest of arguments, please refer `ndsary-file-search'."
   (sort
    (remove-duplicates
     (apply 'nconc
@@ -259,9 +260,7 @@ matches START-tag, and END-tag respectively."
                      (ndsary-file-search
                       file string method (car x) (cdr x)
                       regular coding max-hits
-                      'ndbtonic-entry-function
-                      ndbtonic-content-start
-                      ))
+                      entry-func content-start))
                    entry-pairs))
     :test (lambda (x y) (equal (car x) (car y))))
    (lambda (x y) (string< (cdr x) (cdr y)))))

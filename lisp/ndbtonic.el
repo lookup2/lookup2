@@ -194,7 +194,7 @@
     (cons code heading)))
 
 (defun ndbtonic-arrange-replace (entry)
-  (while (re-search-forward "\t+" nil t)
+  (while (re-search-forward "^[\t ]+" nil t)
     (replace-match "")))
 
 (defun ndbtonic-arrange-image (entry)
