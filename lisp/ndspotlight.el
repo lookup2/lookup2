@@ -34,13 +34,17 @@
 ;; 
 ;; (setq lookup-search-agents
 ;;       '(....
+;;         (ndspotlight)
 ;;         (ndspotlight "/usr/doc")
+;;         (ndspotlight "/usr/doc&kMDItemAuthors")
+;;         (ndspotlight "/usr/doc"
+;;                      :restrict "kMDItemContentType =='audio'wc")
 ;;        ))
-;; /usr/bin/mdimport -n -d2 /path/to/file.{pdf,xls,doc,ppt} >& file.txt
 
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-content)
 ;;(require 'normalize)
 
 ;;;
@@ -72,7 +76,7 @@
   :type 'string
   :group 'ndspotlight)
 
-(defcustom ndspotlight-content-program-options '("-d2")
+(defcustom ndspotlight-content-program-options '("-n -d2")
   "*Options for content-program."
   :type '(repeat :tag "Options" string)
   :group 'ndspotlight)
@@ -92,8 +96,8 @@
   :type 'string
   :group 'ndspotlight)
 
-(defcustom ndspotlight-max-chars 5000
-  "*Maximum bytes of display.  Unicode escape chars takes up to 5 bytes."
+(defcustom ndspotlight-max-chars (* 6 lookup-max-text)
+  "*Maximum bytes of display.  Unicode escape chars takes up to 6 bytes."
   :type 'integer
   :group 'ndspotlight)
 
@@ -113,7 +117,7 @@
 ;;;
 
 (put 'ndspotlight :methods 
-     '(exact prefix suffix substring wildcard keyword))
+     '(exact prefix suffix substring))
 (put 'ndspotlight :arranges '((structure ndspotlight-arrange-structure)))
 
 
@@ -129,13 +133,36 @@
 
 (put 'ndspotlight :search #'ndspotlight-search)
 (defun ndspotlight-search (dictionary query)
-  (let ((options (or (lookup-dictionary-option dictionary :restrict t)))
-        (string (lookup-query-string query))
-        count entry entries)
+  "Search spotlight DICTIONARY for QUERY."
+  (let* ((location
+          (lookup-agent-location
+           (lookup-dictionary-agent dictionary)))
+         (metadata (if (and location
+                            (string-match "\\(.*\\)&\\(.*\\)" location))
+                       (match-string 2 location)))
+         (location (if (and location
+                            (string-match "\\(.*\\)&\\(.*\\)" location))
+                       (match-string 1 location) location))
+         (location (if (equal location "") nil location))
+         (restrict (lookup-dictionary-option dictionary :restrict t))
+         (pattern  (concat (if restrict
+                               (concat restrict " && "))
+                           (if metadata
+                               (concat metadata " == "))
+                           "\""
+                           (lookup-query-pattern query)
+                           "\""
+                           ndspotlight-search-modifiers
+                           ))
+         (arguments (if location
+                        (list "-onlyin" location pattern)
+                      (list pattern)))
+         count entry entries)
+    (message "debug: arguments=%s" arguments)
     (with-temp-buffer
       (lookup-with-coding-system 'utf-8-mac
-        (apply 'call-process ndspotlight-search-program 
-               nil t nil "-count" (list string)))
+        (apply 'call-process ndspotlight-search-program
+               nil t nil "-count" arguments))
       (goto-char (point-min))
       (re-search-forward "[0-9]+" nil t)
       (setq count (string-to-number (match-string 0))))
@@ -143,14 +170,15 @@
         (progn
           (message "Too many hits! %d" count)
           nil)
-      (with-temp-buffer 
+      (with-temp-buffer
         (lookup-with-coding-system 'utf-8-mac
-          (apply 'call-process ndspotlight-search-program 
-                 nil t nil (list string)))
+          (apply 'call-process ndspotlight-search-program
+                 nil t nil (append ndspotlight-search-program-options
+                                   arguments)))
         (goto-char (point-min))
         (while (re-search-forward "^/.+/\\([^/\n]+\\)$" nil t)
-          (setq entry 
-                (lookup-new-entry 'regular 
+          (setq entry
+                (lookup-new-entry 'regular
                                   dictionary (match-string 0) (match-string 1)))
           (setq entries (cons entry entries)))
         (nreverse entries)))))
@@ -158,30 +186,62 @@
 (put 'ndspotlight :content #'ndspotlight-content)
 (defun ndspotlight-content (entry)
   (let* ((code (lookup-entry-code entry))
-         (options (list "-n" "-d2" code))
+         (options (append ndspotlight-content-program-options
+                          (list code)))
          point)
     (with-temp-buffer
-      (lookup-with-coding-system 'utf-8-mac
+      (lookup-with-coding-system 'utf-8
         (apply 'call-process ndspotlight-content-program 
                nil t nil options))
-      (goto-char (point-min))
-      (re-search-forward "kMDItemDisplayName\\|kMDItemTitle")
-      (forward-line) (zap-to-char 3 ?\") (delete-region (point-min) (point))
-      (forward-line) (setq point (point))
-      (if (search-forward "kMDItemTextContent = \"")
-          (delete-region point (point)))
-      (while (re-search-forward "+" nil t) 
-        (replace-match (if (= 1 (length (match-string 0))) "\n" "\n\n")))
       (goto-char ndspotlight-max-chars)
       (delete-region (point) (point-max))
-      (goto-char (point-min))
-      (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
-        (replace-match (char-to-string (string-to-int (match-string 1) 16))))
       (buffer-string))))
 
 (defun ndspotlight-arrange-structure (entry)
-  ;; nothing to do for now
-  )
+  (let (title point)
+  (setq tab-width 4)
+  (re-search-forward "\\(kMDItemDisplayName\\|kMDItemTitle\\)[^{]+{[^=]+= \"\\(.+\\)\";")
+  (setq title (match-string 2))
+  (delete-region (point-min) (point)) (insert title "\n")
+  (setq point (point))
+  (insert "《→ View》") (ndspotlight-set-link point (point) (lookup-entry-code entry))
+  (forward-line) (setq point (point))
+  (if (search-forward "kMDItemTextContent = \"")
+      (delete-region point (point)))
+  (while (re-search-forward "\\(\\|\\\\[nv]\\)+" nil t)
+    (replace-match (if (= 1 (length (match-string 0))) "\n" "\n\n")))
+  (goto-char (point-min))
+  (while (re-search-forward "\\\\t" nil t)
+    (replace-match "\t"))
+  (goto-char (point-min))
+  (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
+    (replace-match (char-to-string (string-to-int (match-string 1) 16))))))
+
+(defun ndspotlight-set-link (start end file)
+  (add-text-properties start end
+                       (list
+                        'keymap ndspotlight-link-map
+                        'face 'lookup-reference-face
+                        'mouse-face 'highlight
+                        'lookup-tab-stop t
+                        'ndspotlight-link file)))
+
+(defun ndspotlight-get-link (&optional pos)
+  (get-text-property (or pos (point)) 'ndspotlight-link))
+
+(defun ndspotlight-follow-link ()
+  (interactive)
+  (let ((file (ndspotlight-get-link (point))))
+    (apply 'call-process ndspotlight-view-program 
+           nil 0 nil
+           (append ndspotlight-view-program-options
+                   (list file)))))
+
+(defun ndspotlight-mouse-follow (e)
+  "Play the binary you click on."
+  (interactive "e")
+  (mouse-set-point event)
+  (ndspotlight-follow-link))
 
 (provide 'ndspotlight)
 
