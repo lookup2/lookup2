@@ -2,6 +2,7 @@
 ;; Copyright (C) 2007 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
+;; Modified by: Taichi KAWABATA <kawabata.taichi@gmail.com>
 
 ;; ndest.el is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -15,6 +16,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'url-http)
 
 (defconst ndest-version "0.1")
 
@@ -34,11 +36,6 @@
 (defcustom ndest-estcmd-program-name "estcmd"
   "Program name of estcmd."
   :type 'string
-  :group 'ndest)
-
-(defcustom ndest-access-to-node-directly nil
-  "When Non-nil, access to node server via `url-retrieve-synchronously' function."
-  :type 'boolean
   :group 'ndest)
 
 (defcustom ndest-process-coding-system-for-write 'utf-8
@@ -122,7 +119,7 @@ estcall使用時は無効。"
      '(ndest-arrange-heading))
 
 (put 'ndest ':arranges
-     '(ndest-arrange-content))
+     '((structure ndest-arrange-content)))
 
 (put 'ndest ':adjusts
      '(lookup-adjust-goto-min))
@@ -163,33 +160,30 @@ estcall使用時は無効。"
 ;;; Interface functions
 ;;;
 
-(put 'ndest 'setup 'ndest-setup)
-(defun ndest-setup (agent)
-  (let* ((location (lookup-agent-location agent))
-	 directory)
-    (if (string-match "^http://" location)
-	(progn
-	  (when ndest-access-to-node-directly
-	    (require 'url-http))
-	  (setq directory location))
-      (setq directory (expand-file-name location)))
-    (list (lookup-new-dictionary agent directory "est" "Hyper Estraier"))))
+(put 'ndest :list 'ndest-list)
+(defun ndest-list (agent)
+  (let* ((location (lookup-agent-location agent)))
+    (if (or (string-match "^http://" location)
+            (file-directory-p location))
+        (list (lookup-new-dictionary agent "")))))
 
-(put 'ndest 'clear 'ndest-clear)
-(defun ndest-clear (agent)
+(put 'ndest :kill 'ndest-kill)
+(defun ndest-kill (agent)
   (when (buffer-live-p ndest-mime-raw-buffer)
     (kill-buffer ndest-mime-raw-buffer))
   (when (buffer-live-p ndest-mime-view-buffer)
     (kill-buffer ndest-mime-view-buffer)))
 
-(put 'ndest 'search 'ndest-dictionary-search)
+(put 'ndest :title 'ndest-title)
+(defun ndest-title (dictionary)
+  "HyperEstraier Search")
+
+(put 'ndest :search 'ndest-dictionary-search)
 (defun ndest-dictionary-search (dictionary query)
   (with-temp-buffer
     (if (string-match "^http://" (lookup-agent-location
 				  (lookup-dictionary-agent dictionary)))
-	(if ndest-access-to-node-directly
-	    (ndest-dictionary-search-node dictionary query)
-	  (ndest-dictionary-search-with-estcall dictionary query))
+        (ndest-dictionary-search-node dictionary query)
       (ndest-dictionary-search-with-estcmd dictionary query))
     (goto-char (point-min))
     (when (re-search-forward "^--------\\[[0-9A-F]+\\]--------" nil t)
@@ -250,8 +244,10 @@ estcall使用時は無効。"
 		 (let ((half (number-to-string (/ max-text 2))))
 		   (list "-sn" (number-to-string max-text)
 			 half half)))))
-	   (list (lookup-dictionary-code dictionary)
+	   (list (expand-file-name (lookup-agent-location
+                  (lookup-dictionary-agent dictionary)))
 		 (lookup-query-string query))))
+    (message "debug: args=%s" args)
     (apply 'call-process ndest-estcmd-program-name nil t nil args)))
    
 (defun ndest-dictionary-search-with-estcall (dictionary query)
@@ -275,7 +271,8 @@ estcall使用時は無効。"
 			   ndest-default-auth)))
 	     (when (consp auth)
 	       (list "-auth" (car auth) (cdr auth))))
-	   (list (lookup-dictionary-code dictionary)
+	   (list (lookup-agent-location
+                  (lookup-dictionary-agent dictionary))
 		 (lookup-query-string query))))
     (apply 'call-process ndest-estcall-program-name nil t nil args)))
 
@@ -307,7 +304,8 @@ estcall使用時は無効。"
 		      (ndest-normalize-query-string
 		       (lookup-query-string query)))))
     (setq uri (url-generic-parse-url
-	       (concat (lookup-dictionary-code dictionary) arg)))
+	       (concat (lookup-agent-location
+                        (lookup-dictionary-agent dictionary)) arg)))
     ;; URLに含まれたユーザ名/パスワードは使わないようなので
     ;; 直接 url-http-real-basic-auth-storage に入れている。
     (let ((auth (or (lookup-dictionary-option dictionary ':auth t)
@@ -345,10 +343,9 @@ estcall使用時は無効。"
     (insert-string (decode-coding-string
 		    (with-current-buffer data (buffer-string)) 'utf-8))))
 
-(put 'ndest 'content 'ndest-dictionary-content)
-(defun ndest-dictionary-content (dictionary entry)
+(put 'ndest :content 'ndest-entry-content)
+(defun ndest-entry-content (entry)
   (lookup-entry-code entry))
-
 
 ;;;
 ;:: Internal functions
