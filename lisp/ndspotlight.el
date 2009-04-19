@@ -45,7 +45,7 @@
 
 (require 'lookup)
 (require 'lookup-content)
-;;(require 'normalize)
+(require 'ucs-normalize)
 
 ;;;
 ;;; Customizable variables
@@ -117,8 +117,11 @@
 ;;;
 
 (put 'ndspotlight :methods 
-     '(exact prefix suffix substring))
-(put 'ndspotlight :arranges '((structure ndspotlight-arrange-structure)))
+     '(exact prefix suffix substring text))
+(put 'ndspotlight :arranges 
+     '((structure ndspotlight-arrange-structure)))
+(put 'ndspotlight ':default-method
+     'text)
 
 
 ;;;
@@ -215,7 +218,9 @@
     (replace-match "\t"))
   (goto-char (point-min))
   (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
-    (replace-match (char-to-string (string-to-int (match-string 1) 16))))))
+    (replace-match (char-to-string (string-to-int (match-string 1) 16))))
+  (ucs-normalize-HFS-NFC-region (point-min) (point-max))
+  ))
 
 (defun ndspotlight-set-link (start end file)
   (add-text-properties start end
