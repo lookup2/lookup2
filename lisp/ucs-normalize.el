@@ -84,11 +84,12 @@
 ;; B. Identification of Normalization Block
 ;;
 ;;    (1) start of the block
-;;        If the searched character is in quick-check-list, then the
-;;        beginning of the block is the searched character.
-;;        If searched character is combining character, then previous
-;;        character will be the target character
-;;    (2) end of the block
+;;        If the searched character is a starter and not combining
+;;        with previous character, then the beginning of the block is
+;;        the searched character.  If searched character is combining
+;;        character, then previous character will be the target
+;;        character 
+;;    (2) end of the block 
 ;;        Block ends at non-composable starter character.
 ;;
 ;; C. Decomposition  (`ucs-normalize-block')
@@ -107,7 +108,7 @@
 
 ;;; Code:
 
-(defconst ucs-normalize-version "1.1beta")
+(defconst ucs-normalize-version "1.1beta2")
 
 (eval-when-compile (require 'cl))
 
@@ -197,12 +198,10 @@
 
   (setq combining-chars
         (append combining-chars 
-                '(?ᄀ ?ᄁ ?ᄂ ?ᄃ ?ᄄ ?ᄅ ?ᄆ ?ᄇ ?ᄈ ?ᄉ ?ᄊ ?ᄋ
-                ?ᄌ ?ᄍ ?ᄎ ?ᄏ ?ᄐ ?ᄑ ?ᄒ ?ᅡ ?ᅢ ?ᅣ ?ᅤ ?ᅥ ?ᅦ ?ᅧ ?ᅨ ?ᅩ ?ᅪ
-                ?ᅫ ?ᅬ ?ᅭ ?ᅮ ?ᅯ ?ᅰ ?ᅱ ?ᅲ ?ᅳ ?ᅴ ?ᅵ ?ᆨ ?ᆩ ?ᆪ ?ᆫ 
-                ?ᆬ ?ᆭ ?ᆮ ?ᆯ ?ᆰ ?ᆱ ?ᆲ ?ᆳ ?ᆴ
+                '(?ᅡ ?ᅢ ?ᅣ ?ᅤ ?ᅥ ?ᅦ ?ᅧ ?ᅨ ?ᅩ ?ᅪ
+                ?ᅫ ?ᅬ ?ᅭ ?ᅮ ?ᅯ ?ᅰ ?ᅱ ?ᅲ ?ᅳ ?ᅴ ?ᅵ 
+                ?ᆨ ?ᆩ ?ᆪ ?ᆫ ?ᆬ ?ᆭ ?ᆮ ?ᆯ ?ᆰ ?ᆱ ?ᆲ ?ᆳ ?ᆴ
                 ?ᆵ ?ᆶ ?ᆷ ?ᆸ ?ᆹ ?ᆺ ?ᆻ ?ᆼ ?ᆽ ?ᆾ ?ᆿ ?ᇀ ?ᇁ ?ᇂ)))
-
   )
 
 (defun ucs-normalize-make-hash-table-from-alist (alist)
@@ -372,7 +371,10 @@ decomposition.  "
          (do ((i (car start-end) (+ i 1))) ((> i (cdr start-end)))
            (setq decomposition
                  (string-to-list
-                  (translate-string (char-to-string i) decomposition-translation)))
+                  (with-temp-buffer 
+                    (insert i)
+                    (translate-region 1 2 decomposition-translation)
+                    (buffer-string))))
            (setq composition
                  (ucs-normalize-block-compose-chars decomposition composition-predicate))
            (when (not (equal composition (list i)))
@@ -405,7 +407,7 @@ decomposition.  "
     (concat (quick-check-list-to-regexp quick-check-list) "\\|[가-힣]"))
 
   (defun quick-check-composition-list-to-regexp (quick-check-list)
-    (concat (quick-check-list-to-regexp quick-check-list) "\\|[ᄀ-하-ᅵᆧ-ᇂ]"))
+    (concat (quick-check-list-to-regexp quick-check-list) "\\|[ᅡ-ᅵᆨ-ᇂ]"))
 )
 
 

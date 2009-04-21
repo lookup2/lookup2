@@ -55,6 +55,11 @@
   :type 'string
   :group 'ndeb)
 
+(defcustom ndeb-max-text nil
+  "*Maximum text size for ndeb agent."
+  :type 'integer
+  :group 'ndeb)
+
 (defcustom ndeb-gaiji-size 16
   "デフォルトで使用する外字のサイズ。指定したサイズの外字が存在しない場合は指定値を越えない最大サイズを、それも存在しない場合は16ドットの外字を使用する。"
   :type '(choice :tag "size"
@@ -118,7 +123,8 @@
 ;; arrangements
 
 (put 'ndeb :arrange-table
-     '((replace   lookup-arrange-replaces
+     '((replace   ndeb-arrange-auto-jump-reference
+                  lookup-arrange-replaces
                   ndeb-arrange-xbm
                   ndeb-arrange-bmp
                   ndeb-arrange-jpeg
@@ -132,8 +138,7 @@
                   )
        (gaiji     lookup-arrange-gaijis)
        ;(media    lookup-arrange-media)              ; default
-       (reference ndeb-arrange-auto-jump-reference
-                  ndeb-arrange-paged-reference
+       (reference ndeb-arrange-paged-reference
                   ndeb-arrange-squeezed-references
                   lookup-arrange-references)
        (structure 
@@ -470,8 +475,8 @@ Nil means it has not been checked yet.")
 (defun ndeb-entry-content (entry)
   (or (lookup-get-property entry 'ndeb-content)
       (ndeb-with-dictionary (lookup-entry-dictionary entry)
-        (if lookup-max-text 
-            (ndeb-process-require-set "max-text" lookup-max-text))
+        (if ndeb-max-text 
+            (ndeb-process-require-set "max-text" ndeb-max-text))
         ;; processing `stop-code' if necessary.
         (let ((stop (lookup-dictionary-option dictionary ':stop-code t))
               (last (lookup-get-property ndeb-current-agent 'ndeb-stop)))

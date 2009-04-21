@@ -180,7 +180,7 @@
 
 (defun ndic-index-file (original-file)
   "Get corresponding index file of ORIGINAL-FILE."
-  (concat (file-name-sans-extension ; remove .dz.index
+  (concat (file-name-sans-extension ; remove .dict.dz
            (file-name-sans-extension original-file)) ".index"))
 
 (defconst ndic-b64-table

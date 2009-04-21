@@ -161,7 +161,6 @@
                         (list "-onlyin" location pattern)
                       (list pattern)))
          count entry entries)
-    (message "debug: arguments=%s" arguments)
     (with-temp-buffer
       (lookup-with-coding-system 'utf-8-mac
         (apply 'call-process ndspotlight-search-program
@@ -181,8 +180,9 @@
         (goto-char (point-min))
         (while (re-search-forward "^/.+/\\([^/\n]+\\)$" nil t)
           (setq entry
-                (lookup-new-entry 'regular
-                                  dictionary (match-string 0) (match-string 1)))
+                (lookup-new-entry 
+                 'regular dictionary (match-string 0)
+                 (ucs-normalize-HFS-NFC-string (match-string 1))))
           (setq entries (cons entry entries)))
         (nreverse entries)))))
 
@@ -202,25 +202,27 @@
 
 (defun ndspotlight-arrange-structure (entry)
   (let (title point)
-  (setq tab-width 4)
-  (re-search-forward "\\(kMDItemDisplayName\\|kMDItemTitle\\)[^{]+{[^=]+= \"\\(.+\\)\";")
-  (setq title (match-string 2))
-  (delete-region (point-min) (point)) (insert title "\n")
-  (setq point (point))
-  (insert "《→ View》") (ndspotlight-set-link point (point) (lookup-entry-code entry))
-  (forward-line) (setq point (point))
-  (if (search-forward "kMDItemTextContent = \"")
-      (delete-region point (point)))
-  (while (re-search-forward "\\(\\|\\\\[nv]\\)+" nil t)
-    (replace-match (if (= 1 (length (match-string 0))) "\n" "\n\n")))
-  (goto-char (point-min))
-  (while (re-search-forward "\\\\t" nil t)
-    (replace-match "\t"))
-  (goto-char (point-min))
-  (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
-    (replace-match (char-to-string (string-to-int (match-string 1) 16))))
-  (ucs-normalize-HFS-NFC-region (point-min) (point-max))
-  ))
+    (setq tab-width 4)
+    (re-search-forward "\\(kMDItemDisplayName\\|kMDItemTitle\\)[^{]+{[^=]+= \"\\(.+\\)\";")
+    (setq title (match-string 2))
+    (delete-region (point-min) (point)) 
+    (insert title "\n")
+    (insert (lookup-entry-code entry) "\n")
+    (setq point (point))
+    (insert "《→ View》") (ndspotlight-set-link point (point) (lookup-entry-code entry))
+    (forward-line) (setq point (point))
+    (if (search-forward "kMDItemTextContent = \"" nil t)
+        (delete-region point (point)))
+    (while (re-search-forward "\\(\\|\\\\[nv]\\)+" nil t)
+      (replace-match (if (= 1 (length (match-string 0))) "\n" "\n\n")))
+    (goto-char (point-min))
+    (while (re-search-forward "\\\\t" nil t)
+      (replace-match "\t"))
+    (goto-char (point-min))
+    (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
+      (replace-match (char-to-string (string-to-int (match-string 1) 16))))
+    (ucs-normalize-HFS-NFC-region (point-min) (point-max))
+    ))
 
 (defun ndspotlight-set-link (start end file)
   (add-text-properties start end

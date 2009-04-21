@@ -621,6 +621,7 @@ link-item, heading, or code may be integer or function."
 		 (code (cond ((not code-item) heading)
 			     ((integerp code-item) (match-string code-item))
 			     (t code-item))))
+            (if (= 0 (length heading)) (setq heading "[No Title]"))
 	    (replace-match link t t)
 	    (if (stringp code)
 		(setq entry (lookup-new-entry 'regular dict code heading))

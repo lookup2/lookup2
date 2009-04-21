@@ -82,7 +82,7 @@
 `C'(reate) - create a module    `C-y'    - yank a removed dictionary
 
 `f'(ind)   - search pattern     `F'(ind) - search this dictionary
-`i'(nfo)   - dictionary info    `M'(enu) - show dictionary menu
+(`i'(nfo)   - dictionary info)  `M'(enu) - show dictionary menu
 
 `r' - return  `q' - leave  `g' - reset  `Q' - quit  `R' - restart
 
@@ -206,14 +206,16 @@ have found some entries, which means this dictionary cannot appear alone."
 ;  (lookup-display-menu (lookup-current-module)
 ;		       (lookup-select-this-dictionary)))
 
-(defun lookup-select-dictionary-menu ()
-  (interactive)
+(defun lookup-select-dictionary-menu (args)
+  "Display selected dictionary menu.
+With prefix ARGS, display menus of all dictionaries in current module ."
+  (interactive "P")
   (let* ((module (lookup-current-module))
-	 (dicts (lookup-module-dictionaries module))
+	 (dicts (if args (lookup-module-dictionaries module)
+                  (list (lookup-select-this-dictionary))))
 	 entries)
     (while dicts
       (if (memq 'menu (lookup-dictionary-methods (car dicts)))
-;	  (setq entries (cons (lookup-dictionary-menu (car dicts)) entries)))
 	  (setq entries (append (lookup-dictionary-menu (car dicts)) entries)))
       (setq dicts (cdr dicts)))
     (if entries

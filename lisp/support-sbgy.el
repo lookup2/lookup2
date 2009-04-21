@@ -25,7 +25,7 @@
 ;;
 ;; Following Program will make index point file, which then can be
 ;; sorted by 'mksary -s' command.  
-;;
+
 ;; #!/usr/bin/env ruby -Ku
 ;; # Usage: ruby sbgy.rb sbgy.xml
 ;; #        mksary -s sbgy.xml
@@ -34,15 +34,31 @@
 ;; file = $stdin
 ;; $offset=0
 ;; file.each_line{|line|
-;;   #if line =~ /^(.+word_head id=")/ 
-;;   #  print [$offset+$1.length].pack("N")
-;;   #end
-;;   if line =~ /^(.+word_head id="[^"]+")>.+<note/ 
-;;     print [$offset+$1.length].pack("N")
-;;   end
-;;   if line =~ /^(.+<original_word)(>.+<rewrite_word)>/ 
+;;   if line =~ /^(.+)(ipa=")([^"]+)"/
 ;;     print [$offset+$1.length].pack("N")
 ;;     print [$offset+$1.length+$2.length].pack("N")
+;;     offs=$offset+$1.length+$2.length
+;;     chars=$3.split(//)
+;;     chars.each {|char| 
+;;       print [offs].pack("N")
+;;       offs = offs+char.length
+;;     }
+;;   end
+;;   if line =~ /^(.+)(onyomi=")([^"]+)"/
+;;     print [$offset+$1.length].pack("N")
+;;     print [$offset+$1.length+$2.length].pack("N")
+;;     offs=$offset+$1.length+$2.length
+;;     chars=$3.split(//)
+;;     chars.each {|char| 
+;;       print [offs].pack("N")
+;;       offs = offs+char.length
+;;     }
+;;   end
+;;   if line =~ /^(.+d id="[^"]+")>.+</
+;;     print [$offset+$1.length].pack("N")
+;;   end
+;;   if line =~ /^(.+<original_word)>.+<rewrite_word>/ 
+;;     print [$offset+$1.length].pack("N")
 ;;   end
 ;;   $offset+=line.length
 ;; }
@@ -104,19 +120,30 @@
   (let ((string (lookup-query-string query)))
     (cond ((lookup-text-single-cjk-p string)
            '((">" . "<note>")
+             (">" . "<added_note>")
              (">" . "<headnote>")
              (">" . "<rewrite_word>")
              (">" . "</rewrite_word>")))
           ((string-match support-sbgy-pronunciation-regexp string)
            '(("ipa=\"" . "\"")))
-          ((string-match "[ア-ン]" string)
+          ((string-match "^[ア-ン]+$" string)
            '(("onyomi=\"" . "\"")))
           (t nil))))
+
+(defun support-sbgy-entry-func ()
+  (let (code heading)
+    (message "debug: %s" (buffer-substring (point-min) (point-max)))
+    (if (re-search-forward "ipa=\"\\(.*?\\)\"")
+        (setq code (match-string 1))
+      (if (re-search-forward ">\\(.\\)<")
+          (setq heading (match-string 1))))
+    (cons code heading)))
 
 (setq lookup-support-options
       (list :title "宋本廣韻"
             :entry-start-end-pairs 'support-sbgy-entry-pairs
             :charsets 'lookup-text-single-cjk-p
+            :entry-func 'support-sbgy-entry-func
             :content-start "<voice_part" :content-end "</voice_part>"
             :arranges '((replace support-sbgy-arrange-structure))))
 

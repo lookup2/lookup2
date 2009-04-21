@@ -115,7 +115,7 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'integer
   :group 'lookup-general-options)
 
-(defcustom lookup-max-text 100000
+(defcustom lookup-max-text 10000
   "*Maximum length of entry texts.
 0 means unlimited."
   :type 'integer
@@ -167,7 +167,7 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'number
   :group 'lookup-view-options)
 
-(defcustom lookup-title-width 24
+(defcustom lookup-title-width 26
   "*Dictionary title width."
   :type 'integer
   :group 'lookup-view-options)
