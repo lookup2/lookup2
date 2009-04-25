@@ -59,6 +59,8 @@
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
         ;; ndsrd
         ("ndsrd:" . "support-srd")
+        ;; ndjitsuu
+        ("ndjitsuu:" . "support-jitsuu")
         ;; misc.
 	("/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")

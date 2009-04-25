@@ -3,19 +3,19 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
 	lookup-select.el lookup-modules.el lookup-history.el		\
 	lookup-text.el stem-english.el ucs-normalize.el			\
 	ndbtonic.el ndcookie.el ndeb.el ndeb-binary.el ndest.el	ndic.el	\
-	ndict.el ndlatin.el  ndmecab.el ndmisc.el ndpdic.el ndsary.el	\
-	ndsimple.el ndspell.el ndspotlight.el ndsrd.el ndtut.el		\
-	nducs.el							\
+	ndict.el ndjitsuu.el ndlatin.el ndmecab.el ndmisc.el ndpdic.el	\
+	ndsary.el ndsimple.el ndspell.el ndspotlight.el ndsrd.el	\
+	ndtut.el nducs.el						\
 	support-loaddef.el support-cebd.el support-chiezo.el		\
 	support-chinakan.el support-chujiten.el support-colloc.el	\
 	support-comp.el support-crown.el support-daijirin.el		\
 	support-foldoc.el support-genius.el support-iwakoku.el		\
-	support-jargon.el support-jmdict.el support-kojien.el		\
-	support-mwsedic.el support-mypaedia.el support-nhd.el		\
-	support-onmusic.el support-oxford.el support-pdh.el		\
-	support-plus.el support-plusv2.el support-rfc1983.el		\
-	support-rfc4949.el support-rika.el support-sbgy.el		\
-	support-sdic.el support-skp.el support-srd.el			\
+	support-jargon.el support-jmdict.el support-jitsuu.el		\
+	support-kojien.el support-mwsedic.el support-mypaedia.el	\
+	support-nhd.el support-onmusic.el support-oxford.el		\
+	support-pdh.el support-plus.el support-plusv2.el		\
+	support-rfc1983.el support-rfc4949.el support-rika.el		\
+	support-sbgy.el support-sdic.el support-skp.el support-srd.el	\
 	support-swjz.el support-unihan.el support-vera.el		\
 	support-wikipedia.el support-zhongri.el support-zigen.el
 ELCFILES = $(SOURCES:.el=.elc)
