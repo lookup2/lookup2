@@ -668,18 +668,30 @@ link-item, heading, or code may be integer or function."
 (defun lookup-arrange-nofill (entry))
 
 (defun lookup-arrange-fill-lines (entry)
+  "Fill lines except `read-only' property region."
   (text-mode)
   (let ((fill-column (if (integerp lookup-fill-column)
 			 lookup-fill-column
 		       (round (* (window-width) lookup-fill-column))))
-	start)
+	start end read-only-start)
     (while (not (eobp))
-      (setq start (point))
-      (end-of-line)
-      (if (> (current-column) fill-column)
-          (save-excursion
-            (fill-region start (point))))
-      (forward-line))))
+      (setq start (point)
+            end   (point-at-eol)
+            read-only-start (text-property-any start end 'read-only t))
+      (if read-only-start
+          (progn
+            (goto-char read-only-start)
+            (if (> (current-column) fill-column)
+                (save-excursion
+                  (fill-region start (point))))
+            (goto-char (text-property-not-all read-only-start (point-max) 'read-only t))
+            (if (and (> (current-column) fill-column)
+                     (not (eolp))) (insert "\n")))
+        (goto-char end)
+        (if (> (current-column) fill-column)
+            (save-excursion
+              (fill-region start (point))))
+        (forward-line)))))
 
 (defun lookup-arrange-fill-paragraphs (entry)
   (text-mode)
