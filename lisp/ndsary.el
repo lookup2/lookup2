@@ -318,10 +318,9 @@ value (code heading)."
 (defun ndsary-file-match-count (file pattern)
   "Return the number of match in FILE for PATTERN."
   (with-temp-buffer
-    (lookup-with-coding-system coding
-      (call-process
-       ndsary-sary-program nil t nil "-c" "-i"
-       pattern file))
+    (call-process
+     ndsary-sary-program nil t nil "-c" "-i"
+     pattern file)
     (goto-char (point-min))
     (if (looking-at "\\([0-9]+\\)")
         (setq count (+ count (string-to-number (match-string 1))))

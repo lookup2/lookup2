@@ -157,7 +157,7 @@
                                    (lookup-agent-option agent :fonts)))
     (when (and (file-exists-p ndjitsuu-dat-file)
                (file-exists-p ndjitsuu-font-directory))
-      (list (lookup-new-dictionary agent location)))))
+      (list (lookup-new-dictionary agent "")))))
 
 (put 'ndjitsuu :title 'ndjitsuu-title)
 (defun ndjitsuu-title (dictionary)
