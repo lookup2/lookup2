@@ -1004,7 +1004,7 @@ If there is no session, default module will be returned."
   (add-hook 'kill-emacs-hook 'lookup-exit))
 
 (defun lookup-init-support-autoload ()
-  (load "support-loaddef")
+  (load "support-defs")
   (dolist (pair lookup-support-autoload-alist)
     (dolist (dict lookup-dictionary-list)
       (when (string-match (car pair) (lookup-dictionary-id dict))
