@@ -22,8 +22,12 @@
 ;;
 ;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
-;; Following Program will make index point file, which then can be
-;; sorted by 'mksary -s' command.  
+;; Download 214 xml files (from 001.xml to 214.xml) in that directory,
+;; then concatenate all of them to make one single `all.xml'
+;; file.
+;;
+;; Following Program will make index point file, which then can
+;; be sorted by 'mksary -s' command.
 ;;
 ;; #!/usr/bin/env ruby -Ku
 ;; # Usage: ruby zigen.rb all.xml
