@@ -92,13 +92,15 @@
 
 
 ;;;
-;;; 
+;;; Customizable Variables
+;;;
 
 ;;(defgroup ndsary nil
 ;;  "Lookup ndsary interface."
 ;;  :group 'lookup-agents)
 
 (defvar ndsary-sary-program "sary")
+(defvar ndsary-sary-program-options '("-i"))
 
 ;;;
 ;;; Internal variables
@@ -296,12 +298,14 @@ value (code heading)."
              (with-temp-buffer
                (lookup-with-coding-system coding
                  (if (and entry-func content-start entry-end)
-                     (call-process
-                      ndsary-sary-program nil t nil "-i"
-                      "-s" content-start "-e" entry-end 
-                      pattern file)
-                   (call-process
-                    ndsary-sary-program nil t nil "-i" pattern file)))
+                     (let ((args (append ndsary-sary-program-options
+                                         (list "-s" content-start
+                                               "-e" entry-end pattern file))))
+                       (apply 'call-process ndsary-program nil t nil args))
+                   (let ((args (append ndsary-sary-program-options
+                                       (list pattern file))))
+                     (apply 'call-process
+                            ndsary-sary-program nil t nil args))))
                ;; extract entries
                (setq result
                      (ndsary-extract-entries
@@ -318,9 +322,10 @@ value (code heading)."
 (defun ndsary-file-match-count (file pattern)
   "Return the number of match in FILE for PATTERN."
   (with-temp-buffer
-    (call-process
-     ndsary-sary-program nil t nil "-c" "-i"
-     pattern file)
+    (let ((args (append ndsary-sary-program-options
+                        (list "-c" pattern file))))
+      (apply 'call-process
+             ndsary-sary-program nil t nil args))
     (goto-char (point-min))
     (if (looking-at "\\([0-9]+\\)")
         (setq count (+ count (string-to-number (match-string 1))))
@@ -390,23 +395,25 @@ from the region CONTENT-START and ENTRY-END."
 
 (defun ndsary-file-content 
   (file string content-start content-end &optional coding)
-  (let ((coding (if (null coding) 'utf-8 coding)))
-    (if (equal "�" string) string
+  (if (equal "�" string) string
+    (let ((coding (if (null coding) 'utf-8 coding))
+          (args (append 
+                 ndsary-sary-program-options
+                 (if (stringp content-start) 
+                     (list "-s" content-start)
+                   (if (integerp content-start)
+                       (list "-A" (number-to-string content-start))
+                     (list "-A" "0")))
+                 (if (stringp content-end) 
+                     (list "-e" content-end)
+                   (if (integerp content-end)
+                       (list "-B" (number-to-string content-end))
+                     (list "-B" "0")))
+                 (list string file))))
       (with-temp-buffer
         (lookup-with-coding-system coding
-          (apply 'call-process
-                 `(,ndsary-sary-program nil t nil "-i"
-                   ,@(if (stringp content-start) (list "-s" content-start)
-                       (if (integerp content-start)
-                           (list "-A" (number-to-string content-start))
-                         (list "-A" "0")))
-                   ,@(if (stringp content-end) (list "-e" content-end)
-                       (if (integerp content-end)
-                           (list "-B" (number-to-string content-end))
-                         (list "-B" "0")))
-                   ,string ,file)))
+          (apply 'call-process ndsary-sary-program nil t nil args))
         (buffer-string)))))
-
 
 (provide 'ndsary)
 
