@@ -45,10 +45,12 @@
 (defvar ndjitsuu-tmp-directory (expand-file-name (concat temporary-file-directory "/ndjitsuu"))
   "Temporafy Directory for NDJitsuu file.")
 
-(defvar ndjitsuu-font-program "convert") ;; ImageMagick
+(defvar ndjitsuu-convert-program "convert") ;; ImageMagick
 
-(defvar ndjitsuu-font-program-options 
+(defvar ndjitsuu-convert-program-options 
   '("-background"  "black"  "-fill" "white" "-transparent" "black"))
+
+(defvar ndjitsuu-font-size-offset 4)
 
 ;;;
 ;;; Internal variables
@@ -180,14 +182,26 @@
          (prev
           (if (/= index 1)
               (lookup-new-entry 'regular dictionary
-                                (number-to-string (1- index)))))
+                                (number-to-string (1- index))
+                                (ndjitsuu-oyaji (1- index)))))
          (next
           (if (/= index ndjitsuu-oyaji-number)
               (lookup-new-entry 'regular dictionary
-                                (number-to-string (1+ index))))))
-    (if prev (lookup-put-property entry :preceding prev))
-    (if next (lookup-put-property entry :following next))
-    (ndjitsuu-inf-entry index)))
+                                (number-to-string (1+ index))
+                                (ndjitsuu-oyaji (1+ index))))))
+    (concat
+     (ndjitsuu-inf-entry index)
+     (when prev
+       (lookup-put-property entry :preceding prev)
+       (let ((text (concat "\n前項目：" (lookup-entry-heading prev))))
+         (lookup-set-link 5 (length text) prev text)
+         text))
+     (when next
+       (if next (lookup-put-property entry :following next))
+       (let ((text (concat "\n次項目：" (lookup-entry-heading next))))
+         (lookup-set-link 5 (length text) next text)
+         text))
+    )))
 
 (put 'ndjitsuu :arranges
      '((replace ndjitsuu-arrange-replace)))
@@ -205,10 +219,10 @@
   '(1
     ;; CCL main code
     ((loop
-      (r0 = 0)
-      (r1 = 0)
-      (r2 = 0)
-      (r3 = 0)
+      (r0 = #xff)
+      (r1 = #xff)
+      (r2 = #xff)
+      (r3 = #xff)
       (read r0)
       (read r1)
       (read r2)
@@ -226,27 +240,30 @@
       (r1 = (r4 & #xff))
       (r2 = ((r5 >> 8) & #xff))
       (r3 = (r5 & #xff))
+      ;; check
       (if (r0 != 0)
-        ((write r0)
-         (if (r1 != 0)
-           ((write r1)
-            (if (r2 != 0)
-              ((write r2)
-               (if (r3 != 0)
-                 ((write r3)
-                  (repeat)))))))))))
-    ((if (r0 != 0)
-       (if (r0 != #xff)
-         ((r0 ^= #xff)
-          (write r0)
-          (if (r1 != 0)
-            (if (r1 != #xff)
-              ((r1 ^= #xff)
-               (write r1)
-               (if (r2 != 0)
-                 (if (r2 != #xff)
-                   ((r2 ^= #xff)
-                    (write r2)))))))))))))
+          ((write r0)
+           (if (r1 != 0)
+               ((write r1)
+                (if (r2 != 0)
+                    ((write r2)
+                     (if (r3 != 0)
+                         ((write r3)
+                          (repeat)))))))))))
+    ((r6 = (r0 != 0))
+     (r6 &= (r1 != 0))
+     (r6 &= (r2 != 0))
+     (r6 &= (r3 != 0))
+     (if (r6 != 0)
+         (if (r0 != #xff)
+             ((r0 ^= #xff)
+              (write r0)
+              (if (r1 != #xff)
+                  ((r1 ^= #xff)
+                   (write r1)
+                   (if (r2 != #xff)
+                       ((r2 ^= #xff)
+                        (write r2)))))))))))
 
 (defsubst ndjitsuu-file-contents-literally (file from length)
   (with-temp-buffer
@@ -267,7 +284,7 @@
 
 (defun ndjitsuu-str-to-int (str &optional pos)
   (if (null pos) (setq pos 0))
-  (+ ;; (* (elt str (+ pos 3)) 16777216)
+  (+ (* (elt str (+ pos 3)) 16777216)
      (* (elt str (+ pos 2)) 65536)
      (* (elt str (+ pos 1)) 256)
      (elt str pos)))
@@ -279,7 +296,8 @@
 (defun ndjitsuu-forward-char (num &optional after-tag)
   (while (< 0 num)
     (while (looking-at "<.+?>") (goto-char (match-end 0)))
-    (if (< (char-after (point)) 128) (setq num (1- num)) (setq num (- num 2)))
+    (let ((char (char-after (point))))
+      (if (and char (< char 128)) (setq num (1- num)) (setq num (- num 2))))
     (forward-char))
   (if after-tag (while (looking-at "<.+?>") (goto-char (match-end 0)))))
 
@@ -357,6 +375,7 @@
 
       (goto-char (point-min))
       (setq char-pos 0 current 0)
+      (message "debug: buffer=%s" (buffer-string))
       (while (< char-pos fontspec-length)
         (setq start  (ndjitsuu-str-to-int fontspecs char-pos))
         (setq length (ndjitsuu-str-to-int fontspecs (+ char-pos 4)))
@@ -385,7 +404,8 @@
 ;; Font Image
 
 (defun ndjitsuu-font-image (font-code size code)
-  "Create font image for FONT-CODE, SIZE and CODE."
+  "Create font image for FONT-CODE, SIZE and CODE.
+Returns image file path."
   (let* ((font-file
           (expand-file-name
            (concat ndjitsuu-font-directory "/JITSUU" font-code ".TTF")))
@@ -393,15 +413,17 @@
           (expand-file-name
            (concat ndjitsuu-tmp-directory "/"
                               (format "%02d-%s-%04X" size font-code code) ".png")))
-         (args (append ndjitsuu-font-program-options
-                       (list "-size" (format "%02dx%02d" (+ 2 size) (+ 2 size))
+         (args (append ndjitsuu-convert-program-options
+                       (list "-size" (format "%02dx%02d" 
+                                             (+ ndjitsuu-font-size-offset size)
+                                             (+ ndjitsuu-font-size-offset size))
                              "-font" font-file
                              (format "label:%c" code)
                              image-file))))
-    (message "debug: args=%s" args)
+    ;;(message "debug: args=%s" args)
     (if (null (file-exists-p image-file))
         (lookup-with-coding-system 'utf-8
-          (apply 'call-process ndjitsuu-font-program nil nil nil args)))
+          (apply 'call-process ndjitsuu-convert-program nil nil nil args)))
     image-file))
 
 ;; Arrange Contents

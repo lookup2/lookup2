@@ -725,11 +725,11 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
                                'intangible glyph
                                'rear-nonsticky (list 'display)))))
 
-(defun lookup-glyph-insert (glyph &optional start end)
+(defun lookup-glyph-insert (glyph &optional start end foreground background)
   (if (and start end)
       (progn
-        (setq glyph (append glyph (list :foreground "Black"
-                                        :background "White")))
+        (if foreground (setq glyph (nconc glyph (list :foreground foreground))))
+        (if background (setq glyph (nconc glyph (list :background background))))
         (add-text-properties
          start end (list 'display glyph
                          'intangible glyph
