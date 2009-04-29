@@ -712,9 +712,10 @@ link-item, heading, or code may be integer or function."
   (add-text-properties start end (list 'face (lookup-heading-face level)
 				       'lookup-heading level)))
 
-(defun lookup-set-link (start end reference)
+(defun lookup-set-link (start end reference &optional object)
   (add-text-properties start end (list 'mouse-face 'highlight
-				       'lookup-reference reference)))
+				       'lookup-reference reference)
+                       object))
 
 (defun lookup-get-link (position)
   (get-text-property position 'lookup-reference))
