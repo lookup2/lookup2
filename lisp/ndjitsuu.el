@@ -197,7 +197,7 @@
          (lookup-set-link 5 (length text) prev text)
          text))
      (when next
-       (if next (lookup-put-property entry :following next))
+       (lookup-put-property entry :following next)
        (let ((text (concat "\n次項目：" (lookup-entry-heading next))))
          (lookup-set-link 5 (length text) next text)
          text))
@@ -296,8 +296,7 @@
 (defun ndjitsuu-forward-char (num &optional after-tag)
   (while (< 0 num)
     (while (looking-at "<.+?>") (goto-char (match-end 0)))
-    (let ((char (char-after (point))))
-      (if (and char (< char 128)) (setq num (1- num)) (setq num (- num 2))))
+    (if (< (char-after (point)) 128) (setq num (1- num)) (setq num (- num 2)))
     (forward-char))
   (if after-tag (while (looking-at "<.+?>") (goto-char (match-end 0)))))
 
@@ -375,7 +374,6 @@
 
       (goto-char (point-min))
       (setq char-pos 0 current 0)
-      (message "debug: buffer=%s" (buffer-string))
       (while (< char-pos fontspec-length)
         (setq start  (ndjitsuu-str-to-int fontspecs char-pos))
         (setq length (ndjitsuu-str-to-int fontspecs (+ char-pos 4)))

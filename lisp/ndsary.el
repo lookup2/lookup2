@@ -282,7 +282,7 @@ value (code heading)."
          (count 0) result)
     (if (null pattern) nil
       (if (/= 0 max-hits)
-          (setq count (ndsary-file-match-count file pattern)))
+          (setq count (ndsary-file-match-count file pattern coding)))
       (cond ((and (/= 0 max-hits) (< max-hits count))
              (list
               (cons "�"
@@ -301,9 +301,11 @@ value (code heading)."
                      (let ((args (append ndsary-sary-program-options
                                          (list "-s" content-start
                                                "-e" entry-end pattern file))))
+                       (message "debug: 1 coding=%s args=%s" coding args)
                        (apply 'call-process ndsary-sary-program nil t nil args))
                    (let ((args (append ndsary-sary-program-options
                                        (list pattern file))))
+                     (message "debug: 2 coding=%s args=%s" coding args)
                      (apply 'call-process
                             ndsary-sary-program nil t nil args))))
                ;; extract entries
@@ -319,17 +321,18 @@ value (code heading)."
                         :test (lambda (x y) (equal (car x) (car y))))))
                result))))))
 
-(defun ndsary-file-match-count (file pattern)
-  "Return the number of match in FILE for PATTERN."
+(defun ndsary-file-match-count (file pattern coding)
+  "Return the number of match in FILE for PATTERN with CODING."
   (with-temp-buffer
-    (let ((args (append ndsary-sary-program-options
-                        (list "-c" pattern file))))
-      (apply 'call-process
-             ndsary-sary-program nil t nil args))
-    (goto-char (point-min))
-    (if (looking-at "\\([0-9]+\\)")
-        (setq count (+ count (string-to-number (match-string 1))))
-      0)))
+    (lookup-with-coding-system coding
+      (let ((args (append ndsary-sary-program-options
+                          (list "-c" pattern file))))
+        (apply 'call-process
+               ndsary-sary-program nil t nil args))
+      (goto-char (point-min))
+      (if (looking-at "\\([0-9]+\\)")
+          (setq count (+ count (string-to-number (match-string 1))))
+        0))))
 
 (defun ndsary-extract-entries
   (string method entry-start entry-end regular
