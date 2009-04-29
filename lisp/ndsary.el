@@ -301,7 +301,7 @@ value (code heading)."
                      (let ((args (append ndsary-sary-program-options
                                          (list "-s" content-start
                                                "-e" entry-end pattern file))))
-                       (apply 'call-process ndsary-program nil t nil args))
+                       (apply 'call-process ndsary-sary-program nil t nil args))
                    (let ((args (append ndsary-sary-program-options
                                        (list pattern file))))
                      (apply 'call-process
