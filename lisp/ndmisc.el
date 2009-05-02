@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.7 2009/04/02 16:03:55 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.9 2009/05/12 00:59:47 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -59,6 +59,8 @@ CHARSET, URL and ENCODING may be a function.")
 ;;;
 ;;; Interface Functions
 ;;;
+
+(put 'ndcookie :priority 'supplement)
 
 (put 'ndmisc :methods 'ndmisc-methods)
 (defun ndmisc-methods (dictionary)
