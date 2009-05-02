@@ -1,5 +1,6 @@
 ;;; ndest.el --- search agent for Hyper Estraier
 ;; Copyright (C) 2007 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 ;; Modified by: Taichi KAWABATA <kawabata.taichi@gmail.com>
@@ -115,8 +116,8 @@ estcall使用時は無効。"
 
 (put 'ndest ':methods '(text keyword))
 
-(put 'ndest ':headings
-     '(ndest-arrange-heading))
+;;(put 'ndest ':headings
+;;     '(ndest-arrange-heading))
 
 (put 'ndest ':arranges
      '((structure ndest-arrange-content)))
@@ -154,7 +155,6 @@ estcall使用時は無効。"
     ("^junet"             . "ISO-2022-JP")
     )
   )
-
 
 ;;;
 ;;; Interface functions
@@ -198,12 +198,12 @@ estcall使用時は無効。"
 	      (let ((uri (ndest-get-header-string "@uri")))
 		(setq title (or (ndest-get-header-string "@title")
 				(and (ndest-uri-is-file uri)
-				     (ndest-get-header-string "_lreal"))
+				     (ndest-get-header-string "_lfile")) ;; _lpath
 				uri)))
 	      (setq type (or (ndest-get-header-string "@type") "unknown"))
 	      (setq entries 
 		    (cons (lookup-new-entry 'regular dictionary (buffer-string)
-					     (concat type ":" title))
+					     (concat title " (" type ")"))
 			  entries))
 	      (widen)
 	      (goto-char end-end)
@@ -610,10 +610,10 @@ estcall使用時は無効。"
 ;;; Arrange functions
 ;;;
 
-(defun ndest-arrange-heading (entry)
-  (when (and (lookup-dictionary-option dictionary ':hide-type t)
-	     (re-search-forward "^[^:/]+/[^:]+:" nil t))
-    (replace-match "" t t)))
+;;(defun ndest-arrange-heading (entry)
+;;  (when (and (lookup-dictionary-option dictionary ':hide-type t)
+;;	     (re-search-forward "^[^:/]+/[^:]+:" nil t))
+;;    (replace-match "" t t)))
 
 (defun ndest-arrange-content (entry)
   (let* ((links (ndest-get-link (point)))
@@ -684,8 +684,8 @@ estcall使用時は無効。"
 
 (defun ndest-arrange-default (entry)
   (ndest-arrange-plain entry)
-  (goto-char (point-min))
-  (lookup-arrange-fill-lines entry))
+  (goto-char (point-min)))
+;;  (lookup-arrange-fill-lines entry))
 
 (defun ndest-arrange-plain (entry)
   (let ((uri (ndest-get-header-string "@uri"))
@@ -697,9 +697,12 @@ estcall使用時は無効。"
     (goto-char (point-min))
     (let (start end)
       (setq start (point))
-      (insert-string uri)
+      (if file (insert-string file)
+        (insert-string uri))
       (setq end (point))
-      (ndest-set-link start end nil type uri file)))
+      (ndest-set-link start end nil type uri file)
+      (add-text-properties start end '(read-only t)) ;; added
+      ))
   (goto-char (point-min))
   (while (re-search-forward "\n\\([^\t\n]+\\)\t[^\n]+\n?" nil t)
     (let ((point (match-beginning 0))
