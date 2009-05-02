@@ -5910,6 +5910,8 @@
 
       ;;("zdd21" "〓")
       ;;("zdd22" "〓")
+      ;;
+      ("zdd4f" "𝄉")
       )))
   (defconst kojien-gaiji-table
     (lookup-new-gaiji-table

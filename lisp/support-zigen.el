@@ -1,4 +1,4 @@
-;;; support-zigen.el --- suport file for "字源"
+;;; support-zigen.el --- support file for "字源"
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
@@ -18,13 +18,13 @@
 ;;; Documentation:
 
 ;; This agent will search the "字源" XML dictionary file for the
-;; character.  File can be downloaded from the following site:
+;; character.  Files can be downloaded from the following site:
 ;;
 ;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
 ;; Download 214 xml files (from 001.xml to 214.xml) in that directory,
 ;; then concatenate all of them to make one single `all.xml'
-;; file.
+;; file in the directory named ".../zigen/".
 ;;
 ;; Following Program will make index point file, which then can
 ;; be sorted by 'mksary -s' command.
@@ -50,6 +50,16 @@
 ;;       offs = offs+char.length
 ;;     }
 ;;   end
+;;   if line =~ /^(.*)(<音>)(.+)<\/音>/
+;;     offs = $offset+$1.length
+;;     print [offs].pack("N")
+;;     offs = offs+$2.length
+;;     chars=$3.split(//)
+;;     chars.each {|char| 
+;;       print [offs].pack("N")
+;;       offs = offs+char.length
+;;     }
+;;   end
 ;;   $offset+=line.length
 ;; }
 
@@ -59,7 +69,7 @@
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsary "~/edicts/zigen/all.xml")
+;;           (ndsary "~/edicts/zigen/")
 ;;           ....)
 
 ;;; Code:
@@ -109,7 +119,8 @@
 (setq lookup-support-options
       (list :title "字源"
             :entry-start-end-pairs '(("<見出字>" . "</見出字>")
-                                     ("<見出語>" . "</見出語>"))
+                                     ("<見出語>" . "</見出語>")
+                                     ("<音>" . "</音>"))
             :content-start "<漢字>" :content-end "</漢字>"
             :arranges '((replace support-zigen-arrange-structure))))
 
