@@ -31,6 +31,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-utils)
 (require 'lookup-text)
 
 ;;;
@@ -47,8 +48,12 @@
   :group 'ndmecab)
 
 (defcustom ndmecab-content-format
-  '(t "\n" ("-O" "yomi") "\n" readings "\n" 
-   "【解析】" ("--node-format=[%m|%F-[0,1]]" "--eos-format=\n") "\n")
+  `(t "\n" 
+    ;; (,lookup-mecab-program "-O" "yomi") "\n" 
+    readings "\n" 
+    "【解析】" 
+    (,lookup-mecab-program "--node-format=[%m|%F-[0,1]]" "--eos-format=\n") 
+    "\n")
   "*ndmecab 辞書が出力するエントリ内容のフォーマット。
 最初にエントリの文字列と「読み」が表示された後の書式を指定できる。
 `文字列' - それがそのまま挿入される。
@@ -94,7 +99,7 @@
                         (mapconcat 
                          'identity (lookup-text-get-readings string) ","))
 		       ((stringp element) element)
-		       ((listp element) (lookup-mecab-process-require element string))
+		       ((listp element) (lookup-get-process-require element string lookup-mecab-coding-system))
 		       (t (error "Invalid format element: %S" element))))
 	       ndmecab-content-format "")))
 
