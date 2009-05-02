@@ -441,7 +441,7 @@ Returns image file path."
                                      (string-to-char string)))))
            text-props
            (start    (match-beginning 0)) end)
-      (replace-match (or gaiji string))
+      (replace-match (or gaiji string) t)
       (setq end (point))
       (if (and (null gaiji)
                font-code
@@ -467,7 +467,7 @@ Returns image file path."
                            match)
       (replace-match match)))
   (goto-char (point-min))
-  (while (re-search-forward "</a>" nil t) (replace-match ""))
+  (while (re-search-forward "</A>" nil t) (replace-match ""))
   )
 
 (provide 'ndjitsuu)
