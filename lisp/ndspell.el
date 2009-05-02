@@ -1,7 +1,10 @@
 ;;; ndspell.el --- Lookup spell checker
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
+
 ;; Keywords: dictionary
 
 ;; This file is part of Lookup.
@@ -20,9 +23,27 @@
 ;; along with Lookup; if not, write to the Free Software Foundation,
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+;;; Documentation:
+
+;; This agent provides spell-checking capabilities for various European 
+;; languages.  Language can be specified with `location' that is actually
+;; an language specification options for spell checking program.
+;;
+;; Example:
+;;
+;; (setq lookup-search-agents
+;;       '(....
+;;         (ndspell "--lang=en"
+;;                  :charsets '(ascii iso-8859-1))
+;;         (ndspell "--lang=ru"
+;;                  :title "Russian Spell Checking"
+;;                  :charsets '(ascii iso-8859-5))
+;;         ....))
+
 ;;; Code:
 
 (require 'lookup)
+(require 'lookup-utils)
 
 ;;;
 ;;; Customizable variables
@@ -32,31 +53,41 @@
   "Lookup spell checker."
   :group 'lookup-search-agents)
 
-(defcustom ndspell-aspell-program "aspell"
-  "*Program name of Aspell."
+(defcustom ndspell-spell-program "aspell"
+  "*Program name of spell."
   :type 'string
   :group 'ndspell)
 
-(defcustom ndspell-grep-program "grep"
-  "*Program name of grep."
+(defcustom ndspell-spell-options 
+  '("-a" "-m" "-C")
+  "*Default options for spell checking program."
+  :type 'list
+  :group 'ndspell)
+
+(defcustom ndspell-spell-dump-options
+  '("dump" "master")
+  "*Default dictionary dump options for spell checking program."
+  :type 'list
+  :group 'ndspell)
+
+(defcustom ndspell-shell-program "sh"
+  "*Program name for shell program."
   :type 'string
   :group 'ndspell)
 
-(defcustom ndspell-words-dictionary
-  (if (file-exists-p "/usr/dict/words")
-      "/usr/dict/words")
-  "*Dictionary file."
-  :type 'file
-  :group 'ndspell)
-
-(defcustom ndspell-dictionary-title "Spell Checker"
-  "*Title of ndspell dictionary."
+(defcustom ndspell-shell-option "-c"
+  "*Program option for shell program."
   :type 'string
   :group 'ndspell)
 
-(defcustom ndspell-process-coding-system lookup-process-coding-system
-  "*Coding system for Aspell process."
-  :type 'symbol
+(defcustom ndspell-search-program "grep"
+  "*Program name for searching program."
+  :type 'string
+  :group 'ndspell)
+
+(defcustom ndspell-search-options
+  `("-m" ,(number-to-string lookup-max-hits) "-e")
+  "*Program options for searching program."
   :group 'ndspell)
 
 
@@ -71,27 +102,38 @@
 ;;; Interface functions
 ;;;
 
+(defsubst ndspell-command-args (option)
+  `(,ndspell-spell-program ,@(if option (split-string option " "))
+                           ,@ndspell-spell-options))
+
 (put 'ndspell :list 'ndspell-list)
 (defun ndspell-list (agent)
-  (list (lookup-new-dictionary agent ndspell-aspell-program)))
+  (list (lookup-new-dictionary agent "")))
 
-(put 'ndspell :title ndspell-dictionary-title)
+(put 'ndspell :title 'ndspell-dictionary-title)
+(defun ndspell-dictionary-title (dictionary)
+  (or (lookup-dictionary-option dictionary :title)
+      "Spell Checking"))
 
 (put 'ndspell :kill 'ndspell-kill-process)
+(defun ndspell-kill-process (agent)
+  (let* ((option (lookup-agent-location agent))
+         (command-args (ndspell-command-args option)))
+    (lookup-get-process-kill command-args)))
 
 (put 'ndspell :search 'ndspell-dictionary-search)
 (defun ndspell-dictionary-search (dictionary query)
-  (let ((string (lookup-query-string query)))
-    (when (or (not (fboundp 'find-charset-string))
-	      (equal (find-charset-string string) '(ascii))
-	      (not (find-charset-string string)))
-      (mapcar (lambda (word)
-		(let ((entry (lookup-new-entry 'dynamic dictionary word)))
-		  (lookup-put-property entry 'search-word word)
-		  entry))
-	      (if (eq (lookup-query-method query) 'exact)
-		  (ndspell-check-spelling string)
-		(ndspell-search-spelling (lookup-query-to-regexp query)))))))
+  (let ((string (lookup-query-string query))
+        (option (lookup-agent-location
+                 (lookup-dictionary-agent dictionary))))
+    (mapcar (lambda (word)
+              (let ((entry (lookup-new-entry 'dynamic dictionary word)))
+                (lookup-put-property entry 'search-word word)
+                entry))
+            (if (eq (lookup-query-method query) 'exact)
+                (ndspell-check-spelling string option)
+              (ndspell-search-spelling (lookup-query-to-regexp query)
+                                       option)))))
 
 (put 'ndspell :dynamic 'ndspell-dynamic-search)
 (defun ndspell-dynamic-search (entry)
@@ -106,7 +148,7 @@
 		      (setq prio (lookup-module-dictionary-priority module dict))
 		      (when (and (not (eq dict self))
 				 (cond ((eq prio t) t)
-				       ((eq prio 'secondary) (not search-found))
+				       ((eq prio 'secondary) nil) ;; (not search-found))
 				       ((eq prio 'supplement) search-found)))
 			(lookup-message
 			 (format "by %s..." (lookup-dictionary-title dict)))
@@ -122,8 +164,9 @@
 ;;; Internal functions
 ;;;
 
-(defun ndspell-check-spelling (string)
-  (let ((output (ndspell-process-require string)))
+(defun ndspell-check-spelling (string option)
+  (let* ((command-args (ndspell-command-args option))
+         (output (lookup-get-process-require command-args string 'utf-8)))
     (cond
      ((string= output "") nil)			; empty
      ((eq (aref output 0) ?*) nil)		; match
@@ -134,43 +177,27 @@
      ((string-match "^&[^:]*: " output)		; some candidates
       (split-string (substring output (match-end 0)) "[,\n] ?" t)))))
 
-(defun ndspell-search-spelling (regexp)
-  (if (file-exists-p ndspell-words-dictionary)
-      (with-temp-buffer
-        (call-process ndspell-grep-program nil t nil
-                      regexp ndspell-words-dictionary)
-        (let ((candidates nil))
-          (while (not (bobp))
-            (setq candidates (cons (buffer-substring-no-properties
-                                    (1- (point)) (progn (forward-line -1) (point)))
-                                   candidates)))
-          candidates))))
-
-;;;
-;;; Aspell process
-;;;
-
-(defvar ndspell-process nil)
-
-(defun ndspell-get-process ()
-  (unless (and ndspell-process (eq (process-status ndspell-process) 'run))
-    (if ndspell-process (lookup-process-kill ndspell-process))
-    (let ((buffer (lookup-open-process-buffer " *ndspell*")))
-      (setq ndspell-process
-	    (start-process "ndspell" buffer ndspell-aspell-program
-			   "-a" "-m" "-C"))
-      (set-process-query-on-exit-flag ndspell-process nil)
-      (accept-process-output ndspell-process)
-      (let ((coding ndspell-process-coding-system))
-	(when coding
-	  (set-process-coding-system ndspell-process coding coding)))))
-  ndspell-process)
-
-(defun ndspell-process-require (string)
-  (lookup-process-require (ndspell-get-process) (concat string "\n") "^\n"))
-
-(defun ndspell-kill-process (agent)
-  (if ndspell-process (lookup-process-kill ndspell-process)))
+(defun ndspell-search-spelling (regexp option)
+  (with-temp-buffer
+    (lookup-with-coding-system 'utf-8
+      (call-process 
+       ndspell-shell-program nil t nil           ; sh
+       ndspell-shell-option                      ; -c
+       (mapconcat 'identity
+                  `(,ndspell-spell-program       ; aspell
+                    ,@(if option 
+                      (split-string option " ")) ; --lang=en
+                    ,@ndspell-spell-dump-options ; dump master
+                    "|"                          ; |
+                    ,ndspell-search-program      ; grep
+                    ,@ndspell-search-options     ; -e
+                    ,regexp) " ")))
+    (let ((candidates nil))
+      (while (not (bobp))
+        (setq candidates (cons (buffer-substring-no-properties
+                                (1- (point)) (progn (forward-line -1) (point)))
+                               candidates)))
+      candidates)))
 
 (provide 'ndspell)
 
