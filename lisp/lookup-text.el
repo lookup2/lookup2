@@ -4,7 +4,7 @@
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: lookup-text.el,v 1.5 2009/04/04 14:43:38 kawabata Exp $
+;; Version: $Id: lookup-text.el,v 1.6 2009/05/02 11:50:59 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -65,49 +65,15 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
   "漢字ピンイン変換用ハッシュテーブル")
 
 ;;;
-;;; Mecab Processes Management
-;;;
-
-;; TODO: kill-process-at-exit.
-
-(defvar lookup-mecab-process-alist nil)
-
-(defun lookup-mecab-get-process (args)
-  (let ((process (lookup-assoc-get lookup-mecab-process-alist args)))
-    (unless (and process (eq (process-status process) 'run))
-      (if process (kill-process process))
-      (let ((buffer (lookup-open-process-buffer " *lookup-mecab*")))
-	(setq process (apply 'start-process "lookup-mecab" buffer
-			     lookup-mecab-program args))
-	(set-process-query-on-exit-flag process nil)
-	;; 起動後、少し時間を置かないと、最初の検索がうまくいかない。
-	(sleep-for 0.1)
-	(let ((coding lookup-mecab-coding-system))
-	  (when coding
-	    (set-process-coding-system process coding coding)))
-	(setq lookup-mecab-process-alist
-	      (lookup-assoc-put lookup-mecab-process-alist args process))))
-    process))
-
-(defun lookup-mecab-process-require (args string)
-  (lookup-process-require 
-   (lookup-mecab-get-process args) (concat string "\n") "\n"))
-
-(defun lookup-mecab-process-kill ()
-  (while lookup-mecab-process-alist
-    (lookup-process-kill (cdar lookup-mecab-process-alist))
-    (setq lookup-mecab-process-alist (cdr lookup-mecab-process-alist))))
-
-;;;
 ;;; Wakati Gaki
 ;;;
 
-(defvar lookup-mecab-wakati-option '("-O" "wakati"))
+(defvar lookup-mecab-wakati-command (list lookup-mecab-program "-O" "wakati"))
 
 ;;;###autoload
 (defun lookup-text-wakati (string)
-  (lookup-mecab-process-require 
-   lookup-mecab-wakati-option string))
+  (lookup-get-process-require 
+   lookup-mecab-wakati-command string lookup-mecab-coding-system))
 
 ;;;
 ;;; Kanji to Kana 
@@ -318,6 +284,86 @@ the string will be returned.  If CHARSETS is null, it returns t."
         (lookup-text-old-to-new lookup-query-string)))
 
 (add-hook 'lookup-query-string-hook 'lookup-text-old-to-new-query-string)
+
+;;; Lookup superscript/subscript utilities
+
+(defconst lookup-superscript-char-table
+  '((?2 . ?²) (?3 . ?³) (?1 . ?¹)
+    (?o . ?º) (?h . ?ʰ) (?ɦ . ?ʱ) (?j . ?ʲ)
+    (?r . ?ʳ) (?ɹ . ?ʴ) (?ɻ . ?ʵ) (?ʁ . ?ʶ)
+    (?w . ?ʷ) (?y . ?ʸ) (?ɣ . ?ˠ) (?l . ?ˡ)
+    (?s . ?ˢ) (?x . ?ˣ) (?ʕ . ?ˤ) (?ნ . ?ჼ)
+    (?A . ?ᴬ) (?Æ . ?ᴭ) (?B . ?ᴮ) (?D . ?ᴰ)
+    (?E . ?ᴱ) (?Ǝ . ?ᴲ) (?G . ?ᴳ) (?H . ?ᴴ)
+    (?I . ?ᴵ) (?J . ?ᴶ) (?K . ?ᴷ) (?L . ?ᴸ)
+    (?M . ?ᴹ) (?N . ?ᴺ) (?O . ?ᴼ) (?Ȣ . ?ᴽ)
+    (?P . ?ᴾ) (?R . ?ᴿ) (?T . ?ᵀ) (?U . ?ᵁ)
+    (?W . ?ᵂ) (?a . ?ᵃ) (?ɐ . ?ᵄ) (?ɑ . ?ᵅ)
+    (?ᴂ . ?ᵆ) (?b . ?ᵇ) (?d . ?ᵈ) (?e . ?ᵉ)
+    (?ə . ?ᵊ) (?ɛ . ?ᵋ) (?ɜ . ?ᵌ) (?g . ?ᵍ)
+    (?k . ?ᵏ) (?m . ?ᵐ) (?ŋ . ?ᵑ) (?o . ?ᵒ)
+    (?ɔ . ?ᵓ) (?ᴖ . ?ᵔ) (?ᴗ . ?ᵕ) (?p . ?ᵖ)
+    (?t . ?ᵗ) (?u . ?ᵘ) (?ᴝ . ?ᵙ) (?ɯ . ?ᵚ)
+    (?v . ?ᵛ) (?ᴥ . ?ᵜ) (?β . ?ᵝ) (?γ . ?ᵞ)
+    (?δ . ?ᵟ) (?φ . ?ᵠ) (?χ . ?ᵡ) (?н . ?ᵸ)
+    (?ɒ . ?ᶛ) (?c . ?ᶜ) (?ɕ . ?ᶝ) (?ð . ?ᶞ)
+    (?ɜ . ?ᶟ) (?f . ?ᶠ) (?ɟ . ?ᶡ) (?ɡ . ?ᶢ)
+    (?ɥ . ?ᶣ) (?ɨ . ?ᶤ) (?ɩ . ?ᶥ) (?ɪ . ?ᶦ)
+    (?ᵻ . ?ᶧ) (?ʝ . ?ᶨ) (?ɭ . ?ᶩ) (?ᶅ . ?ᶪ)
+    (?ʟ . ?ᶫ) (?ɱ . ?ᶬ) (?ɰ . ?ᶭ) (?ɲ . ?ᶮ)
+    (?ɳ . ?ᶯ) (?ɴ . ?ᶰ) (?ɵ . ?ᶱ) (?ɸ . ?ᶲ)
+    (?ʂ . ?ᶳ) (?ʃ . ?ᶴ) (?ƫ . ?ᶵ) (?ʉ . ?ᶶ)
+    (?ʊ . ?ᶷ) (?ᴜ . ?ᶸ) (?ʋ . ?ᶹ) (?ʌ . ?ᶺ)
+    (?z . ?ᶻ) (?ʐ . ?ᶼ) (?ʑ . ?ᶽ) (?ʒ . ?ᶾ)
+    (?θ . ?ᶿ) (?0 . ?⁰) (?i . ?ⁱ) (?4 . ?⁴)
+    (?5 . ?⁵) (?6 . ?⁶) (?7 . ?⁷) (?8 . ?⁸)
+    (?9 . ?⁹) (?+ . ?⁺) (?− . ?⁻) (?= . ?⁼)
+    (?( . ?⁽) (?) . ?⁾) (?n . ?ⁿ) (?ⵡ . ?ⵯ)))
+ ;; ("SM" . ?℠) ("TM" . ?™)
+
+(defsubst lookup-superscript-character (char)
+  "Return the superscript character of CHAR if exists."
+  (cdr (assq char lookup-superscript-char-table)))
+
+(defun lookup-superscript-string (str)
+  (let ((i (string-to-list str)) chars ch)
+    (while i
+      (if (setq ch (lookup-superscript-character (car i)))
+          (setq chars (cons ch chars) i (cdr i))
+        (setq i nil chars nil)))
+    (if chars (apply 'string (nreverse chars))
+      (put-text-property
+       0 (length str)
+       'display '((raise 0.3) (height 0.8))
+       str)
+      str)))
+
+(defconst lookup-subscript-char-table
+  '((?i . ?ᵢ) (?r . ?ᵣ) (?u . ?ᵤ) (?v . ?ᵥ)
+    (?β . ?ᵦ) (?γ . ?ᵧ) (?ρ . ?ᵨ) (?φ . ?ᵩ)
+    (?χ . ?ᵪ) (?0 . ?₀) (?1 . ?₁) (?2 . ?₂)
+    (?3 . ?₃) (?4 . ?₄) (?5 . ?₅) (?6 . ?₆)
+    (?7 . ?₇) (?8 . ?₈) (?9 . ?₉) (?+ . ?₊)
+    (?− . ?₋) (?= . ?₌) (?( . ?₍) (?) . ?₎)
+    (?a . ?ₐ) (?e . ?ₑ) (?o . ?ₒ) (?x . ?ₓ)
+    (?ə . ?ₔ)))
+
+(defsubst lookup-subscript-character (char)
+  "Return the subscript character of CHAR if exists."
+  (cdr (assq char lookup-subscript-char-table)))
+
+(defun lookup-subscript-string (str)
+  (let ((i (string-to-list str)) chars ch)
+    (while i
+      (if (setq ch (lookup-subscript-character (car i)))
+          (setq chars (cons ch chars) i (cdr i))
+        (setq i nil chars nil)))
+    (if chars (apply 'string (nreverse chars))
+      (put-text-property
+       0 (length str)
+       'display '((raise -0.3) (height 0.8))
+       str)
+      str)))
 
 (provide 'lookup-text)
 
