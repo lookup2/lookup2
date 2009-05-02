@@ -3573,8 +3573,8 @@
           (goto-char start)
           (insert
            (make-char 'chinese-gb2312 
-                      (- (string-to-int (match-string 1 code) 16) 128)
-                      (- (string-to-int (match-string 2 code) 16) 128)))))
+                      (- (string-to-number (match-string 1 code) 16) 128)
+                      (- (string-to-number (match-string 2 code) 16) 128)))))
     (goto-char (point-min))))
 
 (defun zhongri-pinyin-string (str)

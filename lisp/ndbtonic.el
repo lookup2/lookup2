@@ -215,7 +215,7 @@
 
 (defun ndbtonic-arrange-references (entry)
   "Attach References on ENTRY."
-  (let ((dict (lookup-entry-dictionary entry))
+  (let ((dictionary (lookup-entry-dictionary entry))
         entry)
     (while (re-search-forward "<ref idref=\"\\(.+?\\)\">\\(.+?\\)</ref>" nil t)
       (setq entry (lookup-new-entry 'regular dictionary

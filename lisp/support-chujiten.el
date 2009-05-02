@@ -236,18 +236,18 @@
 	((eq lookup-support-agent 'ndeb)
 	 "<reference>→<gaiji=za33a></reference=\\([0-9a-f:]+\\)>")))
 
-(defun chujiten-arrange-expand-examples (entry)
-  (setq entry (lookup-new-entry (lookup-entry-dictionary entry) nil ""))
-  (while (re-search-forward chujiten-example-regexp nil t)
-    (lookup-entry-set-code entry (match-string 1))
-    (delete-region (match-beginning 0) (match-end 0))
-    (forward-line)
-    (narrow-to-region (point) (progn (insert (lookup-dictionary-command
-					      dictionary 'content entry))
-				     (point)))
-    (goto-char (point-min))
-    (while (not (eobp)) (insert "*") (forward-line))
-    (widen)))
+;;(defun chujiten-arrange-expand-examples (entry)
+;;  (setq entry (lookup-new-entry (lookup-entry-dictionary entry) nil ""))
+;;  (while (re-search-forward chujiten-example-regexp nil t)
+;;    (lookup-entry-set-code entry (match-string 1))
+;;    (delete-region (match-beginning 0) (match-end 0))
+;;    (forward-line)
+;;    (narrow-to-region (point) (progn (insert (lookup-dictionary-command
+;;					      dictionary 'content entry))
+;;				     (point)))
+;;    (goto-char (point-min))
+;;    (while (not (eobp)) (insert "*") (forward-line))
+;;    (widen)))
 
 (defconst chujiten-eiwa-structure-regexp
   (concat "^\\(−\\[[^]\n]+\\]\\)\\|"		; level 2

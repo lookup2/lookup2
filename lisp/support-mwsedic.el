@@ -17,6 +17,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'ind-util)
 
 (let 
   ((encoded-mwsedic-gaiji-table
@@ -323,7 +324,6 @@
 ;; convert input string to Kyoto-Harvard
 (defun mwsedic-dev-kyoto-harvard-encode-string (str)
   (with-temp-buffer
-    (require 'ind-util)
     (insert str)
     (indian-dev-kyoto-harvard-encode-region (point-min) (point-max))
     (buffer-string)))

@@ -220,7 +220,7 @@
       (replace-match "\t"))
     (goto-char (point-min))
     (while (re-search-forward "\\\\U\\([0-9a-f]\\{4\\}\\)" nil t)
-      (replace-match (char-to-string (string-to-int (match-string 1) 16))))
+      (replace-match (char-to-string (string-to-number (match-string 1) 16))))
     (ucs-normalize-HFS-NFC-region (point-min) (point-max))
     ))
 
@@ -244,7 +244,7 @@
            (append ndspotlight-view-program-options
                    (list file)))))
 
-(defun ndspotlight-mouse-follow (e)
+(defun ndspotlight-mouse-follow (event)
   "Play the binary you click on."
   (interactive "e")
   (mouse-set-point event)

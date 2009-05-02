@@ -232,7 +232,7 @@
   (let* ((buffer (lookup-open-process-buffer (concat " *ndict+" server "*")))
 	 (process (open-network-stream "ndict" buffer server service)))
     (accept-process-output process)
-    (process-kill-without-query process)
+    (set-process-query-on-exit-flag process nil)
     process))
 
 (put 'ndict-process-require 'lisp-indent-function 1)

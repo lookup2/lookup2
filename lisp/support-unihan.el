@@ -49,13 +49,13 @@
   (let ((code (lookup-entry-code entry)))
     (if (string-match "^U\\+\\([0-9A-F]+\\)\\'" code)
         (insert (format "【%c】 %s\n"
-                        (string-to-int (match-string 1 code) 16) code))
+                        (string-to-number (match-string 1 code) 16) code))
       (insert (lookup-entry-code entry ) "\n")))
   (if (re-search-forward "kKangXi	\\([0-9]+\\)\\.[0-9][0-9]0" nil t)
       (lookup-url-set-link
        (match-beginning 0) (match-end 0)
        (format support-unihan-kangxi-url-format
-               (string-to-int (match-string 1)))))
+               (string-to-number (match-string 1)))))
   )
 
 (setq lookup-support-options

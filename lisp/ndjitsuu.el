@@ -179,6 +179,7 @@
   "Return string content of ENTRY."
   (let* ((code (lookup-entry-code entry))
          (index (string-to-number code))
+         (dictionary (lookup-entry-dictionary entry))
          (prev
           (if (/= index 1)
               (lookup-new-entry 'regular dictionary

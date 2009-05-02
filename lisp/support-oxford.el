@@ -285,7 +285,7 @@
 
 (defun oxford-arrange-structure (entry)
   (goto-char (point-min))
-  (next-line 1)
+  (forward-line 1)
   (and
    (search-forward ". -" nil t)
    (insert "\n "))

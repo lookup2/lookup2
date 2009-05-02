@@ -331,7 +331,7 @@ value (code heading)."
                ndsary-sary-program nil t nil args))
       (goto-char (point-min))
       (if (looking-at "\\([0-9]+\\)")
-          (setq count (+ count (string-to-number (match-string 1))))
+          (string-to-number (match-string 1))
         0))))
 
 (defun ndsary-extract-entries

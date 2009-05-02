@@ -115,11 +115,11 @@
   (or (lookup-dictionary-option dictionary :title)
       "Spell Checking"))
 
-(put 'ndspell :kill 'ndspell-kill-process)
-(defun ndspell-kill-process (agent)
-  (let* ((option (lookup-agent-location agent))
-         (command-args (ndspell-command-args option)))
-    (lookup-get-process-kill command-args)))
+;;(put 'ndspell :kill 'ndspell-kill-process)
+;;(defun ndspell-kill-process (agent)
+;;  (let* ((option (lookup-agent-location agent))
+;;         (command-args (ndspell-command-args option)))
+;;    (lookup-get-process-kill command-args)))
 
 (put 'ndspell :search 'ndspell-dictionary-search)
 (defun ndspell-dictionary-search (dictionary query)

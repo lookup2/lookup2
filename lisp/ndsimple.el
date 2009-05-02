@@ -50,7 +50,7 @@
 ;;; Customizable Variables
 ;;;
 
-(defcustom ndsimple-extension-regexp
+(defvar ndsimple-extension-regexp
   "\\(\\.txt\\)\\|\\(\\.sdic\\)|\\(\\.xml\\)\\'"
   "File Extension to be used as `ndsimple' files.")
 

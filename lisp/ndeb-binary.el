@@ -2,7 +2,7 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.11 2009/04/05 03:06:49 kawabata Exp $
+;; Version: $Id: ndeb-binary.el,v 1.13 2009/05/12 00:59:47 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -963,9 +963,10 @@ Using this function with :snd-autoplay option is not recommendable."
   
 (defun ndeb-arrange-snd-autoplay (entry)
   "Arrange function for Lookup to play sound in an ndeb entry if option :snd-autoplay is non-nil."
-  (when (and (lookup-dictionary-option dictionary :snd-autoplay nil)
-	     (assq 'wave ndeb-binary-programs))
-    (ndeb-binary-follow-first-link 'wave)))
+  (let ((dictionary (lookup-entry-dictionary entry)))
+    (when (and (lookup-dictionary-option dictionary :snd-autoplay nil)
+               (assq 'wave ndeb-binary-programs))
+      (ndeb-binary-follow-first-link 'wave))))
 
 ;;;
 ;;; Setup

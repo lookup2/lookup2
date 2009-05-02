@@ -562,7 +562,7 @@ FILEが、PDIC Unicodeの英辞郎バージョンの場合は、下記の様に�
         (error "%s can't be created!" index-file)
       (with-temp-buffer
         (dotimes (i (length block-index))
-          (setq block (aref block-index i) 0)
+          (setq block (aref block-index i))
           (if (= 0 (% i 100)) (message "%d %% done..." (/ (* 100 i) total)))
           (setq block-num (number-to-string (aref block 1)))
           (dolist (entry (ndpdic-entries file block))
