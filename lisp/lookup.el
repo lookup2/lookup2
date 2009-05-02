@@ -31,7 +31,7 @@
 (unless lookup-byte-compiling
   (load "lookup-autoloads"))
 
-(defconst lookup-version "1.99.6"
+(defconst lookup-version "1.99.7"
   "The version numbers of Lookup.")
 
 
