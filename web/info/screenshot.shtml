@@ -12,7 +12,166 @@
 
 <h2>Screenshots</h2>
 
-<h3>M. Monier-Williams Sanskrit-English Dictionary</h3>
+<p>
+  This page shows various language dictionaries used under "Lookup".
+  They span from Japanese, Chinese, Sanskirt to Latin dictionaries.
+</p>
+
+<br/>
+<hr/>
+
+<h3>DICT Dictionaries</h3>
+<ul>
+  <li><a href="http://www.dict.org/">Dict.org</a></li>
+  <li><a href="http://www.freedict.org/en/">FreeDict.org</a></li>
+</ul>
+<p>
+  "Dict project" provides a
+  unique <a href="http://www.dict.org/announce.html">dictzip</a> (.dz)
+  format, which enables randam-access of compressed dictionary data.
+</p>
+<p>
+  "Freedict" project adopts `dict' tools and attempt to create
+  various multi-lingual dictionary data.  Their compressed dictionary
+  data file has been distributed widely as debian packages.
+</p>
+
+<img src="freedict-eh.png">
+
+<br/>
+<hr/>
+
+<h3>PDIC Dictionaries</h3>
+<ul>
+  <li><a href="http://homepage3.nifty.com/TaN/">PDIC Format Home Page</a>
+</ul>
+<p>
+ “Lookup” can handle PDIC format.  PDIC format is adopted by various
+  free bi-lingual dictionaries in Japan, including Korean-Japanese and
+  Chinese-Japanese dictionaries.
+</p>
+
+<img src="cj2.png"><br/>
+<img src="kazuo_kj.png">
+
+<br/>
+<hr/>
+
+<h3>「字通」 Kanji Ideographs Dictionary </h3>
+<ul>
+  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
+</ul>
+<p>
+  「字通」 is renowned etymological dictionary for Japanese Kanji.
+</p>
+<img src="jitsuu.png">
+
+<br/>
+<hr/>
+
+<h3>“Eijiro” English-Japanese Dictionary</h3>
+<ul>
+  <li><a href="http://www.eijiro.jp/e/index.htm">[Home Page]</a>
+  <li><a href="http://www.alc.co.jp/">ALC (Distributer of EIJIRO)</a>
+</ul>
+<p>
+  EIJIRO is one of the most famous electronic English-Japanese
+  dictionary.  Its CD-ROM is distributed by ALC, and encoded by PDIC
+  format.
+</p>
+
+<img src="eijiro.png">
+
+<br/>
+<hr/>
+
+<h3>BTONIC "Midium-Size Music Dictionary"</h3>
+<ul>
+  <li><a href="http://www.btonic.com/">[BTONIC Home Page]</a>
+  <li><a href="http://www.bitway.ne.jp/ontomo/ongakuchujiten/club/">[Dictionary Home Page]</a>
+</ul>
+<p>
+  Recently, BTONIC has become popular for electronic dictionary format
+  in Japan.  It is actually an compressed and archived XML files, and
+  once they are de-compressed, they can be searched by Lookup
+  `ndbtonic' agent.
+</p>
+
+<img src="btonic.png">
+
+<br/>
+<hr/>
+
+<h3>“Kojien” Japanese Language Dictionary</h3>
+<ul>
+  <li><a href="http://www.iwanami.co.jp/kojien/">[Home Page]</a>
+  <li><a href="http://www.epwing.or.jp/about/about.html">EPWING Consortium</a>
+</ul>
+<p>
+  “Lookup” can handle EBG/EBXA/EPWING (up to V6) dictionaries with
+  `eblook' and EB libraries.  Furthermore, when used with EPWING
+  dictionaries, old Kanji characters （旧字） in a query can
+  automatically be converted to new Kanji characters （新字）.
+</p>
+
+<img src="kojien.png">
+
+<br/>
+<hr/>
+
+<h3>Crown French-Japanese Dictionary </h3>
+<ul>
+  <li><a href="http://www.sanseido-publ.co.jp/publ/ep/cd_ep_crfutu.html">[Home Page]</a>
+</ul>
+<p>
+  If specified, “Lookup” can automatically remove accents from
+  alphabets in a query string.
+</p>
+<img src="french.png">
+
+<br/>
+<hr/>
+
+<h3>Wikipedia Abstract</h3>
+
+<ul>
+  <li><a href="http://sary.sourceforge.net/">sary</a>...Suffix Array Tool.
+  <li><a href="http://download.wikipedia.org/jawiki/latest/">Wikipedia Abstract (Japanese)</a>
+</ul>
+
+<p>
+  By using suffix array tool, look-up of single huge text file is fast
+  and simple.  `ndsary' provides an easy interface for sary (suffix
+  array tool).  Following examples shows searching of various
+  languages of Wikipedia.  Currently, Japanese, English, French, and
+  Chinese Wikipedia is supported by support-file.
+</p>
+
+<img src="wikipedia.png">
+<br/>
+<img src="wikipedia-fr.png">
+<br/>
+<img src="wikipedia-zh.png">
+
+<br/>
+<hr/>
+
+<h3>Zigen</h3>
+
+<ul>
+  <li><a href="http://wagang.econ.hc.keio.ac.jp/zigen/">KO Zigen</a>...Old Chinese-Japanese Dictionary.
+</ul>
+
+<p>
+  Kadokawa Zigen is old dictionary of that electric version is freely distributable.  
+</p>
+
+<img src="zigen.png">
+
+<br/>
+<hr/>
+
+<h3>Monier-Williams Sanskrit-English Dictionary</h3>
 <ul>
   <li><a href="http://www.pup.waiwai-net.ne.jp/~iwaihiro/Mwsedictk/">[Home Page]</a>
 </ul>
@@ -24,12 +183,15 @@
 <br/>
 <hr/>
 
-<h3>Shōgakukan Chūnichi Nicchū Jiten</h3>
+<h3>Shōgakukan Chinese-Japanese Japanese-Chinese Dictionary </h3>
 <ul>
   <li><a href="./eblook.c.patch">[Patch for eblook]</a>
 </ul>
 <p>
-  “Lookup” can automatically convert GB Hanzi to pinyin when used with EBXA-C dictionary.
+  “Lookup” can automatically convert GB Hanzi to pinyin when used
+  with EBXA-C dictionary.  Also, When used with EBXA dictionaries,
+  Kanji characters in a query can automatically be converted to
+  Hiragana so that the dictionaries can handle queries.
 </p>
 <img src="chinese.png">
 
@@ -50,23 +212,46 @@
 <br/>
 <hr/>
 
-<h3>“Kojien” Japanese Language Dictionary</h3>
+<h3>Shina-bun Wo Yomu tame no Kanji-ten</h3>
 <ul>
-  <li><a href="http://www.iwanami.co.jp/kojien/">[Home Page]</a>
+  <li><a href="http://www.seiwatei.net/chinakan/chinakan.cgi">[Home Page]</a>
 </ul>
 <p>
-  “Lookup” can handle EBG/EBXA/EPWING (up to V6) dictionaries with
-  `eblook' and EB libraries.  When used with EBXA dictionaries, Kanji
-  characters in the query can automatically be converted to Hiragana
-  so that the dictionaries can handle the queries.  Furthermore, when
-  used with EPWING dictionaries, old Kanji characters （旧字） in the
-  query can automatically be converted to new Kanji characters （新字）.
+  “Lookup” can be used as an interface of "Shina-bun Wo Yomu tame no
+  Kanji-ten", renowned Chinese-Japanese dictionary published in early
+  20th centry and no longer copyrighted by anyone.
 </p>
-
-<img src="kojien.png">
+<img src="chinakan.png">
 
 <br/>
 <hr/>
+
+<h3>JMdict</h3>
+<ul>
+  <li><a href="http://www.csse.monash.edu.au/~jwb/jmdict.html">[Home Page]</a>
+</ul>
+<p>
+  “Lookup” can be used as an interface of "JMdict", produced by Jim
+  Breen, famous for his "jedict" and various other lexicographic
+  resources.  It can be used as an dictionary for Japanese vs French,
+  Russian, German, English and vice versa.
+</p>
+<img src="jmdict.png">
+
+<br/>
+<hr/>
+
+<h3>Shuowen Jiezi Zhu</h3>
+
+<ul>
+  <li><a href="http://kanji-database.sourceforge.net/">Shuowen Jiezi Zhu data</a>...A "Bible" for Chinese Ideograph Study.
+</ul>
+
+<p>
+  Support file for `Shuowen' XML file is also provided with lookup.
+</p>
+
+<img src="swjz.png">
 
 <!--#include virtual="/footer.html" -->
 

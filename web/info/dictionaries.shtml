@@ -2,41 +2,115 @@
         "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
 <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Lookup - Supported Dictionaries -</title>
 </head>
 
-<!-- #include virtual="/header.html" -->
+<body bgcolor="white">
 
-<h2>EPWing Dictionaries</h2>
+<!--#include virtual="/header.html" -->
 
-<dl>
-<dt>EPWing Commercial Dictionaries
-<dd><a href="http://www.epwing.or.jp/">
-    EPWing Consortium</a> 
-</dl>
+<h1>List of Supported Dictionaries</h1>
 
-<dl>
-<dt>EPWing Converted Dictionaries
-<dd><a href="http://www.epwing.or.jp/">
-    EPWing Consortium</a> 
-</dl>
+<h2>EPWING Dictionaries</h2>
 
-<dl>
-<dt>EPWing Free/Converted Dictionaries</dt>
-<dd><a href="http://www.epwing.or.jp/">
-    EPWing Consortium</a></dd>
-</dl>
+<p><a href="http://www.epwing.or.jp/about/about.html">EPWing
+Consortium</a> standardized CD-ROM/DVD-ROM dictionary format.</p>
 
-<hr/>
+<ul>
+  <li><a href="http://www.epwing.or.jp/lineup/lineup.html">List of Major Commericial EPWING Dictionaries</a></li>
+  <li><a href="http://openlab.ring.gr.jp/edict/fpw/">List of Free EPWING Dictionaries created by <a href="http://www.sra.co.jp/people/m-kasahr/freepwing/">FreePWing</a></li>
+  <li><a href="http://www31.ocn.ne.jp/~h_ishida/">EBStudio</a>, EPWING Creation software and list of free/commercial dictionaries created by EBStudio.</li>
+</ul>
 
-<h2>Random House Dictionary</h2>
+<h2>EBXA, EBG Format Dictionaries</h2>
 
-<dl>Shogakukan Random House Dictionary (ISBN-XX-XXXXX)
-<dd><a href="csrd"></a>
-</dl>
+<h2>DICT Format Dictionaries</h2>
 
-<!-- #include virtual="/footer.html" -->
-</td></tr></table>
+<ul>
+  <li><a href="http://www.freedict.org/en/">FreeDict.org</a></li>
+  <li><a href="http://www.dict.org/">Dict.org</a></li>
+</ul>
+
+<h2>SDIC Format Dictionaries</h2>
+
+<ul>
+  <li><a href="http://www.namazu.org/~tsuchiya/sdic/index.html">SDIC page</a> and two famous dictionaries (gene95.sdic and edict.sdic) frequently used with sdic.</li>
+</ul>
+
+<h2>PDIC Format Dictionaries</h2>
+
+<ul>
+  <li><a href="http://homepage3.nifty.com/TaN/">PDIC</a> provides well-compressed (BOCU) bi-lingual dictionaries.</li>
+  <li><a href="http://homepage3.nifty.com/TaN/dic-link.html">List of major PDIC Dictionaries.</a>
+  <li><a href="http://www.eijiro.jp/">EIJIRO</a> is one of most famous English-Japanese electronic dictionary, encoded by PDIC format.</li>
+</ul>
+
+<h2>BTONIC Format Dictionaries</h2>
+
+<p>
+  BTONIC dictionaries with extension of ".exi" and can be decompressed
+  by `btonic2xml110' can be used with lookup.  Display of unicode
+  characters is supported.
+</p>
+<ul>
+  <li>新編・音楽中辞典</li>
+</ul>
+
+<h2>XML-style Dictionaries</h2>
+
+Huge XML text file can be easily looked-up by using <a href="http://sary.sourceforge.net/index.html.ja">suffix array tool</a>.
+
+<ul>
+  <li><a href="http://www.csse.monash.edu.au/~jwb/jmdict.html">JMDict</a></li>
+  <li>Wikipedia Abstract .. (<a href="http://download.wikipedia.org/enwiki/latest/">en</a>), (<a href="http://download.wikipedia.org/jawiki/latest/">ja</a>), (<a href="http://download.wikipedia.org/zhwiki/latest/">zh</a>), etc.</li>
+  <li><a href="http://wagang.econ.hc.keio.ac.jp/zigen/">角川 字源</a></li>
+  <li><a href="http://kanji-database.sourceforge.net/dict/swjz/index.html">説文解字注</a></li>
+  <li><a href="http://kanji-database.sourceforge.net/dict/sbgy/index.html">宋本廣韻</a></li>
+</ul>
+
+<h2>Plain-text Dictionaries and Glossaries</h2>
+<ul>
+  <li>Unihan.txt (it can be used as index of KangXi Dictionary.)</li>
+  <li>RFC4949.txt</li>
+</ul>
+
+<h2>Software-based Dictionaries</h2>
+<ul>
+  <li>Mecab program</li>
+  <li>WORDS Latin Program</li>
+  <li>aspell</li>
+</ul>
+
+<h2>Network-based Dictionaries</h2>
+<ul>
+  <li>dict protocol</li>
+  <li>ebnet protocol</li>
+</ul>
+
+<h2>Search Engines</h2>
+<ul>
+  <li>SpotLight</li>
+  <li>HyperEstraier</li>
+</ul>
+
+<h2>Image Scanned Old Dictionaries with Encoded Index</h2>
+<ul>
+  <li>康煕字典 (through Unihan.txt)</li>
+  <li>支那文のための漢字典</li>
+</ul>
+
+<h2>Shogakukan 小学館 Random House Dictionary</h2>
+<ul>
+  <li><a href="http://ebook.shogakukan.co.jp/catalog/srd/srdw_xp.html">[Home Page]</a></li>
+</ul>
+
+<h2>Jituu 「字通」 Dictionary</h2>
+<ul>
+  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
+</ul>
+
+<!--#include virtual="/footer.html" -->
 
 </body>
 </html>
