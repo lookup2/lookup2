@@ -131,6 +131,7 @@
                   ndeb-arrange-image-page
                   ndeb-arrange-wave
                   ndeb-arrange-mpeg
+                  ndeb-arrange-unicode
                   ndeb-arrange-scripts
                   ndeb-arrange-faces
                   ndeb-arrange-no-newline
@@ -627,6 +628,13 @@ Nil means it has not been checked yet.")
 		  (point-max)))
 	(set-left-margin point indent-end level)
 	(goto-char point)))))
+
+(defun ndeb-arrange-unicode (entry)
+  (while (re-search-forward "<unicode>\\([0-9A-F０-９Ａ-Ｆ]+\\)</unicode>" nil t)
+    (replace-match 
+     (save-match-data
+       (char-to-string 
+        (string-to-int (japanese-hankaku (match-string 1)) 16))))))
 
 (defun ndeb-arrange-scripts (entry)
   (while (re-search-forward "<\\(su[bp]\\)>" nil t)
