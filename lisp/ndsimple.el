@@ -178,8 +178,10 @@ If CONTNET-END is nil, end of line is assumed."
     (with-current-buffer (find-file-noselect file)
       (goto-char point)
       (if content-start
-          (or (looking-at (regexp-quote content-start))
-              (search-backward content-start nil t))
+          (progn
+            (or (looking-at (regexp-quote content-start))
+                (search-backward content-start nil t))
+            (setq point (match-end 0)))
         (goto-char (line-beginning-position)))
       (setq start (point))
       (goto-char point)
