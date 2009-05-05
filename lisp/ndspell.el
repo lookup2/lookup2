@@ -25,9 +25,10 @@
 
 ;;; Documentation:
 
-;; This agent provides spell-checking capabilities for various European 
-;; languages.  Language can be specified with `location' that is actually
-;; an language specification options for spell checking program.
+;; This agent provides spell-checking capabilities for various
+;; European languages.  Language can be specified with `location'
+;; specification that is actually an language specification option
+;; for spell checking program.
 ;;
 ;; Example:
 ;;
@@ -148,7 +149,7 @@
 		      (setq prio (lookup-module-dictionary-priority module dict))
 		      (when (and (not (eq dict self))
 				 (cond ((eq prio t) t)
-				       ((eq prio 'secondary) nil) ;; (not search-found))
+				       ((eq prio 'secondary) (not search-found))
 				       ((eq prio 'supplement) search-found)))
 			(lookup-message
 			 (format "by %s..." (lookup-dictionary-title dict)))
@@ -156,7 +157,10 @@
 			(if entries (setq search-found t))
 			entries))
 		    (lookup-module-dictionaries module)))
-      (setq entries (mapcar 'lookup-new-slink (apply 'append entries)))
+      (setq entries (remove-if 
+                     (lambda (x) (equal (lookup-entry-type x) 'dynamic))
+                     (apply 'append entries)))
+      (setq entries (mapcar 'lookup-new-slink entries))
       entries)))
 
 
