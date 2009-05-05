@@ -32,18 +32,176 @@
 ;;        (ndpdic "~/edicts/eijiro")
 ;;         ....
 ;;         ))
-
-
-;;; <<Sample Function>>
-
+;;
+;; If dictionary option `:index' is specified via support file, then that 
+;; file is searched for regular expressions.
+;;
 ;; There is a small sample function to create `index' file for PDIC.
 ;; To make an index, type M-x ndpdic-create-index-file.
-;; (You need at least 1G memory, it would take 10 minutes for 2GHz machine.)
+;; (You need at least 1G memory, it would take 10 minutes for 2GHz machine 
+;; for huge file such as Eijiro.)
 
-;; Index is XML-like style, so you can try `mksary' to create and refer
-;; it.
+;;;
+;;; Customizable Variables
+;;;
 
-;; BOCU Decoder
+(defvar ndpdic-max-hits 150)
+
+(defvar ndpdic-grep-program "grep")
+
+(defvar ndpdic-grep-options (list (format "--max-count=%d" ndpdic-max-hits) "-e"))
+
+(defvar ndpdic-extended-attributes
+  '((0 . (lambda (x) (concat (ndpdic-bocu-to-str x) "\n")))
+    (1 . (lambda (x) (concat "【用例】" (ndpdic-bocu-to-str x) "\n")))
+    (2 . (lambda (x) (concat "【発音】" (ndpdic-bocu-to-str x) "\n")))))
+
+;;;
+;;; Interface Functions
+;;;
+
+(defvar ndpdic-extension-regexp "\\.dic\\'")
+
+(defun ndpdic-dictionary-index (dictionary)
+  "Return optional index file for DICTIONARY if exists."
+  (let* ((location
+          (lookup-agent-location
+           (lookup-dictionary-agent dictionary)))
+         (index
+          (lookup-dictionary-option dictionary :index))
+         (index
+          (if index
+              (expand-file-name index location))))
+    (if (and index (file-exists-p index)) index)))
+
+(put 'ndpdic :methods 'ndpdic-dictionary-methods)
+(defun ndpdic-dictionary-methods (dictionary)
+  "Return methods of DICTIONARY."
+  (let ((index (ndpdic-dictionary-index dictionary)))
+    (if index '(exact prefix suffix substring regexp)
+      '(exact prefix))))
+
+(put 'ndpdic :list 'ndpdic-list)
+(defun ndpdic-list (agent)
+  "Return a list of dictionary of AGENT."
+  (let* ((dir (lookup-agent-location agent))
+         (files (directory-files (expand-file-name dir)
+                                 nil ndpdic-extension-regexp))
+         dicts file)
+    (dolist (file files)
+      (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
+          (message "Version of PDIC `%s' file is old and not supported!" file)
+        (setq dicts
+              (cons (lookup-new-dictionary agent file)
+                    dicts))))
+    (nreverse dicts)))
+
+(put 'ndpdic :title 'ndpdic-title)
+(defun ndpdic-title (dictionary)
+  "Return title of DICTIONARY."
+  (replace-regexp-in-string
+   "^.*/\\([^/]+\\)$" "\\1"
+   (lookup-dictionary-name dictionary)))
+
+(put 'ndpdic :search 'ndpdic-dictionary-search)
+(defun ndpdic-dictionary-search (dictionary query)
+  "Return entries for DICTIONARY QUERY."
+  (let ((index (ndpdic-dictionary-index dictionary))
+        (query-method (lookup-query-method query))
+        query-regexp dir file block-index entries)
+    (if (or (null index)
+            (equal query-method 'exact)
+            (equal query-method 'prefix))
+        ;; normal PDIC search
+        (ndpdic-dictionary-search-normal dictionary query)
+      ;; regular expression search
+      (setq query-regexp (replace-regexp-in-string "$\\'" "	"
+                          (lookup-query-to-regexp query))
+            dir          (lookup-agent-location
+                          (lookup-dictionary-agent dictionary))
+            file         (expand-file-name
+                          (lookup-dictionary-name dictionary) dir)
+            block-index  (ndpdic-block-index file))
+      (with-temp-buffer
+        (lookup-with-coding-system 'utf-8
+          (apply 'call-process
+                 ndpdic-grep-program nil t nil
+                 (append ndpdic-grep-options
+                         (list query-regexp index))))
+        (goto-char (point-min))
+        (while (re-search-forward
+                "^\\(.+?	\\)\\([-]+\\)\\|\\([0-9A-F]+\\)" nil t)
+          (let* ((word (match-string 1))
+                 (hex1 (match-string 2))
+                 (hex2 (match-string 3))
+                 (hex (if hex1 (+ (* (- (elt hex1 0) 16) 65536)
+                                  (* (- (elt hex1 1) 16) 4096)
+                                  (* (- (elt hex1 2) 16) 256)
+                                  (* (- (elt hex1 3) 16) 16)
+                                  (- (elt hex1 4) 16))
+                        (string-to-number hex2 16)))
+                 (headers (ndpdic-entries file (elt block-index hex)))
+                 (header (find-if (lambda (x) (string-match word x)) headers)))
+            (if header
+                (setq entries (cons
+                               (lookup-new-entry
+                                'regular dictionary header
+                                (if (string-match "	" header)
+                                    (substring header (match-end 0))))
+                               entries))))))
+      (nreverse entries))))
+
+(defun ndpdic-dictionary-search-normal (dictionary query)
+  "Return list of entries for DICTIONARY QUERY."
+  (let* ((query-method (lookup-query-method query))
+         (query-string
+          (concat (lookup-query-string query)
+                  (if (eq query-method 'exact) "\\(	\\|$\\)")))
+         (dir (lookup-agent-location 
+               (lookup-dictionary-agent dictionary)))
+         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (result
+          (ndpdic-binary-search file query-string)))
+    (when result
+      (setq result
+            (remove-if
+             (lambda (x) (null (string-match
+                                (concat "^" query-string) x)))
+             (append (ndpdic-entries file (car result))
+                     (ndpdic-entries file (cdr result)))))
+      ;;(if (> (length result) ndpdic-max-hits)
+      ;;    )
+      (mapcar (lambda (x) (lookup-new-entry
+                           'regular dictionary x
+                           (if (string-match "	" x)
+                               (substring x (match-end 0)))))
+              result))))
+
+(put 'ndpdic :content 'ndpdic-content)
+(defun ndpdic-content (entry)
+  "Content of ENTRY."
+  (let* ((code (lookup-entry-code entry))
+         (dictionary (lookup-entry-dictionary entry))
+         (dir (lookup-agent-location
+               (lookup-dictionary-agent dictionary)))
+         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (result (car (ndpdic-binary-search file code))))
+    (ndpdic-entry-content file result code)))
+
+;; Hash variables 
+;; (in future, move them to lookup hash tables)
+
+(defvar ndpdic-block-index-hash
+  (make-hash-table :test 'equal)
+  "Hash table for file -> block-index table.")
+
+(defvar ndpdic-block-entries-hash
+  (make-hash-table :test 'equal)
+  "Hash table for file -> (block -> entries) table.")
+
+;;;
+;;; BOCU Decoder
+;;;
 
 (defun bocu-read-decode-trail-char (reg)
   "BOCU trail char in REG to be decoded."
@@ -129,99 +287,6 @@
 (defun ndpdic-bocu-to-str (string)
   "Decode BOCU STRING to Emacs String."
   (ccl-execute-on-string 'decode-bocu '[0 0 0 0 0 0 0 0 0] string))
-
-;;;
-;;; Variables
-;;;
-
-(defvar ndpdic-extended-attributes
-  '((0 . (lambda (x) (concat (ndpdic-bocu-to-str x) "\n")))
-    (1 . (lambda (x) (concat "【用例】" (ndpdic-bocu-to-str x) "\n")))
-    (2 . (lambda (x) (concat "【発音】" (ndpdic-bocu-to-str x) "\n")))))
-
-;;;
-;;; Interface Functions
-;;;
-
-(defvar ndpdic-max-hits 150)
-
-(defvar ndpdic-extension-regexp "\\.dic\\'")
-
-(put 'ndpdic :methods 'ndpdic-dictionary-methods)
-(defun ndpdic-dictionary-methods (dictionary)
-  "Return methods of DICTIONARY."
-  '(exact prefix))
-
-(put 'ndpdic :list 'ndpdic-list)
-(defun ndpdic-list (agent)
-  "Return a list of dictionary of AGENT."
-  (let* ((dir (lookup-agent-location agent))
-         (files (directory-files (expand-file-name dir)
-                                 nil ndpdic-extension-regexp))
-         dicts file)
-    (dolist (file files)
-      (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
-          (message "Version of PDIC `%s' file is old and not supported!" file)
-        (setq dicts
-              (cons (lookup-new-dictionary agent file)
-                    dicts))))
-    (nreverse dicts)))
-
-(put 'ndpdic :title 'ndpdic-title)
-(defun ndpdic-title (dictionary)
-  "Return title of DICTIONARY."
-  (replace-regexp-in-string
-   "^.*/\\([^/]+\\)$" "\\1"
-   (lookup-dictionary-name dictionary)))
-
-(put 'ndpdic :search 'ndpdic-dictionary-search)
-(defun ndpdic-dictionary-search (dictionary query)
-  "Return list of entries for DICTIONARY QUERY."
-  (let* ((query-method (lookup-query-method query))
-         (query-string
-          (concat (lookup-query-string query)
-                  (if (eq query-method 'exact) "\\(	\\|$\\)")))
-         (dir (lookup-agent-location 
-               (lookup-dictionary-agent dictionary)))
-         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
-         (result
-          (ndpdic-binary-search file query-string)))
-    (when result
-      (setq result
-            (remove-if
-             (lambda (x) (null (string-match
-                                (concat "^" query-string) x)))
-             (append (ndpdic-entries file (car result))
-                     (ndpdic-entries file (cdr result)))))
-      ;;(if (> (length result) ndpdic-max-hits)
-      ;;    )
-      (mapcar (lambda (x) (lookup-new-entry
-                           'regular dictionary x
-                           (if (string-match "	" x)
-                               (substring x (match-end 0)))))
-              result))))
-
-(put 'ndpdic :content 'ndpdic-content)
-(defun ndpdic-content (entry)
-  "Content of ENTRY."
-  (let* ((code (lookup-entry-code entry))
-         (dictionary (lookup-entry-dictionary entry))
-         (dir (lookup-agent-location
-               (lookup-dictionary-agent dictionary)))
-         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
-         (result (car (ndpdic-binary-search file code))))
-    (ndpdic-entry-content file result code)))
-
-;; Hash variables 
-;; (in future, move them to lookup hash tables)
-
-(defvar ndpdic-block-index-hash
-  (make-hash-table :test 'equal)
-  "Hash table for file -> block-index table.")
-
-(defvar ndpdic-block-entries-hash
-  (make-hash-table :test 'equal)
-  "Hash table for file -> (block -> entries) table.")
 
 ;;;
 ;;; Basic Functions
@@ -456,7 +521,7 @@ Return the list of entry words.  Result will be cached."
         (setq word (car word-spec))
         (setq word-data (elt word-spec 3))
         (if (null word-spec) (goto-char (point-max))
-          (when (equal (car word-spec) entry)
+          (when (equal entry (car word-spec))
             (setq content
                   (ndpdic-adjust-content
                    entry (elt word-spec 1)
@@ -546,13 +611,12 @@ Return value would be (block . next-block)."
         
 ;; Utility Function
 
-(defun ndpdic-create-index-file (file)
+(defun ndpdic-create-index-file (file &optional eijiro)
   "Create XML-like index file from FILE.
-FILEは `.dic' ファイルとおなじ場所に、拡張子 `.idx' で保存される。
-FILEが、PDIC Unicodeの初期バージョンの場合は、下記のように出力される。
-<entry><word>XXXX</word><block>ZZZZ</block></entry>
-FILEが、PDIC Unicodeの英辞郎バージョンの場合は、下記の様に出力される。
-<entry><word>XXXX</word><head>YYYY</head><block>ZZZZ</block></entry>."
+PDIC辞書に対して、正規表現などで検索するためのインデックスファイルを生成する。
+ 各行は以下の構成となる。
+ ［エントリ］<TAB>［16進数のブロック番号］
+ 英辞郎と同様のフォーマットにするならば、 EIJIRO を t にする。"
   (interactive "fPDIC File Name:")
   (let ((index-file (concat (file-name-sans-extension file) ".idx"))
         (block-index (ndpdic-block-index file))
@@ -564,16 +628,22 @@ FILEが、PDIC Unicodeの英辞郎バージョンの場合は、下記の様に�
         (dotimes (i (length block-index))
           (setq block (aref block-index i))
           (if (= 0 (% i 100)) (message "%d %% done..." (/ (* 100 i) total)))
-          (setq block-num (number-to-string (aref block 1)))
+          (setq block-num (number-to-string i))
           (dolist (entry (ndpdic-entries file block))
             (if (string-match "	" entry)
-                (insert "<entry><word>" (substring entry 0 (match-beginning 0))
-                        "</word><head>" (substring entry (match-end 0))
-                        "</head><block>" block-num
-                        "</block></entry>\n")
-              (insert "<entry><word>" entry
-                      "</word><block>" block-num
-                      "</block></entry>\n"))))
+                (insert (substring entry 0 (match-beginning 0)) "\t"
+                        (format "%05x" block-num))
+              (insert entry "\t" (format "%05x" block-num)))))
+        (when eijiro
+          (goto-char (point-min))
+          (while (re-search-forward "	\\([0-9A-F]\\{5\\}\\)" nil t)
+            (replace-match
+             (save-match-data
+               (apply 'string
+                      (mapcar
+                       (lambda (x) (+ 16 (string-to-int x 16)))
+                       (split-string (match-string 1) "" t))))
+             t nil nil 1)))
         (write-region (point-min) (point-max) (expand-file-name index-file))))))
 
 (provide 'ndpdic)

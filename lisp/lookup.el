@@ -1011,7 +1011,8 @@ If there is no session, default module will be returned."
 	(lookup-assoc-set 'lookup-support-alist
 			  (lookup-dictionary-id dict)
 			  (cdr pair))
-	(return)))))
+        ))))
+	;;(return))))) ;; what if we stop reading after first match?
 
 (defun lookup-clear ()
   (remove-hook 'kill-emacs-hook 'lookup-exit))

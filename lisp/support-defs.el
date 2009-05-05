@@ -54,6 +54,8 @@
         ("ndsary:.*/chinadat\\.csv" . "support-chinakan")
         ;; ndbtonic
         ("ndbtonic:.*/onmusic/" . "support-onmusic")
+        ;; ndpdic
+        ("ndpdic:.*/eijiro/" . "support-eijiro")
         ;; ndsimple
         ("ndsimple:.*/rfc4949\\.txt" . "support-rfc4949")
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
