@@ -4,7 +4,6 @@
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
-;; Version: $Id: lookup-text.el,v 1.6 2009/05/02 11:50:59 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -35,8 +34,8 @@
 
 ;;; Code:
 
-;;(require 'lookup-utils)
 (require 'lookup-vars)
+(require 'ucs-normalize)
 
 ;;;
 ;;; Customizable Variables
@@ -170,6 +169,18 @@ the string will be returned.  If CHARSETS is null, it returns t."
 (defun lookup-text-single-cjk-p (string)
   "Determines if STRING is one single CJK Unified Ideogrph."
   (if (string-match "^[㐀-鿿𠀀-𯟿]$" string) t))
+
+;;
+;; Normalize Input String
+;;
+
+(defun lookup-normalize-query-string ()
+  (setq lookup-query-string
+        (replace-regexp-in-string
+         "[〾󠀀-󯿽]" ""
+        (ucs-normalize-NFC-string lookup-query-string))))
+
+(add-hook 'lookup-query-string-hook 'lookup-normalize-query-string)
 
 ;;
 ;; 日本の旧字・新字の対応
