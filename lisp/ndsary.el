@@ -301,11 +301,9 @@ value (code heading)."
                      (let ((args (append ndsary-sary-program-options
                                          (list "-s" content-start
                                                "-e" entry-end pattern file))))
-                       (message "debug: 1 coding=%s args=%s" coding args)
                        (apply 'call-process ndsary-sary-program nil t nil args))
                    (let ((args (append ndsary-sary-program-options
                                        (list pattern file))))
-                     (message "debug: 2 coding=%s args=%s" coding args)
                      (apply 'call-process
                             ndsary-sary-program nil t nil args))))
                ;; extract entries
