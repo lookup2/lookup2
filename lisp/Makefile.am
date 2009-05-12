@@ -9,6 +9,7 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
 	support-defs.el support-cebd.el support-chiezo.el		\
 	support-chinakan.el support-chujiten.el support-colloc.el	\
 	support-comp.el support-crown.el support-daijirin.el		\
+	support-eijiro.el 						\
 	support-foldoc.el support-genius.el support-iwakoku.el		\
 	support-jargon.el support-jmdict.el support-jitsuu.el		\
 	support-kojien.el support-mwsedic.el support-mypaedia.el	\
