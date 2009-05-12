@@ -612,7 +612,7 @@ Return value would be (block . next-block)."
 ;; Utility Function
 
 (defun ndpdic-create-index-file (file &optional eijiro)
-  "Create XML-like index file from FILE.
+  "Create index file from FILE.
 PDIC辞書に対して、正規表現などで検索するためのインデックスファイルを生成する。
  各行は以下の構成となる。
  ［エントリ］<TAB>［16進数のブロック番号］
