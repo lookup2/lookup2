@@ -324,7 +324,9 @@
 
 (defun lookup-get-process-kill (&optional command-args)
   (if command-args
-      (lookup-process-kill (lookup-get-process command-args nil))
+      (let ((process (lookup-assoc-get lookup-get-process-alist command-args)))
+        (if process 
+            (lookup-process-kill (lookup-get-process command-args nil))))
     (while lookup-get-process-alist
       (lookup-process-kill (cdar lookup-get-process-alist))
       (setq lookup-get-process-alist (cdr lookup-get-process-alist)))))
