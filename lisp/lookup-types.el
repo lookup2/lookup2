@@ -450,12 +450,17 @@ will be attached to the module 'default'."
                     (lookup-new-query 'exact string))
                   query-strings))
          (entries
-          (apply 'nconc 
-                 (mapcar (lambda (query)
-                           (lookup-dictionary-search-internal
-                            dictionary query 'lookup-regular-search))
-                         queries)))
-         (entries (remove-if 'null entries)))
+          (mapcar (lambda (query)
+                    (lookup-dictionary-search-internal
+                     dictionary query 'lookup-regular-search))
+                  queries))
+         (entries
+          (progn
+            ;; (message "debug: nconc=%s" entries)
+            (apply 'nconc entries)))
+         (entries
+          (progn
+            (remove-if 'null entries))))
     (if (> (length entries) 1)
         (remove-duplicates 
          entries

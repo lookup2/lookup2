@@ -100,7 +100,7 @@
 ;;  :group 'lookup-agents)
 
 (defvar ndsary-sary-program "sary")
-(defvar ndsary-sary-program-options '("-i"))
+(defvar ndsary-sary-program-options '())
 
 ;;;
 ;;; Internal variables

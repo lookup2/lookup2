@@ -1,14 +1,15 @@
---- eblook.c.orig	2007-06-16 00:35:08.000000000 +0900
-+++ eblook.c	2007-06-17 23:31:17.000000000 +0900
-@@ -189,6 +189,7 @@
+--- eblook.c.orig	2009-02-26 10:25:26.000000000 +0900
++++ eblook.c	2009-05-07 02:26:27.000000000 +0900
+@@ -166,6 +166,8 @@
  int insert_font_list (EB_Book *);
  
  EB_Error_Code hook_font (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
 +EB_Error_Code hook_gb2312 (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
++EB_Error_Code hook_ebxac_gaiji (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
  EB_Error_Code hook_stopcode (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
  EB_Error_Code hook_tags (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
  EB_Error_Code hook_img (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
-@@ -197,6 +198,7 @@
+@@ -175,6 +177,7 @@
  
  EB_Error_Code can_menu_narrow_char (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
  EB_Error_Code can_menu_wide_char (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
@@ -16,23 +17,41 @@
  EB_Error_Code can_menu_gaiji (EB_Book *, EB_Appendix *, void *, EB_Hook_Code, int, const unsigned int *);
  
  #if 0
-@@ -348,6 +350,7 @@
+@@ -328,6 +331,8 @@
    {EB_HOOK_NARROW_JISX0208, hook_euc_to_ascii},
    {EB_HOOK_NARROW_FONT,     hook_font},
    {EB_HOOK_WIDE_FONT,	    hook_font},
-+  {EB_HOOK_GB2312,	    hook_gb2312},
++  {EB_HOOK_GB2312,			hook_gb2312},
++  {EB_HOOK_EBXAC_GAIJI,		hook_ebxac_gaiji},
    {EB_HOOK_NEWLINE,         eb_hook_newline},
  #ifdef EB_HOOK_STOP_CODE
    {EB_HOOK_STOP_CODE,       hook_stopcode},
-@@ -396,6 +399,7 @@
+@@ -356,6 +361,8 @@
+   {EB_HOOK_END_REFERENCE,   hook_tags},
+   {EB_HOOK_BEGIN_CANDIDATE, hook_tags},
+   {EB_HOOK_END_CANDIDATE_GROUP, hook_tags},
++  {EB_HOOK_BEGIN_UNICODE, hook_tags},
++  {EB_HOOK_END_UNICODE, hook_tags},
+ #ifdef EB_HOOK_BEGIN_IMAGE_PAGE
+   {EB_HOOK_BEGIN_IMAGE_PAGE, hook_img},
+   {EB_HOOK_END_IMAGE_PAGE,   hook_img},
+@@ -388,10 +395,15 @@
    {EB_HOOK_NARROW_JISX0208, hook_euc_to_ascii},
    {EB_HOOK_NARROW_FONT,     hook_font},
    {EB_HOOK_WIDE_FONT,	    hook_font},
-+  {EB_HOOK_GB2312,	    hook_gb2312},
++  {EB_HOOK_GB2312,			hook_gb2312},
++  {EB_HOOK_EBXAC_GAIJI,		hook_ebxac_gaiji},
    {EB_HOOK_NEWLINE,         eb_hook_newline},
  #ifdef EB_HOOK_STOP_CODE
    {EB_HOOK_STOP_CODE,       hook_stopcode},
-@@ -2687,6 +2691,21 @@
+ #endif
++  {EB_HOOK_BEGIN_UNICODE, hook_tags},
++  {EB_HOOK_END_UNICODE, hook_tags},
++
+   {EB_HOOK_BEGIN_SUBSCRIPT, hook_decoration},
+   {EB_HOOK_END_SUBSCRIPT, hook_decoration},
+   {EB_HOOK_BEGIN_SUPERSCRIPT, hook_decoration},
+@@ -2720,6 +2732,36 @@
  }
  
  EB_Error_Code
@@ -51,10 +70,38 @@
 +}
 +
 +EB_Error_Code
++hook_ebxac_gaiji (book, appendix, container, code, argc, argv)
++     EB_Book *book;
++     EB_Appendix *appendix;
++     void *container;
++     EB_Hook_Code code;
++     int argc;
++     const unsigned int *argv;
++{
++  char buff[EB_MAX_ALTERNATION_TEXT_LENGTH + 1];
++  sprintf (buff, "<gaiji=c%04x>", (argv[0] & 0x7f7f));
++  eb_write_text_string(book, buff);
++  return 0;
++}
++
++EB_Error_Code
  hook_decoration (book, appendix, container, code, argc, argv)
       EB_Book *book;
       EB_Appendix *appendix;
-@@ -3698,6 +3717,22 @@
+@@ -2935,6 +2977,12 @@
+     sprintf (buff, "</reference=%d:%d>", argv[1], argv[2]);
+     result = eb_write_text_string(book, buff);
+     break;
++  case EB_HOOK_BEGIN_UNICODE:
++	result = eb_write_text_string(book, "<unicode>");
++	break;
++  case EB_HOOK_END_UNICODE:
++	result = eb_write_text_string(book, "</unicode>");
++	break;
+ #ifdef EB_HOOK_BEGIN_CLICKABLE_AREA
+   case EB_HOOK_BEGIN_GRAPHIC_REFERENCE:
+     sprintf (buff, "<paged-reference=%d:%d>", argv[1], argv[2]);
+@@ -3724,6 +3772,22 @@
      return EB_SUCCESS;
  }
  
@@ -77,7 +124,7 @@
  EB_Hookset multi_candidate_hookset;
  EB_Hook
  multi_candidate_hooks [] = {
-@@ -3705,6 +3740,7 @@
+@@ -3731,6 +3795,7 @@
    {EB_HOOK_WIDE_FONT,	    can_menu_gaiji},
    {EB_HOOK_NARROW_JISX0208, can_menu_narrow_char},
    {EB_HOOK_WIDE_JISX0208,   can_menu_wide_char},

@@ -19,42 +19,37 @@ Lookup は Emacs エディタで利用できる辞書検索インターフェー
 <h1>Latest Release</h1>
 
 <ul>
-  <li>Stable version:
+  <li>安定版:
   <a href="http://download.sourceforge.net/lookup/lookup-1.3.tar.gz">Lookup 1.3</a>,
   <a href="http://openlab.ring.gr.jp/lookup/eblook/">eblook-1.3</a>
   </li>
+</ul>
 
-  <li>Unstable version:
-  <a href="">Lookup 1.99.2</a>
-  </li>
+<h1>Lookup 2.0 リリース</h1>
+<ul>
+  <li>β版: 
+    <a href="http://downloads.sourceforge.net/lookup/lookup-1.99.7.tar.gz">Lookup 1.99.7</a> (for Emacs 23.0.93) </li>
+  <li>最新版の入手には、<a href="http://sourceforge.net/cvs/?group_id=893">CVS リポジトリ</a> をご利用ください.</li>
+</ul>
 
-  <li>Contribution:
+  <!--li>Contribution:
   <a href="http://www.aist-nara.ac.jp/~masata-y/autolookup/index.html">Auto Lookup</a>
-  </li>
+  </li-->
 </ul>
 
 <h1>News</h1>
 <ul>
   <li>
-    <p><font color="#3366cc"><b>メーリングリストのアドレス変更</b></font> (2001-06-19)<br/>
-    <a href="lists/">Lookup メーリングリスト</a>
-    のアドレス、及び subscribe/unsubscribe の仕方が変更になりました。
-    </p>
-  </li>
-  <li>
-    <p><font color="#3366cc"><b>ndic sass support</b></font> (2000-11-11)<br/>
-    Yoishiro Okabe さんにより、ndic で sass をサポートするための
     <a href="http://openlab.ring.gr.jp/edict">電子辞書オープンラボ</a>
     から、<a href="http://openlab.ring.gr.jp/edict">Unix などで使える電子辞書の情報</a>
     が公開されています。これから電子辞書を買おうと思っている方、どの電子辞書を買おうか迷っている方はチェックしてみましょう。
-    </p>
   </li>
-  <li>
+  <!--li>
     <p><font color="#3366cc"><b>Auto Lookup リリース</b></font> (2000-10-13)<br/>
     <a href="http://www.aist-nara.ac.jp/~masata-y/autolookup/index.html">Auto Lookup</a>
     は、Lookup を使ってカーソル下の英単語を自動的に調べてミニバッファに結果を表示してくれるプログラムです。
     </p>
-  </li>
+  </li-->
   <li>
     <p><font color="#3366cc"><b>FreePWING による JIS X 4081 版各種辞書</b></font> (2000-09-01)<br/>
     <a href="http://openlab.ring.gr.jp/edict/fpw/">FreePWING 辞書の配布ページ</a>
@@ -73,7 +68,7 @@ Lookup は Emacs エディタで利用できる辞書検索インターフェー
 <hr/>
 
 <address>
-Last modified: $Date: 2009/03/08 01:20:37 $<br/>
+Last modified: $Date: 2009/05/12 00:59:47 $<br/>
 </address>
 
 <hr/>

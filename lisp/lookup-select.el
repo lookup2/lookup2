@@ -172,7 +172,7 @@ by the command `\\[lookup-select-dictionary-search]'."
   (lookup-select-dictionary-set-priority nil))
 
 (defun lookup-select-dictionary-unselect-all ()
-  "Unselect the dictionary on the all line."
+  "Unselect all dictionaries."
   (interactive)
   (save-excursion
     (lookup-select-goto-first)

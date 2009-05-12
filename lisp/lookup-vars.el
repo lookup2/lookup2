@@ -109,7 +109,7 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'symbol
   :group 'lookup-general-options)
 
-(defcustom lookup-max-hits 50
+(defcustom lookup-max-hits 120
   "*Maximum entries to display for each Agent.
 0 means unlimited."
   :type 'integer
