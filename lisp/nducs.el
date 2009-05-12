@@ -48,6 +48,8 @@
 
 (put 'nducs :methods '(exact prefix suffix substring regexp))
 
+(put 'nducs :default-method 'substring)
+
 (put 'nducs :list 'nducs-list)
 (defun nducs-list (agent)
   (list (lookup-new-dictionary agent "ucs")))
@@ -60,6 +62,7 @@
 (defun nducs-dictionary-search (dictionary query)
   "Search nducs DICTIONARY for QUERY."
   (let ((regexp (lookup-query-to-regexp query))
+        (case-fold-search t)
         entries)
     (dolist (ucs-name (ucs-names))
       (if (string-match regexp (car ucs-name))
