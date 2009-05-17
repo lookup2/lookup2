@@ -255,6 +255,11 @@
          (subindex (if (string-match ":\\([0-9]+\\)" code)
                        (match-string 1 code)))
          (dictionary (lookup-entry-dictionary entry))
+         (head
+          (if subindex
+              (lookup-new-entry 'regular dictionary
+                                (number-to-string index)
+                                (ndjitsuu-oyaji index))))
          (prev
           (if (/= index 1)
               (lookup-new-entry 'regular dictionary
@@ -267,6 +272,10 @@
                                 (ndjitsuu-oyaji (1+ index))))))
     (concat
      (ndjitsuu-inf-entry index subindex)
+     (when head
+       (let ((text (concat "\n親字：" (lookup-entry-heading head))))
+         (lookup-set-link 4 (length text) head text)
+         text))
      (when prev
        (lookup-put-property entry :preceding prev)
        (let ((text (concat "\n前項目：" (lookup-entry-heading prev))))
@@ -556,12 +565,30 @@ Returns image file path."
 ;;; Utility Function
 (defun ndjitsuu-convert-gaiji-to-ucs ()
   (interactive)
+  (goto-char (point-min))
   (while (re-search-forward "<\\(1[123]\\)>\\(.\\)" nil t)
     (let* ((code (concat (match-string 1) "-"
                          (format "%4X" (string-to-char (match-string 2)))))
            (char (car (lookup-gaiji-table-ref
                        ndjitsuu-gaiji-table code)))
            (char (and char (substring char 0 1))))
+      (replace-match (or char "〓")))))
+
+(defun ndjitsuu-convert-html-to-ucs ()
+  (interactive)
+  (goto-char (point-min))
+  (while (re-search-forward "<font\\W+face=\"?JITSUU\\([H1].\\)\"?[^>]*>\\(.\\)</font>" nil t)
+    (let* ((code (concat (match-string 1) "-"
+                         (format "%4X" (string-to-char (match-string 2)))))
+           (char (car (lookup-gaiji-table-ref
+                       ndjitsuu-gaiji-table code))))
+      (replace-match (or char "〓"))))
+  (goto-char (point-min))
+  (while (re-search-forward "<font\\W+style=\"font-family: JITSUU\\([H1].\\);\"[^>]*>\\W*\\(.\\)[^/]*</font>" nil t)
+    (let* ((code (concat (match-string 1) "-"
+                         (format "%4X" (string-to-char (match-string 2)))))
+           (char (car (lookup-gaiji-table-ref
+                       ndjitsuu-gaiji-table code))))
       (replace-match (or char "〓")))))
 
 (provide 'ndjitsuu)
