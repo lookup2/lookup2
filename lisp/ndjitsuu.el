@@ -76,26 +76,25 @@
 ;;;
 
 ;; HONMON
-(defvar ndjitsuu-dat-file "~/edicts/Jitsuu/DATA/DAT/HONMON.DAT")
-(defvar ndjitsuu-inf-file "~/edicts/Jitsuu/DATA/DAT/HONMON.INF")
+(defvar ndjitsuu-dat-file nil)
+(defvar ndjitsuu-inf-file nil)
 (defvar ndjitsuu-inf-header 8)
 (defvar ndjitsuu-inf-entry-number 7232)
 (defvar ndjitsuu-inf-table-size 8) ; start (4) length (4)
 
 ;; OYAJI
-(defvar ndjitsuu-oyaji-file "~/edicts/Jitsuu/DATA/LST/OYAJI.LST")
+(defvar ndjitsuu-oyaji-file nil)
 (defvar ndjitsuu-oyaji-header-length 32)
 (defvar ndjitsuu-oyaji-number 7232)
 (defvar ndjitsuu-oyaji-entry-size 190)
 
 ;; JUKUGO
-(defvar ndjitsuu-jukugo-file "~/edicts/Jitsuu/DATA/LST/JUKUGO.LST")
 (defvar ndjitsuu-jukugo-header-length 32)
 (defvar ndjitsuu-jukugo-number 126189)
 (defvar ndjitsuu-jukugo-entry-size 102)
 
 ;; Fonts
-(defvar ndjitsuu-font-directory "~/edicts/Jitsuu/Fonts/")
+(defvar ndjitsuu-font-directory nil)
 
 ;; INI
 (defvar ndjitsuu-st-code
@@ -165,20 +164,21 @@
   "Return list of dictionaries of AGENT."
   (if (null (file-directory-p ndjitsuu-tmp-directory))
       (make-directory ndjitsuu-tmp-directory))
+  (ndjitsuu-init agent)
+  (when (and (file-exists-p ndjitsuu-dat-file)
+             (file-exists-p ndjitsuu-font-directory))
+    (list (lookup-new-dictionary agent ""))))
+
+(defun ndjitsuu-init (agent)
   (let* ((location (lookup-agent-location agent)))
-    (setq ndjitsuu-dat-file (expand-file-name
-                             (concat location "/DATA/DAT/HONMON.DAT"))
-          ndjitsuu-inf-file (expand-file-name
-                             (concat location "/DATA/DAT/HONMON.INF"))
-          ndjitsuu-oyaji-file (expand-file-name
-                               (concat location "/DATA/LST/OYAJI.LST"))
-          ndjitsuu-jukugo-file (expand-file-name
-                                (concat location "/DATA/LST/JUKUGO.LST"))
-          ndjitsuu-font-directory (expand-file-name
-                                   (lookup-agent-option agent :fonts)))
-    (when (and (file-exists-p ndjitsuu-dat-file)
-               (file-exists-p ndjitsuu-font-directory))
-      (list (lookup-new-dictionary agent "")))))
+    (setq ndjitsuu-dat-file 
+          (expand-file-name "DATA/DAT/HONMON.DAT" location)
+          ndjitsuu-inf-file 
+          (expand-file-name "DATA/DAT/HONMON.INF" location)
+          ndjitsuu-oyaji-file 
+          (expand-file-name "DATA/LST/OYAJI.LST" location)
+          ndjitsuu-font-directory 
+          (expand-file-name (lookup-agent-option agent :fonts)))))
 
 (put 'ndjitsuu :title 'ndjitsuu-title)
 (defun ndjitsuu-title (dictionary)
@@ -187,6 +187,8 @@
 (put 'ndjitsuu :search 'ndjitsuu-search)
 (defun ndjitsuu-search (dictionary query)
   "Return entries list of DICTIONARY for QUERY."
+  (when (null ndjitsuu-font-directory)
+    (ndjitsuu-init (lookup-dictionary-agent dictionary)))
   (let* ((string (lookup-query-string query))
          (method (lookup-query-method query)))
     (cond ((string-match "^[0-9]+\\(:[0-9]+\\)?$" string)
@@ -485,12 +487,6 @@ Optional argument SUBINDEX indicates JUKUGO index."
                    (* ndjitsuu-oyaji-entry-size (1- index)))))
     (ndjitsuu-file-contents
      ndjitsuu-oyaji-file start ndjitsuu-oyaji-entry-size)))
-
-(defun ndjitsuu-jukugo (index)
-  (let* ((start (+ ndjitsuu-jukugo-header-length
-                   (* ndjitsuu-jukugo-entry-size (1- index)))))
-    (ndjitsuu-file-contents
-     ndjitsuu-jukugo-file start ndjitsuu-jukugo-entry-size)))
 
 ;; Font Image
 
