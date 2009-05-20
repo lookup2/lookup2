@@ -71,8 +71,8 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
 
 ;;;###autoload
 (defun lookup-text-wakati (string)
-  (lookup-get-process-require 
-   lookup-mecab-wakati-command string lookup-mecab-coding-system))
+  (lookup-with-coding-system lookup-mecab-coding-system
+    (lookup-get-process-require lookup-mecab-wakati-command string)))
 
 ;;;
 ;;; Kanji to Kana 

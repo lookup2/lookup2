@@ -169,17 +169,18 @@
 ;;;
 
 (defun ndspell-check-spelling (string option)
-  (let* ((command-args (ndspell-command-args option))
-         (output (lookup-get-process-require command-args string 'utf-8)))
-    (cond
-     ((string= output "") nil)			; empty
-     ((eq (aref output 0) ?*) nil)		; match
-     ((eq (aref output 0) ?-) nil)		; compound
-     ((eq (aref output 0) ?#) nil)		; no match
-     ((string-match "^\\+ \\(.*\\)" output)	; root match
-      (list (downcase (match-string 1 output))))
-     ((string-match "^&[^:]*: " output)		; some candidates
-      (split-string (substring output (match-end 0)) "[,\n] ?" t)))))
+  (lookup-with-coding-system 'utf-8
+    (let* ((command-args (ndspell-command-args option))
+           (output (lookup-get-process-require command-args string)))
+      (cond
+       ((string= output "") nil)			; empty
+       ((eq (aref output 0) ?*) nil)		; match
+       ((eq (aref output 0) ?-) nil)		; compound
+       ((eq (aref output 0) ?#) nil)		; no match
+       ((string-match "^\\+ \\(.*\\)" output)	; root match
+        (list (downcase (match-string 1 output))))
+       ((string-match "^&[^:]*: " output)		; some candidates
+        (split-string (substring output (match-end 0)) "[,\n] ?" t))))))
 
 (defun ndspell-search-spelling (regexp option)
   (with-temp-buffer

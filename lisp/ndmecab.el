@@ -92,16 +92,17 @@
 
 (put 'ndmecab :content 'ndmecab-entry-content)
 (defun ndmecab-entry-content (entry)
-  (let ((string (lookup-entry-code entry)))
-    (mapconcat (lambda (element)
-                 (cond ((eq element t) string)
-                       ((eq element 'readings)
-                        (mapconcat 
-                         'identity (lookup-text-get-readings string) ","))
-		       ((stringp element) element)
-		       ((listp element) (lookup-get-process-require element string lookup-mecab-coding-system))
-		       (t (error "Invalid format element: %S" element))))
-	       ndmecab-content-format "")))
+  (lookup-with-coding-system lookup-mecab-coding-system
+    (let ((string (lookup-entry-code entry)))
+      (mapconcat (lambda (element)
+                   (cond ((eq element t) string)
+                         ((eq element 'readings)
+                          (mapconcat 
+                           'identity (lookup-text-get-readings string) ","))
+                         ((stringp element) element)
+                         ((listp element) (lookup-get-process-require element string))
+                         (t (error "Invalid format element: %S" element))))
+                 ndmecab-content-format ""))))
 
 
 (provide 'ndmecab)

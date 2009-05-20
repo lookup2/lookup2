@@ -296,37 +296,46 @@
 ;;; simple process management utility
 ;;;
 
+;; coding-system should be set by `with-lookup-coding-system'.
+;; prompt, if not specified, will be treated as "\n".
+
 ;; TODO: kill-process-at-exit.
 
 (defvar lookup-get-process-alist nil)
 
-(defun lookup-get-process (command-args coding)
+(defun lookup-get-process (command-args)
+  "Get new process for COMMAND-ARGS.
+If process is not run, silently remove the process and re-create new process."
   (let ((process (lookup-assoc-get lookup-get-process-alist command-args)))
     (unless (and process (eq (process-status process) 'run))
-      (condition-case nil 
-          (if process (kill-process process)))
-      (let ((buffer (lookup-open-process-buffer 
+      (condition-case nil
+          (if process (kill-process process))
+        (error nil))
+      (let ((buffer (lookup-open-process-buffer
                      (concat " *" (car command-args) "*"))))
-	(setq process (apply 'start-process "lookup-process" buffer
+	(setq process (apply 'start-process (car command-args) buffer
 			     command-args))
 	(set-process-query-on-exit-flag process nil)
 	;; 起動後、少し時間を置かないと、最初の検索がうまくいかない。
 	(sleep-for 0.1)
-        (when coding
-          (set-process-coding-system process coding coding))
+        (set-process-coding-system process
+                                   coding-system-for-read
+                                   coding-system-for-write)
 	(setq lookup-get-process-alist
 	      (lookup-assoc-put lookup-get-process-alist command-args process))))
     process))
 
-(defun lookup-get-process-require (command-args string coding)
+(defun lookup-get-process-require (command-args string &optional prompt filter)
   (lookup-process-require 
-   (lookup-get-process command-args coding) (concat string "\n") "\n"))
+   (lookup-get-process command-args) 
+   (concat string "\n") (or prompt "\n") filter))
 
 (defun lookup-get-process-kill (&optional command-args)
   (if command-args
       (let ((process (lookup-assoc-get lookup-get-process-alist command-args)))
-        (if process 
-            (lookup-process-kill (lookup-get-process command-args nil))))
+        (when process 
+          (lookup-process-kill (lookup-get-process command-args nil))
+          (lookup-assoc-del lookup-get-process-alist command-args)))
     (while lookup-get-process-alist
       (lookup-process-kill (cdar lookup-get-process-alist))
       (setq lookup-get-process-alist (cdr lookup-get-process-alist)))))
