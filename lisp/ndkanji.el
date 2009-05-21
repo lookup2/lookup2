@@ -68,13 +68,13 @@
   (expand-file-name "~/edicts/KDP/unihan.sl3"))
 
 (defvar ndkanji-sql-utf8-format 
-  "select unihan.kBase.char from unihan.kBase where unihan.kBase.k in (%s) limit 200")
+  "select distinct ids.ch from ids where ids.k in (%s) limit 200")
 
 (defvar ndkanji-sql-ucs-format 
-  "select * from (%s) limit 200")
+  "select distinct * from (%s) limit 200")
 
 (defvar ndkanji-sql-count-format 
-  "select count(*) from unihan.kBase where unihan.kBase.k in (%s)")
+  "select count(*) from (%s)")
 
 (defvar ndkanji-sql-ids-format 
   "select ids.k from ids where ids.v glob \"%s\"")
@@ -89,12 +89,12 @@
   "select strokes.v from strokes where strokes.k = \"%X\" ")
 
 (defvar ndkanji-sql-char-ids-format
-  "select ids.v from ids where ids.k = \"%X\" ")
+  "select ids.v from ids where ids.ch = \"%c\" ")
 
 (defvar ndkanji-parse-regexp
-  "\\([?*⿰-⿻㐀-鿿豈-﫿𠀀-𫜴-]+\\)\\([0-9][0-9]?\\)?\\(-[0-9]?[0-9]?\\)?\\(J\\)?")
+  "\\([?*⿰-⿻⺀-⻳〢㇀㇉㐀-鿿豈-﫿𠀀-𫜴-]+\\)\\([0-9][0-9]?\\)?\\(-[0-9]?[0-9]?\\)?\\(J\\)?")
 
-(defvar ndkanji-kanji-regexp "[㐀-鿿豈-﫿𠀀-𫜴-]")
+(defvar ndkanji-kanji-regexp "[⺀-⻳〢㇀㇉㐀-鿿豈-﫿𠀀-𫜴-]")
 
 ;;;
 ;;; types
@@ -127,9 +127,7 @@
          (result (ndkanji-sl3-query 
                   (ndkanji-construct-sql query))))
     (mapcar (lambda (ucs)
-              (lookup-new-entry 'dynamic dictionary 
-                                (char-to-string (string-to-number ucs 16))))
-            result)))
+              (lookup-new-entry 'dynamic dictionary result)))))
 
 (put 'ndkanji :dynamic 'ndkanji-dynamic-search)
 (defun ndkanji-dynamic-search (entry)
@@ -173,12 +171,16 @@
                     ndkanji-sl3-prompt)))
       (split-string output "\n" t))))
 
+(defun ndkanji-sl3-exit ()
+  (let ((command-args (list ndkanji-sl3-program ndkanji-kdp-sl3)))
+    (lookup-get-process-kill command-args)))
+
 (defun ndkanji-sl3-setup (location)
   (setq ndkanji-unihan-sl3 (expand-file-name "unihan.sl3" location)
         ndkanji-kdp-sl3    (expand-file-name "kdp.sl3" location))
   (if (file-exists-p ndkanji-unihan-sl3)
       (ndkanji-sl3-query 
-       (concat "attach \"" ndkanji-unihan-sl3 "\" as unihan;"))))
+       (concat "attach \"" ndkanji-unihan-sl3 "\" as unihan"))))
 
 (defun ndkanji-sl3-char-strokes (char)
   "Get strokes of specified CHAR."
@@ -263,7 +265,7 @@ If it does not match, return nil."
         (setq flag-sql ndkanji-sql-japanese-format))
       (format 
        (if count ndkanji-sql-count-format
-           ndkanji-sql-ucs-format )
+           ndkanji-sql-utf8-format )
        (concat ids-sql
                (if strokes-sql (concat " intersect " strokes-sql))
                (if flag (concat " intersect " flag-sql))))
@@ -282,8 +284,7 @@ If ARG is provided, decompose char even if char exists at point."
          (looking-at ndkanji-parse-regexp))
     ;; Forward matching
     (let ((end (match-end 0))
-          (result (mapcar (lambda (x) (string-to-number x 16))
-                          (ndkanji-sl3-query (ndkanji-construct-sql (match-string 0))))))
+          (result (ndkanji-sl3-query (ndkanji-construct-sql (match-string 0)))))
       (if (null result)
           (message "No such pattern!")
         (delete-region (point) end)
