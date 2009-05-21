@@ -334,7 +334,7 @@ If process is not run, silently remove the process and re-create new process."
   (if command-args
       (let ((process (lookup-assoc-get lookup-get-process-alist command-args)))
         (when process 
-          (lookup-process-kill (lookup-get-process command-args nil))
+          (lookup-process-kill (lookup-get-process command-args))
           (lookup-assoc-del lookup-get-process-alist command-args)))
     (while lookup-get-process-alist
       (lookup-process-kill (cdar lookup-get-process-alist))
