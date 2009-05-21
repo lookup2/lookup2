@@ -1,4 +1,5 @@
 dnl Copyright (C) 1999 NISHIDA Keisuke <knishida@ring.aist.go.jp>
+dnl Copyright (C) 2009 Lookup Development Team
 dnl
 dnl This program is free software; you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -15,10 +16,12 @@ dnl along with this program; if not, write to the Free Software
 dnl Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 dnl 02111-1307, USA.
 
-AC_DEFUN(AM_PATH_LISPDIR,
+AC_DEFUN([AM_PATH_LISPDIR],
  [dnl #
   dnl # Check Emacs
   dnl #
+  AC_PROG_EGREP
+  AC_PROG_SED
   AC_ARG_WITH(emacs,
     [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, xemacs...]],
     [case "${withval}" in
@@ -27,9 +30,12 @@ AC_DEFUN(AM_PATH_LISPDIR,
        *)	EMACS=${withval} ;;
      esac], EMACS=)
   if test "x$EMACS" = "xt" -o "x$EMACS" = x; then
-    AC_PATH_PROGS(EMACS, emacs xemacs mule, no)
+    AC_PATH_PROGS(EMACS, emacs, no)
     if test $EMACS = no; then
       AC_MSG_ERROR(you should install Emacs first)
+    fi
+    if test `$EMACS --version | $EGREP -e 'GNU Emacs [[0-9]]' | $SED -e 's/GNU Emacs \([[0-9]]*\).*/\1/'` -le 22 ; then
+      AC_MSG_ERROR(you need Emacs version 23 or later.)
     fi
   fi
   dnl # 
@@ -49,28 +55,6 @@ AC_DEFUN(AM_PATH_LISPDIR,
       fi
       if test -d $prefix/share/emacs; then
 	emacsdir="$prefix/share/emacs"
-      fi
-      ;;
-    xemacs|xemacs-*)
-      if test -d $prefix/lib/xemacs; then
-	emacsdir="$prefix/lib/xemacs"
-      fi
-      if test -d $prefix/share/xemacs; then
-	emacsdir="$prefix/share/xemacs"
-      fi
-      ;;
-    mule|mule-*)
-      if test -d $prefix/lib/emacs; then
-	emacsdir="$prefix/lib/emacs"
-      fi
-      if test -d $prefix/share/emacs; then
-	emacsdir="$prefix/share/emacs"
-      fi
-      if test -d $prefix/lib/mule; then
-	emacsdir="$prefix/lib/mule"
-      fi
-      if test -d $prefix/share/mule; then
-	emacsdir="$prefix/share/mule"
       fi
       ;;
     esac
@@ -93,11 +77,6 @@ AC_DEFUN(AM_PATH_LISPDIR,
     if test -d $emacsdir/lisp; then
       lispdir="$emacsdir/lisp"
     fi
-    case "$EMACS_BASENAME" in
-    xemacs|xemacs-*)
-      lispdir="$lispdir/lookup"
-      ;;
-    esac
   fi
   AC_MSG_RESULT($lispdir)
   AC_SUBST(lispdir)])
