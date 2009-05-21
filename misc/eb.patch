@@ -1,0 +1,145 @@
+--- ./eb/text.h.orig	2007-12-12 16:54:52.000000000 +0900
++++ ./eb/text.h	2009-05-02 00:21:45.000000000 +0900
+@@ -105,6 +105,12 @@
+ #define EB_HOOK_BEGIN_CLICKABLE_AREA    47
+ #define EB_HOOK_END_CLICKABLE_AREA      48
+ 
++#define EB_HOOK_BEGIN_UNICODE		49
++#define EB_HOOK_END_UNICODE		50
++#define EB_HOOK_BEGIN_EBXAC_GAIJI	51
++#define EB_HOOK_END_EBXAC_GAIJI		52
++#define EB_HOOK_EBXAC_GAIJI		53
++
+ /*
+  * Function declarations.
+  */
+--- ./eb/defs.h.orig	2007-12-12 16:54:52.000000000 +0900
++++ ./eb/defs.h	2009-05-01 16:21:36.000000000 +0900
+@@ -175,7 +175,7 @@
+ /*
+  * The number of text hooks.
+  */
+-#define EB_NUMBER_OF_HOOKS		49
++#define EB_NUMBER_OF_HOOKS		54
+ 
+ /*
+  * The number of search contexts required by a book.
+@@ -771,6 +771,11 @@
+      * Whether the current text point is in the candidate word or not.
+      */
+     int is_candidate;
++
++    /*
++     * Whether the current text point is in EBXA-C gaiji area.
++     */
++    int ebxac_gaiji_flag;
+ };
+ 
+ /*
+--- ./eb/readtext.c.orig	2009-01-07 18:09:29.000000000 +0900
++++ ./eb/readtext.c	2009-05-02 00:21:25.000000000 +0900
+@@ -113,6 +113,7 @@
+     book->text_context.auto_stop_code = -1;
+     book->text_context.candidate[0] = '\0';
+     book->text_context.is_candidate = 0;
++    book->text_context.ebxac_gaiji_flag = 0;
+ 
+     LOG(("out: eb_initialize_text_context()"));
+ }
+@@ -157,6 +158,7 @@
+     book->text_context.auto_stop_code = -1;
+     book->text_context.candidate[0] = '\0';
+     book->text_context.is_candidate = 0;
++    book->text_context.ebxac_gaiji_flag = 0;
+ 
+     LOG(("out: eb_reset_text_context()"));
+ }
+@@ -753,6 +755,18 @@
+ 		hook = hookset->hooks + EB_HOOK_NEWLINE;
+ 		break;
+ 
++	    case 0x0b:
++		/* beginning of unicode */
++		in_step = 2;
++		hook = hookset->hooks + EB_HOOK_BEGIN_UNICODE;
++		break;
++
++	    case 0x0c:
++		/* end of unicode */
++		in_step = 2;
++		hook = hookset->hooks + EB_HOOK_END_UNICODE;
++		break;
++
+ 	    case 0x0e:
+ 		/* beginning of superscript */
+ 		in_step = 2;
+@@ -794,7 +808,7 @@
+ 		context->skip_code = 0x15;
+ 		break;
+ 
+-	    case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
++	    case 0x1a: case 0x1b: case 0x1e: case 0x1f:
+ 		/* emphasis; described in JIS X 4081-1996 */
+ 		in_step = 4;
+ 		if (cache_rest_length < in_step) {
+@@ -807,6 +821,20 @@
+ 		    in_step = 2;
+ 		break;
+ 
++	    case 0x1c:
++		/* beginning of EBXA-C gaiji */
++		in_step = 2;
++		hook = hookset->hooks + EB_HOOK_BEGIN_EBXAC_GAIJI;
++		context->ebxac_gaiji_flag = 1;
++		break;
++
++	    case 0x1d:
++		/* end of EBXA-C gaiji */
++		in_step = 2;
++		hook = hookset->hooks + EB_HOOK_END_EBXAC_GAIJI;
++		context->ebxac_gaiji_flag = 0;
++		break;
++
+ 	    case 0x32:
+ 		/* beginning of reference to monochrome graphic */
+ 		in_step = 2;
+@@ -1313,7 +1341,22 @@
+ 		    candidate_length += 2;
+ 		}
+ 
+-		if (context->narrow_flag) {
++		if (context->ebxac_gaiji_flag) {
++		    hook = hookset->hooks + EB_HOOK_EBXAC_GAIJI;
++		    if (forward_only) {
++			; /* do nothing */
++		    } else if (hook->function == NULL) {
++			error_code = eb_write_text_byte2(book, c1 | 0x80,
++			    c2 | 0x80);
++			if (error_code != EB_SUCCESS)
++			    goto failed;
++		    } else {
++			error_code = hook->function(book, appendix, container,
++			    EB_HOOK_EBXAC_GAIJI, 0, argv);
++			if (error_code != EB_SUCCESS)
++			    goto failed;
++		    }
++		} else if (context->narrow_flag) {
+ 		    hook = hookset->hooks + EB_HOOK_NARROW_JISX0208;
+ 		    if (forward_only) {
+ 			; /* do nothing */
+--- ./ChangeLog.orig	2009-03-14 09:30:41.000000000 +0900
++++ ./ChangeLog	2009-05-02 00:29:35.000000000 +0900
+@@ -1,3 +1,13 @@
++2009-05-02  Motoyuki Kasahara  <m-kasahr@sra.co.jp>
++
++	* eb/text.h (EB_HOOK_BEGIN_UNICODE, EB_HOOK_END_UNICODE,
++	EB_HOOK_BEGIN_EBXAC_GAIJI, EB_HOOK_END_EBXAC_GAIJI,
++	EB_HOOK_EBXAC_GAIJI): Added.
++	* eb/defs.h (EB_NUMBER_OF_HOOKS): Defined as 54.
++	* eb/defs.h (EB_Text_Context_Struct): Add `ebxac_gaiji_flag'.
++	* eb/readtext.c (eb_read_text_internal): Also recognize escape 
++	sequences 0x0b, 0x0c, 0x1c and 0x1d.
++
+ 2009-03-14  Motoyuki Kasahara  <m-kasahr@sra.co.jp>
+ 
+ 	* Version 4.4.1.
