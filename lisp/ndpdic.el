@@ -33,8 +33,8 @@
 ;;         ....
 ;;         ))
 ;;
-;; If dictionary option `:index' is specified via support file, then that 
-;; file is searched for regular expressions.
+;; If dictionary option `:index' is specified via support file, then it 
+;; will be possible to search the dictionary by regular expression.
 ;;
 ;; There is a small sample function to create `index' file for PDIC.
 ;; To make an index, type M-x ndpdic-create-index-file.
@@ -78,7 +78,7 @@
 (defun ndpdic-dictionary-methods (dictionary)
   "Return methods of DICTIONARY."
   (let ((index (ndpdic-dictionary-index dictionary)))
-    (if index '(exact prefix suffix substring regexp)
+    (if index '(exact prefix suffix substring wildcard regexp)
       '(exact prefix))))
 
 (put 'ndpdic :list 'ndpdic-list)
