@@ -68,7 +68,7 @@
   (expand-file-name "~/edicts/KDP/unihan.sl3"))
 
 (defvar ndkanji-sql-utf8-format 
-  "select distinct ids.ch from ids where ids.k in (%s) limit 200")
+  "select distinct ch.v from ch where ch.k in (%s) limit 200")
 
 (defvar ndkanji-sql-ucs-format 
   "select distinct * from (%s) limit 200")
@@ -89,7 +89,10 @@
   "select strokes.v from strokes where strokes.k = \"%X\" ")
 
 (defvar ndkanji-sql-char-ids-format
-  "select ids.v from ids where ids.ch = \"%c\" ")
+  "select ids.v from ids where ids.k in (select ch.k from ch where ch.v = \"%c\") ")
+
+(defvar ndkanji-sql-similar-format
+  "select ch.v from ch where ch.k in (select similar.k from similar where similar.v = \"%s\" union select similar.v from similar where similar.k = \"%s\")")
 
 (defvar ndkanji-parse-regexp
   "\\([?*⿰-⿻⺀-⻳〢㇀㇉㐀-鿿豈-﫿𠀀-𫜴-]+\\)\\([0-9][0-9]?\\)?\\(-[0-9]?[0-9]?\\)?\\(J\\)?")
@@ -234,6 +237,26 @@
       strokes-list)))
 
 ;;;
+;;; char-to-code, code-to-char functions
+;;;
+
+(defun kdp-util-char-to-code (char)
+  (if (and (< #xf100 char) (< char #xf700))
+      (let* ((x (- char #xee1b))
+             (y (% x 157))
+             (y (+ y (if (< y 63) 64 98))))
+        (format "CDP-%02X%02X" (+ (/ x 157) #x80) y))
+    (format "%X" char)))
+
+(defun kdp-util-code-to-char (code)
+  (if (string-match "^CDP" code)
+      (let* ((x (string-to-number (substring str 4 6) 16))
+             (y (string-to-number (substring str 6 8) 16))
+             (x (+ (* (- x #x80) 157) (if (< y 129) (- y 64) (- y 98)))))
+        (+ x #xee1b))
+    (string-to-number code 16)))
+
+;;;
 ;;; Main Function
 ;;;
 
@@ -270,6 +293,19 @@ If it does not match, return nil."
                (if strokes-sql (concat " intersect " strokes-sql))
                (if flag (concat " intersect " flag-sql))))
       )))
+
+;;;
+;;; Ambiguous Expansion Function
+;;;
+(defun ndkanji-expand-wildcard (str)
+  (let ((chars (string-to-list str)))
+    (mapconcat (lambda (ch)
+                 (let ((chars (ndkanji-sl3-query 
+                               (format ndkanji-sql-similar-format 
+                                       (kdp-util-char-to-code char)
+                                       (kdp-util-char-to-code char)))))
+                   (if chars (concat "[" chars "]") ch)))
+               "")))
 
 ;;;
 ;;; Edit Function
