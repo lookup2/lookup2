@@ -33,11 +33,11 @@
 ;; word will be an independent entry.
 ;;
 ;; If `:entry-start' and `:entry-end' is provided by the dictionary
-;; spec, then `exact', `prefix', `suffix', `substring' and `keyword'
+;; spec, then `exact', `prefix', `suffix', `substring' and `text'
 ;; search is possible.
 ;;
 ;; While `substring' only matches the string between `:entry-start'
-;; and `:entry-end', `keyword' matches anywhere in the content.
+;; and `:entry-end', `text' matches anywhere in the content.
 ;;
 ;; If a user wants to search multiple `:entry-start' and `:entry-end'
 ;; pairs, then they can be provided by `:entry-start-end-pairs'
@@ -82,7 +82,7 @@
 ;;           ....
 ;;           ))
 ;;
-;;  If you want to give multiple search methods to singel XML file, 
+;;  If you want to give multiple search methods to single XML file, 
 ;;  then please make a hard-link copy of them and create purpose-specific
 ;;  ".ary" files individually.
 
@@ -117,7 +117,7 @@
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
 (defun ndsary-dictionary-methods (dictionary)
-  '(exact prefix suffix substring keyword))
+  '(exact prefix suffix substring text))
 
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
@@ -198,7 +198,7 @@ If END tag is provided, then that will also be attached."
   (if (and (or (null start) (null end))
            (or (equal method 'suffix)
                (equal method 'substring)
-               (equal method 'keyword)))
+               (equal method 'text)))
       nil
     (concat (if (or (equal method 'exact)
                     (equal method 'prefix))
@@ -232,7 +232,7 @@ matches START-tag, and END-tag respectively."
     ;; forward-search only
     (if (equal method 'exact)
         (cons (concat start-regexp regexp end-regexp) nil)
-      (if (equal method 'keyword)
+      (if (equal method 'text)
           (cons (concat start-regexp ".+?" end-regexp) nil)
         (if regular
             (if (equal method 'prefix)
@@ -252,7 +252,7 @@ matches START-tag, and END-tag respectively."
 
 (defun ndsary-file-searches
   (file string method entry-pairs regular coding max-hits
-   &optional entry-func content-start )
+   &optional entry-func content-start content-end)
   "Return entry list of FILE STRING of METHOD for ENTRY-PAIRS.
 For the rest of arguments, please refer `ndsary-file-search'."
   (sort
@@ -262,21 +262,21 @@ For the rest of arguments, please refer `ndsary-file-search'."
                      (ndsary-file-search
                       file string method (car x) (cdr x)
                       regular coding max-hits
-                      entry-func content-start))
+                      entry-func content-start content-end))
                    entry-pairs))
     :test (lambda (x y) (equal (car x) (car y))))
    (lambda (x y) (string< (cdr x) (cdr y)))))
 
 (defun ndsary-file-search
   (file string method entry-start entry-end regular coding max-hits
-   &optional entry-func content-start )
-  "Return entry list of FILE STRING of METHOD for ENTRY-START and ENTRY-END.
+   &optional entry-func content-start content-end)
+  "Return entry list in FILE for STRING with METHOD for ENTRY-START and ENTRY-END.
 CODING specifies file's coding system.
 If more than MAX-HITS is hit, then error response query will be returned.
 Returned list will be a list of (code . heading).
-If ENTRY-FUNC and CONTENT-START is provided, the region between
-CONTENT-START to ENTRY-END will be passed to create the ENTRY
-value (code heading)."
+If ENTRY-FUNC, CONTENT-START and CONTENT-END (default: ENTRY-END) 
+are provided, the region between CONTENT-START to CONTENT-END 
+will be passed to create the ENTRY value (code heading).  "
   (let* ((pattern (ndsary-pattern
                    string method entry-start entry-end))
          (count 0) result)
@@ -300,7 +300,8 @@ value (code heading)."
                  (if (and entry-func content-start entry-end)
                      (let ((args (append ndsary-sary-program-options
                                          (list "-s" content-start
-                                               "-e" entry-end pattern file))))
+                                               "-e" (or content-end entry-end)
+                                               pattern file))))
                        (apply 'call-process ndsary-sary-program nil t nil args))
                    (let ((args (append ndsary-sary-program-options
                                        (list pattern file))))
@@ -310,7 +311,7 @@ value (code heading)."
                (setq result
                      (ndsary-extract-entries
                       string method entry-start entry-end regular
-                      entry-func content-start))
+                      entry-func content-start (or content-end entry-end)))
                ;; remove duplicate entries
                (unless regular
                  (setq result
@@ -334,18 +335,17 @@ value (code heading)."
 
 (defun ndsary-extract-entries
   (string method entry-start entry-end regular
-   &optional entry-func content-start)
+   &optional entry-func content-start content-end)
   "Extract entries in accordance with STRING, METHOD, ENTRY-START and ENTRY-END.
-If ID-START and ID-END are specified, they will be used as entry code.
 If REGULAR is t, then no duplicate start-tag in single line is assumed.
-Extraction are done in accordance with follows.
-  * exact, keyword:  No need to extract.  Just use query-string.
+Extractions are done in accordance with follows.
+  * exact, text:  No need to extract.  Just use query-string.
   * suffix:    <start>.....|[str]<end>
   * substring: <start>...|[str]..<end>
   * prefix:    <start>[str]......<end>.
 Entries will be a list of (code . heading).
 If ENTRY-FUNC is provided, it will be called to  extract headr (code . heading).
-from the region CONTENT-START and ENTRY-END."
+from the region CONTENT-START and CONTENT-END."
   ;; Additional Note.
   ;; METHOD and STRING is needed to filter out `outside-entry match'.
   ;; Backward Checking is also needed.
@@ -383,18 +383,18 @@ from the region CONTENT-START and ENTRY-END."
           (save-restriction
             (if (and (progn (search-backward content-start nil t)
                             (setq code-start (match-beginning 0)))
-                     (progn (search-forward entry-end nil t)
+                     (progn (search-forward content-end nil t)
                             (setq code-end (match-end 0))))
                 (progn
                   (narrow-to-region code-start code-end)
                   (goto-char (point-min))
-                  (setq entry (funcall entry-func)))
+                  (setq entry (funcall entry-func entry)))
               (setq entry nil)))))
       ;; entry accumulation
       (setq entries (cons entry entries)))
     entries))
 
-(defun ndsary-file-content 
+(defun ndsary-file-content
   (file string content-start content-end &optional coding)
   (if (equal "�" string) string
     (let ((coding (if (null coding) 'utf-8 coding))
