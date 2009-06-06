@@ -275,6 +275,27 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 	(set-window-buffer lookup-start-window (current-buffer))
       (display-buffer (current-buffer))))))
 
+(defun lookup-filter-query (query filters)
+  "Apply FILTERS functions to QUERY to generate filtered queries."
+  (let ((queries (list query)) result)
+    (mapcar 
+     (lambda (filter)
+       (setq queries 
+             (apply 'append 
+                    (mapcar (lambda (query)
+                              (setq result (apply filter (list query)))
+                              (message "debug: result=%s" result)
+                              (if (listp result) result (list result)))
+                            queries)))
+       (message "debug: queries=%s" queries))
+     filters)
+    queries))
+
+(defun lookup-filter-string (string filters)
+  (let ((query (lookup-new-query 'default string)))
+    (lookup-query-string 
+     (car (lookup-filter-query query filters)))))
+
 
 ;;;
 ;;; Search commands
@@ -318,11 +339,9 @@ See `lookup-pattern' for details."
   (interactive (lookup-word-input))
   (if lookup-edit-input 
       (lookup-search-pattern module (lookup-input-pattern module word))
-    (lookup-search-pattern 
+    (lookup-search-pattern
      module 
-     (let ((lookup-query-string word))
-       (run-hooks 'lookup-query-string-hook)
-       lookup-query-string)
+     (lookup-filter-string string lookup-query-filters)
      lookup-default-method)))
 
 ;;;###autoload
@@ -434,23 +453,14 @@ See `lookup-secondary' for details."
 (defvar lookup-input-dictionary-history nil
   "History of inputed dictionary-IDs.")
 
-(defvar lookup-query-string nil)
-
-(defvar lookup-query-string-hook nil
-  "Functions to be applied before QUERY-STRING is queried.")
-
 (defun lookup-input-pattern (module &optional default)
-  (let* ((lookup-query-string default))
-    (or default (setq default (lookup-current-word)))
-    (if lookup-query-string
-        (run-hooks 'lookup-query-string-hook))
-    (if (or (string-equal default "")
-            (string-equal default lookup-query-string))
-        (setq default nil))
-    (lookup-read-string
-     (concat (if module (concat "[" (lookup-module-name module) "] "))
-             "Look up")
-     lookup-query-string 'lookup-input-history default t)))
+  (or default (setq default (lookup-current-word)))
+  (setq default (lookup-filter-string default lookup-query-filters))
+  (if (string-equal default "") (setq default nil))
+  (lookup-read-string
+   (concat (if module (concat "[" (lookup-module-name module) "] "))
+           "Look up")
+   default 'lookup-input-history default t))
 
 (defun lookup-input-module-interactively ()
   (if current-prefix-arg (lookup-input-module) (lookup-current-module)))
