@@ -1,4 +1,4 @@
-;;; ndic.el --- Lookup by free dictionaries
+;;; ndic.el --- Lookup by `dict'-format dictionaries
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 
@@ -86,7 +86,7 @@
 	  (setq title (match-string 1 title)))
       title)))
 
-(defconst ndic-dictd-methods (delq 'text lookup-search-methods))
+(defconst ndic-dictd-methods (remove 'text lookup-search-methods))
 
 (put 'ndic :methods 'ndic-dictionary-methods)
 (defun ndic-dictionary-methods (dictionary)
