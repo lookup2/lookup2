@@ -63,7 +63,7 @@
   (if (or (and (lookup-dictionary-option dictionary :entry-start t)
                (lookup-dictionary-option dictionary :entry-end t))
           (lookup-dictionary-option dictionary :entry-start-end-pairs t))
-      '(exact prefix suffix substring keyword)
+      '(exact prefix suffix substring text)
     '(exact prefix)))
 
 (put 'ndsimple :list 'ndsimple-list)
@@ -144,7 +144,7 @@ If applied, (match-string 1) should be an entry word."
         (start-regexp (if start (regexp-quote start) "^"))
         (end-regexp   (if end   (regexp-quote end)   "$")))
     (concat
-     (unless (equal method 'keyword) start-regexp)
+     (unless (equal method 'text) start-regexp)
      "\\("
      (unless (or (equal method 'prefix) (equal method 'exact))
        ".*")
@@ -152,7 +152,7 @@ If applied, (match-string 1) should be an entry word."
      (unless (or (equal method 'suffix) (equal method 'exact))
        ".*")
      "\\)"
-     (unless (equal method 'keyword) end-regexp))))
+     (unless (equal method 'text) end-regexp))))
      
 (defun ndsimple-file-entries (file string method entry-start entry-end regular)
   "Extract entries in FILE with STRING, METHOD, ENTRY-START and ENTRY-END.
