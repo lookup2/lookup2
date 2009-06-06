@@ -380,6 +380,6 @@
 	    :stop-code "0x1f090000"
 	    :gaiji-table   oxford-gaiji-table
 	    :arranges '((structure oxford-arrange-structure))
-	    :transformer 'lookup-stem-english-search))
+            :query-filter 'lookup-query-filter-stem-english))
 
 ;;; support-oxford.el ends here

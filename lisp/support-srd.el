@@ -664,6 +664,6 @@
       (list :arranges '((structure srd-arrange-structure))
 	    :gaiji-regexp  "<\\(G[0-9]-[0-9a-f][0-9a-f]\\)>"
 	    :gaiji-table   srd-gaiji-table
-	    :transformer   'lookup-stem-english-search))
+            :query-filter 'lookup-query-filter-stem-english))
 
 ;;; srd.el ends here

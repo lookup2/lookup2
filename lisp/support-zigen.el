@@ -26,42 +26,8 @@
 ;; then concatenate all of them to make one single `all.xml'
 ;; file in the directory named ".../zigen/".
 ;;
-;; Following Program will make index point file, which then can
-;; be sorted by 'mksary -s' command.
-;;
-;; #!/usr/bin/env ruby -Ku
-;; # Usage: ruby zigen.rb all.xml
-;; STDIN.reopen(ARGV[0], "r")
-;; STDOUT.reopen(ARGV[0]+".ary", "w")
-;; file = $stdin
-;; $offset=0
-;; file.each_line{|line|
-;;   if line =~ /^(.*)(<見出字>).+<\/見出字>/ 
-;;     print [$offset+$1.length].pack("N")
-;;     print [$offset+$1.length+$2.length].pack("N")
-;;   end
-;;   if line =~ /^(.*)(<見出語>)(.+)<\/見出語>/
-;;     offs = $offset+$1.length
-;;     print [offs].pack("N")
-;;     offs = offs+$2.length
-;;     chars=$3.split(//)
-;;     chars.each {|char| 
-;;       print [offs].pack("N")
-;;       offs = offs+char.length
-;;     }
-;;   end
-;;   if line =~ /^(.*)(<音>)(.+)<\/音>/
-;;     offs = $offset+$1.length
-;;     print [offs].pack("N")
-;;     offs = offs+$2.length
-;;     chars=$3.split(//)
-;;     chars.each {|char| 
-;;       print [offs].pack("N")
-;;       offs = offs+char.length
-;;     }
-;;   end
-;;   $offset+=line.length
-;; }
+;; Following will make index points.
+;; % mksary -c utf-8 all.xml
 
 ;;; Usage
 ;;
@@ -75,6 +41,21 @@
 ;;; Code:
 
 (require 'lookup)
+
+;; Internal Variables
+(defvar support-zigen-kanji-content-start "<漢字>")
+(defvar support-zigen-kanji-content-end   "</漢字>")
+(defvar support-zigen-kanji-entry-start "<見出字>")
+(defvar support-zigen-kanji-entry-end   "</見出字>")
+(defvar support-zigen-kanji-on-start "
+					<音>")
+(defvar support-zigen-jukugo-content-start "<熟語>")
+(defvar support-zigen-jukugo-content-end   "</熟語>")
+(defvar support-zigen-jukugo-on-start "
+				<音>")
+(defvar support-zigen-on-end "</音>")
+(defvar support-zigen-jukugo-entry-start "<見出語>")
+(defvar support-zigen-jukugo-entry-end "</見出語>")
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
@@ -116,12 +97,33 @@
   (goto-char (point-min))
   (if (looking-at "$") (delete-region (point-min) (1+ (point-min)))))
 
+(defun support-zigen-entry-start-end-pairs (string method)
+  (if (string-match "^[ァ-ヺ]+$" string)
+      (list (cons support-zigen-kanji-on-start  support-zigen-on-end)
+            (cons support-zigen-jukugo-on-start support-zigen-on-end))
+    (if (string-match "^[㐀-鿿𠀀-𮿿]$" string)
+        (list (cons support-zigen-kanji-entry-start support-zigen-kanji-entry-end))
+      (list (cons support-zigen-jukugo-entry-start support-zigen-jukugo-entry-end)))))
+
+(defun support-zigen-content-start (entry-start)
+  (if (or (equal entry-start support-zigen-jukugo-entry-start)
+          (equal entry-start support-zigen-jukugo-on-start))
+      support-zigen-jukugo-content-start
+    support-zigen-kanji-content-start))
+
+(defun support-zigen-content-end (entry-start)
+  (if (or (equal entry-start support-zigen-jukugo-entry-start)
+          (equal entry-start support-zigen-jukugo-on-start))
+      support-zigen-jukugo-content-end
+    support-zigen-kanji-content-end))
+
 (setq lookup-support-options
       (list :title "字源"
-            :entry-start-end-pairs '(("<見出字>" . "</見出字>")
-                                     ("<見出語>" . "</見出語>")
-                                     ("<音>" . "</音>"))
+            :entry-start-end-pairs #'support-zigen-entry-start-end-pairs
+            :coding 'utf-8-dos
+            :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
             :content-start "<漢字>" :content-end "</漢字>"
+            :query-filter 'lookup-query-filter-hiragana-to-katakana
             :arranges '((replace support-zigen-arrange-structure))))
 
 ;;; support-zigen.el ends here

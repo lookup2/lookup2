@@ -304,6 +304,6 @@
       (list :gaiji-table chujiten-gaiji-table
 ;	    :reference-pattern 'chujiten-reference-pattern
 ;	    :arranges '((structure chujiten-arrange-structure))
-	    :transformer 'lookup-stem-english-search))
+	    :query-filter 'lookup-query-filter-stem-english))
 
 ;;; chujiten.el ends here

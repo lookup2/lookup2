@@ -182,18 +182,16 @@ unconditionally."  )
       x) x)
    str))
 
-(defun support-unihan-transformer (dictionary query)
-  (let* ((query-string (upcase (lookup-query-string query))))
-    (if (string-match "^[㐀-鿿𠀀-𯿼]" query-string)
-        (lookup-search-multiple 
-         dictionary 
-         (list (format "U+%X" (elt query-string 0))))
-      (lookup-search-multiple dictionary (list query-string)))))
+(defun support-unihan-query-filter (query)
+  (setf (lookup-query-string query)
+        (if (string-match "^[㐀-鿿𠀀-𯿼]$" (lookup-query-string query))
+            (list (format "U+%X" (elt (lookup-query-string query) 0)))
+          (upcase (lookup-query-string query))))
+  query)
 
 (setq lookup-support-options
       (list :title "Unihan"
             :arranges '((reference support-unihan-arrange-structure))
-	    :transformer 'support-unihan-transformer
-            :max-hits 100 :regular t))
+            :query-filter 'support-unihan-query-filter))
 
 ;;; support-unihan.el ends here

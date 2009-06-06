@@ -385,6 +385,9 @@ This hook will run just after loading `lookup-init-file' and
 (defvar lookup-search-dictionaries nil)
 (defvar lookup-window-configuration nil)
 
+(defvar lookup-query-filters nil
+  "Functions to be applied before a QUERY is queried.")
+
 (provide 'lookup-vars)
 
 ;;; lookup-vars.el ends here

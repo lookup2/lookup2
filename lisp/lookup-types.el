@@ -1,7 +1,9 @@
 ;;; lookup-types.el --- internal data types
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
+;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
+;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
 ;; Keywords: dictionary
 
 ;; This file is part of Lookup.
@@ -22,6 +24,7 @@
 
 ;;; Code:
 
+(require 'lookup-text)
 (require 'lookup-utils)
 (require 'lookup-vars)
 (require 'stem-english)
@@ -324,14 +327,20 @@ will be attached to the module 'default'."
     (lambda () (truncate-string-to-width (lookup-dictionary-title dictionary)
 					 lookup-title-width nil ? ))))
 
-(defun lookup-dictionary-transformer (dictionary)
-  (lookup-dictionary-get dictionary 'transformer
-    (lambda () (lookup-dictionary-option dictionary :transformer t))))
+(defun lookup-dictionary-query-filters (dictionary)
+  (lookup-dictionary-get dictionary 'query-filters
+    (lambda () 
+      (let ((a-fs (lookup-agent-option (lookup-dictionary-agent dictionary)
+                                       :query-filters))
+            (a-f  (lookup-agent-option (lookup-dictionary-agent dictionary)
+                                       :query-filter))
+            (d-fs (lookup-dictionary-option dictionary :query-filters))
+            (d-f  (lookup-dictionary-option dictionary :query-filter)))
+        (append (or a-fs (if a-f (list a-f))) (or d-fs (if d-f (list d-f))))))))
 
 (defun lookup-dictionary-default-method (dictionary)
   (lookup-dictionary-get dictionary 'default-method
-    (lambda () (or (lookup-dictionary-transformer dictionary)
-		   (lookup-dictionary-option dictionary :default-method)
+    (lambda () (or (lookup-dictionary-option dictionary :default-method)
 		   lookup-default-method))))
 
 (defun lookup-dictionary-methods (dictionary)
@@ -413,113 +422,49 @@ will be attached to the module 'default'."
 	(unless (eq gaiji 'no-gaiji) gaiji))))))
 
 (defun lookup-dictionary-search (dictionary query)
-  (let ((method (lookup-query-method query))
-	(string (lookup-query-string query)))
-    ;; Default method may vary, depending on dictionaries
+  (let ((method  (lookup-query-method query))
+        (filters (lookup-dictionary-query-filters dictionary)))
     (when (eq method 'default)
-      (setq method (lookup-dictionary-default-method dictionary))
-      (setq query (lookup-new-query method string)))
-    (let* ((search (if (memq method lookup-search-methods)
-		       'lookup-regular-search
-		     method))
-	   (entries (lookup-dictionary-search-internal
-		     dictionary query search)))
+      (setf (lookup-query-method query) 
+            (lookup-dictionary-default-method dictionary)))
+    (let* ((queries (if filters (lookup-filter-query query filters)
+                      (list query)))
+	   (entries (lookup-dictionary-search-multiple
+		     dictionary queries)))
       (run-hook-with-args 'lookup-after-dictionary-search-hook
 			  dictionary entries)
       entries)))
 
-(defun lookup-dictionary-search-internal (dictionary query search)
-  (let ((string (lookup-query-string query))
+(defun lookup-dictionary-search-multiple (dictionary queries)
+  (let* ((entries
+          (apply 'nconc
+           (mapcar (lambda (query)
+                     (lookup-dictionary-search-internal dictionary query))
+                   queries))))
+    (setq entries (delq 'null entries))
+    (remove-duplicates 
+         entries
+         :test (lambda (x y)
+                 (eq (lookup-entry-substance x) 
+                     (lookup-entry-substance y))))))
+
+(defun lookup-dictionary-search-internal (dictionary query)
+  (let ((string   (lookup-query-string query))
         (charsets (lookup-dictionary-option dictionary :charsets t))
         entries)
+    (if (null (memq (lookup-query-method query) lookup-search-methods))
+              (error "Invalid method!"))
     (when (lookup-text-charsetsp string charsets)
       (unless lookup-force-update
         (setq entries (lookup-dictionary-search-cache-get dictionary query)))
       (unless entries
-        (setq entries (or (funcall search dictionary query) 'no-exists))
+        (setq entries (or (lookup-regular-search dictionary query) 'no-exists))
         (lookup-dictionary-search-cache-put dictionary query entries))
       (unless (eq entries 'no-exists)
         entries))))
 
 (defun lookup-regular-search (dictionary query)
   (lookup-dictionary-command dictionary :search query))
-
-(defun lookup-search-multiple (dictionary query-strings)
-  (let* ((queries
-          (mapcar (lambda (string) 
-                    (lookup-new-query 'exact string))
-                  query-strings))
-         (entries
-          (mapcar (lambda (query)
-                    (lookup-dictionary-search-internal
-                     dictionary query 'lookup-regular-search))
-                  queries))
-         (entries
-          (progn
-            ;; (message "debug: nconc=%s" entries)
-            (apply 'nconc entries)))
-         (entries
-          (progn
-            (remove-if 'null entries))))
-    (if (> (length entries) 1)
-        (remove-duplicates 
-         entries
-         :test (lambda (x y)
-                 (eq (lookup-entry-substance x) 
-                     (lookup-entry-substance y))))
-      entries)))
-
-(defun lookup-stem-english-search (dictionary query)
-  (let* ((query-string (downcase (lookup-query-string query)))
-         (query-strings
-          (cons query-string
-                (remove-if 
-                 '(lambda (x) (< (length x) 4))
-                 (cdr (nreverse (stem-english (downcase (lookup-query-string query)))))))))
-    (lookup-search-multiple dictionary query-strings)))
-
-(defun lookup-kana-search (dictionary query)
-  (let ((query-strings 
-         (lookup-text-get-readings (lookup-query-string query))))
-    (lookup-search-multiple dictionary query-strings)))
-
-(defun lookup-decompose-alphabet-chars (chars)
-  "Decompose alphabet characters CHARS."
-  (apply 'append
-         (mapcar '(lambda (x)
-                    (or (and (< x #x2000)
-                             (get-char-code-property x 'decomposition))
-                        (list x)))
-                 chars)))
-
-(defun lookup-remove-alphabet-accents (string)
-  (let* ((chars (string-to-list string))
-         (new-chars (lookup-decompose-alphabet-chars chars)))
-    (while (/= (length chars) (length new-chars))
-      (setq chars new-chars)
-      (setq new-chars
-            (remove-if 
-             (lambda (x)
-               (let ((ccc 
-                      (get-char-code-property x 'canonical-combining-class)))
-                 (and ccc (< 0 ccc))))
-             (lookup-decompose-alphabet-chars new-chars))))
-    (apply 'string chars)))
-
-(defun lookup-remove-alphabet-accents-query-string ()
-  (setq lookup-query-string 
-        (downcase (lookup-remove-alphabet-accents lookup-query-string))))
-
-;; remove-hook if you don't like.
-(add-hook 'lookup-query-string-hook 'lookup-remove-alphabet-accents-query-string)
-
-(defun lookup-remove-accent-search (dictionary query)
-  (let* ((query-string 
-          (downcase 
-           (lookup-remove-alphabet-accents
-            (lookup-query-string query))))
-         (query-strings (list query-string)))
-    (lookup-search-multiple dictionary query-strings)))
 
 (defconst lookup-obarray (make-vector 1511 nil))
 

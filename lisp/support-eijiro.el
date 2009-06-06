@@ -77,7 +77,7 @@
   (setq lookup-support-options
         (list :title title
               :arranges '((reference support-eijiro-arrange-reference))
-              :transformer 'lookup-stem-english-search
+              :query-filter 'lookup-query-filter-stem-english
               :index index
               )))
 

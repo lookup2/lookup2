@@ -259,6 +259,6 @@
 
 (setq lookup-support-options
       (list :gaiji-table crown-gaiji-table
-	    :transformer 'lookup-remove-accent-search))
+	    :query-filter 'lookup-query-filter-remove-accents))
 
 ;;; support-crown.el ends here

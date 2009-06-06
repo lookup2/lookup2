@@ -85,6 +85,6 @@
 (setq lookup-support-options
       (list :title "英和活用大辞典"
 	    :arranges '((replace colloc-arrange-first))
-	    :transformer 'lookup-stem-english-search))
+	    :query-filter 'lookup-query-filter-stem-english))
 
 ;;; colloc.el ends here

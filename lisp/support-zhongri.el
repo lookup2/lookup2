@@ -3581,10 +3581,9 @@
   (remove-if 'null 
              (list (lookup-text-get-pinyin str) str)))
 
-(defun zhongri-pinyin-search (dictionary query)
-  (let* ((query-string (lookup-query-string query))
-         (query-strings (zhongri-pinyin-string query-string)))
-  (lookup-search-multiple dictionary query-strings)))
+(defun zhongri-query-filter-pinyin (query)
+  (mapcar (lambda (x) (lookup-new-query (lookup-query-method query) x))
+          (zhongri-pinyin-string (lookup-query-string query))))
 
 ;; If you use "EB Kanji Indexer" 
 ;; (http://www31.ocn.ne.jp/~h_ishida/EBKIdx.html), you can search 
@@ -3593,6 +3592,6 @@
       `(:gaiji-table ,zhongri-gaiji-table
         :arranges ((gaiji zhongri-dictionary-arrange-gaiji))
         ,@(when (file-exists-p lookup-text-pinyin-file)
-            (list :transformer  #'zhongri-pinyin-search))))
+            (list :query-filter  'zhongri-query-filter-pinyin))))
 
 ;;; support-zhongri.el ends here

@@ -348,16 +348,17 @@
       (insert " 《" (mwsedic-dev-kyoto-harvard-decode-string (match-string 1))
               "》 "))))
                                                             
-(defun mwsedic-kyoto-harvard-query-string ()
+(defun mwsedic-query-filter-kyoto-harvard (query)
   "If query-string is Devanagari, convert it to kyoto-harvard."
-  (if (string-match "[ँ-ॽ]" lookup-query-string)
-      (setq lookup-query-string
-            (mwsedic-dev-kyoto-harvard-encode-string lookup-query-string))))
-
-(add-hook 'lookup-query-string-hook 'mwsedic-kyoto-harvard-query-string)
+  (let ((string (lookup-query-string query)))
+    (if (string-match "[ँ-ॽ]" string)
+        (setf (lookup-query-string query)
+              (mwsedic-dev-kyoto-harvard-encode-string string)))
+    query))
 
 (setq lookup-support-options
       (list :arranges '((fill mwsedic-arrange-structure))
+            :query-filter 'mwsedic-query-filter-kyoto-harvard
             :gaiji-table mwsedic-gaiji-table))
 
 ;;; support-mwsedic.el ends here

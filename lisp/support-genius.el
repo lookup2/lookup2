@@ -116,6 +116,6 @@
 (setq lookup-support-options
       (list :gaiji-table genius-gaiji-table
 	    :arranges '((structure genius-arrange-structure))
-	    :transformer 'lookup-stem-english-search))
+            :query-filter 'lookup-query-filter-stem-english))
 
 ;;; genius.el ends here

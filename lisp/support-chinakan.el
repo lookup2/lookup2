@@ -67,7 +67,6 @@
 
 (setq lookup-support-options
       (list :title "China漢"
-            :arranges '((reference support-chinakan-arrange-reference))
-            :max-hits 100 :regular t))
+            :arranges '((reference support-chinakan-arrange-reference))))
 
 ;;; support-chinakan.el ends here
