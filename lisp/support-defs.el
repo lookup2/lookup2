@@ -47,7 +47,6 @@
         ("ndsary:.*/zhwiki.*-abstract-.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
-        ("ndsary:.*\\.sdic" . "support-sdic")
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
         ("ndsary:.*/Unihan" . "support-unihan")
         ("ndsary:.*/JMdict" . "support-jmdict")
@@ -61,8 +60,6 @@
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
         ;; ndsrd
         ("ndsrd:" . "support-srd")
-        ;; ndjitsuu
-        ("ndjitsuu:" . "support-jitsuu")
         ;; misc.
 	("/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
