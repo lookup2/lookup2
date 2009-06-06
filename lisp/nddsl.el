@@ -1,4 +1,5 @@
 ;;; nddsl.el --- Lookup `dsl' interface -*- coding: utf-8 -*-
+;; Copyright (C) 2009 KAWABATA Taichi <kawabata.taichi@gmail.com>
 
 ;; Keywords: dictionary
 
@@ -36,7 +37,7 @@
 ;; (setq looukp-search-agents
 ;;       '(
 ;;         .....
-;;         (nddsl "~/edicts/hydzd")  ; directory where `*.dsl.ary' file exists.
+;;         (nddsl "~/edicts/hydcd")  ; directory where `*.dsl.ary' file exists.
 ;;         ...))
 
 ;;; Code:
@@ -57,13 +58,20 @@
 ;;; Internal variables
 ;;;
 
+(defvar nddsl-entry-tags '("\n" . "\n"))
+(defvar nddsl-content-start "\n\n")
+(defvar nddsl-content-end   "\n\n")
+(defvar nddsl-entry-content-end "[")
+(defun nddsl-content-tags (x)
+  (if (consp x) '("\n\n" . "[") '("\n\n" "\n\n")))
+
 ;;;
 ;;; Interface functions
 ;;;
 
 (put 'nddsl :methods 'nddsl-dictionary-methods)
 (defun nddsl-dictionary-methods (dictionary)
-  '(exact prefix suffix text))
+  '(exact prefix suffix substring text))
 
 (put 'nddsl :list 'nddsl-list)
 (defun nddsl-list (agent)
@@ -83,42 +91,28 @@
                 (lookup-agent-location 
                  (lookup-dictionary-agent dictionary))))
          (result
-          (ndsary-file-search
-           file "#NAME" 'prefix "" "\n" t 'utf-8 1)))
-    (message "debug: result=%s" result)
+          (lookup-with-coding-system 'utf-8
+            (ndsary-file-content file "#NAME"))))
     (if (and result 
-             (string-match "\"\\(.+\\)\"" (caar result)))
-        (match-string 1 (caar result))
+             (string-match "\"\\(.+\\)\"" result))
+        (match-string 1 result)
       name)))
 
 (put 'nddsl :search 'nddsl-dictionary-search)
 (defun nddsl-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((entry-start "\n")
-        (entry-end   "\n")
-        (content-start "\n\n")
-        (content-end   "[")
-        (string      (lookup-query-string query))
+  (let ((string      (lookup-query-string query))
         (method      (lookup-query-method query))
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
                        (lookup-dictionary-agent dictionary))))
-        (coding      'utf-8)
-        (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
-                         lookup-max-hits
-                         200))
         entries)
     (setq entries
-          (ndsary-file-search
-           file string method entry-start entry-end
-           t coding max-hits 
-           '(lambda (x) 
-              (if 
-                  (string-match "^\\([^\n\t ]+\\)$" (car x))
-                  (cons (concat "\n" (match-string 1 (car x)) "\n")
-                        (match-string 1 (car x)))))
-           content-start content-end))
+          (lookup-with-coding-system 'utf-8
+            (ndsary-file-search
+             file string method nddsl-entry-tags
+             'nddsl-content-tags nddsl-entry-tags)))
     (mapcar
      (lambda (x) (lookup-new-entry
                   'regular dictionary (car x) (cdr x)))
@@ -127,16 +121,16 @@
 (put 'nddsl :content 'nddsl-entry-content)
 (defun nddsl-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((string         (lookup-entry-code entry))
-         (dictionary     (lookup-entry-dictionary entry))
-         (coding         'utf-8)
-         (file           (expand-file-name
-                          (lookup-dictionary-name dictionary)
-                          (lookup-agent-location
-                           (lookup-dictionary-agent dictionary))))
-         (content-start "\n\n")
-         (content-end   "\n\n"))
-    (ndsary-file-content file string content-start content-end coding)))
+  (let* ((code (lookup-entry-code entry))
+         (dict (lookup-entry-dictionary entry))
+         (file (expand-file-name
+                (lookup-dictionary-name dictionary)
+                (lookup-agent-location
+                 (lookup-dictionary-agent dictionary)))))
+    (lookup-with-coding-system 'utf-8
+      (ndsary-file-content
+       file (concat (car nddsl-entry-tags) code (cdr nddsl-entry-tags))
+       nddsl-content-start nddsl-content-end))))
 
 ;;;
 ;;; Formatting Functions

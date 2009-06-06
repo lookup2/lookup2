@@ -59,7 +59,7 @@
 
 ;;; Customizable variables
 
-(defvar support-jmdict-search-tags
+(defvar support-jmdict-entry-tags-list
   '(("<gloss xml:lang=\"rus\">" . "</gloss>")
     ("<gloss xml:lang=\"ger\">" . "</gloss>")
     ("<gloss xml:lang=\"fre\">" . "</gloss>")
@@ -230,22 +230,17 @@ searching time.")
     (lookup-make-region-heading (match-beginning 0) (match-end 0) 1))
   )
     
-(defun support-jmdict-entry-function ()
-  (let ((heading "??") code)
-    (if (re-search-forward "<ent_seq>\\(.+\\)</ent_seq>")
-        (setq code (match-string 1)))
-    (if (re-search-forward "<keb>\\(.+\\)</keb>" nil t)
-        (setq heading (match-string 1))
-      (if (re-search-forward "<reb>\\(.+\\)</reb>" nil t)
-          (setq heading (match-string 1))))
-    (cons code heading)))
-
 (setq lookup-support-options
       (list :title "JMDict"
             :arranges '((reference support-jmdict-arrange-structure))
-            :entry-start-end-pairs support-jmdict-search-tags
-            :content-start "<entry>" :content-end "</entry>"
-            :entry-func 'support-jmdict-entry-function
-            :max-hits 100 :regular nil))
+            :entry-tags-list support-jmdict-entry-tags-list
+            :content-tags '("<entry>" . "</entry>")
+            :code-tags '("<ent_seq>" . "</ent_seq>")
+            :coding 'utf-8
+            :head-tags 
+            (lambda (x)
+              (or (ndsary-extract-string x "<keb>" "</keb>")
+                  (ndsary-extract-string x "<reb>" "</reb>")
+                  (ndsary-extract-string x "<ent_seq>" "</ent_seq>")))))
 
 ;;; support-jmdict.el ends here

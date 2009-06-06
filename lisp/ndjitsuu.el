@@ -48,6 +48,7 @@
 
 (require 'lookup)
 (require 'ndsary)
+(load "support-jitsuu")
 
 
 
@@ -235,8 +236,7 @@
       (let* ((file (car file-word))
              (word (cdr file-word))
              (entries 
-              (ndsary-file-content 
-               file word nil nil 'utf-8))
+              (ndsary-file-content file word))
              (entries
               (replace-regexp-in-string "《\\|》\\|\\(</?yomi>\\)" "" entries))
              (entries
@@ -297,7 +297,7 @@
 (put 'ndjitsuu :reference-pattern
      '("<REF,\\([0-9]+\\)>\\(.+?\\)</REF>" 2 2 1))
 
-(put 'nducs :charsets (lambda (x) (string-match "^[0-9]+$" x)))
+(put 'ndjitsuu :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\|[あ-ん]+\\)$" x)))
 
 ;;;
 ;;; Main Program

@@ -116,7 +116,7 @@
     (while (re-search-forward "\t+" nil t)
       (replace-match ""))))
 
-(defun support-sbgy-entry-pairs (query)
+(defun support-sbgy-entry-tags-list (query)
   (let ((string (lookup-query-string query)))
     (cond ((lookup-text-single-cjk-p string)
            '((">" . "<note>")
@@ -130,21 +130,18 @@
            '(("onyomi=\"" . "\"")))
           (t nil))))
 
-(defun support-sbgy-entry-func ()
-  (let (code heading)
-    (message "debug: %s" (buffer-substring (point-min) (point-max)))
-    (if (re-search-forward "ipa=\"\\(.*?\\)\"")
-        (setq code (match-string 1))
-      (if (re-search-forward ">\\(.\\)<")
-          (setq heading (match-string 1))))
-    (cons code heading)))
-
 (setq lookup-support-options
       (list :title "宋本廣韻"
-            :entry-start-end-pairs 'support-sbgy-entry-pairs
-            :charsets 'lookup-text-single-cjk-p
-            :entry-func 'support-sbgy-entry-func
-            :content-start "<voice_part" :content-end "</voice_part>"
+            :entry-tags-list 'support-sbgy-entry-tags-list
+            ;; :charsets 'lookup-text-single-cjk-p
+            :content-tags '("<voice_part" . "</voice_part>")
+            :code-tags '("id=\"" . "\">")
+            :head-tags
+            (lambda (x) 
+              (let ((ipa (ndsary-extract-string x "ipa=\"" "\""))
+                    (yomi (ndsary-extract-string x "onyomi=\"" "\""))
+                    (char (ndsary-extract-string x ">" "<note")))
+                (format "【%s】%s《%s》" char yomi ipa)))
             :arranges '((replace support-sbgy-arrange-structure))))
 
 ;;; support-sbgy.el ends here

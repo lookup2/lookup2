@@ -71,11 +71,14 @@
 
 
 ;;;
-;;; Basic Variables
+;;; Internal Variables
 ;;;
 
-(defvar ndbtonic-content-start "<dic-item")
-(defvar ndbtonic-content-end "</dic-item>")
+(defvar ndbtonic-content-tags '("<dic-item" . "</dic-item>"))
+(defvar ndbtonic-code-tags    '(" id=\"" . "\">"))
+(defvar ndbtonic-head-tags   '("<headword>" . "</headword>"))
+(defvar ndbtonic-entry-tags-list '(("<key>" . "</key>")
+                                   (">" . "</headword>")))
 
 ;;;
 ;;; Interface functions
@@ -85,7 +88,7 @@
 
 (put 'ndbtonic :methods 'ndbtonic-dictionary-methods)
 (defun ndbtonic-dictionary-methods (dictionary)
-  '(exact prefix suffix substring))
+  '(exact prefix suffix substring text))
 
 (put 'ndbtonic :list 'ndbtonic-list)
 (defun ndbtonic-list (agent)
@@ -107,45 +110,35 @@
 (put 'ndbtonic :search 'ndbtonic-dictionary-search)
 (defun ndbtonic-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((entry-pairs '(("<key>" . "</key>")
-                       (">" . "</headword>")))
-        (entry-func  'ndbtonc-entry-function)
-        (string      (lookup-query-string query))
+  (let ((string      (lookup-query-string query))
         (method      (lookup-query-method query))
         (regular     nil)
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
-                       (lookup-dictionary-agent dictionary))))
-        (header-func nil)
-        (coding      'cp932-dos)
-        (max-hits    (or lookup-max-hits 100)))
+                       (lookup-dictionary-agent dictionary)))))
     (mapcar
      (lambda (x) (lookup-new-entry
-                  'regular dictionary (car x)
-                  (if header-func (funcall header-func x query)
-                    (cdr x))))
-     (ndsary-file-searches
-      file string method entry-pairs
-      regular coding max-hits
-      'ndbtonic-entry-function
-      ndbtonic-content-start))))
+                  'regular dictionary (car x) (cdr x)))
+     (lookup-with-coding-system 'cp932
+       (ndsary-file-searches
+        file string method ndbtonic-entry-tags-list
+        ndbtonic-content-tags ndbtonic-code-tags 
+        ndbtonic-head-tags)))))
 
 (put 'ndbtonic :content 'ndbtonic-entry-content)
 (defun ndbtonic-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((string         (lookup-entry-code entry))
-         (dictionary     (lookup-entry-dictionary entry))
-         (coding         'cp932-dos)
-         (file           (expand-file-name
-                          (lookup-dictionary-name dictionary)
-                          (lookup-agent-location
-                           (lookup-dictionary-agent dictionary)))))
-    ;;(if (string-match "^[0-9]+$" string)
-    ;;    (setq string (concat "<dic-item id=\"" string)))
-    (ndsary-file-content file string 
-                         ndbtonic-content-start ndbtonic-content-end 
-                         coding)))
+  (let* ((string     (lookup-entry-code entry))
+         (dictionary (lookup-entry-dictionary entry))
+         (file       (expand-file-name
+                      (lookup-dictionary-name dictionary)
+                      (lookup-agent-location
+                       (lookup-dictionary-agent dictionary)))))
+    (lookup-with-coding-system 'cp932
+      (ndsary-file-content 
+       file (concat (car ndbtonic-code-tags) string (cdr ndbtonic-code-tags))
+       (car ndbtonic-content-tags) (cdr ndbtonic-content-tags)))))
 
 (put 'ndbtonic :arrange-table
      '((replace   ndbtonic-arrange-replace
@@ -154,7 +147,7 @@
        (gaiji     lookup-arrange-gaijis
                   ndbtonic-arrange-gaiji
                   )
-       (reference ndbtonic-arrange-references)
+       (reference lookup-arrange-references)
        (structure ndbtonic-arrange-structure
                   lookup-arrange-structure
                   )
@@ -166,7 +159,6 @@
 (put 'ndbtonic :gaiji-regexp  "<gi set=\"unicode\" name=\"\\(.+\\)\"/>")
 (put 'ndbtonic :gaiji     #'ndbtonic-dictionary-gaiji)
 
-
 ;;;
 ;;; Internal Variables
 ;;;
@@ -175,23 +167,10 @@
   '((4095 . ?𠹚)
     (65325 . ?𢢫)
     (58234 . ?嚮)))
+
 ;;;
 ;;; Main Program
 ;;;
-
-(defun ndbtonic-entry-function ()
-  "Function to process Code and Header of BTONIC dictionary."
-  (let (code heading)
-    (if (re-search-forward "<dic-item id=\".+?\"" nil t)
-        (progn
-          (setq code (match-string-no-properties 0))
-          (if (re-search-forward "<headword>\\(.+\\)</headword>" nil t)
-              (setq heading (match-string-no-properties 1))
-            (setq heading "Heading not found. code=%s " code)))
-      (setq code "code not found.")
-      (setq heading "heading not found.")
-      )
-    (cons code heading)))
 
 (defun ndbtonic-arrange-replace (entry)
   (while (re-search-forward "^[\t ]+" nil t)
@@ -213,15 +192,7 @@
   ;; for mojikyo characters, etc.
   )
 
-(defun ndbtonic-arrange-references (entry)
-  "Attach References on ENTRY."
-  (let ((dictionary (lookup-entry-dictionary entry))
-        entry)
-    (while (re-search-forward "<ref idref=\"\\(.+?\\)\">\\(.+?\\)</ref>" nil t)
-      (setq entry (lookup-new-entry 'regular dictionary
-                                    (concat "<dic-item id=\"" (match-string 1) "\"")
-                                    (match-string 2)))
-      (lookup-set-link (match-beginning 0) (point) entry))))
+(put 'ndbtonic :reference-pattern '("<ref idref=\"\\(.+?\\)\">\\(.+?\\)</ref>" 2 2 1))
 
 (defun ndbtonic-arrange-structure (entry)
   (while (re-search-forward "<key type=\"ソート用かな\">.+?</key>" nil t)

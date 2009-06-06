@@ -82,11 +82,11 @@
 
 (setq lookup-support-options
       (list :title "説文解字注"
-            :entry-start-end-pairs '((">" . "</wordhead>")
-                                     (">" . "</img></wordhead>")
-                                     ;;("id=\"" . "\""))
-                                     )
-            :content-start "<shuowen>" :content-end "</shuowen>"
+            :entry-tags-list '((">" . "</wordhead>")
+                               (">" . "</img></wordhead>")
+                               ;;("id=\"" . "\""))
+                               )
+            :content-tags '("<shuowen>" . "</shuowen>")
             :charsets 'lookup-text-cjk-p
             :arranges '((replace support-swjz-arrange-structure))))
 

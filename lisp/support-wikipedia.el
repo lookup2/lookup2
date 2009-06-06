@@ -116,14 +116,14 @@
                   ((string-match "/zhwiki" lookup-support-dictionary-id)
                    "Wikipedia 中文")
                   (t "Wikipedia"))
-            :entry-start
-            (cond ((string-match "/enwiki" lookup-support-dictionary-id)
-                   "<title>Wikipedia:&amp;#32;")
-                  ((string-match "/frwiki" lookup-support-dictionary-id)
-                   "<title>Wikipédia&amp;nbsp;:&amp;#32;")
-                  (t "<title>Wikipedia: "))
-            :entry-end "</title>"
-            :content-start "<doc>" :content-end "</doc>"
+            :entry-tags
+            (cons (cond ((string-match "/enwiki" lookup-support-dictionary-id)
+                         "<title>Wikipedia:&amp;#32;")
+                        ((string-match "/frwiki" lookup-support-dictionary-id)
+                         "<title>Wikipédia&amp;nbsp;:&amp;#32;")
+                        (t "<title>Wikipedia: "))
+                  "</title>")
+            :content-tags '("<doc>" . "</doc>")
             :arranges '((reference support-wikipedia-arrange-structure))
             :charsets
             (cond ((string-match "/enwiki" lookup-support-dictionary-id)
@@ -134,7 +134,6 @@
                    '(iso-8859-1))
                   ((string-match "/zhwiki" lookup-support-dictionary-id)
                    '(ascii chinese-gb2312))
-                  (t nil))
-            :max-hits 100 :regular t))
+                  (t nil))))
 
 ;;; support-wikipedia.el ends here
