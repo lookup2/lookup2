@@ -108,15 +108,6 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
           (puthash str readings lookup-text-reading-hash))
         readings)))
 
-;;(defun lookup-text-filter (str entries)
-;;  "STR が見出しに含まれているようなエントリのみを取り出すフィルタ関数"
-;;  (let ((regex (mapconcat 
-;;                'char-to-string (string-to-char-list string) ".?.?.?")))
-;;    (delq nil (mapcar 
-;;               (lambda (entry)
-;;                 (if (string-match regex (lookup-entry-heading entry)) entry))
-;;               entries))))
-
 ;;;
 ;;; Kanji to Pinyin
 ;;;
@@ -174,13 +165,72 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;; Normalize Input String
 ;;
 
-(defun lookup-normalize-query-string ()
-  (setq lookup-query-string
-        (replace-regexp-in-string
-         "[〾󠀀-󯿽]" ""
-        (ucs-normalize-NFC-string lookup-query-string))))
+(defun lookup-query-filter-normalize-ucs (query)
+  (setf (lookup-query-string query)
+        (replace-regexp-in-string 
+         "[〾󠀀-󯿽]" "" (ucs-normalize-NFC-string 
+                       (lookup-query-string query))))
+  query)
 
-(add-hook 'lookup-query-string-hook 'lookup-normalize-query-string)
+(add-to-list 'lookup-query-filters 'lookup-query-filter-normalize-ucs)
+
+;;
+;; Stem English
+;;
+
+(defun lookup-query-filter-stem-english (query)
+  (let* ((string (downcase (lookup-query-string query)))
+         (method (lookup-query-method query))
+         strings)
+    (if (or (equal method 'exact) (equal method 'keyword))
+        (mapcar 
+         (lambda (x) (lookup-new-query method x))
+         (cons string
+               (remove-if 
+                (lambda (x) (< (length x) 4))
+                (cdr (nreverse (stem-english string))))))
+      query)))
+
+(defun lookup-query-filter-kanji-to-kana (query)
+  (mapcar (lambda (x) (lookup-new-query (lookup-query-method query) x))
+          (lookup-text-get-readings (lookup-query-string query))))
+
+(defun lookup-query-filter-hiragana-to-katakana (query)
+  (setf (lookup-query-string query)
+        (japanese-katakana (lookup-query-string query)))
+  query)
+
+(defun lookup-decompose-alphabet-chars (chars)
+  "Decompose alphabet characters CHARS."
+  (apply 'append
+         (mapcar '(lambda (x)
+                    (or (and (< x #x2000)
+                             (get-char-code-property x 'decomposition))
+                        (list x)))
+                 chars)))
+
+(defun lookup-remove-alphabet-accents (string)
+  (let* ((chars (string-to-list string))
+         (new-chars (lookup-decompose-alphabet-chars chars)))
+    (while (/= (length chars) (length new-chars))
+      (setq chars new-chars)
+      (setq new-chars
+            (remove-if 
+             (lambda (x)
+               (let ((ccc 
+                      (get-char-code-property x 'canonical-combining-class)))
+                 (and ccc (< 0 ccc))))
+             (lookup-decompose-alphabet-chars new-chars))))
+    (apply 'string chars)))
+
+(defun lookup-query-filter-remove-accents (query)
+  (setf (lookup-query-string query)
+        (lookup-remove-alphabet-accents (lookup-query-string query)))
+  query)
+
+;; remove from list if you don't like.
+;; (add-to-list 'lookup-query-filters 'lookup-query-filter-remove-accents)
+
 
 ;;
 ;; 日本の旧字・新字の対応
@@ -290,11 +340,12 @@ the string will be returned.  If CHARSETS is null, it returns t."
                         chars)))
     (apply 'string chars)))
 
-(defun lookup-text-old-to-new-query-string ()
-  (setq lookup-query-string
-        (lookup-text-old-to-new lookup-query-string)))
+(defun lookup-query-filter-old-to-new-kanji (query)
+  (setf (lookup-query-string query)
+        (lookup-text-old-to-new (lookup-query-string query)))
+  query)
 
-(add-hook 'lookup-query-string-hook 'lookup-text-old-to-new-query-string)
+(add-to-list 'lookup-query-filters 'lookup-query-filter-old-to-new-kanji)
 
 ;;; Lookup superscript/subscript utilities
 
