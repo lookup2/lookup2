@@ -50,6 +50,7 @@
 
 (defun support-chinakan-arrange-reference (entry)
   "Arrange contents of ENTRY."
+  (while (search-forward "\n\n" nil t) (replace-match ""))
   (goto-char (point-min))
   (insert (lookup-entry-code entry) "\n")
   (while (re-search-forward "^\\([^,]*?\\),\\([^,]*?\\),\\([^,]*?\\),\\([^,]*?\\)," nil t)
@@ -66,7 +67,8 @@
   )
 
 (setq lookup-support-options
-      (list :title "China漢"
+      (list :title "支那文を讀む爲の漢字典"
+            :charset 'utf-8-dos
             :arranges '((reference support-chinakan-arrange-reference))))
 
 ;;; support-chinakan.el ends here
