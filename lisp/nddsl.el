@@ -194,9 +194,9 @@
                       (point-max)))
            (heading (buffer-substring-no-properties start end))
            (entry (lookup-new-entry 'regular dict
-                                    (concat "\n" heading "\n")
+                                    heading
                                     heading)))
-      (lookup-put-property entry :dynamic code)
+      (lookup-put-property entry :dynamic heading)
       (lookup-set-link start end entry))))
 
 (defun nddsl-arrange-fill (entry)
