@@ -29,13 +29,13 @@
 
 ;;; Usage:
 
-;;  Specify the directory with XXX.xml.ary files.  
+;;  Specify the directory with XXX.sdic.ary files.  
 ;;
 ;;  Example:
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndsdic "~/edicts/sdic/")
+;;           (ndsdic "~/edicts/sdic")
 ;;           ....
 ;;           ))
 
@@ -56,10 +56,10 @@
     ("gt" . ">")
     ("lf" . "\n")))
 
-(defvar support-sdic-replace-entities-regexp
+(defvar ndsdic-replace-entities-regexp
   (concat "&\\("
           (regexp-opt
-           (mapcar 'car support-sdic-replace-entities))
+           (mapcar 'car ndsdic-replace-entities))
           "\\);"))
 
 (defvar ndsdic-entry-tags '("<K>" . "</K>"))
@@ -76,7 +76,7 @@
 
 (put 'ndsdic :list 'ndsdic-list)
 (defun ndsdic-list (agent)
-  "Return list of dictionaries of btonic AGENT."
+  "Return list of dictionaries of SDIC AGENT."
   (let* ((files (directory-files 
                  (expand-file-name (lookup-agent-location agent))
                  nil "\\.sdic\\.ary\\'")))
@@ -96,7 +96,6 @@
   "Return entry list of DICTIONARY for QUERY."
   (let ((string      (lookup-query-string query))
         (method      (lookup-query-method query))
-        (regular     nil)
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
@@ -137,9 +136,9 @@
   "Arrange content of ENTRY."
   (goto-char (point-min))
   (if (looking-at "\n+") (replace-match ""))
-  (while (re-search-forward support-sdic-replace-entities-regexp nil t)
+  (while (re-search-forward ndsdic-replace-entities-regexp nil t)
     (replace-match
-     (cdr (assoc (match-string 1) support-sdic-replace-entities))))
+     (cdr (assoc (match-string 1) ndsdic-replace-entities))))
   (goto-char (point-min))
   (while (re-search-forward "^.*<H>\\(.+\\)</H>.*<K>.+</K>\\(.*\\)" nil t)
     (replace-match "\\1\n\\2\n" t))
