@@ -21,8 +21,9 @@
 ;; Unicode Consortium.  It also has an ability to refer Kangxi
 ;; Dictionary.
 ;;
-;; You may need to make the suffix array index
-;; by "mksary" program.  (-l option should be attached.)
+;; You need to make the suffix array index by "mksary" program.  (-l
+;; option should be attached, or some specific index point file should
+;; be prepared, unless you want to search every contents.)
 ;;
 ;; Download site:
 ;; http://unicode.org/Public/5.0.0/ucd/Unihan.html
@@ -30,6 +31,16 @@
 ;;; Code:
 
 (require 'lookup)
+
+;;;
+;;; Customizable Variable
+;;;
+
+(defvar support-unihan-kangxi-url-format
+  "http://kangxizidian.com/kangxi/%04d.gif"
+  "URL-Format of Scanned Image of KangXi Dictionary.
+If you have a local copy of KangXi Dictionary, you should
+customize this variable.")
 
 (defvar support-unihan-information-format
   '(
@@ -135,14 +146,35 @@ the string will be converted to actual Character).  If first
 element is nil, then second element will be displayed
 unconditionally."  )
 
+;;;
+;;; Query-Filter
+;;;
+
+(defun support-unihan-query-filter (query)
+  (setf (lookup-query-string query)
+        (if (string-match "^[㐀-鿿𠀀-𯿼]$" (lookup-query-string query))
+            (format "U+%X" (elt (lookup-query-string query) 0))
+          (upcase (lookup-query-string query))))
+  query)
+
+;;;
+;;; Search Tags
+;;;
+
+(defun support-unihan-head-tags (str)
+  (string-match "\\(U\\+\\([0-9A-F]+\\)\\)" str)
+  (concat (list (string-to-number (match-string 2 str) 16))
+          "【" (match-string 1 str) "】"))
+
+;;;
+;;; arrangements
+;;;
+
 (defun support-unihan-unicode-to-char (str)
   (replace-regexp-in-string 
    "U\\+[0-9A-F]+"
    (lambda (x) (char-to-string (string-to-number (substring x 2) 16)))
    str))
-
-(defvar support-unihan-kangxi-url-format
-  "http://kangxizidian.com/kangxi/%04d.gif")
 
 (defun support-unihan-arrange-structure (entry)
   "Arrange contents of ENTRY."
@@ -182,16 +214,14 @@ unconditionally."  )
       x) x)
    str))
 
-(defun support-unihan-query-filter (query)
-  (setf (lookup-query-string query)
-        (if (string-match "^[㐀-鿿𠀀-𯿼]$" (lookup-query-string query))
-            (list (format "U+%X" (elt (lookup-query-string query) 0)))
-          (upcase (lookup-query-string query))))
-  query)
-
 (setq lookup-support-options
       (list :title "Unihan"
             :arranges '((reference support-unihan-arrange-structure))
+            :entry-tags '("\n" . "\t")
+            :content-tags '("\n" . "\n")
+            :code-tags  (lambda (x) 
+                          (if (equal x 'search) '("\n" . "\t") '("" . "\t")))
+            :head-tags  'support-unihan-head-tags
             :query-filter 'support-unihan-query-filter))
 
 ;;; support-unihan.el ends here

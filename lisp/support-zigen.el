@@ -42,20 +42,37 @@
 
 (require 'lookup)
 
-;; Internal Variables
-(defvar support-zigen-kanji-content-start "<漢字>")
-(defvar support-zigen-kanji-content-end   "</漢字>")
-(defvar support-zigen-kanji-entry-start "<見出字>")
-(defvar support-zigen-kanji-entry-end   "</見出字>")
+;;;
+;;; Internal Variables
+;;;
+
 (defvar support-zigen-kanji-on-start "
 					<音>")
-(defvar support-zigen-jukugo-content-start "<熟語>")
-(defvar support-zigen-jukugo-content-end   "</熟語>")
 (defvar support-zigen-jukugo-on-start "
 				<音>")
 (defvar support-zigen-on-end "</音>")
-(defvar support-zigen-jukugo-entry-start "<見出語>")
-(defvar support-zigen-jukugo-entry-end "</見出語>")
+
+;;;
+;;; Search Support
+;;;
+
+(defun support-zigen-entry-tags-list (string method)
+  (if (string-match "^[ァ-ヺ]+$" string)
+      (list (cons support-zigen-kanji-on-start  support-zigen-on-end)
+            (cons support-zigen-jukugo-on-start support-zigen-on-end))
+    (if (and (string-match "^[㐀-鿿𠀀-𮿿]$" string)
+             (or (equal method 'exact) (equal method 'prefix)))
+        '(("<見出字>" . "</見出字>"))
+      '(("<見出字>" . "</見出字>") ("<見出語>" . "</見出語>")))))
+
+(defun support-zigen-content-tags (x)
+  (if (consp x)
+      (if (or (equal (car x) "<見出字>")
+              (equal (car x) support-zigen-kanji-on-start))
+          '("<漢字>" . "</漢字>")
+        '("<熟語>" . "</熟語>"))
+    (if (string-match "<見出字>" x) '("<漢字>" . "</漢字>")
+      '("<熟語>" . "</熟語>"))))
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
@@ -97,33 +114,13 @@
   (goto-char (point-min))
   (if (looking-at "$") (delete-region (point-min) (1+ (point-min)))))
 
-(defun support-zigen-entry-start-end-pairs (string method)
-  (if (string-match "^[ァ-ヺ]+$" string)
-      (list (cons support-zigen-kanji-on-start  support-zigen-on-end)
-            (cons support-zigen-jukugo-on-start support-zigen-on-end))
-    (if (string-match "^[㐀-鿿𠀀-𮿿]$" string)
-        (list (cons support-zigen-kanji-entry-start support-zigen-kanji-entry-end))
-      (list (cons support-zigen-jukugo-entry-start support-zigen-jukugo-entry-end)))))
-
-(defun support-zigen-content-start (entry-start)
-  (if (or (equal entry-start support-zigen-jukugo-entry-start)
-          (equal entry-start support-zigen-jukugo-on-start))
-      support-zigen-jukugo-content-start
-    support-zigen-kanji-content-start))
-
-(defun support-zigen-content-end (entry-start)
-  (if (or (equal entry-start support-zigen-jukugo-entry-start)
-          (equal entry-start support-zigen-jukugo-on-start))
-      support-zigen-jukugo-content-end
-    support-zigen-kanji-content-end))
-
 (setq lookup-support-options
       (list :title "字源"
-            :entry-start-end-pairs #'support-zigen-entry-start-end-pairs
             :coding 'utf-8-dos
-            :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
-            :content-start "<漢字>" :content-end "</漢字>"
             :query-filter 'lookup-query-filter-hiragana-to-katakana
+            :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
+            :entry-tags-list #'support-zigen-entry-tags-list
+            :content-tags 'support-zigen-content-tags
             :arranges '((replace support-zigen-arrange-structure))))
 
 ;;; support-zigen.el ends here
