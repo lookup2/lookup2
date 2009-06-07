@@ -59,7 +59,7 @@
 ;;
 ;; If `head-tags' are not provided, then substring surrounded by
 ;; entry-start and entry-end will be a head.  `head-tags' may be a
-;; function, whose argument is `string', `method' and `content'.
+;; function, whose argument is `string' (for entry).
 ;;
 ;; While `substring' method only matches the string between
 ;; entry-start and entry-end, `text' method matches anywhere in the
@@ -163,6 +163,8 @@
         (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
                          lookup-max-hits))
         entries)
+    (if (functionp code-tags)
+        (setq code-tags (apply code-tags '(search))))
     (if (null entry-tags-list)
         (setq entry-tags-list (list entry-tags)))
     (setq entries
@@ -181,7 +183,7 @@
   (let* ((code-tags    (or (lookup-dictionary-option dictionary :code-tags t)
                             (lookup-dictionary-option dictionary :entry-tags t)))
          (content-tags (lookup-dictionary-option dictionary :content-tags t))
-         (code         (concat (car code-tags) (lookup-entry-code entry) (cdr code-tags)))
+         (code         (lookup-entry-code entry))
          (dictionary   (lookup-entry-dictionary entry))
          (coding       (or (lookup-dictionary-option dictionary :coding t)
                            'utf-8))
@@ -189,6 +191,9 @@
                         (lookup-dictionary-name dictionary)
                         (lookup-agent-location
                          (lookup-dictionary-agent dictionary)))))
+    (if (functionp code-tags)
+        (setq code-tags (apply code-tags '(content))))
+    (setq code (concat (car code-tags) code (cdr code-tags)))
     (if (functionp content-tags) 
         (setq content-tags (apply content-tags (list code))))
     (lookup-with-coding-system coding
@@ -341,8 +346,11 @@ If OPTION is `split', then split the result."
              (ndsary-file-content-options file string content-start content-end))
       (if (equal option 'split)
           (if (equal content-start content-end)
-              (remove-if-not (lambda (x) (string-match (regexp-quote string) x))
-                             (split-string (buffer-string) content-start t))
+              (mapcar 
+               (lambda (x) (concat content-start x content-end))
+               (remove-if-not (lambda (x) 
+                                (string-match (regexp-quote string) x))
+                              (split-string (buffer-string) content-start t)))
             (let ((regexp (concat (regexp-quote content-start)
                                   "\\|"
                                   (regexp-quote content-end)))
