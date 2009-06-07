@@ -41,10 +41,6 @@
         ("/SKP\\'" . "support-skp")
         ("/PDH\\'" . "support-pdh")
         ;; ndsary
-        ("ndsary:.*/jawiki.*-abstract\\.xml" . "support-wikipedia")
-        ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")
-        ("ndsary:.*/frwiki.*-abstract\\.xml" . "support-wikipedia")
-        ("ndsary:.*/zhwiki.*-abstract-.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")
@@ -60,6 +56,11 @@
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
         ;; ndsrd
         ("ndsrd:" . "support-srd")
+        ;; ndwpedia
+        ("ndwpedia:.*/enwiki.*-abstract.*\\.xml" . "support-wiki-en")
+        ("ndwpedia:.*/frwiki.*-abstract.*\\.xml" . "support-wiki-fr")
+        ("ndwpedia:.*/jawiki.*-abstract.*\\.xml" . "support-wiki-ja")
+        ("ndwpedia:.*/zhwiki.*-abstract.*\\.xml" . "support-wiki-zh")
         ;; misc.
 	("/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
