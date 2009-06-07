@@ -641,7 +641,7 @@ PDIC辞書に対して、正規表現などで検索するためのインデッ�
              (save-match-data
                (apply 'string
                       (mapcar
-                       (lambda (x) (+ 16 (string-to-int x 16)))
+                       (lambda (x) (+ 16 (string-to-number x 16)))
                        (split-string (match-string 1) "" t))))
              t nil nil 1)))
         (write-region (point-min) (point-max) (expand-file-name index-file))))))
