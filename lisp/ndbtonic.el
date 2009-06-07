@@ -25,32 +25,8 @@
 ;; (http://www.namazu.org/sary/).
 ;;
 ;; To use this agent, you must uncompress XXX.EXI format file to
-;; XXXX.xml file, and then apply following ruby program and `mksary
-;; -s' (or `mkary -so' if you like) command to create sufary index.
-
-;; #!/usr/bin/env ruby -Ks
-;; # Usage: ruby btonic.rb XXXX.xml
-;; STDIN.reopen(ARGV[0], "r")
-;; STDOUT.reopen(ARGV[0]+".ary", "w")
-;; file = $stdin
-;; $offset=0
-;; file.each_line{|line|
-;;   if (( line =~ /^(.*)(<key>)(.+)<\/key>/ ) ||
-;;       ( line =~ /^(.*<headword[^>]*)(>)(.+)<\/headword>/))
-;;     offs = $offset+$1.length
-;;     print [offs].pack("N")
-;;     offs = offs+$2.length
-;;     chars=$3.split(//)
-;;     chars.each {|char| 
-;;       print [offs].pack("N")
-;;       offs = offs+char.length
-;;     }
-;;   elsif (( line =~ /^(.*)<dic-item/ ))
-;;     offs = $offset+$1.length
-;;     print [offs].pack("N")
-;;   end
-;;   $offset+=line.length
-;; }
+;; XXXX.xml file, and then `mksary -s' (or `mkary -so' if you like)
+;; command to create sufary index.
 
 ;;; Usage:
 
@@ -112,7 +88,6 @@
   "Return entry list of DICTIONARY for QUERY."
   (let ((string      (lookup-query-string query))
         (method      (lookup-query-method query))
-        (regular     nil)
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
