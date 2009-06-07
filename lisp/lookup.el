@@ -284,10 +284,8 @@ Otherwise, this is the same with \\[lookup-previous-history]."
              (apply 'append 
                     (mapcar (lambda (query)
                               (setq result (apply filter (list query)))
-                              (message "debug: result=%s" result)
                               (if (listp result) result (list result)))
-                            queries)))
-       (message "debug: queries=%s" queries))
+                            queries))))
      filters)
     queries))
 
@@ -341,7 +339,7 @@ See `lookup-pattern' for details."
       (lookup-search-pattern module (lookup-input-pattern module word))
     (lookup-search-pattern
      module 
-     (lookup-filter-string string lookup-query-filters)
+     (lookup-filter-string word lookup-query-filters)
      lookup-default-method)))
 
 ;;;###autoload
