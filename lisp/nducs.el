@@ -64,7 +64,6 @@
   (let ((regexp (lookup-query-to-regexp query))
         (case-fold-search t)
         entries)
-    (message "debug: regexp=%s" regexp)
     (dolist (ucs-name (ucs-names))
       (if (string-match regexp (car ucs-name))
           (setq entries (cons (lookup-new-entry
