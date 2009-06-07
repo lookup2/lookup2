@@ -1,4 +1,4 @@
-;;; mypaedia.el --- support file for $B!X%^%$%Z%G%#%"#9#7!Y(B
+;;; mypaedia.el --- support file for 『マイペディア９７』 -*- coding: utf-8 -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -21,43 +21,43 @@
 
 (defconst mypaedia-gaiji-table
   (lookup-new-gaiji-table
-   '(("ha121" ",A4(B") ("ha122" ",0,(B") ("ha123" ",07(B") ("ha124" ",0#(B") ("ha125" ",0'(B")
-     ("ha126" ",0I(B") ("ha127" ",0U(B") ("ha128" ",0M(B") ("ha129" ",0r(B") ("ha12a" "`")
-     ("ha12b" nil "1/2") ("ha12c" nil "1/3") ("ha12d" ",AA(B") ("ha12e" ",Aa(B")
-     ("ha12f" ",A@(B") ("ha130" ",A`(B") ("ha133" ",AB(B") ("ha134" ",Ab(B") ("ha136" ",AD(B")
-     ("ha137" ",Ad(B") ("ha138" ",AC(B") ("ha139" ",Ac(B") ("ha13a" ",AE(B") ("ha13b" ",Ae(B")
-     ("ha13c" ",AF(B") ("ha13d" ",Af(B") ("ha154" ",Aj(B") ("ha157" ",AK(B") ("ha158" ",Ak(B")
-     ("ha161" ",Am(B") ("ha162" ",AL(B") ("ha168" ",AO(B") ("ha169" ",Ao(B") ("ha16a" ",0!(B")
-     ("ha16b" "l") ("ha16e" ",B#(B") ("ha17a" ",AS(B") ("ha17b" ",As(B") ("ha17c" ",AR(B")
-     ("ha17d" ",Ar(B") ("ha222" ",AT(B") ("ha223" ",At(B") ("ha224" ",AV(B") ("ha225" ",Av(B")
-     ("ha226" ",AU(B") ("ha227" ",Au(B") ("ha228" ",AX(B") ("ha229" ",Ax(B") ("ha22e" ",01(B")
-     ("ha22f" ",00(B") ("ha242" ",Az(B") ("ha243" ",AY(B") ("ha244" ",Ay(B") ("ha247" ",A\(B")
-     ("ha248" ",A|(B") ("ha25b" ",0H(B") ("ha25c" ",0L(B")
-     ("za121" nil ",A4(B") ("za122" nil ",0,(B") ("za123" nil ",07(B") ("za124" nil ",0#(B")
-     ("za125" nil ",0'(B") ("za126" nil ",0I(B") ("za127" nil ",0U(B") ("za128" nil ",0M(B")
-     ("za129" nil ",0r(B") ("za12a" nil "`") ("za12b" nil "1/2")
-     ("za12c" nil "1/3") ("za12d" nil ",AA(B") ("za12e" nil ",Aa(B") ("za12f" nil ",A@(B")
-     ("za130" nil ",A`(B") ("za133" nil ",AB(B") ("za134" nil ",Ab(B") ("za136" nil ",AD(B")
-     ("za137" nil ",Ad(B") ("za138" nil ",AC(B") ("za139" nil ",Ac(B") ("za13a" nil ",AE(B")
-     ("za13b" nil ",Ae(B") ("za13c" nil ",AF(B") ("za13d" nil ",Af(B") ("za154" nil ",Aj(B")
-     ("za157" nil ",AK(B") ("za158" nil ",Ak(B") ("za161" nil ",Am(B") ("za162" nil ",AL(B")
-     ("za168" nil ",AO(B") ("za169" nil ",Ao(B") ("za16a" nil ",0!(B") ("za16b" nil "l")
-     ("za16e" nil ",B#(B") ("za17a" nil ",AS(B") ("za17b" nil ",As(B") ("za17c" nil ",AR(B")
-     ("za17d" nil ",Ar(B") ("za222" nil ",AT(B") ("za223" nil ",At(B") ("za224" nil ",AV(B")
-     ("za225" nil ",Av(B") ("za226" nil ",AU(B") ("za227" nil ",Au(B") ("za228" nil ",AX(B")
-     ("za229" nil ",Ax(B") ("za22e" nil ",01(B") ("za22f" nil ",00(B") ("za242" nil ",Az(B")
-     ("za243" nil ",AY(B") ("za244" nil ",Ay(B") ("za247" nil ",A\(B") ("za248" nil ",A|(B")
-     ("za25b" nil ",0H(B") ("za25c" nil ",0L(B"))))
+   '(("ha121" "´") ("ha122" "ɑ") ("ha123" "ɔ") ("ha124" "ɛ") ("ha125" "ə")
+     ("ha126" "ð") ("ha127" "ŋ") ("ha128" "ʒ") ("ha129" "ː") ("ha12a" "`")
+     ("ha12b" nil "1/2") ("ha12c" nil "1/3") ("ha12d" "Á") ("ha12e" "á")
+     ("ha12f" "À") ("ha130" "à") ("ha133" "Â") ("ha134" "â") ("ha136" "Ä")
+     ("ha137" "ä") ("ha138" "Ã") ("ha139" "ã") ("ha13a" "Å") ("ha13b" "å")
+     ("ha13c" "Æ") ("ha13d" "æ") ("ha154" "ê") ("ha157" "Ë") ("ha158" "ë")
+     ("ha161" "í") ("ha162" "Ì") ("ha168" "Ï") ("ha169" "ï") ("ha16a" "ɪ")
+     ("ha16b" "l") ("ha16e" "Ł") ("ha17a" "Ó") ("ha17b" "ó") ("ha17c" "Ò")
+     ("ha17d" "ò") ("ha222" "Ô") ("ha223" "ô") ("ha224" "Ö") ("ha225" "ö")
+     ("ha226" "Õ") ("ha227" "õ") ("ha228" "Ø") ("ha229" "ø") ("ha22e" "ɶ")
+     ("ha22f" "œ") ("ha242" "ú") ("ha243" "Ù") ("ha244" "ù") ("ha247" "Ü")
+     ("ha248" "ü") ("ha25b" "θ") ("ha25c" "ʃ")
+     ("za121" nil "´") ("za122" nil "ɑ") ("za123" nil "ɔ") ("za124" nil "ɛ")
+     ("za125" nil "ə") ("za126" nil "ð") ("za127" nil "ŋ") ("za128" nil "ʒ")
+     ("za129" nil "ː") ("za12a" nil "`") ("za12b" nil "1/2")
+     ("za12c" nil "1/3") ("za12d" nil "Á") ("za12e" nil "á") ("za12f" nil "À")
+     ("za130" nil "à") ("za133" nil "Â") ("za134" nil "â") ("za136" nil "Ä")
+     ("za137" nil "ä") ("za138" nil "Ã") ("za139" nil "ã") ("za13a" nil "Å")
+     ("za13b" nil "å") ("za13c" nil "Æ") ("za13d" nil "æ") ("za154" nil "ê")
+     ("za157" nil "Ë") ("za158" nil "ë") ("za161" nil "í") ("za162" nil "Ì")
+     ("za168" nil "Ï") ("za169" nil "ï") ("za16a" nil "ɪ") ("za16b" nil "l")
+     ("za16e" nil "Ł") ("za17a" nil "Ó") ("za17b" nil "ó") ("za17c" nil "Ò")
+     ("za17d" nil "ò") ("za222" nil "Ô") ("za223" nil "ô") ("za224" nil "Ö")
+     ("za225" nil "ö") ("za226" nil "Õ") ("za227" nil "õ") ("za228" nil "Ø")
+     ("za229" nil "ø") ("za22e" nil "ɶ") ("za22f" nil "œ") ("za242" nil "ú")
+     ("za243" nil "Ù") ("za244" nil "ù") ("za247" nil "Ü") ("za248" nil "ü")
+     ("za25b" nil "θ") ("za25c" nil "ʃ"))))
 
 (defconst mypaedia-reference-regexp
 ;  (cond ((eq lookup-support-agent 'ndtp)
-;	 "$B"*(B\\(.*\\)<\\([0-9a-f:]+\\)>\n")
+;	 "→\\(.*\\)<\\([0-9a-f:]+\\)>\n")
 ;	((eq lookup-support-agent 'ndeb)
-	 "<reference>$B"*(B\\(.*\\)</reference=\\([0-9a-f:]+\\)>\n");))
+	 "<reference>→\\(.*\\)</reference=\\([0-9a-f:]+\\)>\n");))
 
 (defun mypaedia-arrange-references (entry)
-  ;; $B$3$N<-=q$O%j%s%/$,%F%-%9%H$N:G8e$K$^$H$a$i$l$F$$$k$N$@$,!"(B
-  ;; $BB>$N<-=q$K9g$o$;$F!"%F%-%9%H$NESCf$K:n$k!#(B
+  ;; この辞書はリンクがテキストの最後にまとめられているのだが、
+  ;; 他の辞書に合わせて、テキストの途中に作る。
   (let ((dictionary (lookup-entry-dictionary entry))
 	heading code start end)
     (while (re-search-forward mypaedia-reference-regexp nil t)
@@ -65,9 +65,9 @@
       (setq heading (match-string 1) code (match-string 2))
       (setq entry (lookup-new-entry 'regular dictionary code heading))
       (delete-region start end)
-      (if (search-backward (concat "$B"M(B" heading) nil t)
+      (if (search-backward (concat "⇒" heading) nil t)
 	  (setq start (match-beginning 0) end (match-end 0))
-	(insert "$B"*(B" heading "\n")
+	(insert "→" heading "\n")
 	(setq end (1- (point))))
       (lookup-set-link start end entry))))
 
