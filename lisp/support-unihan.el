@@ -217,7 +217,7 @@ unconditionally."  )
 (setq lookup-support-options
       (list :title "Unihan"
             :arranges '((reference support-unihan-arrange-structure))
-            :entry-tags '("\n" . "\t")
+            :entry-tags '("" . "\t")
             :content-tags '("\n" . "\n")
             :code-tags  (lambda (x) 
                           (if (equal x 'search) '("\n" . "\t") '("" . "\t")))
