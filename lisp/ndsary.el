@@ -109,7 +109,7 @@
 ;;  :group 'lookup-agents)
 
 (defvar ndsary-sary-program "sary")
-(defvar ndsary-sary-program-options '())
+(defvar ndsary-sary-program-options '("-i"))
 
 ;;;
 ;;; Internal variables
@@ -263,18 +263,18 @@ surrounded by CONTENT-TAGS will be searched for CODE and HEAD."
   "Costruct search pattern from query STRING and METHOD for `sary'.
 If START tag is provided, then that will be attached.
 If END tag is provided, then that will also be attached."
-  (if (and (or (null start) (null end))
-           (or (equal method 'suffix)
-               (equal method 'substring)
-               (equal method 'text)))
-      nil
+  ;;(if (and (or (null start) (null end))
+  ;;         (or (equal method 'suffix)
+  ;;             (equal method 'substring)
+  ;;             (equal method 'text)))
+  ;;    nil
     (concat (if (or (equal method 'exact)
                     (equal method 'prefix))
                 start)
             string
             (if (or (equal method 'exact)
                     (equal method 'suffix))
-                end))))
+                end)));;)
 
 (defun ndsary-extract-entry
   (entry string method entry-tags &optional code-tags head-tags)
@@ -354,7 +354,7 @@ If OPTION is `split', then split the result."
             (let ((regexp (concat (regexp-quote content-start)
                                   "\\|"
                                   (regexp-quote content-end)))
-                  (start 0) entries)
+                  (start 1) entries)
               (goto-char (point-min))
               (while (re-search-forward regexp nil t)
                 (if (equal (match-string 0) content-start)
