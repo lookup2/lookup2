@@ -130,7 +130,8 @@
          (result (ndkanji-sl3-query 
                   (ndkanji-construct-sql query))))
     (mapcar (lambda (ucs)
-              (lookup-new-entry 'dynamic dictionary result)))))
+              (lookup-new-entry 'dynamic dictionary ucs))
+            result)))
 
 (put 'ndkanji :dynamic 'ndkanji-dynamic-search)
 (defun ndkanji-dynamic-search (entry)
