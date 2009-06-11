@@ -1,4 +1,4 @@
-;;; nddsl.el --- Lookup `dsl' interface -*- coding: utf-8 -*-
+;;; nddsl.el --- Lookup `DSL' interface -*- coding: utf-8 -*-
 ;; Copyright (C) 2009 KAWABATA Taichi <kawabata.taichi@gmail.com>
 
 ;; Keywords: dictionary
@@ -63,7 +63,7 @@
 (defvar nddsl-content-end   "\n\n")
 (defvar nddsl-entry-content-end "[")
 (defun nddsl-content-tags (x)
-  (if (consp x) '("\n\n" . "[") '("\n\n" "\n\n")))
+  (if (consp x) '("\n\n" . "[") '("\n\n" . "\n\n")))
 
 ;;;
 ;;; Interface functions
@@ -129,7 +129,7 @@
                  (lookup-dictionary-agent dictionary)))))
     (lookup-with-coding-system 'utf-8
       (ndsary-file-content
-       file (concat (car nddsl-entry-tags) code (cdr nddsl-entry-tags))
+       file code
        nddsl-content-start nddsl-content-end))))
 
 ;;;

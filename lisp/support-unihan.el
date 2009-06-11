@@ -216,12 +216,11 @@ unconditionally."  )
 
 (setq lookup-support-options
       (list :title "Unihan"
-            :arranges '((reference support-unihan-arrange-structure))
+            :query-filter 'support-unihan-query-filter
             :entry-tags '("" . "\t")
             :content-tags '("\n" . "\n")
-            :code-tags  (lambda (x) 
-                          (if (equal x 'search) '("\n" . "\t") '("" . "\t")))
-            :head-tags  'support-unihan-head-tags
-            :query-filter 'support-unihan-query-filter))
+            :code-tags  '("" . "\t")
+            :arranges '((reference support-unihan-arrange-structure))
+            :head-tags  'support-unihan-head-tags))
 
 ;;; support-unihan.el ends here

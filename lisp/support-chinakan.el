@@ -45,22 +45,49 @@
 (require 'lookup)
 (require 'lookup-content)
 
+;;;
+;;; Customizable Variable
+;;;
+
 (defvar support-chinakan-url-format
   "http://www.seiwatei.net/chinakan/%s.gif")
+
+(defvar support-chinakan-field-format
+  '("文字"
+    "参照文字"
+    "支那漢のページ"
+    "参照文字のページ"
+    "部首コード"
+    "部首内画数"
+    "総画数"
+    "四角号碼"
+    "ピンイン"
+    "日本語音訓"))
+
+;;;
+;;; Main Program
+;;;
+
+(defun support-chinakan-entry-tags-list (string method)
+  (if (string-match "^[ァ-ヺあ-ん]+$" string) '(("1" . "1")) '(("" . ""))))
 
 (defun support-chinakan-arrange-reference (entry)
   "Arrange contents of ENTRY."
   (while (search-forward "\n\n" nil t) (replace-match ""))
   (goto-char (point-min))
   (insert (lookup-entry-code entry) "\n")
-  (while (re-search-forward "^\\([^,]*?\\),\\([^,]*?\\),\\([^,]*?\\),\\([^,]*?\\)," nil t)
-    (replace-match
-     (concat "\\1"
-             (unless (equal (match-string 2) "") "(\\2)")
-             (unless (equal (match-string 3) "") " ページ番号：\\3")
-             (unless (equal (match-string 4) "") " ページ番号：\\4") ",")))
+  (while (re-search-forward "^.+?,.+?,.+$" nil t)
+    (let ((data (match-string 0))
+          (field support-chinakan-field-format))
+      (replace-match "")
+      (setq data (split-string data ","))
+      (while (and data field)
+        (if (and (car data) (not (equal (car data) "")))
+            (insert (car field) ": " (car data) "\n"))
+        (setq data (cdr data)
+              field (cdr field)))))
   (goto-char (point-min))
-  (while (re-search-forward "ページ番号：\\([0-9]+\\)" nil t)
+  (while (re-search-forward "ページ: \\([0-9]+\\)" nil t)
     (lookup-url-set-link (match-beginning 0) (match-end 0)
                          (format support-chinakan-url-format
                                  (match-string 1))))
@@ -68,7 +95,12 @@
 
 (setq lookup-support-options
       (list :title "支那文を讀む爲の漢字典"
-            :charset 'utf-8-dos
+            :coding 'utf-8-dos
+            :charsets 
+            (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺあ-ん]+\\)$" x))
+            :entry-tags-list 'support-chinakan-entry-tags-list
+            :content-tags '("\n" . "\n")
+            :code-tags  '("" . ",")
             :arranges '((reference support-chinakan-arrange-reference))))
 
 ;;; support-chinakan.el ends here

@@ -22,27 +22,35 @@
 
 ;;; Code:
 
-(defvar support-eijiro-index-table
-  '(("Eijiro112.dic" . "indices/dic00.idx")
-    ("Waeiji112.dic" . "indices/dic01.idx")
-    ("Ryaku112.dic" . "indices/dic02.idx")
-    ("Reiji112.dic" . "indices/dic03.idx")))
+(defvar support-eijiro-option-list
+  '(("Eijiro112.dic" 
+     "英辞郎"
+     '(ascii)
+     "indices/dic00.idx")
+    ("Waeiji112.dic" 
+     "和英辞郎"
+     '(ascii japanese-jisx0208)
+     "indices/dic01.idx")
+    ("Ryaku112.dic" 
+     "略語辞典"
+     '(ascii)
+     "indices/dic02.idx")
+    ("Reiji112.dic" 
+     "例辞郎"
+     '(ascii japanese-jisx0208)
+     "indices/dic03.idx")))
 
-(defvar support-eijiro-title-table
-  '(("Eijiro112.dic" . "英辞郎")
-    ("Waeiji112.dic" . "和英辞郎")
-    ("Ryaku112.dic" . "略語辞典")
-    ("Reiji112.dic" . "例辞郎")))
-
-(defun support-eijiro-index-file (dict-id)
-  (cdr 
-   (assoc (replace-regexp-in-string "^.+/\\([^/]+\\)$" "\\1" dict-id)
-          support-eijiro-index-table)))
-
-(defun support-eijiro-title-name (dict-id)
-  (cdr 
-   (assoc (replace-regexp-in-string "^.+/\\([^/]+\\)$" "\\1" dict-id)
-          support-eijiro-title-table)))
+(defun support-eijiro-options (dict-id)
+  (let* ((id (replace-regexp-in-string "^.+/\\([^/]+\\)$" "\\1" dict-id))
+         (options (assoc id support-eijiro-option-list))
+         (title    (elt options 1))
+         (charsets (elt options 2))
+         (index    (elt options 3)))
+    `(:title    ,title
+      :charsets ,charsets
+      :query-filter lookup-query-filter-stem-english
+      :arranges ((reference support-eijiro-arrange-reference))
+      :index    ,index)))
 
 (defun support-eijiro-arrange-reference (entry)
   (goto-char (point-min))
@@ -70,15 +78,9 @@
   ;; to be provided in future
   )
 
-(let ((title (support-eijiro-title-name lookup-support-dictionary-id))
-      (index (support-eijiro-index-file lookup-support-dictionary-id)))
+(let ((options (support-eijiro-options lookup-support-dictionary-id)))
   (message "Eijiro: dict-id=%s" lookup-support-dictionary-id)
-  (message "Eijiro: index of %s is set to %s" title index)
-  (setq lookup-support-options
-        (list :title title
-              :arranges '((reference support-eijiro-arrange-reference))
-              :query-filter 'lookup-query-filter-stem-english
-              :index index
-              )))
+  (message "Eijiro: index of %s is set to %s" (plist-get options :title) (plist-get options :index))
+  (setq lookup-support-options options))
 
 ;;; support-eijiro.el ends here

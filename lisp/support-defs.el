@@ -41,6 +41,7 @@
         ("/SKP\\'" . "support-skp")
         ("/PDH\\'" . "support-pdh")
         ;; ndsary
+        ("ndsary:.*\\.sdic" . "support-sdic")
         ("ndsary:.*/swjz\\.xml" . "support-swjz")
         ("ndsary:.*/sbgy\\.xml" . "support-sbgy")
         ("ndsary:.*/zigen.*all\\.xml" . "support-zigen")

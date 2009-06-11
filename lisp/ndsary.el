@@ -23,52 +23,56 @@
 ;; ndsary.el provides the suffix array index searching capability
 ;; using `sary' program (http://www.namazu.org/sary/).
 ;;
-;; Typical text dictionary look as follows:
+;; Typical text dictionary looks like as follows:
 ;;
 ;; ....
-;; <content-start>
-;;  <code-start>CODE</code-end>
-;;  <head-start>HEAD</head-end>
-;;  <entry-start>ENTRY1</entry-end>
-;;  <entry-start>ENTRY2</entry-end>
+;; <content>
+;;  <code>CODE</code>
+;;  <head>HEAD</head>
+;;  <entry-a>ENTRY1</entry-a>
+;;  <entry-a>ENTRY2</entry-a>
 ;;  ....
-;;  <entry-start-2>ENTRY2-1</entry-end-2>
-;;  <entry-start-2>ENTRY2-2</entry-end-2>
+;;  <entry-b>ENTRY3</entry-b>
+;;  <entry-b>ENTRY4</entry-b>
 ;;  ....
 ;;  <explanation>....</explanation>
-;; </content-end>
+;; </content>
 ;; ....
 ;;
 ;; All the above tags are optional.
 ;;
-;; If `:entry-tags' or `:entry-tags-list' is not provided, then only
-;; `exact' and `prefix' search is possible, where searched keyword
-;; itself will be a CODE.  `:entry-tags' or `:entry-tags-list' may be
-;; a function with arguments of queried string and method.
+;; `:entry-tags' or `:entry-tags-list' option denotes above (<entry>
+;; . </entry>) pair or list of them.  `:entry-tags' or
+;; `:entry-tags-list' may be a function with arguments of queried
+;; string and method.
 ;;
-;; If `:entry-tags' is provided by the dictionary spec, then `exact',
-;; `prefix', `suffix', `substring' and `text' search is possible.
+;; If `:entry-tags' is provided , then `exact', `prefix', `suffix',
+;; `substring' and `text' search is possible.  If they are not
+;; provided, then only `exact' and `prefix' search is possible, where
+;; searched keyword itself will be a CODE.
 ;;
-;; If `:content-tags' are not provided, then each LINE is assumed to
-;; be each content.  `:content-tags' may be a function, whose argument
-;; is `entry-tags' cons cell (for searching) or `code' string (for
-;; content display).
-;;
-;; If `:code-tags' are not provided, then entire concatenation of
-;; `entry-start'+entry+`entry-end' will be a code.
+;; `:content-tags' should be a cons cell of `content-start' and
+;; `content-end' string.  `content-start' may be nil, which means a
+;; beginning of each line.  If `:content-tags' is not provided, then
+;; each LINE is assumed to be content of each entries.
+;; `:content-tags' may be a function, whose argument is either
+;; `entry-tags' for searching stage, or `code' string (including tags)
+;; for display stage.
+;; 
+;; `:code-tags' should be a cons cell of `code-start' and `code-end'
+;; string.  If `:code-tags' is not provided, then entire concatenation
+;; of `entry-start'+entry+`entry-end' will be a code.  If `:code-tags'
+;; is a function, then it should generate a cons cell of `code-start'
+;; and `code-end' from `:entry-tags' cons cell for searching stage, or
+;; `entry' string (including tags) for display stage.
 ;;
 ;; If `head-tags' are not provided, then substring surrounded by
 ;; entry-start and entry-end will be a head.  `head-tags' may be a
-;; function, whose argument is `string' (for entry).
+;; function, whose argument is `content' string.
 ;;
 ;; While `substring' method only matches the string between
 ;; entry-start and entry-end, `text' method matches anywhere in the
 ;; content.
-;;
-;; If `content-start' is a natural number , then that number of line
-;; before the hit line will be provided as content.  If `content-end'
-;; is a natural number, then that number of following lines will be
-;; provided as a content.
 ;;
 ;; If multiple contents are found by single CODE, then all the contents
 ;; will be concatenated to form one single content.
@@ -109,7 +113,7 @@
 ;;  :group 'lookup-agents)
 
 (defvar ndsary-sary-program "sary")
-(defvar ndsary-sary-program-options '("-i"))
+(defvar ndsary-sary-program-options '())
 
 ;;;
 ;;; Internal variables
@@ -152,8 +156,11 @@
         (content-tags    (lookup-dictionary-option dictionary :content-tags t))
         (code-tags       (lookup-dictionary-option dictionary :code-tags t))
         (head-tags       (lookup-dictionary-option dictionary :head-tags t))
-        (string      (lookup-query-string query))
-        (method      (lookup-query-method query))
+        (string          (lookup-query-string query))
+        (method          (lookup-query-method query))
+        (ndsary-sary-program-options
+                     (or (lookup-dictionary-option dictionary :sary-options t)
+                         ndsary-sary-program-options))
         (file        (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
@@ -163,8 +170,6 @@
         (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
                          lookup-max-hits))
         entries)
-    (if (functionp code-tags)
-        (setq code-tags (apply code-tags '(search))))
     (if (null entry-tags-list)
         (setq entry-tags-list (list entry-tags)))
     (setq entries
@@ -180,9 +185,7 @@
 (put 'ndsary :content 'ndsary-entry-content)
 (defun ndsary-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((code-tags    (or (lookup-dictionary-option dictionary :code-tags t)
-                            (lookup-dictionary-option dictionary :entry-tags t)))
-         (content-tags (lookup-dictionary-option dictionary :content-tags t))
+  (let* ((content-tags (lookup-dictionary-option dictionary :content-tags t))
          (code         (lookup-entry-code entry))
          (dictionary   (lookup-entry-dictionary entry))
          (coding       (or (lookup-dictionary-option dictionary :coding t)
@@ -191,14 +194,11 @@
                         (lookup-dictionary-name dictionary)
                         (lookup-agent-location
                          (lookup-dictionary-agent dictionary)))))
-    (if (functionp code-tags)
-        (setq code-tags (apply code-tags '(content))))
-    (setq code (concat (car code-tags) code (cdr code-tags)))
     (if (functionp content-tags) 
         (setq content-tags (apply content-tags (list code))))
     (lookup-with-coding-system coding
       (ndsary-file-content file code
-                           (car content-tags) (cdr content-tags) coding))))
+                           (car content-tags) (cdr content-tags)))))
 
 ;;;
 ;;; Main Program
@@ -232,31 +232,36 @@ of (code . heading).  If CONTENT-TAGS is provided, the region
 surrounded by CONTENT-TAGS will be searched for CODE and HEAD."
   ;; Note: If ENTRY-TAGS contains newlines, then it is suggested to
   ;; provide CONTENT-TAGS to properly extract entries.
+  (if (functionp code-tags)
+      (setq code-tags    (apply code-tags    (list entry-tags))))
   (if (functionp content-tags) 
       (setq content-tags (apply content-tags (list entry-tags))))
   (let* ((pattern 
           (ndsary-pattern string method (car entry-tags) (cdr entry-tags)))
-         (count 0) entries)
+         (count 0)
+         entries)
     (if (/= 0 lookup-max-hits)
         (setq count (ndsary-file-match-count file pattern)))
-    (if (and (/= 0 lookup-max-hits) (< lookup-max-hits count))
-        (setq entries (list
-                       (cons "�" (format "Error. More than %s hits. (%d)" 
-                                         lookup-max-hits count))))
-      (if (= count 0) (setq entries nil)
-        ;; count /= 0
-        (if (null entry-tags)
-            ;; TODO method `exact' vs `prefix'
-            (setq entries (list (cons string string)))
-          (setq entries 
-                (mapcar (lambda (x) 
-                          (ndsary-extract-entry 
-                           x string method entry-tags code-tags head-tags))
-                        (ndsary-file-content file pattern 
-                                             (car (or content-tags entry-tags))
-                                             (cdr (or content-tags entry-tags))
-                                             'split))))
-        (setq entries (remove-if 'null entries))))
+    (cond ((= count 0) 
+           (setq entries nil))
+          ((and (/= 0 lookup-max-hits) (< lookup-max-hits count))
+           (setq entries (list
+                          (cons "�" (format "Error. More than %s hits. (%d)" 
+                                            lookup-max-hits count)))))
+          ((null entry-tags) 
+           ;;TODO prefix/exact processing.
+           (setq entries (list (cons string string))))
+          (t
+           (setq entries 
+                 (mapcar (lambda (x) 
+                           (ndsary-extract-entry 
+                            x string method entry-tags code-tags head-tags))
+                         (ndsary-file-content 
+                          file pattern 
+                          (car (if code-tags content-tags entry-tags))
+                          (cdr (if code-tags content-tags entry-tags))
+                          'split)))))
+    (setq entries (remove-if 'null entries))
     entries))
 
 (defun ndsary-pattern (string method start end)
@@ -280,41 +285,35 @@ If END tag is provided, then that will also be attached."
   (entry string method entry-tags &optional code-tags head-tags)
   "Check and extract code and head for ENTRY.
 If STRING is not surrounded by ENTRY-TAGS, nil will be returned.
-If CODE-TAGS is null, ENTRY surrounded by ENTRY-TAGS will be a code.
-If CODE-TAGS is a function, result applied to ENTRY will be a code.
-If HEAD-TAGS is null, CODE will be a head.
+If CODE-TAGS is null, ENTRY-TAGS will be used instead.
+If HEAD-TAGS is null, CODE-TAGS will be used instead.
 If HEAD-TAGS is a function, result applied to ENTRY will be a head."
   (let ((entry-start (regexp-quote (car entry-tags)))
-        (entry-end   (regexp-quote (cdr entry-tags))))
+        (entry-end   (regexp-quote (cdr entry-tags)))
+        code head)
+    ;; validity check
     (if (and (or (equal method 'substring) (equal method 'prefix)
                  (equal method 'suffix))
              (not (string-match (concat entry-start ".*?"
                                         (regexp-quote string) ".*?"
                                         entry-end) entry)))
         nil ;; invalid
-      (let* ((code (if (null code-tags)
-                       (progn
-                         (string-match (concat entry-start "\\(.*?\\)" entry-end) entry)
-                         (match-string 0 entry))
-                     (if (functionp code-tags) (apply code-tags (list entry))
-                       (ndsary-extract-string entry (car code-tags)
-                                              (cdr code-tags)))))
-             (head (if (null head-tags) 
-                       (if (null code-tags) (match-string 1 entry) code)
-                     (if (functionp head-tags) (apply head-tags (list entry))
-                       (ndsary-extract-string entry (car head-tags) 
-                                              (cdr head-tags))))))
-        ;;(if (not (stringp code)) (error "Lookup error!"))
-        (cons code head)))))
+      (if (null code-tags) (setq code-tags entry-tags))
+      (setq head (ndsary-extract-string entry (car code-tags)
+                                              (cdr code-tags))
+            code (concat (car code-tags) head (cdr code-tags)))
+      (if (functionp head-tags) (setq head (apply head-tags (list entry)))
+        (if head-tags (setq head (ndsary-extract-string entry (car head-tags) 
+                                                        (cdr head-tags)))))
+      ;;(if (not (stringp code)) (error "Lookup error!"))
+      (cons code head))))
                       
 (defun ndsary-extract-string (string start end)
-  "Extract string surround by START and END from STRING.
-If START is a function, then it will be applied to STRING."
-  (if (functionp start) (apply start (list string))
-    (if (string-match (concat (regexp-quote start)
-                              "\\(.+?\\)"
-                              (regexp-quote end)) string)
-        (match-string 1 string))))
+  "Extract string surround by START and END from STRING."
+  (if (string-match (concat (regexp-quote start)
+                            "\\(.+?\\)"
+                            (regexp-quote end)) string)
+      (match-string 1 string)))
 
 ;;;
 ;;; Low Level functions
@@ -346,11 +345,11 @@ If OPTION is `split', then split the result."
              (ndsary-file-content-options file string content-start content-end))
       (if (equal option 'split)
           (if (equal content-start content-end)
-              (mapcar 
-               (lambda (x) (concat content-start x content-end))
                (remove-if-not (lambda (x) 
                                 (string-match (regexp-quote string) x))
-                              (split-string (buffer-string) content-start t)))
+                              (mapcar 
+                               (lambda (x) (concat content-start x content-end))
+                               (split-string (buffer-string) content-start t)))
             (let ((regexp (concat (regexp-quote content-start)
                                   "\\|"
                                   (regexp-quote content-end)))

@@ -23,8 +23,8 @@
 ;; http://wagang.econ.hc.keio.ac.jp/zigen/
 ;;
 ;; Download 214 xml files (from 001.xml to 214.xml) in that directory,
-;; then concatenate all of them to make one single `all.xml'
-;; file in the directory named ".../zigen/".
+;; then concatenate all of them to make one single `all.xml' file in
+;; the directory named ".../zigen/".
 ;;
 ;; Following will make index points.
 ;; % mksary -c utf-8 all.xml
@@ -66,13 +66,24 @@
       '(("<見出字>" . "</見出字>") ("<見出語>" . "</見出語>")))))
 
 (defun support-zigen-content-tags (x)
-  (if (consp x)
-      (if (or (equal (car x) "<見出字>")
-              (equal (car x) support-zigen-kanji-on-start))
-          '("<漢字>" . "</漢字>")
-        '("<熟語>" . "</熟語>"))
-    (if (string-match "<見出字>" x) '("<漢字>" . "</漢字>")
-      '("<熟語>" . "</熟語>"))))
+  (if (consp x) (setq x (car x)))
+  (cond ((string-match "<見出語>" x) '("<熟語>" . "</熟語>"))
+        ((string-match support-zigen-jukugo-on-start x) 
+         '("<熟語>" . "</熟語>"))
+        ;;((string-match "<見出字>" x) '("<漢字>" . "</漢字>"))
+        ;;((string-match support-zigen-kanji-on-start x) 
+        ;;                           '("<漢字>" . "</漢字>"))
+        (t '("<漢字>" . "</漢字>"))))
+
+(defun support-zigen-code-tags (x)
+  (if (consp x) (setq x (car x)))
+  (cond ((string-match "<見出語>" x) nil)
+        ((string-match "<見出字>" x) nil)
+        ((string-match support-zigen-jukugo-on-start x) 
+         '("<見出語>" . "</見出語>"))
+        ((string-match support-zigen-kanji-on-start x) 
+         '("<見出字>" . "</見出字>"))
+        (t (error "No proper CODE found!"))))
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
@@ -112,15 +123,18 @@
   (goto-char (point-min))
   (while (re-search-forward "\n\n+" nil t) (replace-match "\n"))
   (goto-char (point-min))
-  (if (looking-at "$") (delete-region (point-min) (1+ (point-min)))))
+  (if (and (looking-at "$") (not (= (point-min) (point-max))))
+      (delete-region (point-min) (1+ (point-min)))))
 
 (setq lookup-support-options
       (list :title "字源"
             :coding 'utf-8-dos
             :query-filter 'lookup-query-filter-hiragana-to-katakana
-            :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
+            :charsets 
+            (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
             :entry-tags-list #'support-zigen-entry-tags-list
             :content-tags 'support-zigen-content-tags
+            :code-tags 'support-zigen-code-tags
             :arranges '((replace support-zigen-arrange-structure))))
 
 ;;; support-zigen.el ends here
