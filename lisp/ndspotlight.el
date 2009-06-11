@@ -61,7 +61,7 @@
   :group 'ndspotlight)
 
 (defcustom ndspotlight-search-program-options '()
-  "*Command name of `mdfind'."
+  "*Command options of `mdfind'."
   :type '(repeat :tag "Options" string)
   :group 'ndspotlight)
 
