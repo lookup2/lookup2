@@ -165,14 +165,34 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;; Normalize Input String
 ;;
 
-(defun lookup-query-filter-normalize-ucs (query)
-  (setf (lookup-query-string query)
-        (replace-regexp-in-string 
-         "[〾󠀀-󯿽]" "" (ucs-normalize-NFC-string 
-                       (lookup-query-string query))))
+(defun lookup-query-filter-normalize-nfc (query)
+  (if (lookup-query-string query)
+      (setf (lookup-query-string query)
+            (replace-regexp-in-string 
+             "[〾󠀀-󯿽]" "" (ucs-normalize-NFC-string 
+                           (lookup-query-string query)))))
   query)
 
-(add-to-list 'lookup-query-filters 'lookup-query-filter-normalize-ucs)
+(defun lookup-query-filter-normalize-nfkc (query)
+  (if (lookup-query-string query)
+      (setf (lookup-query-string query)
+            (replace-regexp-in-string 
+             "[〾󠀀-󯿽]" "" (ucs-normalize-NFKC-string 
+                           (lookup-query-string query)))))
+  query)
+
+(add-to-list 'lookup-query-filters 'lookup-query-filter-normalize-nfkc)
+
+;;
+;; case
+;;
+
+(defun lookup-query-filter-downcase (query)
+  (setf (lookup-query-string query)
+        (downcase (lookup-query-string query)))
+  query)
+
+(add-to-list 'lookup-query-filters 'lookup-query-filter-downcase)
 
 ;;
 ;; Stem English
