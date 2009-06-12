@@ -25,19 +25,19 @@
 (defvar support-eijiro-option-list
   '(("Eijiro112.dic" 
      "英辞郎"
-     '(ascii)
+     (ascii)
      "indices/dic00.idx")
     ("Waeiji112.dic" 
      "和英辞郎"
-     '(ascii japanese-jisx0208)
+     (ascii japanese-jisx0208)
      "indices/dic01.idx")
     ("Ryaku112.dic" 
      "略語辞典"
-     '(ascii)
+     (ascii)
      "indices/dic02.idx")
     ("Reiji112.dic" 
      "例辞郎"
-     '(ascii japanese-jisx0208)
+     (ascii japanese-jisx0208)
      "indices/dic03.idx")))
 
 (defun support-eijiro-options (dict-id)

@@ -112,7 +112,7 @@
                        (lookup-dictionary-agent dictionary)))))
     (lookup-with-coding-system 'cp932
       (ndsary-file-content 
-       file (concat (car ndbtonic-code-tags) string (cdr ndbtonic-code-tags))
+       file  string 
        (car ndbtonic-content-tags) (cdr ndbtonic-content-tags)))))
 
 (put 'ndbtonic :arrange-table
