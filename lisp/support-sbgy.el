@@ -22,46 +22,6 @@
 ;;
 ;; Text file can be downloaded from:
 ;; http://kanji-database.sourceforge.net/dict/sbgy/index.html
-;;
-;; Following Program will make index point file, which then can be
-;; sorted by 'mksary -s' command.  
-
-;; #!/usr/bin/env ruby -Ku
-;; # Usage: ruby sbgy.rb sbgy.xml
-;; #        mksary -s sbgy.xml
-;; STDIN.reopen(ARGV[0], "r")
-;; STDOUT.reopen(ARGV[0]+".ary", "w")
-;; file = $stdin
-;; $offset=0
-;; file.each_line{|line|
-;;   if line =~ /^(.+)(ipa=")([^"]+)"/
-;;     print [$offset+$1.length].pack("N")
-;;     print [$offset+$1.length+$2.length].pack("N")
-;;     offs=$offset+$1.length+$2.length
-;;     chars=$3.split(//)
-;;     chars.each {|char| 
-;;       print [offs].pack("N")
-;;       offs = offs+char.length
-;;     }
-;;   end
-;;   if line =~ /^(.+)(onyomi=")([^"]+)"/
-;;     print [$offset+$1.length].pack("N")
-;;     print [$offset+$1.length+$2.length].pack("N")
-;;     offs=$offset+$1.length+$2.length
-;;     chars=$3.split(//)
-;;     chars.each {|char| 
-;;       print [offs].pack("N")
-;;       offs = offs+char.length
-;;     }
-;;   end
-;;   if line =~ /^(.+d id="[^"]+")>.+</
-;;     print [$offset+$1.length].pack("N")
-;;   end
-;;   if line =~ /^(.+<original_word)>.+<rewrite_word>/ 
-;;     print [$offset+$1.length].pack("N")
-;;   end
-;;   $offset+=line.length
-;; }
 
 ;;; Usage
 ;;
@@ -75,6 +35,12 @@
 ;;; Code:
 
 (require 'lookup)
+
+(defvar support-sbgy-voice-brackets
+  '(("〖" . "〗") ;; 平声
+    ("「" . "】") ;; 上声
+    ("【" . "】") ;; 上声
+    ("【" . "」"))) ;; 入声
 
 (defvar support-sbgy-consonants
   '("p" "pʰ" "bʰ" "m" "t" "tʰ" "dʰ" "n" "ţ" "ţʰ" "ɖʰ" "ɳ" "ts" "tsʰ" "dzʰ" "s" "z" "ʧ" "ʧʰ" "dʒʰ" "ʃ" "dʐʰ" "tɕ" "tɕʰ" "dʑʰ" "ɕ" "ʑ" "k" "kʰ" "gʰ" "ŋ" "ʔ" "x" "ɣ" "" "j" "l" "nʑ" ))
@@ -101,47 +67,61 @@
 
 (defun support-sbgy-arrange-structure (entry)
   "Arrange contents of ENTRY."
-  (let ((head (progn (re-search-forward "[㐀-鿿𠀀-𯟿]" nil t)
-                     (match-string 0))))
-    (goto-char (point-min))
-    (insert head "\n")
-    (if (re-search-forward
-         "<voice_part ipa=\"\\([^\"]+\\)\" onyomi=\"\\([^\"]+\\)\">" nil t)
-        (replace-match
-         (concat "【IPA】" (match-string 1) "【音読み】" (match-string 2))))
-    (goto-char (point-min))
-    (while (re-search-forward "</voice_part>" nil t)
-      (replace-match ""))
-    (goto-char (point-min))
-    (while (re-search-forward "\t+" nil t)
-      (replace-match ""))))
+  (goto-char (point-min))
+  (while (re-search-forward ">\\([^>]+\\)<\\(note\\|added_note\\|headnote\\|\\rewrite_word\\|/rewrite_word\\)>" nil t)
+    (add-text-properties (match-beginning 1) (match-end 1) 
+                         '(display ((height 2.0)) face lookup-heading-1-face)))
+  (while (re-search-forward "<original_word>\\([^>]+\\)<" nil t)
+    (add-text-properties (match-beginning 1) (match-end 1) 
+                         '(display ((height 2.0)) face lookup-comment-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "<original_text>\\([^>]+\\)<" nil t)
+    (add-text-properties (match-beginning 1) (match-end 1) 
+                         '(face lookup-comment-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "\n+\\|\t+\\|<[^>]+>" nil t)
+    (replace-match ""))
+  (goto-char (point-min))
+  (re-search-forward "[㐀-鿿𠀀-𯟿]" nil t)
+  (goto-char (point-min))
+  (insert (match-string 0) "\n"))
 
-(defun support-sbgy-entry-tags-list (query)
-  (let ((string (lookup-query-string query)))
+(defun support-sbgy-entry-tags-list (string method)
+  (if (and (equal method 'text)
+           (lookup-text-cjk-p string))
+      '(("" . ""))
     (cond ((lookup-text-single-cjk-p string)
            '((">" . "<note>")
              (">" . "<added_note>")
              (">" . "<headnote>")
              (">" . "<rewrite_word>")
              (">" . "</rewrite_word>")))
-          ((string-match support-sbgy-pronunciation-regexp string)
+          ((string-match "^[ -˿]+$" string)
            '(("ipa=\"" . "\"")))
           ((string-match "^[ア-ン]+$" string)
            '(("onyomi=\"" . "\"")))
           (t nil))))
 
+(defun support-sbgy-head-tags (x)
+  (let* ((ipa (ndsary-extract-string x "ipa=\"" "\""))
+         (yomi (ndsary-extract-string x "onyomi=\"" "\""))
+         (char (ndsary-extract-string x ">" "<note"))
+         (brckts 
+          (cond ((string-match "˩$" ipa) 0)
+                ((string-match "˩˥$" ipa) 2)
+                ((string-match "˥$" ipa) 1)
+                (t 4))))
+    (format "%s%s%s%s《%s》" (car (elt support-sbgy-voice-brackets brckts))
+                            char 
+                            (cdr (elt support-sbgy-voice-brackets brckts))
+                            yomi ipa)))
+
 (setq lookup-support-options
       (list :title "宋本廣韻"
             :entry-tags-list 'support-sbgy-entry-tags-list
-            ;; :charsets 'lookup-text-single-cjk-p
             :content-tags '("<voice_part" . "</voice_part>")
             :code-tags '("id=\"" . "\">")
-            :head-tags
-            (lambda (x) 
-              (let ((ipa (ndsary-extract-string x "ipa=\"" "\""))
-                    (yomi (ndsary-extract-string x "onyomi=\"" "\""))
-                    (char (ndsary-extract-string x ">" "<note")))
-                (format "【%s】%s《%s》" char yomi ipa)))
-            :arranges '((replace support-sbgy-arrange-structure))))
+            :head-tags 'support-sbgy-head-tags
+            :arranges '((structure support-sbgy-arrange-structure))))
 
 ;;; support-sbgy.el ends here
