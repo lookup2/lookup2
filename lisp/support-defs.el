@@ -65,8 +65,8 @@
         ("ndsary:.*/frwiki.*-abstract.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/jawiki.*-abstract.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/zhwiki.*-abstract.*\\.xml" . "support-wikipedia")
-        ;; misc.
-	("/foldoc" . "support-foldoc")
+        ;; ndic
+	("ndic:.*/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
 	("/vera" . "support-vera")
 	("/nhd" . "support-nhd")))

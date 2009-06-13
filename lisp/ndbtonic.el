@@ -122,7 +122,7 @@
        (gaiji     lookup-arrange-gaijis
                   ndbtonic-arrange-gaiji
                   )
-       (reference lookup-arrange-references)
+       (reference ndbtonic-arrange-references)
        (structure ndbtonic-arrange-structure
                   lookup-arrange-structure
                   )
@@ -167,7 +167,22 @@
   ;; for mojikyo characters, etc.
   )
 
-(put 'ndbtonic :reference-pattern '("<ref idref=\"\\(.+?\\)\">\\(.+?\\)</ref>" 2 2 1))
+(defun ndbtonic-arrange-references (entry)
+  "Arrange reference of ENTRY.
+:reference-pattern should be (regexp link-item heading code).
+link-item, heading, or code may be integer or function."
+  (while (re-search-forward 
+          "<ref idref=\"\\(.+?\\)\">\\(.+?\\)</ref>" nil t)
+    (let* ((start (match-beginning 0))
+           (link (match-string 2))
+           (heading (match-string 2))
+           (code (concat (car ndbtonic-code-tags)
+                         (match-string 1)
+                         (cdr ndbtonic-code-tags))))
+      (replace-match link t t)
+      (setq entry (lookup-new-entry 'regular (lookup-entry-dictionary entry)
+                                    code heading))
+      (lookup-set-link start (point) entry))))
 
 (defun ndbtonic-arrange-structure (entry)
   (while (re-search-forward "<key type=\"ソート用かな\">.+?</key>" nil t)
