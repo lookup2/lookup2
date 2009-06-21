@@ -66,7 +66,7 @@
   "Arrange content of ENTRY."
   (goto-char (point-min))
   (if (looking-at "\n+") (replace-match ""))
-  (while (re-search-forward ndsdic-replace-entities-regexp nil t)
+  (while (re-search-forward support-sdic-replace-entities-regexp nil t)
     (replace-match
      (cdr (assoc (match-string 1) ndsdic-replace-entities))))
   (goto-char (point-min))

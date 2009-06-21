@@ -82,11 +82,12 @@
 
 (setq lookup-support-options
       (list :title "説文解字注"
-            :entry-tags-list '((">" . "</wordhead>")
-                               (">" . "</img></wordhead>")
+            :entry-tags-list '(("\">" . "</wordhead>")
+                               ("\">" . "</img></wordhead>")
                                ;;("id=\"" . "\""))
                                )
             :content-tags '("<shuowen>" . "</shuowen>")
+            :coding 'utf-8-dos
             :charsets 'lookup-text-cjk-p
             :arranges '((replace support-swjz-arrange-structure))))
 
