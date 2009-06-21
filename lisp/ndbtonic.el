@@ -95,7 +95,7 @@
     (mapcar
      (lambda (x) (lookup-new-entry
                   'regular dictionary (car x) (cdr x)))
-     (lookup-with-coding-system 'cp932
+     (lookup-with-coding-system 'cp932-dos
        (ndsary-file-searches
         file string method ndbtonic-entry-tags-list
         ndbtonic-content-tags ndbtonic-code-tags 
@@ -110,7 +110,7 @@
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
                        (lookup-dictionary-agent dictionary)))))
-    (lookup-with-coding-system 'cp932
+    (lookup-with-coding-system 'cp932-dos
       (ndsary-file-content 
        file  string 
        (car ndbtonic-content-tags) (cdr ndbtonic-content-tags)))))
