@@ -52,7 +52,8 @@
 ;;; Customizable Variables
 ;;;
 
-(defvar ndkanji-sl3-program "sqlite3")
+(defvar ndkanji-sl3-program "env")
+(defvar ndkanji-sl3-program-options '("LANG=ja_JP.utf-8" "sqlite3"))
 (defvar ndkanji-sl3-prompt "sqlite>")
 (defvar ndkanji-sl3-kdp "kdp.sl3")
 (defvar ndkanji-sl3-unihan "unihan.sl3")
@@ -169,7 +170,9 @@
   "Return the result of the list by the end."
   (when (null ndkanji-kdp-sl3) (error "Initialization Failed!"))
   (lookup-with-coding-system 'utf-8
-    (let* ((command-args (list ndkanji-sl3-program ndkanji-kdp-sl3))
+    (let* ((command-args (append (list ndkanji-sl3-program) 
+                                 ndkanji-sl3-program-options
+                                 (list ndkanji-kdp-sl3)))
            (output (lookup-get-process-require 
                     command-args (concat query ";")
                     ndkanji-sl3-prompt)))
