@@ -167,8 +167,6 @@
                        (lookup-dictionary-agent dictionary))))
         (coding      (or (lookup-dictionary-option dictionary :coding t)
                          'utf-8))
-        (max-hits    (or (lookup-dictionary-option dictionary :max-hits t)
-                         lookup-max-hits))
         entries)
     (if (null entry-tags-list)
         (setq entry-tags-list (list entry-tags)))
