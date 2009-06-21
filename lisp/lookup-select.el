@@ -223,18 +223,22 @@ With prefix ARGS, display menus of all dictionaries in current module ."
 	  (lookup-display-entries module query (nreverse entries)))
       (error "No dictionary has a menu"))))
 
-(defun lookup-select-dictionary-search (pattern)
+(defun lookup-select-dictionary-search (pattern &optional max-hits)
   "Search the dictionary on the current line for PATTERN.
 Only the dictionary at point will be used regardless of states of
-other dictionaries."
+other dictionaries.  With prefix-argument, MAX-HITS can be specified."
   (interactive
    (let ((dict (lookup-select-this-dictionary)))
      (if dict
-	 (list (lookup-read-string
+         (nreverse
+	 (list (when current-prefix-arg
+                 (string-to-number (lookup-read-string "Max Hits")))
+               (lookup-read-string
 		(format "Look up by `%s'" (lookup-dictionary-title dict))
-		nil 'lookup-input-history))
+		nil 'lookup-input-history)))
        (error "No dictionary at the current line"))))
-  (let ((lookup-search-dictionaries (list (lookup-select-this-dictionary))))
+  (let ((lookup-search-dictionaries (list (lookup-select-this-dictionary)))
+        (lookup-max-hits (or max-hits lookup-max-hits)))
     (lookup-search-pattern (lookup-current-module) pattern)))
 
 (defun lookup-select-add-dictionary (dictionary)
