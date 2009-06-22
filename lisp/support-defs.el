@@ -48,9 +48,14 @@
         ("ndsary:.*/Unihan" . "support-unihan")
         ("ndsary:.*/JMdict" . "support-jmdict")
         ("ndsary:.*/chinadat\\.csv" . "support-chinakan")
+        ("ndsary:.*/waseikanji\\.html" . "support-waseikanji")
         ("ndsary:.*/JitsuuFuroku/b001.html" . "support-jtfrk")
         ("ndsary:.*/JitsuuFuroku/b002.html" . "support-jtfrk")
         ("ndsary:.*/JitsuuFuroku/f001.html" . "support-jtfrk")
+        ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")
+        ("ndsary:.*/frwiki.*-abstract.*\\.xml" . "support-wikipedia")
+        ("ndsary:.*/jawiki.*-abstract.*\\.xml" . "support-wikipedia")
+        ("ndsary:.*/zhwiki.*-abstract.*\\.xml" . "support-wikipedia")
         ;; ndbtonic
         ("ndbtonic:.*/onmusic/" . "support-onmusic")
         ;; ndpdic
@@ -60,11 +65,6 @@
 	("ndsimple:.*/rfc1983\\.txt" . "support-rfc1983")
         ;; ndsrd
         ("ndsrd:" . "support-srd")
-        ;; ndwpedia
-        ("ndsary:.*/enwiki.*-abstract.*\\.xml" . "support-wikipedia")
-        ("ndsary:.*/frwiki.*-abstract.*\\.xml" . "support-wikipedia")
-        ("ndsary:.*/jawiki.*-abstract.*\\.xml" . "support-wikipedia")
-        ("ndsary:.*/zhwiki.*-abstract.*\\.xml" . "support-wikipedia")
         ;; ndic
 	("ndic:.*/foldoc" . "support-foldoc")
 	("/jargon" . "support-jargon")
