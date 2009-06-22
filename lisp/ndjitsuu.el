@@ -193,6 +193,7 @@
     (ndjitsuu-init (lookup-dictionary-agent dictionary)))
   (let* ((string (lookup-query-string query))
          (method (lookup-query-method query)))
+    (lookup-with-coding-system 'utf-8
     (cond ((string-match "^[0-9]+\\(:[0-9]+\\)?$" string)
            (let ((number (string-to-number string)))
              (when (and (< 0 number) (<= number ndjitsuu-oyaji-number))
@@ -225,7 +226,7 @@
                                          (concat prefix string suffix))
                                    (cons ndjitsuu-oyaji-index-file
                                          (concat prefix katakana suffix)))))
-             (ndjitsuu-search-files file-word))))))
+             (ndjitsuu-search-files file-word)))))))
 
 (defun ndjitsuu-search-files (file-word)
   (remove-if 
