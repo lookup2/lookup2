@@ -51,6 +51,20 @@
            (mapcar 'car support-sdic-replace-entities))
           "\\);"))
 
+(defun support-sdic-arrange-replace (entry)
+  "Arrange content of ENTRY."
+  (goto-char (point-min))
+  (if (looking-at "\n+") (replace-match ""))
+  (while (re-search-forward support-sdic-replace-entities-regexp nil t)
+    (replace-match
+     (cdr (assoc (match-string 1) support-sdic-replace-entities))))
+  (goto-char (point-min))
+  (while (re-search-forward "^.*<H>\\(.+\\)</H>.*<K>.+</K>\\(.*\\)" nil t)
+    (replace-match "\\1\n\\2\n" t))
+  (goto-char (point-min))
+  (while (re-search-forward "^.*<K>\\(.+\\)</K>\\(.*\\)" nil t)
+    (replace-match "\\1\n\\2\n" t)))
+
 (defun support-sdic-dictionary-options (dictionary-id)
   (let* ((dic-id (replace-regexp-in-string 
                    "^.+/\\([^/]+\\)\\.sdic$" "\\1" dictionary-id))
@@ -60,21 +74,7 @@
      :title title
      :charsets '(ascii japanese-jisx0208)
      :entry-tags '("<K>" . "</K>")
-     :arranges '((replace   ndsdic-arrange-replace)))))
-
-(defun ndsdic-arrange-replace (entry)
-  "Arrange content of ENTRY."
-  (goto-char (point-min))
-  (if (looking-at "\n+") (replace-match ""))
-  (while (re-search-forward support-sdic-replace-entities-regexp nil t)
-    (replace-match
-     (cdr (assoc (match-string 1) ndsdic-replace-entities))))
-  (goto-char (point-min))
-  (while (re-search-forward "^.*<H>\\(.+\\)</H>.*<K>.+</K>\\(.*\\)" nil t)
-    (replace-match "\\1\n\\2\n" t))
-  (goto-char (point-min))
-  (while (re-search-forward "^.*<K>\\(.+\\)</K>\\(.*\\)" nil t)
-    (replace-match "\\1\n\\2\n" t)))
+     :arranges '((replace   support-sdic-arrange-replace)))))
 
 (setq lookup-support-options
       (support-sdic-dictionary-options lookup-support-dictionary-id))

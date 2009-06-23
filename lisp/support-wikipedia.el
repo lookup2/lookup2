@@ -68,6 +68,8 @@
 ;;; Internal Constants
 ;;;
 
+(defvar support-wikipedia-entry-tags '("<title>Wikipedia:&amp;#32;" . "</title>"))
+
 (defconst support-wikipedia-options-list
   '(("en" 
      (ascii)
