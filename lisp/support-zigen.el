@@ -17,17 +17,25 @@
 
 ;;; Documentation:
 
-;; This agent will search the "字源" XML dictionary file for the
-;; character.  Files can be downloaded from the following site:
+;; This support file provides searching capability to the "字源" XML
+;; dictionary file for that character.  Original files can be
+;; downloaded from `http://wagang.econ.hc.keio.ac.jp/zigen'.
 ;;
-;; http://wagang.econ.hc.keio.ac.jp/zigen/
+;; Download 214 xml files (from 001.xml to 214.xml) in
+;; `http://wagang.econ.hc.keio.ac.jp/zigen' directory, concatenate all
+;; of them to make one single `zigen.xml' file, then create index
+;; point file to be used with sary.  Following script file will do all
+;; the above.
 ;;
-;; Download 214 xml files (from 001.xml to 214.xml) in that directory,
-;; then concatenate all of them to make one single `all.xml' file in
-;; the directory named ".../zigen/".
-;;
-;; Following will make index points.
-;; % mksary -c utf-8 all.xml
+;; #/bin/sh
+;; i=1
+;; while [ $i -le 215 ]; do
+;; wget http://wagang.econ.hc.keio.ac.jp/zigen/$(printf '%02d' $i).xml
+;; i=`expr $i + 1`
+;; done
+;; cat [0-9]*.xml > zigen.xml
+;; rm [0-9]*.xml
+;; mksary -c utf-8 zigen.xml
 
 ;;; Usage
 ;;
