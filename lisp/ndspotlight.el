@@ -130,7 +130,10 @@
 
 (put 'ndspotlight :list #'ndspotlight-list)
 (defun ndspotlight-list (agent)
-  (list (lookup-new-dictionary agent "")))
+  (if (executable-find "mdfind")
+      (list (lookup-new-dictionary agent ""))
+    (message "ndspotlight: error.  executable program not found.")
+    nil))
 
 (put 'ndspotlight :title ndspotlight-title)
 

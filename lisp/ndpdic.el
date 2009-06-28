@@ -84,17 +84,20 @@
 (put 'ndpdic :list 'ndpdic-list)
 (defun ndpdic-list (agent)
   "Return a list of dictionary of AGENT."
-  (let* ((dir (lookup-agent-location agent))
-         (files (directory-files (expand-file-name dir)
-                                 nil ndpdic-extension-regexp))
-         dicts file)
-    (dolist (file files)
-      (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
-          (message "Version of PDIC `%s' file is old and not supported!" file)
-        (setq dicts
-              (cons (lookup-new-dictionary agent file)
-                    dicts))))
-    (nreverse dicts)))
+  (let ((dir (lookup-agent-location agent)))
+    (if (file-directory-p dir)
+        (let ((files (directory-files (expand-file-name dir)
+                                      nil ndpdic-extension-regexp))
+              dicts)
+          (dolist (file files)
+            (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
+                (message 
+                 "Version of PDIC `%s' file is old and not supported!" file)
+              (setq dicts
+                    (cons (lookup-new-dictionary agent file) dicts))))
+          (nreverse dicts))
+      (message "ndpdic: directory %s is not found." dir)
+      nil)))
 
 (put 'ndpdic :title 'ndpdic-title)
 (defun ndpdic-title (dictionary)

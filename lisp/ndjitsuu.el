@@ -167,9 +167,11 @@
 (defun ndjitsuu-list (agent)
   "Return list of dictionaries of AGENT."
   (ndjitsuu-init agent)
-  (when (and (file-exists-p ndjitsuu-dat-file)
-             (file-exists-p ndjitsuu-font-directory))
-    (list (lookup-new-dictionary agent ""))))
+  (if (and (file-exists-p ndjitsuu-dat-file)
+           (file-exists-p ndjitsuu-font-directory))
+      (list (lookup-new-dictionary agent ""))
+    (message "ndjitsuu: error. specified data does not exist." )
+    nil))
 
 (defun ndjitsuu-init (agent)
   (let* ((location (lookup-agent-location agent)))

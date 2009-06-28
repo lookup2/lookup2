@@ -134,12 +134,18 @@
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
   "Return list of dictionaries of AGENT."
-  (let* ((files (directory-files 
-                 (expand-file-name (lookup-agent-location agent))
-                 nil "\\.ary\\'")))
-    (mapcar (lambda (name) 
-              (lookup-new-dictionary agent (file-name-sans-extension name)))
-            files)))
+  (cond ((not (executable-find ndsary-sary-program))
+         (message "ndsary: program not found.") nil)
+        ((not (file-exists-p (lookup-agent-location agent)))
+         (message "ndsary: agent %s not found." 
+                  (lookup-agent-location agent)) nil)
+        (t
+         (mapcar (lambda (name) 
+                   (lookup-new-dictionary agent 
+                                          (file-name-sans-extension name)))
+                 (directory-files 
+                  (expand-file-name (lookup-agent-location agent))
+                  nil "\\.ary\\'")))))
 
 (put 'ndsary :title 'ndsary-title)
 (defun ndsary-title (dictionary)
