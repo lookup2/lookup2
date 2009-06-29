@@ -62,8 +62,12 @@
 
 (require 'lookup)
 
+(defvar support-swjz-use-ivs-font t)
+
 (defun support-swjz-arrange-structure (entry)
   "Attach contents of ENTRY a link and remove tags."
+  (if support-swjz-use-ivs-font
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
   (goto-char (point-min))
   (while (re-search-forward "<wordhead.+?</wordhead>" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
@@ -77,8 +81,7 @@
   (goto-char (point-min))
   (while (search-forward "	" nil t) (replace-match ""))
   (goto-char (point-min))
-  (if (looking-at "$") (delete-region (point) (1+ (point))))
-  )
+  (if (looking-at "$") (delete-region (point) (1+ (point)))))
 
 (setq lookup-support-options
       (list :title "説文解字注"

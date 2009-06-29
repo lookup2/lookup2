@@ -50,6 +50,8 @@
 
 (require 'lookup)
 
+(defvar support-zigen-use-ivs-font t)
+
 ;;;
 ;;; Internal Variables
 ;;;
@@ -95,6 +97,8 @@
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
+  (if support-zigen-use-ivs-font
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
   (goto-char (point-min))
   (while (search-forward "	" nil t) (replace-match ""))
   (goto-char (point-min))

@@ -42,6 +42,8 @@
     ("【" . "】") ;; 上声
     ("【" . "」"))) ;; 入声
 
+(defvar support-sbgy-use-ivs-font t)
+
 ;;;
 ;;; Consonants and Vowels
 ;;;
@@ -269,6 +271,8 @@
 
 (defun support-sbgy-arrange-structure (entry)
   "Arrange contents of ENTRY."
+  (if support-sbgy-use-ivs-font
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
   (goto-char (point-min))
   (while (re-search-forward ">\\([^>]+\\)<\\(note\\|added_note\\|headnote\\|\\rewrite_word\\|/rewrite_word\\)>" nil t)
     (add-text-properties (match-beginning 1) (match-end 1) 

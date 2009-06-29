@@ -39,13 +39,17 @@
 
 (require 'lookup)
 
+(defvar support-xszd-use-ivs-font t)
+
 (defun support-xszd-arrange-structure (entry)
   "Attach contents of ENTRY a link and remove tags."
   (if (looking-at "\\*+")
       (replace-match ""))
   (goto-char (point-max))
   (if (looking-back "\\*+")
-      (replace-match "")))
+      (replace-match ""))
+  (if support-xszd-use-ivs-font
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max))))
 
 (setq lookup-support-options
       (list :title "學生字典"

@@ -18,8 +18,8 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
 	support-rfc1983.el support-rfc4949.el support-rika.el		\
 	support-sbgy.el support-sdic.el support-skp.el support-srd.el	\
 	support-swjz.el support-unihan.el support-vera.el		\
-	support-waseikanji.el support-wikipedia.el support-zhongri.el	\
-	support-zigen.el
+	support-waseikanji.el support-wikipedia.el support-xszd.el	\
+	support-zhongri.el support-zigen.el
 ELCFILES = $(SOURCES:.el=.elc)
 EXTRA_DIST = $(SOURCES) lookup-compile.el
 INSTALLFILES = $(SOURCES) $(ELCFILES) lookup-autoloads.el
