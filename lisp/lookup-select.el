@@ -155,13 +155,19 @@ A \"selected\" dictionary will be used whenever a search is conducted."
   (interactive)
   (lookup-select-dictionary-set-priority t))
 
+(defun lookup-select-dictionary-select-default ()
+  "Select the dictionary on the current line.
+Its priority will be determined by dictionary option `:priority'."
+  (interactive)
+  (lookup-select-dictionary-set-priority 'default))
+
 (defun lookup-select-dictionary-select-all ()
   "Select the dictionary on the all line."
   (interactive)
   (save-excursion
     (lookup-select-goto-first)
     (while (lookup-select-this-dictionary)
-      (lookup-select-dictionary-set-priority t))))
+      (lookup-select-dictionary-set-priority 'default))))
 
 (defun lookup-select-dictionary-unselect ()
   "Unselect the dictionary on the current line.
@@ -196,6 +202,8 @@ have found some entries, which means this dictionary cannot appear alone."
 (defun lookup-select-dictionary-set-priority (value)
   (let ((dict (lookup-select-this-dictionary)))
     (when dict
+      (if (equal value 'default) 
+          (setq value (or (lookup-dictionary-option dict :priority t) t)))
       (setf (lookup-module-dictionary-priority (lookup-current-module) dict)
 	    value)
       (lookup-select-set-mark
