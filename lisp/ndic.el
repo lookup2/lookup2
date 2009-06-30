@@ -33,6 +33,9 @@
 ;; (`**.dict.dz' extension) or non-compressed (`**.dict') format, AND
 ;; index file (`**.index') in either case.  You need `dictzip' tool
 ;; installed on your system to use compressed format.
+;;
+;; Most Linux distributions have packages for `dictzip' programs.  
+;; You can download the source code from `ftp://ftpdict.org/dict/'.
 ;; 
 ;; This agent no longer supports `sdic' format.  (Use `ndsary' or etc. instead)
 
