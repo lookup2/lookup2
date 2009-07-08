@@ -45,11 +45,17 @@
   "Attach contents of ENTRY a link and remove tags."
   (if (looking-at "\\*+")
       (replace-match ""))
+  (goto-char (point-min))
+  (let ((i ?①))
+    (while (re-search-forward "^-\\([^-]\\)" nil t)
+      (replace-match (concat (list i) (match-string 1)))
+      (setq i (1+ i))))
   (goto-char (point-max))
   (if (looking-back "\\*+")
       (replace-match ""))
   (if support-xszd-use-ivs-font
-      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max))))
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max))
+  ))
 
 (setq lookup-support-options
       (list :title "學生字典"
