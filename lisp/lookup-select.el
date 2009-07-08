@@ -246,7 +246,8 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
 		nil 'lookup-input-history)))
        (error "No dictionary at the current line"))))
   (let ((lookup-search-dictionaries (list (lookup-select-this-dictionary)))
-        (lookup-max-hits (or max-hits lookup-max-hits)))
+        (lookup-max-hits (or max-hits lookup-max-hits))
+        (lookup-force-update (and max-hits t)))
     (lookup-search-pattern (lookup-current-module) pattern)))
 
 (defun lookup-select-add-dictionary (dictionary)

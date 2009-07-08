@@ -269,6 +269,8 @@
   (define-key lookup-summary-mode-map "8" 'lookup-summary-redo-nth-dictionary)
   (define-key lookup-summary-mode-map "9" 'lookup-summary-redo-nth-dictionary)
   (define-key lookup-summary-mode-map "0" 'lookup-summary-redo-all-dictionary)
+  ;; search-with-this-dictionary
+  (define-key lookup-summary-mode-map "F" 'lookup-summary-dictionary-search)
   )
 
 (defvar lookup-summary-mode-hook nil)
@@ -680,6 +682,34 @@ which indicates the number of the dictionary."
   (interactive)
   (let ((lookup-force-update t))
     (lookup-summary-display-content)))
+
+;;;;;;;;;;;;;;;;;;;;
+;; Search with this dictionary
+;;;;;;;;;;;;;;;;;;;;
+
+(defun lookup-summary-dictionary-search (pattern &optional max-hits)
+  "Search the dictionary on the current line for PATTERN.
+Only the dictionary at point will be used regardless of states of
+other dictionaries.  With prefix-argument, MAX-HITS can be specified."
+  (interactive
+   (let ((dict (progn 
+                 (lookup-summary-goto-link)
+                 (lookup-entry-dictionary 
+                  (get-text-property (point) 'lookup-entry)))))
+     (if dict
+         (nreverse
+	 (list (when current-prefix-arg
+                 (string-to-number (lookup-read-string "Max Hits")))
+               (lookup-read-string
+		(format "Look up by `%s'" (lookup-dictionary-title dict))
+		nil 'lookup-input-history)))
+       (error "No dictionary at the current line"))))
+  (let ((lookup-search-dictionaries 
+         (list (lookup-entry-dictionary 
+                (get-text-property (point) 'lookup-entry))))
+        (lookup-max-hits (or max-hits lookup-max-hits))
+        (lookup-force-update (and max-hits t)))
+    (lookup-search-pattern (lookup-current-module) pattern)))
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Internal Functions
