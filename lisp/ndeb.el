@@ -161,7 +161,8 @@
 
 (put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
-(put 'ndeb :charsets '(ascii japanese-jisx0208))
+;;(put 'ndeb :charsets '(ascii japanese-jisx0208))
+(put 'ndeb :charsets '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
 
 ;(put'ndeb :font      nil)
 
@@ -395,6 +396,12 @@ Nil means it has not been checked yet.")
 	  (string (lookup-query-string query))
 	  (last (lookup-get-property ndeb-current-agent 'ndeb-method))
 	  cmd)
+      (setq string
+            (replace-regexp-in-string 
+             "[㐀-鿿𠀀-𯿽]"
+             (lambda (ch) (if (encode-char (string-to-char ch) 'japanese-jisx0208)
+                              ch (format "%X" (string-to-char ch))))
+             string))
       (cond
        ((eq method 'keyword)
 	(let (qstring)
