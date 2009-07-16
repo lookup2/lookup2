@@ -154,11 +154,13 @@
               (>= char #x30000))
       (nfd char))))
 
+(eval-and-compile
 (defun ucs-normalize-hfs-nfd-comp-p (char)
   (and (>= char #x2000) (< char #x3000)))
 
 (defsubst ucs-normalize-ccc (char)
   (get-char-code-property char 'canonical-combining-class))
+)
 
 ;; Data common to all normalizations
 
@@ -204,6 +206,7 @@
                 ?ᆵ ?ᆶ ?ᆷ ?ᆸ ?ᆹ ?ᆺ ?ᆻ ?ᆼ ?ᆽ ?ᆾ ?ᆿ ?ᇀ ?ᇁ ?ᇂ)))
   )
 
+(eval-and-compile
 (defun ucs-normalize-make-hash-table-from-alist (alist)
   (let ((table (make-hash-table :test 'equal :size 2000)))
     (mapc (lambda (x) (puthash (car x) (cdr x) table)) alist)
@@ -238,6 +241,7 @@ Note that Hangul are excluded.")
              (functionp composition-predicate)
              (null (funcall composition-predicate char)))
         nil char)))
+)
 
 (defvar ucs-normalize-combining-chars nil)
   (setq ucs-normalize-combining-chars (eval-when-compile combining-chars))
@@ -286,6 +290,7 @@ Note that Hangul are excluded.")
     (setq hfs-nfd-alist (alist-list-to-vector (decomposition-translation-alist 'hfs-nfd)))
   )
 
+(eval-and-compile
 (defvar ucs-normalize-hangul-translation-alist nil)
   (setq ucs-normalize-hangul-translation-alist
         (let ((i 0) entries)
@@ -310,7 +315,7 @@ Note that Hangul are excluded.")
 (define-translation-table 'ucs-normalize-nfkd-table
   (ucs-normalize-make-translation-table-from-alist (eval-when-compile nfkd-alist)))
 (define-translation-table 'ucs-normalize-hfs-nfd-table
-  (ucs-normalize-make-translation-table-from-alist (eval-when-compile hfs-nfd-alist)))
+  (ucs-normalize-make-translation-table-from-alist (eval-when-compile hfs-nfd-alist))))
 
 (defun ucs-normalize-sort (chars)
   "Sort by canonical combining class of chars."
