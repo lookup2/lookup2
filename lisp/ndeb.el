@@ -334,14 +334,16 @@ Nil means it has not been checked yet.")
     (if gaiji-file
         (setf (lookup-agent-option agent :gaiji-table)
               (ndeb-parse-gaiji-file gaiji-file))))
-  (ndeb-with-agent agent
-   (ndeb-process-require "list"
-     (lambda (process)
-       (let (dicts)
-         (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)" nil t)
-           (setq dicts (cons (lookup-new-dictionary ndeb-current-agent
-                                                    (match-string 1)) dicts)))
-         (nreverse dicts))))))
+  (when ndeb-program-name
+    (ndeb-with-agent agent
+      (ndeb-process-require 
+       "list"
+       (lambda (process)
+         (let (dicts)
+           (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)" nil t)
+             (setq dicts (cons (lookup-new-dictionary ndeb-current-agent
+                                                      (match-string 1)) dicts)))
+           (nreverse dicts)))))))
 
 ;; <:kill>
 (defun ndeb-kill (agent)
