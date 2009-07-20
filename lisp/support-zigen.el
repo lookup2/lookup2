@@ -97,12 +97,18 @@
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
-  (if support-zigen-use-ivs-font
-      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
-  (goto-char (point-min))
   (while (search-forward "	" nil t) (replace-match ""))
   (goto-char (point-min))
   (while (re-search-forward "\\(</.+?>\\)\n" nil t) (replace-match "\\1"))
+  (goto-char (point-min))
+  (if support-zigen-use-ivs-font
+      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
+  ;; XMLタグ内のIVSは削除する。
+  (goto-char (point-min))
+  (while (search-forward "<" nil t)
+    (while (and (re-search-forward "[>󠀀-󯿽]" nil t)
+                (not (equal (match-string 0) ">")))
+      (delete-region (match-beginning 0) (match-end 0))))
   (goto-char (point-min))
   (while (re-search-forward "<見出字>.+</見出字>" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
