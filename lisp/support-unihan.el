@@ -57,7 +57,7 @@ customize this variable.")
     ("kMorohashi" "大漢和辞典")
     ("kTotalStrokes" "総画数")
     ("kFourCornerCode" "四角号碼")
-    ("kKangXi" "康煕字典" support-unihan-kangi-set-link)
+    ("kKangXi" "康煕字典" support-unihan-kangxi-set-link)
     ("kRSKangXi" "部首画数（康煕字典）")
     (nil "-----")
     ("kSemanticVariant" "異体字")
@@ -99,7 +99,7 @@ customize this variable.")
     (nil "-----")
     ("kVietnamese" "ベトナム語")
     (nil "-----")
-    ("kIRGKangXi" "康煕字典 (IRG)" support-unihan-kangi-set-link)
+    ("kIRGKangXi" "康煕字典 (IRG)" support-unihan-kangxi-set-link)
     ("kIRGDaiKanwaZiten" "大漢和辞典 (IRG)")
     ("kIRGDaeJaweon" "大字源 (IRG)")
     ("kIRGHanyuDaZidian" "漢語大字典 (IRG)")
@@ -158,7 +158,7 @@ unconditionally."  )
   query)
 
 ;;;
-;;; Search Tags
+;;; Head Tags
 ;;;
 
 (defun support-unihan-head-tags (str)
@@ -203,7 +203,7 @@ unconditionally."  )
     (insert head " " code "\n")
     (lookup-table-insert "%-10t %-20t\n" entries)))
 
-(defun support-unihan-kangi-set-link (str)
+(defun support-unihan-kangxi-set-link (str)
   (replace-regexp-in-string 
    "[0-9][0-9][0-9][0-9]\\.[0-9][0-9]0"
    (lambda (x) 
