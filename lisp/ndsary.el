@@ -129,7 +129,13 @@
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
 (defun ndsary-dictionary-methods (dictionary)
-  '(exact prefix suffix substring text))
+  `(exact prefix suffix substring text
+   ,@(if (lookup-dictionary-option dictionary :menu) (list 'menu))))
+
+(put 'ndsary :menu 'ndsary-dictionary-menu)
+(defun ndsary-dictionary-menu (dictionary)
+  (let ((menu (lookup-dictionary-option dictionary :menu)))
+    (funcall menu dictionary)))
 
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
@@ -199,7 +205,7 @@
                         (lookup-agent-location
                          (lookup-dictionary-agent dictionary)))))
     (if (functionp content-tags) 
-        (setq content-tags (apply content-tags (list code))))
+        (setq content-tags (funcall content-tags code)))
     (lookup-with-coding-system coding
       (ndsary-file-content file code
                            (car content-tags) (cdr content-tags)))))
@@ -216,7 +222,7 @@
 For the rest of arguments, please refer `ndsary-file-search'."
   (if (functionp entry-tags-list)
       (setq entry-tags-list 
-            (apply entry-tags-list (list string method))))
+            (funcall entry-tags-list string method)))
   (remove-duplicates
    (apply 'nconc
           (mapcar (lambda (x)
@@ -237,9 +243,9 @@ surrounded by CONTENT-TAGS will be searched for CODE and HEAD."
   ;; Note: If ENTRY-TAGS contains newlines, then it is suggested to
   ;; provide CONTENT-TAGS to properly extract entries.
   (if (functionp code-tags)
-      (setq code-tags    (apply code-tags    (list entry-tags))))
+      (setq code-tags    (funcall code-tags    entry-tags)))
   (if (functionp content-tags) 
-      (setq content-tags (apply content-tags (list entry-tags))))
+      (setq content-tags (funcall content-tags entry-tags)))
   (let* ((pattern 
           (ndsary-pattern string method (car entry-tags) (cdr entry-tags)))
          (count 0)
