@@ -226,10 +226,11 @@
                                "\\)\\(" )
                     "\\)"))
            (n 1))
-      (re-search-backward regexp)
-      (while (and (match-end n) (<= (match-end n) start))
-	(setq n (1+ n)))
-      (buffer-substring-no-properties (match-beginning n) (match-end n)))))
+      (if (null (re-search-backward regexp nil t))
+          (lookup-current-word-general)
+        (while (and (match-end n) (<= (match-end n) start))
+          (setq n (1+ n)))
+        (buffer-substring-no-properties (match-beginning n) (match-end n))))))
 
 ;;;
 ;;; Lookup process
