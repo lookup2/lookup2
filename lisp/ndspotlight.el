@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Taichi KAWABATA <kawabata.taichi@gmail.com>
 
 ;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
-;; Keywords: MacOS, spotlight, search, dictionary
+;; Keywords: MacOS, spotlight, search
 
 ;; This file is part of Lookup.
 
@@ -22,7 +22,7 @@
 
 ;;; Documentation
 
-;; This agent will search for the file with specific directory and 
+;; This agent will search for the file with specified directory and 
 ;; displays text for target files.
 ;;
 ;; It should be specified with directory and target metadata name,
@@ -130,7 +130,7 @@
 
 (put 'ndspotlight :list #'ndspotlight-list)
 (defun ndspotlight-list (agent)
-  (if (executable-find "mdfind")
+  (if (executable-find ndspotlight-search-program)
       (list (lookup-new-dictionary agent ""))
     (message "ndspotlight: error.  executable program not found.")
     nil))
