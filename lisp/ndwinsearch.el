@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Taichi KAWABATA <kawabata.taichi@gmail.com>
 
 ;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
-;; Keywords: Microsoft Winsearch, Winsearch Search, search
+;; Keywords: Microsoft Windows, Windows Search, search
 
 ;; This file is part of Lookup.
 
@@ -23,7 +23,7 @@
 ;;; Documentation
 
 ;; This agent will search for the file that contains specified
-;; keywords by using `Winsearch Search'.
+;; keywords by using `Microsoft Windows Search'.
 ;;
 ;; You need to install `wdsgrep.exe' (ver 4.1 or later) to use this
 ;; agent.  `wdsgrep.exe' can be downloaded from the following site:
