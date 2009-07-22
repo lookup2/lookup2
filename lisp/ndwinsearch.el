@@ -111,7 +111,7 @@
 ;;;
 
 (put 'ndwinsearch :methods 
-     '(exact prefix suffix substring regexp text))
+     '(exact prefix substring text))
 (put 'ndwinsearch :arranges 
      '((structure ndwinsearch-arrange-structure)))
 (put 'ndwinsearch ':default-method
@@ -140,11 +140,7 @@
          (extension (lookup-dictionary-option dictionary ":ext"))
          (query-method  (lookup-query-method query))
          (query-pattern (lookup-query-pattern query))
-         (arguments (if (or (equal query-method 'exact)
-                            (equal query-method 'text))
-                        (list query-pattern)
-                      (list "-E" 
-                            (lookup-query-to-regexp query))))
+         (arguments (list query-pattern))
          count entry entries)
     (if location
         (setq arguments (nconc (list "-p" location) arguments)))
