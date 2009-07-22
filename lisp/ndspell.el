@@ -109,7 +109,8 @@
 
 (put 'ndspell :list 'ndspell-list)
 (defun ndspell-list (agent)
-  (list (lookup-new-dictionary agent "")))
+  (when (executable-find ndspell-spell-program)
+    (list (lookup-new-dictionary agent ""))))
 
 (put 'ndspell :title 'ndspell-dictionary-title)
 (defun ndspell-dictionary-title (dictionary)
