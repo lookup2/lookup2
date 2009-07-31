@@ -2,7 +2,7 @@
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA, Taichi (kawabata.taichi@gmail.com)
-;; Version: $Id: ndmisc.el,v 1.9 2009/05/12 00:59:47 kawabata Exp $
+;; Version: $Id: ndmisc.el,v 1.10 2009/07/31 18:31:13 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -38,7 +38,7 @@
 ;;;
 
 (defvar ndmisc-settings
-  '(
+  `(
     ("Google (English)"	(ascii)
      "http://www.google.com/search?q=" utf-8)
     ("Google (日本語)"	(ascii japanese-jisx0208)
@@ -52,7 +52,11 @@
     ("GlyphWiki" ndmisc-glyphwiki-charsetp
      "http://glyphwiki.org/wiki/" ndmisc-glyphwiki-encode)
     ("RFC" (ascii)
-     "http://www.rfc-editor.org/cgi-bin/rfcsearch.pl?searchwords=" utf-8))
+     "http://www.rfc-editor.org/cgi-bin/rfcsearch.pl?searchwords=" utf-8)
+    ,@(if (eq system-type 'darwin)
+          '(("Macintosh Dictionary" ()
+           "dict://" utf-8)))
+    )
   "A set of lists of TITLE, CHARSETS, URL, ENCODING and URL-SUFFIX (optional).
 CHARSET, URL and ENCODING may be a function.")
 
