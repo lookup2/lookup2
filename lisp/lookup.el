@@ -701,12 +701,12 @@ link-item, heading, or code may be integer or function."
               (fill-region start (point))))
         (forward-line)))))
 
-(defun lookup-arrange-fill-paragraphs (entry)
-  (text-mode)
-  (let ((fill-column (if (integerp lookup-fill-column)
-			 lookup-fill-column
-		       (round (* (window-width) lookup-fill-column)))))
-    (fill-individual-paragraphs (point-min) (point-max))))
+;;(defun lookup-arrange-fill-paragraphs (entry)
+;;  (text-mode)
+;;  (let ((fill-column (if (integerp lookup-fill-column)
+;;			 lookup-fill-column
+;;		       (round (* (window-width) lookup-fill-column)))))
+;;    (fill-individual-paragraphs (point-min) (point-max))))
 
 ;; utils
 
