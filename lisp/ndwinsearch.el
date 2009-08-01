@@ -41,6 +41,8 @@
 
 ;;; Code:
 
+(require 'lookup-content)
+
 ;;;
 ;;; Customizable variables
 ;;;
