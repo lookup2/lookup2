@@ -10,7 +10,7 @@
 
 <!--#include virtual="/header.html" -->
 
-<h2>Screenshots</h2>
+<h1>Screenshots</h1>
 
 <p>
   This page shows various language dictionaries used under "Lookup".
@@ -20,7 +20,7 @@
 <br/>
 <hr/>
 
-<h3>DICT Dictionaries</h3>
+<h2>DICT Dictionaries</h2>
 <ul>
   <li><a href="http://www.dict.org/">Dict.org</a></li>
   <li><a href="http://www.freedict.org/en/">FreeDict.org</a></li>
@@ -41,7 +41,87 @@
 <br/>
 <hr/>
 
-<h3>PDIC Dictionaries</h3>
+<h2>EPWING/EBXA/EBXA-C Dictionaries</h2>
+
+<h3>“Kojien” Japanese Language Dictionary</h3>
+<ul>
+  <li><a href="http://www.iwanami.co.jp/kojien/">[Home Page]</a>
+  <li><a href="http://www.epwing.or.jp/about/about.html">EPWING Consortium</a>
+</ul>
+<p>
+  “Lookup” can handle EBG/EBXA/EPWING (up to V6) dictionaries with
+  `eblook' and EB libraries.  Furthermore, when used with EPWING
+  dictionaries, old Kanji characters （旧字） in a query can
+  automatically be converted to new Kanji characters （新字）.
+</p>
+
+<img src="kojien.png">
+
+<br/>
+
+<h3>Crown French-Japanese Dictionary </h3>
+<ul>
+  <li><a href="http://www.sanseido-publ.co.jp/publ/ep/cd_ep_crfutu.html">[Home Page]</a>
+</ul>
+<p>
+  If specified, “Lookup” can automatically remove accents from
+  alphabets in a query string.
+</p>
+<img src="french.png">
+
+<br/>
+<hr/>
+
+<h3>Monier-Williams Sanskrit-English Dictionary</h3>
+<ul>
+  <li><a href="http://www.pup.waiwai-net.ne.jp/~iwaihiro/Mwsedictk/">[Home Page]</a>
+</ul>
+<p>
+  “Lookup” can automatically convert Devanagari to Kyoto-Harvard and vice versa.
+</p>
+<img src="sanskrit.png">
+
+<br/>
+
+<h3>Shōgakukan Chinese-Japanese Japanese-Chinese Dictionary </h3>
+<ul>
+  <li><a href="./eblook.c.patch">[Patch for eblook]</a>
+</ul>
+<p>
+  “Lookup” can automatically convert GB Hanzi to pinyin when used
+  with EBXA-C dictionary.  Also, When used with EBXA dictionaries,
+  Kanji characters in a query can automatically be converted to
+  Hiragana so that the dictionaries can handle queries.
+</p>
+<img src="chinese.png">
+
+<br/>
+<hr/>
+
+<h2>LogoVista Dictionaries</h2>
+<p>
+  Some LogoVista Dictionaries, that can be converted to EPWING format
+  by "dessed", may be used with Lookup.
+</p>
+<p>
+  Recent LogoVista Dictionaries began to support displaying and
+  querying Unicode characters.  These dictionaries can also be used
+  with Lookup software.
+</p>
+<h3>漢字源・第４版</h3>
+<p>
+  「漢字源　第４版」 supports Unicode character display and query.  By
+  using LogoVista 「漢字源　第４版」 &amp; Lookup, you can examine
+  non-JIS X 0208 characters, such as JIS X 0212 and JIS X 0213
+  ideographs.
+</p>
+
+<img src="kanjigen.png">
+
+<br/>
+<hr/>
+
+<h2>PDIC Dictionaries</h2>
 <ul>
   <li><a href="http://homepage3.nifty.com/TaN/">PDIC Format Home Page</a>
 </ul>
@@ -53,18 +133,6 @@
 
 <img src="cj2.png"><br/>
 <img src="kazuo_kj.png">
-
-<br/>
-<hr/>
-
-<h3>「字通」 Kanji Ideographs Dictionary </h3>
-<ul>
-  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
-</ul>
-<p>
-  「字通」 is renowned etymological dictionary for Japanese Kanji.
-</p>
-<img src="jitsuu.png">
 
 <br/>
 <hr/>
@@ -85,7 +153,18 @@
 <br/>
 <hr/>
 
-<h3>BTONIC "Midium-Size Music Dictionary"</h3>
+<h2>Lingvo DSL (Dictionary Specification Language)</h2>
+<p>
+  "Lookup" supports "DSL" format dictionaries, especially popular
+  among East European countries.</p>
+<img src="hydcd.png">
+
+<br/>
+<hr/>
+
+<h2>BTONIC Dictionaries</h2>
+
+<h3>"Midium-Size Music Dictionary" (新編・音楽中辞典)</h3>
 <ul>
   <li><a href="http://www.btonic.com/">[BTONIC Home Page]</a>
   <li><a href="http://www.bitway.ne.jp/ontomo/ongakuchujiten/club/">[Dictionary Home Page]</a>
@@ -102,35 +181,35 @@
 <br/>
 <hr/>
 
-<h3>“Kojien” Japanese Language Dictionary</h3>
+<h2>「字通」 Kanji Ideographs Dictionary </h2>
 <ul>
-  <li><a href="http://www.iwanami.co.jp/kojien/">[Home Page]</a>
-  <li><a href="http://www.epwing.or.jp/about/about.html">EPWING Consortium</a>
+  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
 </ul>
 <p>
-  “Lookup” can handle EBG/EBXA/EPWING (up to V6) dictionaries with
-  `eblook' and EB libraries.  Furthermore, when used with EPWING
-  dictionaries, old Kanji characters （旧字） in a query can
-  automatically be converted to new Kanji characters （新字）.
+  「字通」 is renowned etymological dictionary for Japanese Kanji.
 </p>
-
-<img src="kojien.png">
+<img src="jitsuu.png">
+<br/>
+<img src="jitsuu_furoku.png">
 
 <br/>
 <hr/>
 
-<h3>Crown French-Japanese Dictionary </h3>
+<h2>“WORDS” Latin-English Dictionary Program</h2>
 <ul>
-  <li><a href="http://www.sanseido-publ.co.jp/publ/ep/cd_ep_crfutu.html">[Home Page]</a>
+  <li><a href="http://users.erols.com/whitaker/wordsdoc.htm">[Home Page]</a>
 </ul>
 <p>
-  If specified, “Lookup” can automatically remove accents from
-  alphabets in a query string.
+  “Lookup” can be used as an interface of "WORDS Latin-English
+  Dictionary Program".  It can be used as both Latin-English
+  and English-Latin dictionary.
 </p>
-<img src="french.png">
+<img src="latin.png">
 
 <br/>
 <hr/>
+
+<h2>Text/XML Based Dictionaries</h2>
 
 <h3>Wikipedia Abstract</h3>
 
@@ -171,48 +250,7 @@
 <br/>
 <hr/>
 
-<h3>Monier-Williams Sanskrit-English Dictionary</h3>
-<ul>
-  <li><a href="http://www.pup.waiwai-net.ne.jp/~iwaihiro/Mwsedictk/">[Home Page]</a>
-</ul>
-<p>
-  “Lookup” can automatically convert Devanagari to Kyoto-Harvard and vice versa.
-</p>
-<img src="sanskrit.png">
-
-<br/>
-<hr/>
-
-<h3>Shōgakukan Chinese-Japanese Japanese-Chinese Dictionary </h3>
-<ul>
-  <li><a href="./eblook.c.patch">[Patch for eblook]</a>
-</ul>
-<p>
-  “Lookup” can automatically convert GB Hanzi to pinyin when used
-  with EBXA-C dictionary.  Also, When used with EBXA dictionaries,
-  Kanji characters in a query can automatically be converted to
-  Hiragana so that the dictionaries can handle queries.
-</p>
-<img src="chinese.png">
-
-<br/>
-<hr/>
-
-<h3>“WORDS” Latin-English Dictionary Program</h3>
-<ul>
-  <li><a href="http://users.erols.com/whitaker/wordsdoc.htm">[Home Page]</a>
-</ul>
-<p>
-  “Lookup” can be used as an interface of "WORDS Latin-English
-  Dictionary Program".  It can be used as both Latin-English
-  and English-Latin dictionary.
-</p>
-<img src="latin.png">
-
-<br/>
-<hr/>
-
-<h3>Shina-bun Wo Yomu tame no Kanji-ten</h3>
+<h3>Shina-bun Wo Yomu tame no Kanji-ten （支那文を読むための漢字典）</h3>
 <ul>
   <li><a href="http://www.seiwatei.net/chinakan/chinakan.cgi">[Home Page]</a>
 </ul>
@@ -241,7 +279,7 @@
 <br/>
 <hr/>
 
-<h3>Shuowen Jiezi Zhu</h3>
+<h3>Shuowen Jiezi Zhu （説文解字注）</h3>
 
 <ul>
   <li><a href="http://kanji-database.sourceforge.net/">Shuowen Jiezi Zhu data</a>...A "Bible" for Chinese Ideograph Study.
@@ -252,6 +290,66 @@
 </p>
 
 <img src="swjz.png">
+
+<br/>
+<hr/>
+
+<h3>宋本廣韻</h3>
+
+<ul>
+  <li><a href="http://kanji-database.sourceforge.net/dict/sbgy/index.html">宋本廣韻 data</a>...Basic Phonology Data for Middle Chinese.
+</ul>
+
+<p>
+  Support file for `宋本廣韻' XML file is also provided with lookup.
+</p>
+
+<img src="sbgy.png">
+
+<br/>
+<hr/>
+
+<h3>Unihan.txt and KangXi dictionary</h3>
+
+<img src="unihan.png">
+
+<br/>
+<hr/>
+
+<h3>Wasei Kanji no Jiten （和製漢字の辞典）</h3>
+
+<img src="waseikanji.png">
+
+<br/>
+<hr/>
+
+<h3> 學生字典 </h3>
+
+<p>Lookup supports searching "學生字典" (year 1915 edition) via Emacs.</p>
+
+<img src="xszd.png">
+
+<br/>
+<hr/>
+
+<h3> RangJung YeShe Tibetan-English Dictionary </h3>
+
+<p>Lookup supports searching "RangJung-YeShe" Tibetan Dictionary.
+
+<img src="rangjung.png">
+
+<br/>
+<hr/>
+
+<h3> 青空文庫 </h3>
+
+<p>Lookup supports searching 「青空文庫」 files by search-engine agent
+(HyperEstraier, SpotLight or Windows Search) and display them in
+pre-formatted text with ruby.</p>
+
+<p>note: This capability is still under development</p>
+
+<img src="aozora.png">
 
 <!--#include virtual="/footer.html" -->
 

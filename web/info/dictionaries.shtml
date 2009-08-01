@@ -25,6 +25,15 @@ Consortium</a> standardized CD-ROM/DVD-ROM dictionary format.</p>
 
 <h2>EBXA, EBG Format Dictionaries</h2>
 
+<h2>LogoVista Dictionaries</h2>
+<p>
+  LogoVista Dictionaries are actually the compressed and simplified
+  forms of EPWING dictionaries.  If they can be converted to EPWING
+  format
+  by <a href="http://hp.vector.co.jp/authors/VA021723/dessed/">dessed</a>,
+  they can be read by `Lookup' (and eblook).
+</p>
+
 <h2>DICT Format Dictionaries</h2>
 
 <ul>
@@ -46,6 +55,12 @@ Consortium</a> standardized CD-ROM/DVD-ROM dictionary format.</p>
   <li><a href="http://www.eijiro.jp/">EIJIRO</a> is one of most famous English-Japanese electronic dictionary, encoded by PDIC format.</li>
 </ul>
 
+<h2>Lingvo DSL Dictionaries</h2>
+<p>
+  You can use patched `dslcomp.exe' to convert `.lsd' dictionaries
+  (with some exceptions) to `.dsl' dictionaries.
+</p>
+
 <h2>BTONIC Format Dictionaries</h2>
 
 <p>
@@ -55,6 +70,16 @@ Consortium</a> standardized CD-ROM/DVD-ROM dictionary format.</p>
 </p>
 <ul>
   <li>新編・音楽中辞典</li>
+</ul>
+
+<h2>Shogakukan 小学館 Random House Dictionary</h2>
+<ul>
+  <li><a href="http://ebook.shogakukan.co.jp/catalog/srd/srdw_xp.html">[Home Page]</a></li>
+</ul>
+
+<h2>Jituu 「字通」 Dictionary</h2>
+<ul>
+  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
 </ul>
 
 <h2>XML-style Dictionaries</h2>
@@ -67,11 +92,13 @@ Huge XML text file can be easily looked-up by using <a href="http://sary.sourcef
   <li><a href="http://wagang.econ.hc.keio.ac.jp/zigen/">角川 字源</a></li>
   <li><a href="http://kanji-database.sourceforge.net/dict/swjz/index.html">説文解字注</a></li>
   <li><a href="http://kanji-database.sourceforge.net/dict/sbgy/index.html">宋本廣韻</a></li>
+  <li><a href="http://kanji-database.sourceforge.net/dict/xszd/index.html">學生字典</a></li>
 </ul>
 
 <h2>Plain-text Dictionaries and Glossaries</h2>
 <ul>
   <li>Unihan.txt (it can be used as index of KangXi Dictionary.)</li>
+  <li><a href="http://www.rangjung.com/ry-dic.htm">RangJung YeShe Dictionary</a></li>
   <li>RFC4949.txt</li>
 </ul>
 
@@ -92,6 +119,7 @@ Huge XML text file can be easily looked-up by using <a href="http://sary.sourcef
 <ul>
   <li>SpotLight</li>
   <li>HyperEstraier</li>
+  <li>Windows Search</li>
 </ul>
 
 <h2>Image Scanned Old Dictionaries with Encoded Index</h2>
@@ -100,15 +128,8 @@ Huge XML text file can be easily looked-up by using <a href="http://sary.sourcef
   <li>支那文のための漢字典</li>
 </ul>
 
-<h2>Shogakukan 小学館 Random House Dictionary</h2>
-<ul>
-  <li><a href="http://ebook.shogakukan.co.jp/catalog/srd/srdw_xp.html">[Home Page]</a></li>
-</ul>
-
-<h2>Jituu 「字通」 Dictionary</h2>
-<ul>
-  <li><a href="http://www.heibonsha.co.jp/jitsuu/guide.html">[Home Page]</a>
-</ul>
+<h2>Sample Screenshot</h2>
+<img src="screen.png" />
 
 <!--#include virtual="/footer.html" -->
 
