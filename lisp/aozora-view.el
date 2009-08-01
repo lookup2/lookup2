@@ -53,6 +53,7 @@
   (set-keymap-parent aozora-view-mode-map view-mode-map)
   (define-key aozora-view-mode-map "b" 'aozora-view-bookmark)
   (define-key aozora-view-mode-map "," 'aozora-view-restore-bookmark)
+  (define-key aozora-view-mode-map "q" 'aozora-view-suspend)
   (define-key aozora-view-mode-map "i" 'aozora-view-use-ivs)
   (define-key aozora-view-mode-map "l" 'aozora-view-redraw))
 
@@ -112,7 +113,7 @@ Do not call this directly.  Execute `aozora-view' instead."
                        'line-number (line-number-at-pos (match-beginning 0))))
   ;; ルビをつけて、改行禁止にする。
   (goto-char (point-min))
-  (while (re-search-forward "\\(\\(?:｜.+?\\)\\|\\(?:[※㐀-鿿󠄀-󠇿]+[々〻※]?\\)\\)《\\(.+?\\)》" nil t)
+  (while (re-search-forward "\\(\\(?:｜.+?\\)\\|\\(?:[a-z`※㐀-鿿󠄀-󠇿]+[々〻※]?\\)\\)《\\(.+?\\)》" nil t)
     (let ((string (match-string 1))
           (ruby (match-string-no-properties 2)))
       (save-match-data (if (= ?｜ (string-to-char string)) (setq string (substring string 1))))
@@ -245,6 +246,13 @@ Do not call this directly.  Execute `aozora-view' instead."
              (point-min) (point-max)
              'line-number line-number)))
       (if pos (goto-char pos) (goto-char (point-min))))))
+
+(defun aozora-view-suspend ()
+  (interactive)
+  (if (> (count-windows) 1)
+      (delete-window (get-buffer-window (current-buffer)))
+    (switch-to-buffer (other-buffer)))
+  (bury-buffer (current-buffer)))
 
 (defun aozora-view-use-ivs ()
   (interactive)
