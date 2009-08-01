@@ -16,6 +16,7 @@ SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
 	support-kojien.el support-mwsedic.el support-mypaedia.el	\
 	support-nhd.el support-onmusic.el support-oxford.el		\
 	support-pdh.el support-plus.el support-plusv2.el		\
+	support-rangjung.el						\
 	support-rfc1983.el support-rfc4949.el support-rika.el		\
 	support-sbgy.el support-sdic.el support-skp.el support-srd.el	\
 	support-swjz.el support-unihan.el support-vera.el		\

@@ -57,6 +57,7 @@
         ("ndsary:.*/frwiki.*-abstract.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/jawiki.*-abstract.*\\.xml" . "support-wikipedia")
         ("ndsary:.*/zhwiki.*-abstract.*\\.xml" . "support-wikipedia")
+        ("ndsary:.*/Rangjung-Yeshe" . "support-rangjung")
         ;; ndbtonic
         ("ndbtonic:.*/onmusic/" . "support-onmusic")
         ;; ndpdic
