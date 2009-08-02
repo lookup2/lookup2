@@ -79,8 +79,8 @@
   )
 
 (let ((options (support-eijiro-options lookup-support-dictionary-id)))
-  (message "Eijiro: dict-id=%s" lookup-support-dictionary-id)
-  (message "Eijiro: index of %s is set to %s" (plist-get options :title) (plist-get options :index))
+  ;; (message "Eijiro: dict-id=%s" lookup-support-dictionary-id)
+  ;; (message "Eijiro: index of %s is set to %s" (plist-get options :title) (plist-get options :index))
   (setq lookup-support-options options))
 
 ;;; support-eijiro.el ends here

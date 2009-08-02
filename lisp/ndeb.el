@@ -646,11 +646,11 @@ Nil means it has not been checked yet.")
     (replace-match 
      (save-match-data
        (char-to-string 
-        (string-to-int (japanese-hankaku (match-string 1)) 16))))))
+        (string-to-number (japanese-hankaku (match-string 1)) 16))))))
 
 (defun ndeb-arrange-scripts (entry)
   (let ((dictionary (lookup-entry-dictionary entry))
-        beg-tag tag)
+        beg-beg tag)
     (while (re-search-forward "<\\(su[bp]\\)>" nil t)
       (setq beg-beg (match-beginning 0)
             tag     (match-string 1))

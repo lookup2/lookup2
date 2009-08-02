@@ -136,7 +136,7 @@ Do not call this directly.  Execute `aozora-view' instead."
   ;; Rubyを挿入する。
   (let (start end main main-len 
         ruby-start ruby-end ruby-offset ruby ruby-str
-        ruby-start-width ruby-end-width
+        ruby-start-width ruby-end-width glue
         (ruby-newline 
          "\n")
          ;;(propertize "\n" 'line-height 0.5 'line-spacing 0))
