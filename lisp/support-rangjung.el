@@ -222,7 +222,7 @@ already done and match-data is already stored."
                "\\(?:\\(?3:" c "\\)\\|"
                   "\\(\\(?2:" h "\\)?\\(?3:" c "\\)\\)\\|"
                   "\\(\\(?1:" p "\\)?\\(?3:" c "\\)\\)\\|"
-                  "\\(\\(?1:" p "\\)?\\(?2:" h "\\)?\\(?:3" c "\\)\\)\\)"
+                  "\\(\\(?1:" p "\\)?\\(?2:" h "\\)?\\(?3:" c "\\)\\)\\)"
                "\\+?\\(?4:" f "\\)?\\(?5:" v "\\)?\\(?6:" m "\\)?\\)\\|"
             "\\(?:-?"    ;; group 2 .. V(M)  (7-8)
                "\\(?7:" v "\\)\\(?8:" m "\\)?\\)\\|"
@@ -418,7 +418,7 @@ already done and match-data is already stored."
             ")")))
 
 (setq lookup-support-options
-      (list :title "RangJung"
+      (list :title "Rangjung Yeshe"
             :query-filter 'support-rangjung-query-filter
             :entry-tags '("\n" . " - ")
             :content-tags '("\n" . "]\n")
