@@ -76,12 +76,13 @@
 (put 'nddsl :list 'nddsl-list)
 (defun nddsl-list (agent)
   "Return list of dictionaries of AGENT."
-  (let* ((files (directory-files 
-                 (expand-file-name (lookup-agent-location agent))
-                 nil "\\.dsl\\.ary\\'")))
-    (mapcar (lambda (name) 
-              (lookup-new-dictionary agent (file-name-sans-extension name)))
-            files)))
+  (when (executable-find ndsary-sary-program)
+    (let* ((files (directory-files 
+                   (expand-file-name (lookup-agent-location agent))
+                   nil "\\.dsl\\.ary\\'")))
+      (mapcar (lambda (name) 
+                (lookup-new-dictionary agent (file-name-sans-extension name)))
+              files))))
 
 (put 'nddsl :title 'nddsl-title)
 (defun nddsl-title (dictionary)
