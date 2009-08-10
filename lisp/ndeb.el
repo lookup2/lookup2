@@ -334,7 +334,7 @@ Nil means it has not been checked yet.")
     (if gaiji-file
         (setf (lookup-agent-option agent :gaiji-table)
               (ndeb-parse-gaiji-file gaiji-file))))
-  (when ndeb-program-name
+  (when (and ndeb-program-name (file-exists-p (lookup-agent-location agent)))
     (ndeb-with-agent agent
       (ndeb-process-require 
        "list"
