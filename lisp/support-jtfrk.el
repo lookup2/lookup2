@@ -26,10 +26,11 @@
 
 ;;; Code:
 
-(require 'w3m)
+(require 'w3m nil t)
 
 (defun support-jtfrk-arrange-structure (entry)
-  (w3m-region (point-min) (point-max)))
+  (if (functionp 'w3m-region)
+      (w3m-region (point-min) (point-max))))
 
 (setq lookup-support-options
       (list

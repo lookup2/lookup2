@@ -48,7 +48,7 @@
 ;;;
 
 (defgroup ndwinsearch nil
-  "Lookup csrd interface."
+  "Lookup Windows Search Interface."
   :group 'lookup-search-agents)
 
 (defcustom ndwinsearch-search-program "D:\\wdsgrep-4.1test\\wdsgrep.exe"

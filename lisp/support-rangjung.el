@@ -357,7 +357,7 @@ already done and match-data is already stored."
      nil nil nil nil "=" nil nil nil   ;; U+0F30-U+0F37
      nil nil "<" ">" "(" ")" "{" "}")  ;; U+0F38-U+0F3F
     )
-  "ACPI Transcription")
+  "ACIP Transcription")
 (defvar tibetan-acip-encode-table (make-hash-table :test 'equal))
 (defvar tibetan-acip-decode-table (make-hash-table :test 'equal))
 (tibetan-transliteration-table-setup tibetan-acip-table
