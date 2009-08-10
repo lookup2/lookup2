@@ -258,7 +258,8 @@ Do not call this directly.  Execute `aozora-view' instead."
   (interactive)
   (if (eq major-mode 'aozora-view-mode)
       (let ((inhibit-read-only t))
-        (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
+        (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max))
+        (set-buffer-modified-p nil))
     (message "Not Aozora-View mode!")))
 
 (defun aozora-view-redraw ()
@@ -280,6 +281,8 @@ Do not call this directly.  Execute `aozora-view' instead."
         (error "Aozora Text File does not exist!"))
     (delete-region (point-min) (point-max))
     (insert-file-contents aozora-view-file)
+    (goto-char (point-min))
+    (while (search-forward "" nil t) (replace-match ""))
     (aozora-view-arrange-replace)
     (aozora-view-arrange-fill-lines)
     (set-buffer-modified-p nil)
