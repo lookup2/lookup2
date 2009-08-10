@@ -315,7 +315,7 @@ Note that Hangul are excluded.")
 (define-translation-table 'ucs-normalize-nfkd-table
   (ucs-normalize-make-translation-table-from-alist (eval-when-compile nfkd-alist)))
 (define-translation-table 'ucs-normalize-hfs-nfd-table
-  (ucs-normalize-make-translation-table-from-alist (eval-when-compile hfs-nfd-alist))))
+  (ucs-normalize-make-translation-table-from-alist (eval-when-compile hfs-nfd-alist)))
 
 (defun ucs-normalize-sort (chars)
   "Sort by canonical combining class of chars."
@@ -362,6 +362,7 @@ If COMPOSITION-PREDICATE is not given, then do nothing."
     (if composition-predicate
         (ucs-normalize-compose-chars chars composition-predicate)
       chars)))
+)
 
 (eval-when-compile
 
