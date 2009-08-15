@@ -108,7 +108,7 @@
 
 ;;; Code:
 
-(defconst ucs-normalize-version "1.1beta2")
+(defconst ucs-normalize-version "1.1")
 
 (eval-when-compile (require 'cl))
 
