@@ -138,8 +138,8 @@ Do not call this directly.  Execute `aozora-view' instead."
         ruby-start ruby-end ruby-offset ruby ruby-str
         ruby-start-width ruby-end-width glue
         (ruby-newline 
-         "\n")
-         ;;(propertize "\n" 'line-height 0.5 'line-spacing 0))
+         ;; "\n")
+         (propertize "\n" 'display '((height 0.5) (width 0.5)) 'line-height 0.5 'line-spacing 0))
         ruby-spc)
     (while (not (eobp))
       ;; 各行の処理
