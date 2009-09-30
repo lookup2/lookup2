@@ -58,7 +58,7 @@
 
 (defvar ndjitsuu-tmp-directory 
   (expand-file-name (concat temporary-file-directory "/ndjitsuu"))
-  "Temporafy Directory for NDJitsuu file.")
+  "Temporafy Directory for `ndjitsuu' files.")
 
 (defvar ndjitsuu-convert-program "convert") ;; ImageMagick
 
@@ -145,6 +145,7 @@
     ( 8 . lookup-heading-3-face)
     (16 . lookup-heading-2-face)))
 
+;; TODO: support inline images.
 (defvar ndjitsuu-image-links
   '((0 . "jitsu_00001.tif")
     (1 . "jitsu_00001.tif")
