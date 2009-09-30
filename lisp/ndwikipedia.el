@@ -578,12 +578,12 @@
     ;; process text properties
     (while (setq start (next-single-property-change (point) 'w3m-href-anchor))
       (goto-char start)
-      (setq val (get-text-property (point) 'w3m-href-anchor)
-            val (substring val 10)
-            end (next-single-property-change (point) 'w3m-href-anchor))
-      (lookup-set-link start end
-                       (lookup-new-entry 'regular dict val val))
-      (goto-char end))
+      (when (setq val (get-text-property (point) 'w3m-href-anchor))
+        (setq val (substring val 10)
+              end (next-single-property-change (point) 'w3m-href-anchor))
+        (lookup-set-link start end
+                         (lookup-new-entry 'regular dict val val))
+        (goto-char end)))
     (remove-text-properties 
      (point-min) (point-max) 
      '(balloon-help mouse-face keymap help-echo w3m-anchor-sequence 
