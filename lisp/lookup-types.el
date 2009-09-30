@@ -686,7 +686,7 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
                          'rear-nonsticky (list 'display))))
     (insert-image glyph "[image]")))
 
-(defun lookup-img-file-insert (file type &optional start end)
+(defun lookup-img-file-insert (file type &optional start end &rest props)
   (when (or (not lookup-max-image-size)
             (<= (nth 7 (file-attributes file)) lookup-max-image-size))
     (unless (or (memq type image-types)
@@ -701,8 +701,9 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
                                                   (point-max)))
                (buffer-substring-no-properties (point-min)
                                                (point-max))))))
-      (lookup-glyph-insert (create-image glyph type t :ascent 'center)
-                           start end))))
+      (lookup-glyph-insert 
+       (apply 'create-image glyph type t :ascent 'center props)
+       start end))))
 
 
 
