@@ -1,4 +1,4 @@
-;;; lookup-text.el --- Lookup Text Utilities
+;;; lookup-text.el --- Lookup Text Utilities  -*- coding: utf-8 -*-
 ;; Copyright (C) 1999 Lookup Development Team <lookup@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team <lookup@ring.gr.jp>
 
