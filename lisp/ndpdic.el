@@ -282,7 +282,9 @@
                         (r6 = (r1 <= #xd7a3))
                         (if (r5 & r6) (r4 = #xc1d1)
                           ((r5 = (r1 & #xff))
-                           (r6 = (r1 & #xffffff00))
+                           ;; As of 2009/8/27, #xffffff00 is treated as float.
+                           ;;(r6 = (r1 & #xffffff00)) ;; FIXME
+                           (r6 = (r1 & -256))
                            (if (r5 < #x80) (r4 = (r6 + #x40))
                              (r4 = (r6 + #xc0)))))))))))))))
       (repeat)))))
