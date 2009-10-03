@@ -42,9 +42,10 @@
 ;; (1) Download XXwiki-latest-article-pages.xml.bz2 into XX directory.
 ;;     (XX may be `en', `ja', etc.)
 ;; (2) create index `db' directory with `quicksearchindex'
+;;     !!! Make sure to use UTF-8 version of MeCab !!!
 ;;     % cd ja
 ;;     % rm -rf db 
-;;     % for i in rec*.bz; do echo \#$i ; bzcat $i | grep '<title' | perl -ne 'm/<title>([^<]+)</title>/ && print $1."\n";' ; done | ../quicksearchindex
+;;     % for i in rec*.bz2; do echo \#$i ; bzcat $i ; done | ../wikipedia.wakati.rb | ../quicksearchindex
 ;;
 ;;
 ;;; Lookup Setup
@@ -415,7 +416,7 @@
   "Return string content of ENTRY."
   (let ((dict  (lookup-entry-dictionary entry))
         (code  (lookup-entry-code entry)))
-    (when (null (string-match ":" code))
+    (when (null (string-match "\\.bz2:" code))
       (setq code (ndwikipedia-search-for-exact-word
                   (ndwikipedia-db-directory dict) code)))
     (if code
@@ -483,8 +484,7 @@
      '((replace   ndwikipedia-arrange-replace)
        (gaiji     ndwikipedia-arrange-equation)
        (reference ndwikipedia-arrange-table
-                  ndwikipedia-arrange-reference)
-       (structure ndwikipedia-arrange-structure)))
+                  ndwikipedia-arrange-reference)))
 
 ;;;
 ;;; Main Program
@@ -513,13 +513,34 @@
     (replace-match (lookup-superscript-string (match-string 1))))
   (goto-char (point-min))
   (while (re-search-forward "'''\\(.+?\\)'''" nil t)
-    (add-text-properties (match-beginning 1) (match-end 1)
-                         '(face lookup-heading-1-face))
-    (replace-match "\\1"))
+    (let ((text (match-string 1)))
+      (add-text-properties 0 (length text)
+                           '(face lookup-heading-1-face) text)
+      (replace-match text t)))
   (goto-char (point-min))
   (while (re-search-forward "<!--\\(.\\|\n\\)+?-->" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
                          '(face lookup-comment-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "<ref>\\(.\\|\n\\)+?</ref>" nil t)
+    (add-text-properties (match-beginning 0) (match-end 0)
+                         '(face lookup-comment-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "^== .+? ==" nil t)
+    (add-text-properties (match-beginning 0) (match-end 0)
+                         '(face lookup-heading-2-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "^=== .+? ===" nil t)
+    (add-text-properties (match-beginning 0) (match-end 0)
+                         '(face lookup-heading-3-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "^\\* .+?" nil t)
+    (add-text-properties (match-beginning 0) (match-end 0)
+                         '(face lookup-heading-4-face)))
+  (goto-char (point-min))
+  (while (re-search-forward "^\\*\\* .+?" nil t)
+    (add-text-properties (match-beginning 0) (match-end 0)
+                         '(face lookup-heading-5-face)))
   )
 
 (defun ndwikipedia-arrange-equation (entry)
@@ -551,11 +572,14 @@
     (if (file-exists-p file-name) file-name)))
 
 (defun ndwikipedia-arrange-reference (entry)
-  (while (re-search-forward "\\[\\[\\([^]|]+\\)\\(|[^]]+\\)?\\]\\]" nil t)
+  (while (re-search-forward "\\[\\[\\([^]|#]+\\)\\(|[^]#]+\\)?\\(#.+?\\)?\\]\\]" nil t)
     (let* ((start (match-beginning 0))
            (code  (match-string 1))
-           (head  (if (match-string 2)
+           (text  (if (match-string 2)
                       (substring (match-string 2) 1)
+                    code))
+           (head  (if (match-string 2)
+                      (concat code " (" text ")")
                     code))
            (dict  (lookup-entry-dictionary entry))
            ;;(dir   (ndwikipedia-db-directory dict))
@@ -563,7 +587,7 @@
            ;;         (ndwikipedia-search-for-exact-word dir code)))
            ;;(new-entry (if code (lookup-new-entry 'regular dict code head))))
            (new-entry (lookup-new-entry 'regular dict code head)))
-      (replace-match head t t)
+      (replace-match text t t)
       (if new-entry
           (lookup-set-link start (point) new-entry)))))
 
@@ -573,17 +597,19 @@
       (save-restriction
         (narrow-to-region (match-beginning 0) (match-end 0))
         (ndwikipedia-convert-table-to-plain-text (point-min) (point-max))
-    ))
+        (put-text-property (point-min) (point-max) 'read-only t)
+        ))
     (goto-char (point-min))
     ;; process text properties
-    (while (setq start (next-single-property-change (point) 'w3m-href-anchor))
-      (goto-char start)
-      (when (setq val (get-text-property (point) 'w3m-href-anchor))
-        (setq val (substring val 10)
-              end (next-single-property-change (point) 'w3m-href-anchor))
-        (lookup-set-link start end
-                         (lookup-new-entry 'regular dict val val))
-        (goto-char end)))
+    (let ((inhibit-read-only t))
+      (while (setq start (next-single-property-change (point) 'w3m-href-anchor))
+        (goto-char start)
+        (when (setq val (get-text-property (point) 'w3m-href-anchor))
+          (setq val (substring val 10)
+                end (next-single-property-change (point) 'w3m-href-anchor))
+          (lookup-set-link start end
+                           (lookup-new-entry 'regular dict val val))
+          (goto-char end))))
     (remove-text-properties 
      (point-min) (point-max) 
      '(balloon-help mouse-face keymap help-echo w3m-anchor-sequence 
@@ -654,5 +680,3 @@
 (provide 'ndwikipedia)
 
 ;;; ndwikipedia.el ends here
-
-;;; support-wikipedia.el ends here
