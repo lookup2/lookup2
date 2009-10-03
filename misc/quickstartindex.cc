@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 	  }
 
 	  // Title
-	  if (title[0] == '!') {
+	  if (title[0] == '!' && title.length() > 2) {
 
 		title=title.substr(1, string::npos);
 
