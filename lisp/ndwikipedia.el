@@ -43,9 +43,10 @@
 ;;     (XX may be `en', `ja', etc.)
 ;; (2) create index `db' directory with `quicksearchindex'
 ;;     !!! Make sure to use UTF-8 version of MeCab !!!
-;;     % cd ja
+;;     % cd ja (or `en' for English)
 ;;     % rm -rf db 
-;;     % for i in rec*.bz2; do echo \#$i ; bzcat $i ; done | ../wikipedia.wakati.rb | ../quicksearchindex
+;;     % for i in rec*.bz2; do echo \#$i ; bzcat $i ; done | ../wikipedia.ja.rb | ../quicksearchindex (for Japanese)
+;;     % for i in rec*.bz2; do echo \#$i ; bzcat $i ; done | ../wikipedia.en.rb | ../quicksearchindex (for English)
 ;;
 ;;
 ;;; Lookup Setup
@@ -351,6 +352,9 @@
 (defvar ndwikipedia-reference-cache
   (make-hash-table :test 'equal))
 
+(defvar ndwikipedia-dict-table
+  (make-hash-table :test 'equal))
+
 ;;;
 ;;; Interface functions
 ;;;
@@ -364,9 +368,13 @@
     (make-directory ndwikipedia-tmp-work-directory))
   (let ((dir (lookup-agent-location agent)))
     (if (file-directory-p dir)
-        (mapcar (lambda (name) (lookup-new-dictionary agent name))
+        (mapcar (lambda (name) 
+                  (let ((dict (lookup-new-dictionary agent name)))
+                    (puthash name dict ndwikipedia-dict-table)
+                    dict))
                 (remove-if-not (lambda (file)
-                                 (file-directory-p (concat dir "/" file "/db")))
+                                 (file-directory-p
+                                  (concat dir "/" file "/db")))
                                (directory-files dir)))
       (message "ndwikipedia: directory %s is not found." dir)
       nil)))
@@ -411,27 +419,47 @@
                            result)))
       (nreverse result))))
 
+;; Entry Code:
+;; llll:YYYY#ZZZ      … Multilingual InterWiki (lower case)
+;; Zzzz:YYYY#ZZZ      … Category, Image, etc.  (caps case)
+;; FFFFF.bz2:YYYY#ZZZ … File:name
 (put 'ndwikipedia :content 'ndwikipedia-content)
 (defun ndwikipedia-content (entry)
   "Return string content of ENTRY."
   (let ((dict  (lookup-entry-dictionary entry))
-        (code  (lookup-entry-code entry)))
-    (when (null (string-match "\\.bz2:" code))
-      (setq code (ndwikipedia-search-for-exact-word
-                  (ndwikipedia-db-directory dict) code)))
-    (if code
-        (let* ((file  (progn
-                        (string-match "\\([^:]+\\):\\(.+\\)" code)
-                        (match-string 1 code)))
-               (title (match-string 2 code))
-               (agent (lookup-dictionary-agent dict))
-               (file  (concat (lookup-agent-location agent)
-                              "/"
-                              (lookup-dictionary-name dictionary)
-                              "/"
-                              file)))
-          (ndwikipedia-content-of-file file title))
-      "This entry is not defined yet.")))
+        (code  (lookup-entry-code entry))
+        (case-fold-search nil)
+        file title subtitle)
+    ;; analysis of the link
+    (if (string-match "^\\([-a-z]+?\\):\\(.+\\)" code)
+        ;; InterLingual Wiki Link
+        (let* ((lang (match-string 1 code))
+               (code (match-string 2 code))
+               (dict (gethash lang ndwikipedia-dict-table)))
+          (message "InterLingual!! %s %s %s" lang code dict)
+          (if dict
+              (ndwikipedia-content
+               (lookup-new-entry 'regular dict code code))
+            (format "This Language (%s) is not supported." lang)))
+      (when (null (string-match "\\.bz2:" code))
+        ;; File is not specified.  Re-Specify it.
+        (setq code (ndwikipedia-search-for-exact-word
+                    (ndwikipedia-db-directory dict) code)))
+      (if code
+          (let* ((file  
+                  (progn
+                    (string-match "\\([^:]+\\.bz2\\):\\([^#]+\\)\\(#.+\\)?" 
+                                  code)
+                    (match-string 1 code)))
+                 (title (match-string 2 code))
+                 (agent (lookup-dictionary-agent dict))
+                 (file  (concat (lookup-agent-location agent)
+                                "/"
+                                (lookup-dictionary-name dictionary)
+                                "/"
+                                file)))
+            (ndwikipedia-content-of-file file title))
+        "This entry is not defined."))))
 
 (defun ndwikipedia-search-for-exact-word (dir string)
   (let ((key (concat dir string)))
@@ -572,15 +600,14 @@
     (if (file-exists-p file-name) file-name)))
 
 (defun ndwikipedia-arrange-reference (entry)
-  (while (re-search-forward "\\[\\[\\([^]|#]+\\)\\(|[^]#]+\\)?\\(#.+?\\)?\\]\\]" nil t)
+  (while (re-search-forward "\\[\\[\\(.+?\\)\\]\\]" nil t)
     (let* ((start (match-beginning 0))
-           (code  (match-string 1))
-           (text  (if (match-string 2)
-                      (substring (match-string 2) 1)
-                    code))
-           (head  (if (match-string 2)
-                      (concat code " (" text ")")
-                    code))
+           (code-text 
+            (save-match-data (ndwikipedia-parse-link (match-string 1))))
+           (code (car code-text))
+           (text (cdr code-text))
+           (head (if (equal code text) code
+                   (concat code " (" text ")")))
            (dict  (lookup-entry-dictionary entry))
            ;;(dir   (ndwikipedia-db-directory dict))
            ;;(code  (save-match-data 
@@ -590,6 +617,21 @@
       (replace-match text t t)
       (if new-entry
           (lookup-set-link start (point) new-entry)))))
+
+(defun ndwikipedia-parse-link (link)
+  (let ((case-fold-search nil))
+    (string-match "^\\(:?[-a-z]+:\\)?\\([^|]+?\\)\\(|\\(.+?\\)\\)?$" link)
+    (let* ((wiki (match-string 1 link))
+           (code (match-string 2 link))
+           (text (or (match-string 4 link) code)))
+      (if wiki 
+          (if (string-match "^:" wiki)
+              (setq wiki (substring wiki 1)
+                    code (concat wiki code)
+                    text (concat wiki text))
+            (setq code (concat wiki code)
+                  text (concat text " (" (substring wiki 0 -1) ")"))))
+      (cons code (or text code)))))
 
 (defun ndwikipedia-arrange-table (entry)
   (let ((dict (lookup-entry-dictionary entry)) start end)
@@ -641,10 +683,12 @@
     (save-restriction
       (narrow-to-region from to)
       (goto-char (point-min))
-      (while (re-search-forward "\\[\\[\\([^]|]+\\)\\(|\\([^]]+\\)\\)?\\]\\]" nil t)
-        (if (match-string 2) 
-            (replace-match "<a href='#\\1'>\\3</a>" t)
-          (replace-match "<a href='#\\1'>\\1</a>" t)))
+      (while (re-search-forward "\\[\\[\\(.+?\\)\\]\\]" nil t)
+        (let* ((code-text 
+                (save-match-data (ndwikipedia-parse-link (match-string 1))))
+               (code (car code-text))
+               (text (cdr code-text)))
+          (replace-match (concat "<a href='#" code "'>" text "</a>") t)))
       (goto-char (point-min))
       (while (re-search-forward "^{|\\(.*\\)" nil t) (replace-match "<table \\1>"))
       (goto-char (point-min))
