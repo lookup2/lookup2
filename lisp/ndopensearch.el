@@ -191,7 +191,12 @@
       (buffer-string))))
 
 (defun ndopensearch-arrange-structure (entry)
-  (w3m-region (point-min) (point-max)))
+  (w3m-region (point-min) (point-max))
+  (remove-text-properties 
+   (point-min) (point-max) 
+   '(balloon-help face help-echo mouse-face 
+     keymap help-echo w3m-anchor-sequence w3m-balloon-help
+     w3m-safe-url-regexp)))
 
 (defun ndopensearch-set-link (start end file)
   (add-text-properties start end
