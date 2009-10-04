@@ -39,6 +39,12 @@
 ;;
 ;;; Set-up
 ;;
+;; (0) Be sure to install `w3m' elisp package and `texvc' software.
+;;     `texvc' can be downloaded from the following subversion site.
+;;     (Do not use any older version!)
+;;     % svn checkout http://svn.wikimedia.org/svnroot/mediawiki/branches/REL1_15/phase3/math
+;;     If you are using Macintosh, make sure that you re-compile the software.
+;;     (You need to install "OCaml" to re-compile.)
 ;; (1) Download XXwiki-latest-article-pages.xml.bz2 into XX directory.
 ;;     (XX may be `en', `ja', etc.)
 ;; (2) create index `db' directory with `quicksearchindex'
@@ -72,7 +78,7 @@
   (expand-file-name "~/edicts/offline.wikipedia/quickstartsearch"))
 
 (defvar ndwikipedia-texvc-program 
-  (expand-file-name "~/edicts/offline.wikipedia/mediawiki_sa/math/texvc"))
+  (expand-file-name "~/.system/math/texvc"))
 
 (defvar ndwikipedia-tmp-directory 
   (expand-file-name (concat temporary-file-directory "/ndwikipedia"))
@@ -546,6 +552,12 @@
                            '(face lookup-heading-1-face) text)
       (replace-match text t)))
   (goto-char (point-min))
+  (while (re-search-forward "''\\(.+?\\)''" nil t)
+    (let ((text (match-string 1)))
+      (add-text-properties 0 (length text)
+                           '(face italic) text)
+      (replace-match text t)))
+  (goto-char (point-min))
   (while (re-search-forward "<!--\\(.\\|\n\\)+?-->" nil t)
     (add-text-properties (match-beginning 0) (match-end 0)
                          '(face lookup-comment-face)))
@@ -581,7 +593,7 @@
                                              :background "white")))))
 
 (defun ndwikipedia-get-math-image (equation)
-  (let* ((md5 (md5 (concat "\"" equation "\"")))
+  (let* ((md5 (md5 equation))
          (file-name (concat ndwikipedia-tmp-directory "/" md5 ".png")))
     (when (null (file-exists-p file-name))
       (with-temp-buffer
