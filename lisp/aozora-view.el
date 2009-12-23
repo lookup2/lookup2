@@ -23,6 +23,7 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'view)
 
 ;; Customization
 
