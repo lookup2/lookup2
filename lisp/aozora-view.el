@@ -138,9 +138,6 @@ Do not call this directly.  Execute `aozora-view' instead."
   (let (start end main main-len 
         ruby-start ruby-end ruby-offset ruby ruby-str
         ruby-start-width ruby-end-width glue
-        (ruby-newline 
-         ;; "\n")
-         (propertize "\n" 'display '((height 0.5) (width 0.5)) 'line-height 0.5 'line-spacing 0))
         ruby-spc)
     (while (not (eobp))
       ;; 各行の処理
@@ -184,10 +181,9 @@ Do not call this directly.  Execute `aozora-view' instead."
                                              (string-to-list ruby)
                                              (make-string (round ruby-spc) ? )))
                         ruby))))
-      (put-text-property 0 (length ruby-str) 
-                         'display '((height 0.5) (width 0.5)) ruby-str)
       (goto-char start)
-      (insert ruby-str ruby-newline)
+      (insert ruby-str "\n")
+      (put-text-property start (point) 'display '((height 0.5)))
       (forward-line)))
   (let ((inhibit-read-only t)) 
     (remove-text-properties (point-min) (point-max) 
