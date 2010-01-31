@@ -1,5 +1,5 @@
 ;;; aozora-view.el --- viewer mode for "青空文庫" text file.
-;; Copyright (C) 2009 Kawabata Taichi
+;; Copyright (C) 2009,2010 Kawabata Taichi
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -43,6 +43,21 @@
 ;; If you are using session.el, include the above variable for saving among sessions.
 ;; e.g. 
 ;; (add-to-list 'session-globals-include 'aozora-view-bookmarks)
+
+(defvar aozora-kenten-alist
+  '(("傍点" .       ?﹅)
+    ("白ゴマ傍点" . ?﹆)
+    ("丸傍点" .     ?●)
+    ("白丸傍点" .   ?○)
+    ("黒三角傍点" . ?▲)
+    ("白三角傍点" . ?△)
+    ("二重丸傍点" . ?◎)
+    ("蛇の目傍点" . ?◉)))
+
+(defvar aozora-kenten-regexp
+  (concat "［＃「\\([^」]+?\\)」に"
+          (regexp-opt (mapcar 'car aozora-kenten-alist) t)
+          "］\n?"))
 
 ;; Keymap
 
@@ -93,6 +108,67 @@ Do not call this directly.  Execute `aozora-view' instead."
   (while (search-forward "／＼" nil t) (replace-match "〳〵"))
   (goto-char (point-min))
   (while (search-forward "／″＼" nil t) (replace-match "〴〵"))
+  ;; 圏点（﹅◉﹆﹅◦•）
+  (goto-char (point-min))
+  (while (re-search-forward aozora-kenten-regexp nil t)
+    (let* ((text (match-string 1))
+           (size (length text))
+           (dot (cdr (assoc (match-string 2) aozora-kenten-alist ))))
+      (replace-match "")
+      (if (search-backward text nil t)
+          (replace-match (concat "｜" text "《" 
+                                 (apply 'string (make-list size dot)) "》"))
+        (error "圏点指示の対応テキストが見つかりません！")
+        )))
+  ;; 漢文
+  (goto-char (point-min))
+  (while (re-search-forward "［＃\\([レ一二三四上中下甲乙丙丁天地人]\\)］\n?" nil t)
+    (replace-match (propertize (match-string 1)
+                               'display '((height 0.5)))))
+  ;; 漢字の小書
+  (goto-char (point-min))
+  (while (re-search-forward "［＃（\\(.+?\\)）］\n?" nil t)
+    (replace-match (propertize (match-string 1)
+                               'display '((height 0.5) (raise 1))
+                               )))
+  ;; 下付き注記
+  (goto-char (point-min))
+  (while (re-search-forward "［＃「\\(.\\)」は下付き小文字］\n?" nil t)
+    (let* ((text (match-string 1)))
+      (replace-match "")
+      (if (search-backward text nil t)
+          (replace-match (propertize text
+                               'display '((height 0.5))))
+        (error "下付き指示の対応テキストが見つかりません！"))))
+  ;; 上付き注記
+  (goto-char (point-min))
+  (while (re-search-forward "［＃「\\(.\\)」は上付き小文字］\n?" nil t)
+    (let* ((text (match-string 1)))
+      (replace-match "")
+      (if (search-backward text nil t)
+          (replace-match (propertize text
+                               'display '((height 0.5) (raise 1))))
+        (error "上付き注記指示の対応テキストが見つかりません！"))))
+  ;; ママ注記
+  ;; e.g. ［＃「喋」に「ママ」の注記］ 
+  (goto-char (point-min))
+  (while (re-search-forward "［＃「\\(.+?\\)」に「ママ」の注記］" nil t)
+    (let* ((text (match-string 1)))
+      (replace-match "")
+      (if (search-backward text nil t)
+          (replace-match (concat "｜" text "《ママ》"))
+        (error "ママ注記指示の対応テキストが見つかりません！")
+        )))
+  ;; 傍線処理
+  (goto-char (point-min))
+  (while (re-search-forward "［＃「\\([^」]+\\)」に傍線］\n?" nil t)
+    (let* ((text (match-string 1)))
+      (replace-match "")
+      (if (search-backward text nil t)
+          (put-text-property (match-beginning 0) (match-end 0)
+                             'face 'underline)
+        (error "傍線指示の対応テキストが見つかりません！")
+        )))
   ;; 字下げ処理
   (goto-char (point-min))
   (while (re-search-forward "［＃ここから\\([0-9０-９]+\\)字下げ］\n?" nil t)
@@ -104,9 +180,9 @@ Do not call this directly.  Execute `aozora-view' instead."
             (put-text-property start (match-beginning 0) 'left-margin margin)
             (replace-match ""))
         (error "[字下げ] instruction does not match!"))))
-  ;; その他の指示削除
-  (goto-char (point-min))
-  (while (re-search-forward "［.+?］" nil t) (replace-match ""))
+  ;; その他の指示は削除する。
+  ;; (goto-char (point-min))
+  ;; (while (re-search-forward "［.+?］" nil t) (replace-match ""))
   ;; 行番号を付与する。
   (goto-char (point-min))
   (while (re-search-forward "^." nil t)
@@ -114,7 +190,8 @@ Do not call this directly.  Execute `aozora-view' instead."
                        'line-number (line-number-at-pos (match-beginning 0))))
   ;; ルビをつけて、改行禁止にする。
   (goto-char (point-min))
-  (while (re-search-forward "\\(\\(?:｜.+?\\)\\|\\(?:[a-z`※㐀-鿿󠄀-󠇿]+[々〻※]?\\)\\)《\\(.+?\\)》" nil t)
+  (while (re-search-forward 
+          "\\(\\(?:｜.+?\\)\\|\\(?:[a-z`※㐀-鿿󠄀-󠇿]+[々〻※]?\\)\\)《\\(.+?\\)》" nil t)
     (let ((string (match-string 1))
           (ruby (match-string-no-properties 2)))
       (save-match-data (if (= ?｜ (string-to-char string)) (setq string (substring string 1))))
@@ -123,6 +200,17 @@ Do not call this directly.  Execute `aozora-view' instead."
       (put-text-property 1 (length string) 'read-only t string)
       (replace-match string)))
   )
+
+(defun aozora-view-buffer-width (start end)
+  "display テキストプロパティによる文字幅半減を考慮した、指定領域の文字幅を計算する。"
+  (let ((width (string-width (buffer-substring start end)))
+        (pos start)
+        (half-width-txt ""))
+    (while (setq pos (text-property-not-all pos end 'display nil))
+      (if (member '(height 0.5) (get-text-property pos 'display))
+          (setq half-width-txt (concat half-width-txt (buffer-substring pos (1+ pos)))))
+      (setq pos (1+ pos)))
+    (- width (/ (string-width half-width-txt) 2))))
 
 (defun aozora-view-arrange-fill-lines ()
   "テキストをfillし、ルビを表示する。"
@@ -152,15 +240,16 @@ Do not call this directly.  Execute `aozora-view' instead."
                  (and (setq ruby-start (next-single-char-property-change 
                                         ruby-end 'ruby nil end))
                       (not (equal ruby-start end)))) ;; 行末ではない
-        (message "start=%d, ruby-start=%d" start ruby-start)
+        (message "start=%d, ruby-start=%d" start ruby-start) ;; debug
         (setq ruby       (get-text-property ruby-start 'ruby)
               main-len   (car ruby)
               main       (buffer-substring ruby-start (+ ruby-start main-len))
               ruby       (cdr ruby)
               ruby-spc   (- (* 2.0 (string-width main)) (string-width ruby))
-              ruby-end-width   (string-width (buffer-substring start ruby-end))
+              ruby-end-width   (aozora-view-buffer-width start ruby-end)
               ruby-end         (+ ruby-start main-len) ;; new ruby-end
-              ruby-start-width (string-width (buffer-substring start ruby-start)))
+              ruby-start-width (aozora-view-buffer-width start ruby-start)
+              )
         (if (< 0 ruby-spc) 
             ;; ルビ文字列が、本文文字列より短い
             (setq ruby-offset 0
