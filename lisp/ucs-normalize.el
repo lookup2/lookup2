@@ -23,24 +23,24 @@
 
 ;;; Commentary:
 ;;
-;; This program has passed the NormalizationTest-5.1.0.txt.
+;; This program has passed the NormalizationTest-5.2.0.txt.
 ;;
 ;; References:
 ;; http://www.unicode.org/reports/tr15/
 ;; http://www.unicode.org/review/pr-29.html
 ;;
-;; HFS-Normalization:
+;; Normalization for `HFS Plus' File Names:
 ;; Reference:
 ;; http://developer.apple.com/technotes/tn/tn1150.html
 ;;
-;; HFS Normalization excludes following area for decomposition.
+;; HFS+ Normalization excludes following area for decomposition.
 ;;
 ;;  U+02000 .. U+02FFF :: Punctuation, symbols, dingbats, arrows, etc.
 ;;                        (Characters in this region will be composed.)
 ;;  U+0F900 .. U+0FAFF :: CJK compatibility Ideographs.
 ;;  U+2F800 .. U+2FFFF :: CJK compatibility Ideographs.
 ;;
-;; HFS-Normalization is useful for normalizing text involving CJK Ideographs.
+;; HFS+ Normalization is useful to normalize text involving CJK Ideographs.
 ;;
 ;;;
 ;;; Implementation Notes on NFC/HFS-NFC.
@@ -88,8 +88,8 @@
 ;;        with previous character, then the beginning of the block is
 ;;        the searched character.  If searched character is combining
 ;;        character, then previous character will be the target
-;;        character 
-;;    (2) end of the block 
+;;        character
+;;    (2) end of the block
 ;;        Block ends at non-composable starter character.
 ;;
 ;; C. Decomposition  (`ucs-normalize-block')
@@ -97,7 +97,7 @@
 ;;    The entire block will be decomposed by
 ;;    `decomposition-translation' table.
 ;;
-;; D. Sorting and Composition  of Smaller Blocks (`ucs-normalize-block-compose-chars')
+;; D. Sorting and Composition of Smaller Blocks (`ucs-normalize-block-compose-chars')
 ;;
 ;;    The block will be split to multiple samller blocks by starter
 ;;    charcters.  Each block is sorted, and composed if necessary.
@@ -108,9 +108,11 @@
 
 ;;; Code:
 
-(defconst ucs-normalize-version "1.1")
+(defconst ucs-normalize-version "1.3β")
 
 (eval-when-compile (require 'cl))
+
+(declare-function nfd "ucs-normalize" (char))
 
 (eval-when-compile
 
@@ -128,11 +130,16 @@
       #x1D1BF #x1D1C0)
    "Composition Exclusion List.
   This list is taken from
-    http://www.unicode.org/Public/UNIDATA/CompositionExclusions-5.1.0.txt")
+    http://www.unicode.org/Public/UNIDATA/5.2/CompositionExclusions.txt")
 
   ;; Unicode ranges that decompositions & combinings are defined.
   (defvar check-range nil)
-    (setq check-range '((#x00a0 . #x3400) (#xA600 . #xAC00) (#xF900 . #x10fff) (#x1d000 . #x1dfff) (#x2f800 . #x2faff)))
+    (setq check-range '((#x00a0 . #x06ff) (#x0900 . #x10ff) (#x1b00 . #x1bff)
+                        (#x1d00 . #x24ff) (#x2a00 . #x2aff) (#x2c00 . #x33ff)
+                        (#xa700 . #xa7ff) (#xab00 . #xd7ff) (#xf800 . #xffff)
+                        (#x11000 . #x110ff) (#x1d100 . #x1d1ff)
+                        (#x1d300 . #x1d7ff) (#x1f000 . #x1f2ff)
+                        (#x2f800 . #x2faff)))
 
   ;; Basic normalization functions
   (defun nfd (char)
@@ -166,7 +173,7 @@
 
 (eval-when-compile
 
-  (defvar combining-chars nil) 
+  (defvar combining-chars nil)
     (setq combining-chars nil)
   (defvar decomposition-pair-to-composition nil)
     (setq decomposition-pair-to-composition nil)
@@ -199,9 +206,9 @@
      check-range))
 
   (setq combining-chars
-        (append combining-chars 
+        (append combining-chars
                 '(?ᅡ ?ᅢ ?ᅣ ?ᅤ ?ᅥ ?ᅦ ?ᅧ ?ᅨ ?ᅩ ?ᅪ
-                ?ᅫ ?ᅬ ?ᅭ ?ᅮ ?ᅯ ?ᅰ ?ᅱ ?ᅲ ?ᅳ ?ᅴ ?ᅵ 
+                ?ᅫ ?ᅬ ?ᅭ ?ᅮ ?ᅯ ?ᅰ ?ᅱ ?ᅲ ?ᅳ ?ᅴ ?ᅵ
                 ?ᆨ ?ᆩ ?ᆪ ?ᆫ ?ᆬ ?ᆭ ?ᆮ ?ᆯ ?ᆰ ?ᆱ ?ᆲ ?ᆳ ?ᆴ
                 ?ᆵ ?ᆶ ?ᆷ ?ᆸ ?ᆹ ?ᆺ ?ᆻ ?ᆼ ?ᆽ ?ᆾ ?ᆿ ?ᇀ ?ᇁ ?ᇂ)))
   )
@@ -251,6 +258,12 @@ Note that Hangul are excluded.")
   (setq ucs-normalize-combining-chars-regexp
   (eval-when-compile (concat (regexp-opt (mapcar 'char-to-string combining-chars)) "+")))
 
+(declare-function decomposition-translation-alist "ucs-normalize"
+                  (decomposition-function))
+(declare-function decomposition-char-recursively "ucs-normalize"
+                  (char decomposition-function))
+(declare-function alist-list-to-vector "ucs-normalize" (alist))
+
 (eval-when-compile
 
   (defun decomposition-translation-alist (decomposition-function)
@@ -262,7 +275,7 @@ Note that Hangul are excluded.")
            (if decomposition
                (setq alist (cons (cons char
                                        (apply 'append
-                                              (mapcar (lambda (x) 
+                                              (mapcar (lambda (x)
                                                         (decomposition-char-recursively
                                                          x decomposition-function))
                                                       decomposition)))
@@ -274,7 +287,7 @@ Note that Hangul are excluded.")
     (let ((decomposition (funcall decomposition-function char)))
       (if decomposition
           (apply 'append
-                 (mapcar (lambda (x) 
+                 (mapcar (lambda (x)
                            (decomposition-char-recursively x decomposition-function))
                          decomposition))
         (list char))))
@@ -295,8 +308,8 @@ Note that Hangul are excluded.")
   (setq ucs-normalize-hangul-translation-alist
         (let ((i 0) entries)
           (while (< i 11172)
-            (setq entries 
-                  (cons (cons (+ #xac00 i) 
+            (setq entries
+                  (cons (cons (+ #xac00 i)
                               (if (= 0 (% i 28))
                                   (vector (+ #x1100 (/ i 588))
                                           (+ #x1161 (/ (% i 588) 28)))
@@ -307,7 +320,7 @@ Note that Hangul are excluded.")
                   i (1+ i))) entries))
 
 (defun ucs-normalize-make-translation-table-from-alist (alist)
-  (make-translation-table-from-alist 
+  (make-translation-table-from-alist
      (append alist ucs-normalize-hangul-translation-alist)))
 
 (define-translation-table 'ucs-normalize-nfd-table
@@ -318,7 +331,7 @@ Note that Hangul are excluded.")
   (ucs-normalize-make-translation-table-from-alist (eval-when-compile hfs-nfd-alist)))
 
 (defun ucs-normalize-sort (chars)
-  "Sort by canonical combining class of chars."
+  "Sort by canonical combining class of CHARS."
   (sort chars
         (lambda (ch1 ch2)
           (< (ucs-normalize-ccc ch1) (ucs-normalize-ccc ch2)))))
@@ -364,20 +377,24 @@ If COMPOSITION-PREDICATE is not given, then do nothing."
       chars)))
 )
 
+(declare-function quick-check-list "ucs-normalize"
+                  (decomposition-translation &optional composition-predicate))
+(declare-function quick-check-list-to-regexp "ucs-normalize" (quick-check-list))
+
 (eval-when-compile
 
   (defun quick-check-list (decomposition-translation
                            &optional composition-predicate)
     "Quick-Check List for DECOMPOSITION-TRANSLATION and COMPOSITION-PREDICATE.
 It includes Singletons, CompositionExclusions, and Non-Starter
-decomposition.  "
+decomposition."
     (let (entries decomposition composition)
       (mapc
        (lambda (start-end)
          (do ((i (car start-end) (+ i 1))) ((> i (cdr start-end)))
            (setq decomposition
                  (string-to-list
-                  (with-temp-buffer 
+                  (with-temp-buffer
                     (insert i)
                     (translate-region 1 2 decomposition-translation)
                     (buffer-string))))
@@ -510,55 +527,55 @@ COMPOSITION-PREDICATE will be used to compose region."
 
 ;;;###autoload
 (defun ucs-normalize-NFD-region (from to)
-  "Normalize the current region by the Unicode NFD."
+  "Normalize REGION by Unicode NFD."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-nfd-quick-check-regexp
                         'ucs-normalize-nfd-table nil))
 ;;;###autoload
 (defun ucs-normalize-NFD-string (str)
-  "Normalize the string STR by the Unicode NFD."
+  "Normalize STRing by Unicode NFD."
   (ucs-normalize-string ucs-normalize-NFD-region))
 
 ;;;###autoload
 (defun ucs-normalize-NFC-region (from to)
-  "Normalize the current region by the Unicode NFC."
+  "Normalize REGION by Unicode NFC."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-nfc-quick-check-regexp
                         'ucs-normalize-nfd-table t))
 ;;;###autoload
 (defun ucs-normalize-NFC-string (str)
-  "Normalize the string STR by the Unicode NFC."
+  "Normalize STRing by Unicode NFC."
   (ucs-normalize-string ucs-normalize-NFC-region))
 
 ;;;###autoload
 (defun ucs-normalize-NFKD-region (from to)
-  "Normalize the current region by the Unicode NFKD."
+  "Normalize REGION by Unicode NFKD."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-nfkd-quick-check-regexp
                         'ucs-normalize-nfkd-table nil))
 ;;;###autoload
 (defun ucs-normalize-NFKD-string (str)
-  "Normalize the string STR by the Unicode NFKD."
+  "Normalize STRing by Unicode NFKD."
   (ucs-normalize-string ucs-normalize-NFKD-region))
 
 ;;;###autoload
 (defun ucs-normalize-NFKC-region (from to)
-  "Normalize the current region by the Unicode NFKC."
+  "Normalize REGION by Unicode NFKC."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-nfkc-quick-check-regexp
                         'ucs-normalize-nfkd-table t))
 ;;;###autoload
 (defun ucs-normalize-NFKC-string (str)
-  "Normalize the string STR by the Unicode NFKC."
+  "Normalize STRing by Unicode NFKC."
   (ucs-normalize-string ucs-normalize-NFKC-region))
 
 ;;;###autoload
 (defun ucs-normalize-HFS-NFD-region (from to)
-  "Normalize the current region by the Unicode NFD and Mac OS's HFS Plus."
+  "Normalize REGION by Decomposition for HFS Plus file names."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-hfs-nfd-quick-check-regexp
@@ -566,18 +583,18 @@ COMPOSITION-PREDICATE will be used to compose region."
                         'ucs-normalize-hfs-nfd-comp-p))
 ;;;###autoload
 (defun ucs-normalize-HFS-NFD-string (str)
-  "Normalize the string STR by the Unicode NFD and Mac OS's HFS Plus."
+  "Normalize STRing by Decomposition for HFS Plus file names."
   (ucs-normalize-string ucs-normalize-HFS-NFD-region))
 ;;;###autoload
 (defun ucs-normalize-HFS-NFC-region (from to)
-  "Normalize the current region by the Unicode NFC and Mac OS's HFS Plus."
+  "Normalize REGION by Composition for HFS Plus file names."
   (interactive "r")
   (ucs-normalize-region from to
                         ucs-normalize-hfs-nfc-quick-check-regexp
                         'ucs-normalize-hfs-nfd-table t))
 ;;;###autoload
 (defun ucs-normalize-HFS-NFC-string (str)
-  "Normalize the string STR by the Unicode NFC and Mac OS's HFS Plus."
+  "Normalize STRing by Composition for HFS Plus file names."
   (ucs-normalize-string ucs-normalize-HFS-NFC-region))
 
 ;; Post-read-conversion function for `utf-8-hfs'.
@@ -592,7 +609,7 @@ COMPOSITION-PREDICATE will be used to compose region."
 (defun ucs-normalize-hfs-nfd-pre-write-conversion (from to)
   (let ((old-buf (current-buffer)))
     (set-buffer (generate-new-buffer " *temp*"))
-    (if (stringp from) 
+    (if (stringp from)
         (insert from)
       (insert-buffer-substring old-buf from to))
     (ucs-normalize-HFS-NFD-region (point-min) (point-max))
@@ -600,9 +617,9 @@ COMPOSITION-PREDICATE will be used to compose region."
 
 ;;; coding-system definition
 (define-coding-system 'utf-8-hfs
-  "UTF-8 based coding system for MacOS HFS file names.
-The singleton characters in HFS normalization exclusion will not
-be decomposed."
+  "UTF-8 based coding system for MacOS X HFS Plus file names.
+The singleton characters excluded by `HFS Plus' normalization
+will not be decomposed."
   :coding-type 'utf-8
   :mnemonic ?U
   :charset-list '(unicode)
@@ -612,4 +629,9 @@ be decomposed."
 
 (provide 'ucs-normalize)
 
+;; Local Variables:
+;; coding: utf-8
+;; End:
+
+;; arch-tag: cef65ae7-71ad-4e19-8da8-56ab4d42aaa4
 ;;; ucs-normalize.el ends here
