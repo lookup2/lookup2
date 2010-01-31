@@ -447,6 +447,7 @@
               (ndwikipedia-content
                (lookup-new-entry 'regular dict code code))
             (format "This Language (%s) is not supported." lang)))
+      (message "debug!!")
       (when (null (string-match "\\.bz2:" code))
         ;; File is not specified.  Re-Specify it.
         (setq code (ndwikipedia-search-for-exact-word
@@ -461,7 +462,7 @@
                  (agent (lookup-dictionary-agent dict))
                  (file  (concat (lookup-agent-location agent)
                                 "/"
-                                (lookup-dictionary-name dictionary)
+                                (lookup-dictionary-name dict)
                                 "/"
                                 file)))
             (ndwikipedia-content-of-file file title))
@@ -476,7 +477,11 @@
          (call-process ndwikipedia-search-program
                        nil t nil (expand-file-name dir) string))
        (goto-char (point-min))
-       (when (re-search-forward "\\([0-9]+% \\)\\[\\(rec[^:]+:.+\\)\\]" nil t)
+       (when (or (re-search-forward
+                  (concat "\\([0-9]+% \\)\\[\\(rec[^:]+:"
+                          (regexp-quote string) "\\)\\]") nil t)
+                 (re-search-forward
+                  "\\([0-9]+% \\)\\[\\(rec[^:]+:.+\\)\\]" nil t)_)
          (puthash key (match-string 2) ndwikipedia-reference-cache)
          (match-string 2))))))
 
