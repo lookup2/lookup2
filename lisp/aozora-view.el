@@ -122,7 +122,7 @@ Do not call this directly.  Execute `aozora-view' instead."
         )))
   ;; 漢文
   (goto-char (point-min))
-  (while (re-search-forward "［＃\\([レ一二三四上中下甲乙丙丁天地人]\\)］\n?" nil t)
+  (while (re-search-forward "［＃\\([レ一二三四上中下甲乙丙丁天地人]+\\)］\n?" nil t)
     (replace-match (propertize (match-string 1)
                                'display '((height 0.5)))))
   ;; 漢字の小書
@@ -169,15 +169,28 @@ Do not call this directly.  Execute `aozora-view' instead."
                              'face 'underline)
         (error "傍線指示の対応テキストが見つかりません！")
         )))
+  ;; 割注処理
+  (goto-char (point-min))
+  (while (search-forward "［＃ここから割り注］" nil t)
+    (let (start end)
+      (replace-match "")
+      (setq start (point))
+      (if (search-forward "［＃ここで割り注終わり］" nil t)
+          (progn
+            (replace-match "")
+            (put-text-property start (point)
+                               'display '((height 0.5) (raise 0.5))))
+        (error "割注終了指示が見付かりません。"))))
+          
   ;; 字下げ処理
   (goto-char (point-min))
   (while (re-search-forward "［＃ここから\\([0-9０-９]+\\)字下げ］\n?" nil t)
     (let ((start (match-beginning 0))
-          (margin (string-to-number (japanese-hankaku (match-string 1)))))
+          (margin (string-to-number (save-match-data (japanese-hankaku (match-string 1))))))
       (replace-match "")
       (if (re-search-forward "［＃ここで字下げ終わり］\n?" nil t)
           (progn 
-            (put-text-property start (match-beginning 0) 'left-margin margin)
+            (put-text-property start (match-beginning 0) 'left-margin (* 2 margin))
             (replace-match ""))
         (error "[字下げ] instruction does not match!"))))
   ;; その他の指示は削除する。
@@ -2525,6 +2538,7 @@ Do not call this directly.  Execute `aozora-view' instead."
   ("「立＋專」" . "竱")
   ("「立＋支」" . "攱")
   ("「竝／日」" . "暜")
+  ("「竹かんむり／束」" . "䇿")
   ("「竹かんむり／也」" . "竾")
   ("「竹かんむり／二点しんにょうの逐」" . "篴")
   ("「竹かんむり／代」" . "笩")
