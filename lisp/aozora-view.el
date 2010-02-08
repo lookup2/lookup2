@@ -363,8 +363,9 @@ Do not call this directly.  Execute `aozora-view' instead."
     (when (file-exists-p cache)
       (insert 
        (with-temp-buffer
-         (with-auto-compression-mode
-           (insert-file-contents cache))
+         (let ((coding-system-for-read 'utf-8-emacs))
+           (with-auto-compression-mode
+             (insert-file-contents cache)))
          (read (current-buffer))))
       t)))
 
@@ -377,7 +378,7 @@ Do not call this directly.  Execute `aozora-view' instead."
              aozora-view-save-cache)
       (with-auto-compression-mode
         (make-directory (file-name-directory cache-dir) t)
-        (with-coding-priority '(utf-8-emacs)
+        (let ((coding-system-for-write 'utf-8-emacs))
           (write-region 
            (prin1-to-string (buffer-string)) nil cache-file)) t))))
 
@@ -445,7 +446,7 @@ Do not call this directly.  Execute `aozora-view' instead."
                (file-exists-p text-file-name))
           (with-coding-priority '(cp932 utf-8)
             (insert-file-contents text-file-name))
-        (error "Aozora Text File does not exist!")))
+        (error "元のバッファまたはテキストファイルが見付かりません！")))
     (goto-char (point-min))
     (while (search-forward "" nil t) (replace-match ""))
     (aozora-view-arrange-replace)
