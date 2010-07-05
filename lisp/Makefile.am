@@ -1,7 +1,7 @@
 SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
 	lookup-cache.el lookup-summary.el lookup-content.el		\
 	lookup-select.el lookup-modules.el lookup-history.el		\
-	lookup-text.el stem-english.el ucs-normalize.el aozora-view.el	\
+	lookup-text.el stem-english.el  aozora-view.el			\
 	ndbtonic.el ndcookie.el ndeb.el ndeb-binary.el nddsl.el		\
 	ndest.el ndic.el ndict.el ndjitsuu.el ndkanji.el ndlatin.el	\
 	ndmecab.el ndmisc.el ndpdic.el ndsary.el ndsimple.el		\
