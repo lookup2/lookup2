@@ -79,8 +79,8 @@
   (let ((dir (lookup-agent-location agent)))
     (if (file-directory-p dir)
         (mapcar (lambda (name) (lookup-new-dictionary agent name))
-                (ndic-directory-files dir))
-      (message "ndic: directory %s is not found." dir)
+                (ndic-directory-files (lookup-agent-location agent)))
+      (error "ndic: directory %s is not found." dir)
       nil)))
 
 (put 'ndic :title 'ndic-dictionary-title)

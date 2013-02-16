@@ -171,10 +171,8 @@
       (goto-char (point-min))
       (re-search-forward "[0-9]+" nil t)
       (setq count (string-to-number (match-string 0))))
-    (if (> count lookup-max-hits)
-        (progn
-          (message "Too many hits! %d" count)
-          nil)
+    (if (or (<= count lookup-max-hits) 
+            (y-or-n-p (format "SpotLight: %s are hit.  Do you want to display them all?" count)))
       (with-temp-buffer
         (lookup-with-coding-system 'utf-8-mac
           (apply 'call-process ndspotlight-search-program

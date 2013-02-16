@@ -23,8 +23,6 @@
 
 ;;; Code:
 
-(require 'lookup)
-
 ;;;###autoload
 (defun lookup-summary-display (session)
   (with-current-buffer (lookup-get-buffer (lookup-summary-buffer))
@@ -219,8 +217,7 @@
   (define-key lookup-summary-mode-map "N" 'shrink-window)
   (define-key lookup-summary-mode-map "," 'lookup-summary-preceding-entry)
   (define-key lookup-summary-mode-map "." 'lookup-summary-following-entry)
-  (define-key lookup-summary-mode-map
-    (if (featurep 'xemacs) 'button2 [mouse-2]) 'lookup-summary-mouse-follow)
+  (define-key lookup-summary-mode-map [mouse-2] 'lookup-summary-mouse-follow)
   ;; entry management
   (define-key lookup-summary-mode-map "i" 'lookup-summary-info)
   (define-key lookup-summary-mode-map "m" 'lookup-summary-mark)
@@ -271,6 +268,7 @@
   (define-key lookup-summary-mode-map "0" 'lookup-summary-redo-all-dictionary)
   ;; search-with-this-dictionary
   (define-key lookup-summary-mode-map "F" 'lookup-summary-dictionary-search)
+  (define-key lookup-summary-mode-map "f" 'lookup-summary-follow-first-link)
   )
 
 (defvar lookup-summary-mode-hook nil)
@@ -465,6 +463,15 @@ Overview モードになっている場合にはそれを解除し、Content バ
 	(if (stringp memo) (insert "\n---- memorandum ----\n" memo))
 	(goto-char (point-min)))
       (lookup-display-buffer (current-buffer)))))
+
+(defun lookup-summary-follow-first-link ()
+  "エントリ本文の最初のリンクへジャンプする。"
+  (interactive)
+  (lookup-with-buffer-and-window (lookup-content-buffer)
+    (goto-char (point-min))
+    (when (or (lookup-get-link (point))
+              (lookup-content-next-link))
+      (lookup-content-follow-link))))
 
 (defun lookup-summary-mark ()
   (interactive)

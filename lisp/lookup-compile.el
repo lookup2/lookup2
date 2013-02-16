@@ -1,8 +1,9 @@
 ;;; lookup-compile.el
 
+(push "." load-path)
+
 (defun lookup-bytecomp ()
   (setq lookup-byte-compiling t)
-  (setq load-path (nconc '("." "agent") load-path))
   (mapcar 'load command-line-args-left)
   (mapc 'byte-compile-file command-line-args-left))
 

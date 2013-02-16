@@ -1,8 +1,0 @@
-.cvsignore
-config.log
-config.cache
-config.status
-configure
-Makefile
-Makefile.in
-aclocal.m4

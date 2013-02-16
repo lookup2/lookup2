@@ -23,8 +23,6 @@
 
 ;;; Code:
 
-(require 'lookup)
-
 (defvar lookup-modules-killed-modules nil)
 
 ;;;###autoload
@@ -47,19 +45,18 @@
     (insert "Type `c' to create module, `v' to visit, "
 	    "`q' to leave, `?' for help.\n\n")
     (lookup-table-insert
-     "%c %-8t %s\n"
+     "%2s %-8t %s\n"
      (append
-      '((?% "Name" "Dictionaries")
-	(?- "----" "------------"))
-      (mapcar (lambda (module)
-		(let* ((dicts (lookup-module-dictionaries module))
-		       (str (mapconcat 'lookup-dictionary-name dicts "/")))
-		  (list ? (lookup-module-name module)
-			(format "[%d] %s" (length dicts) str))))
-	      lookup-module-list)))))
+      '(("No" "Name" "Dictionaries")
+	("--" "----" "------------"))
+      (loop for module in lookup-module-list
+            for i = 1 then (+ 1 i)
+            for name = (lookup-module-name module)
+            for dicts = (lookup-module-dictionaries module)
+            for names = (mapconcat 'lookup-dictionary-name dicts "/")
+            collect (list i name names))))))
 
 (defun lookup-modules-update-buffer ()
-  "Update buffer."
   (let ((line (lookup-current-line)))
     (lookup-modules-build-buffer)
     (goto-line line)))
@@ -69,7 +66,14 @@
 ;;;
 
 (defconst lookup-modules-mode-help
-  "Lookup Modules mode:")
+  "Lookup Modules mode:
+
+`c'(reate) - create a module    `C-k'     - remove this dictionary
+`r'(ename) - rename a module    `C-y'     - yank a removed dictionary
+`v'(isit)  - visit a module     `C-x C-y' - transpose a module
+
+`q' - leave  `g' - reset")
+
 
 (defvar lookup-modules-mode-map nil
   "*Keymap for Lookup Modules mode.")
@@ -171,13 +175,10 @@ will be used instead of the usual `kill-ring'."
 
 (defun lookup-modules-update ()
   (interactive)
-  (let* ((module (lookup-current-module))
-	 (message (format "Updating %s..." (lookup-module-name module))))
-    (message message)
-    ;; (dolist (dict (lookup-module-dictionaries module))
-    ;;   (lookup-dictionary-setplist dict nil))
-    (lookup-modules-update-buffer)
-    (message (concat message "done"))))
+  (let* ((module (lookup-current-module)))
+    (lookup-with-message
+        (format "Updating %s" (lookup-module-name module))
+      (lookup-modules-update-buffer))))
 
 (defun lookup-modules-visit-module ()
   (interactive)

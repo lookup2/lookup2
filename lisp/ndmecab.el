@@ -80,7 +80,7 @@
 (defun ndmecab-list (agent)
   (if (executable-find lookup-mecab-program)
       (list (lookup-new-dictionary agent lookup-mecab-program))
-    (message "ndmecab: error. program file missing.")
+    (error "ndmecab: error. program file missing.")
     nil))
 
 (put 'ndmecab :title ndmecab-dictionary-title)

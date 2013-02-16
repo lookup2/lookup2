@@ -24,22 +24,26 @@
 ;;; Code:
 
 (require 'cl)
+
 (require 'lookup-types)
 (require 'lookup-utils)
 (require 'lookup-vars)
+(require 'lookup-select)
+(require 'lookup-content)
+(require 'lookup-summary)
+(require 'lookup-modules)
+(require 'lookup-history)
+(require 'lookup-text)
 
-(unless lookup-byte-compiling
-  (load "lookup-autoloads"))
+;(unless lookup-byte-compiling
+;  (load "lookup-autoloads"))
 
-(defconst lookup-version "1.99.95"
+(defconst lookup-version "1.99.96"
   "The version numbers of Lookup.")
 
 
-;;;
-;;; Top-level
-;;;
+;;;; Top-level
 
-;;;###autoload
 (defun lookup-version (arg)
   "Display the version string of Lookup.
 With prefix argument, insert string at point."
@@ -56,7 +60,8 @@ If you have already started lookup, display the last status of buffers."
                       (lookup-history-ref  lookup-search-history))))
     (if session
 	(lookup-session-display session)
-      (lookup-initialize)
+      (if (not (and lookup-agent-list lookup-dictionary-list lookup-module-list))
+          (lookup-initialize))
       (lookup-select-dictionaries (lookup-default-module)))))
 
 (defun lookup-kill ()
@@ -75,15 +80,16 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 	       "Lookup debug enabled"
 	     "Lookup debug disabled")))
 
-
-;;;;;;;;;;;;;;;;;;;;
-;; Internal Functions
-;;;;;;;;;;;;;;;;;;;;
+(defun lookup-debug-message (format-string &rest args)
+  (if lookup-enable-debug
+      (apply 'message (concat "lookup-debug:" format-string) args)))
 
+
+;;; Internal Functions
 (defvar lookup-message nil)
 
-(put 'lookup-with-message 'lisp-indent-function 1)
 (defmacro lookup-with-message (msg &rest body)
+  (declare (indent 1))
   `(let ((lookup-message ,msg))
      (message "%s..." lookup-message)
      (prog1 (progn ,@body)
@@ -93,81 +99,6 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
   (message "%s... (%s)" lookup-message msg))
 
 
-
-;;;
-;;; Global commands
-;;;
-
-(defvar lookup-global-map nil)
-
-(unless lookup-global-map
-  (setq lookup-global-map (make-sparse-keymap))
-  (define-key lookup-global-map "\C-\M-n" 'lookup-next-history)
-  (define-key lookup-global-map "\C-\M-p" 'lookup-previous-history)
-  (define-key lookup-global-map "\C-\M-f" 'lookup-forward-module)
-  (define-key lookup-global-map "\C-\M-b" 'lookup-backward-module)
-  (define-key lookup-global-map "B" 'lookup-list-bookmarks)
-  (define-key lookup-global-map "H" 'lookup-list-history)
-  (define-key lookup-global-map "f" 'lookup-find-pattern)
-  (define-key lookup-global-map "o" 'lookup-open-window)
-  (define-key lookup-global-map "r" 'lookup-return)
-  (define-key lookup-global-map "q" 'lookup-suspend)
-  (define-key lookup-global-map "Q" 'lookup-exit)
-  (define-key lookup-global-map "R" 'lookup-restart)
-  (define-key lookup-global-map "?" 'lookup-help))
-
-(defun lookup-nth-module (n &optional module)
-  (let* ((len (length lookup-module-list))
-	 (pos (if module (position module lookup-module-list) 0)))
-    (setq pos (% (+ pos n) len))
-    (if (< pos 0) (setq pos (+ pos len)))
-    (nth pos lookup-module-list)))
-
-(defun lookup-forward-module (arg)
-  "Forward current module by ARG.
-New session begins if there is a session.  If called from 
-`lookup-select-mode' or `lookup-modules-mode', then default
-module will be changed."
-  (interactive "p")
-  (let ((session (lookup-current-session)) 
-        module query)
-    (if (or (eq major-mode 'lookup-select-mode)
-            (eq major-mode 'lookup-modules-mode)
-            (null session))
-        (progn
-          (dotimes (x (mod arg (length lookup-module-list)))
-            (setq lookup-module-list (nconc (cdr lookup-module-list)
-                                            (list (car lookup-module-list)))))
-          (setq module (car lookup-module-list))
-          (cond ((eq major-mode 'lookup-select-mode)
-                 (setf (lookup-session-module session) module)
-                 (lookup-select-dictionaries module))
-                ((eq major-mode 'lookup-modules-mode)
-                 (setf (lookup-session-module session) module)
-                 (lookup-list-modules))
-                (t (message "Current module in this buffer is %s" 
-                            (lookup-current-module)))))
-      (setq module (lookup-nth-module arg (lookup-current-module)))
-      (setq query (lookup-session-query session))
-      (if (not (eq (lookup-query-method query) 'reference))
-          (lookup-search-query module query)
-        (error
-         "Current session handles `reference'.  Please exit session first")))
-    (princ (lookup-module-name module))))
-
-(defun lookup-backward-module (arg)
-  (interactive "p")
-  (lookup-forward-module (- arg)))
-
-(defun lookup-next-history (&optional arg)
-  (interactive "p")
-  (let ((session (lookup-history-move lookup-search-history (or arg 1))))
-    (lookup-session-display session))
-  (princ (lookup-history-position lookup-search-history)))
-
-(defun lookup-previous-history (&optional arg)
-  (interactive "p")
-  (lookup-next-history (- (or arg 1))))
 
 (defun lookup-find-pattern (pattern)
   (interactive
@@ -220,10 +151,10 @@ Type `\\[lookup]' to back to Lookup."
   "Exit Lookup and related processes."
   (interactive)
   (if (not lookup-last-session)
-      (if (interactive-p) (error "Lookup is not started"))
-    (when (or (not (interactive-p))
+      (if (called-interactively-p) (error "Lookup is not started"))
+    (when (or (not (called-interactively-p))
 	      (y-or-n-p "Are you sure to exit Lookup? "))
-      (lookup-with-message "Exitting Lookup"
+      (lookup-with-message "Exiting Lookup"
 	(if lookup-cache-file (lookup-dump-cache lookup-cache-file))
 	(lookup-suspend)
 	(mapc 'kill-buffer lookup-buffer-list)
@@ -249,17 +180,12 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-restart ()
   "Exit Lookup, initialize it again, and restart."
   (interactive)
-  (when (or (not (interactive-p))
+  (when (or (not (called-interactively-p))
 	    (yes-or-no-p "Are you sure to restart Lookup? "))
     (setq lookup-property-table nil)
+    (setq lookup-current-session nil)
+    (setq lookup-module-list nil)
     (lookup-exit)
-    (when (and (interactive-p)
-               (file-exists-p lookup-cache-file)
-               (y-or-n-p "Delete cache (Warning: module info will be lost.) ? "))
-      (delete-file lookup-cache-file)
-      (setq lookup-search-modules nil)
-      (setq lookup-agent-attributes nil)
-      (setq lookup-dictionary-attributes nil))
     (lookup)))
 
 (defun lookup-help ()
@@ -278,15 +204,13 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-filter-query (query filters)
   "Apply FILTERS functions to QUERY to generate filtered queries."
   (let ((queries (list query)) result)
-    (mapcar 
-     (lambda (filter)
-       (setq queries 
-             (apply 'append 
-                    (mapcar (lambda (query)
-                              (setq result (apply filter (list query)))
-                              (if (listp result) result (list result)))
-                            queries))))
-     filters)
+    (dolist (filter filters)
+      (setq queries 
+            (apply 'append 
+                   (mapcar (lambda (query)
+                             (setq result (apply filter (list query)))
+                             (if (listp result) result (list result)))
+                           queries))))
     queries))
 
 (defun lookup-filter-string (string filters)
@@ -308,7 +232,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-pattern (pattern &optional module)
   "Search for the PATTERN with MODULE."
   (interactive (lookup-pattern-input))
-  (lookup-search-pattern module pattern))
+  (lookup-search-pattern (or module (lookup-default-module)) pattern))
 
 ;;;###autoload
 (defun lookup-pattern-full-screen (pattern &optional module)
@@ -461,7 +385,13 @@ See `lookup-secondary' for details."
    default 'lookup-input-history default t))
 
 (defun lookup-input-module-interactively ()
-  (if current-prefix-arg (lookup-input-module) (lookup-current-module)))
+  ;; t is e.g. `-'. etc.
+  (message "current-prefix-arg=%s" current-prefix-arg)
+  (typecase  current-prefix-arg
+    (null (lookup-current-module))
+    (list (lookup-input-module))
+    (integer (nth (1+ current-prefix-arg) lookup-module-list))
+    (t (lookup-default-module))))
 
 (defun lookup-input-module ()
   (let ((table (mapcar (lambda (module) (lookup-module-name module))
@@ -496,57 +426,53 @@ candidates."
       (lookup-search-query module query))))
 
 (defun lookup-search-query (module query)
-;  (if (and lookup-last-session
-;	    (let ((last (lookup-session-query lookup-last-session)))
-;	      (and (eq (lookup-query-method query)
-;		       (lookup-query-method last))
-;		   (string= (lookup-query-string query)
-;			    (lookup-query-string last)))))
-;      (lookup-session-display  (lookup-history-ref lookup-search-history))
-    (lookup-with-message (format "Looking up `%s'" (lookup-query-pattern query))
-      (let ((lookup-dynamic-display t)
-	    found valid)
-        ; ** multiple module search is temporary off. **
-	;(do ((mod module next-module)
-	;     (next-module nil (lookup-nth-module 1 mod)))
-	;    ((or found (eq next-module module)))
-	(let ((mod module))
-	  (dolist (dict (or lookup-search-dictionaries
-			    (lookup-module-dictionaries mod)))
-	    (when (and
-		   ;; Check dictionary priority
-		   (or lookup-search-dictionaries
-		       (let ((p (lookup-module-dictionary-priority mod dict)))
-			 (cond ((eq p t) t)
-			       ((eq p 'secondary) (not found))
-			       ((eq p 'supplement) found))))
-		   ;; Check search method
-		   (let ((method (lookup-query-method query)))
-		     (or (eq method 'default)
-			 (memq method (lookup-dictionary-methods dict)))))
-	      (setq valid t)
-	      (lookup-message (concat (lookup-dictionary-title dict) "..."))
-	      (let ((entries (lookup-dictionary-search dict query)))
-		(when entries
-		  (if found
-		      (lookup-summary-append entries)
-		    (setq found t)
-		    (let ((session (lookup-new-session mod query entries)))
-		      (lookup-session-open session))))))))
-	(cond
-	 ((not valid) (error "[%s] No valid dictionary for method `%s'"
-                             (lookup-module-name module)
-			     (lookup-query-method query)))
-	 ((not found) (error "[%s] No entry for query: %s"
-                             (lookup-module-name module)
-			     (lookup-query-pattern query)))))))
+  ;;(if (and lookup-last-session
+  ;;          (let ((last (lookup-session-query lookup-last-session)))
+  ;;            (and (eq (lookup-query-method query)
+  ;;      	       (lookup-query-method last))
+  ;;      	   (string= (lookup-query-string query)
+  ;;      		    (lookup-query-string last)))))
+  ;;    (lookup-session-display  (lookup-history-ref lookup-search-history))
+  (lookup-with-message (format "Looking up `%s'" (lookup-query-pattern query))
+    (let ((lookup-dynamic-display t)
+          found valid
+          (mod module))
+      (dolist (dict (or lookup-search-dictionaries
+                        (lookup-module-dictionaries mod)))
+        (when (and
+               ;; Check dictionary priority
+               (or lookup-search-dictionaries
+                   (let ((p (lookup-module-dictionary-priority mod dict)))
+                     (cond ((eq p t) t)
+                           ((eq p 'secondary) (not found))
+                           ((eq p 'supplement) found))))
+               ;; Check search method
+               (let ((method (lookup-query-method query)))
+                 (or (eq method 'default)
+                     (memq method (lookup-dictionary-methods dict)))))
+          (setq valid t)
+          (lookup-message (concat (lookup-dictionary-title dict) "..."))
+          (let ((entries (lookup-dictionary-search dict query)))
+            (when entries
+              (if found
+                  (lookup-summary-append entries)
+                (setq found t)
+                (let ((session (lookup-new-session mod query entries)))
+                  (lookup-session-open session)))))))
+      (cond
+       ((not valid) (error "[%s] No valid dictionary for method `%s'"
+                           (lookup-module-name module)
+                           (lookup-query-method query)))
+       ((not found) (error "[%s] No entry for query: %s"
+                           (lookup-module-name module)
+                           (lookup-query-pattern query)))))))
 
 (defun lookup-display-entries (module query entries)
   (lookup-session-open (lookup-new-session module query entries)))
 
 
 ;;;
-;;; Arrange & Adjust
+;;; Arrange
 ;;;
 
 (defun lookup-arrange-content (entry)
@@ -559,11 +485,9 @@ candidates."
   (let ((funcs '(lookup-adjust-show-gaijis
 		 lookup-adjust-hide-examples
 		 lookup-adjust-check-references)))
-    (if (featurep 'xemacs)
-	(mapcar-extents 'delete-extent)
-      (let ((overlay (overlay-lists)))
-	(mapc 'delete-overlay (car overlay))
-	(mapc 'delete-overlay (cdr overlay))))
+    (let ((overlay (overlay-lists)))
+      (mapc 'delete-overlay (car overlay))
+      (mapc 'delete-overlay (cdr overlay)))
     (lookup-format-internal entry funcs nil)
     (goto-char (point-min))))
 
@@ -615,27 +539,72 @@ link-item, heading, or code may be integer or function."
     (when pattern
       (when (functionp pattern)
 	(setq pattern (funcall pattern entry)))
-      (let ((case-fold-search nil)
-	    (regexp (car pattern)) (link-item (nth 1 pattern))
-	    (heading-item (nth 2 pattern)) (code-item (nth 3 pattern)))
-	(while (re-search-forward regexp nil t)
-	  (let* ((start (match-beginning 0))
-		 (link (if (integerp link-item)
-			   (match-string link-item)
-			 (save-match-data (eval link-item))))
-		 (heading (if (integerp heading-item)
-			      (match-string heading-item)
-			    (save-match-data (eval heading-item))))
-		 (code (cond ((not code-item) heading)
-			     ((integerp code-item) (match-string code-item))
-			     (t code-item))))
-            (if (= 0 (length heading)) (setq heading "[No Title]"))
-	    (replace-match link t t)
-	    (if (stringp code)
-		(setq entry (lookup-new-entry 'regular dict code heading))
-	      (setq entry (lookup-new-entry 'dynamic dict heading))
-	      (lookup-put-property entry :dynamic code))
-	    (lookup-set-link start (point) entry)))))))
+      (let ((case-fold-search nil))
+        (destructuring-bind
+            (regexp link-item heading-item code-item) pattern
+          (while (re-search-forward regexp nil t)
+            (let* ((start (match-beginning 0))
+                   (link (if (integerp link-item)
+                             (match-string link-item)
+                           (save-match-data (eval link-item))))
+                   (heading (if (integerp heading-item)
+                                (match-string heading-item)
+                              (save-match-data (eval heading-item))))
+                   (code (typecase code-item
+                           (null    heading)
+                           (integer (match-string code-item))
+                           (t       code-item))))
+              (if (= 0 (length heading)) (setq heading "[No Title]"))
+              (replace-match link t t)
+              (if (stringp code)
+                  (if (string-match (concat "^" lookup-url-regexp "$")
+                                    code)
+                      ;; If code matches URL, then....
+                      (setq entry (lookup-new-entry 'url dict code heading))
+                    (setq entry (lookup-new-entry 'regular dict code heading)))
+                (setq entry (lookup-new-entry 'dynamic dict heading))
+                (lookup-put-property entry :dynamic code))
+              (lookup-set-link start (point) entry))))))))
+
+;(defun lookup-arrange-references (entry)
+;  "Arrange reference of ENTRY.
+;:reference-pattern should be (regexp link-item heading code).
+;link-item, heading, or code may be integer or function."
+;  (let* ((dict (lookup-entry-dictionary entry))
+;	 (pattern (lookup-dictionary-reference-pattern dict)))
+;    (when pattern
+;      (when (functionp pattern)
+;	(setq pattern (funcall pattern entry)))
+;      (let ((case-fold-search nil)
+;	    (regexp (car pattern)) (link-item (nth 1 pattern))
+;	    (heading-item (nth 2 pattern)) (code-item (nth 3 pattern)))
+;	(while (re-search-forward regexp nil t)
+;	  (let* ((start (match-beginning 0))
+;		 (link (if (integerp link-item)
+;			   (match-string link-item)
+;			 (save-match-data (eval link-item))))
+;		 (heading (if (integerp heading-item)
+;			      (match-string heading-item)
+;			    (save-match-data (eval heading-item))))
+;		 (code (cond ((null code-item) heading)
+;		 	     ((integerp code-item) (match-string code-item))
+;		 	     (t code-item))))
+;            (if (= 0 (length heading)) (setq heading "[No Title]"))
+;	    (replace-match link t t)
+;	    (if (stringp code)
+;		(setq entry (lookup-new-entry 'regular dict code heading))
+;	      (setq entry (lookup-new-entry 'dynamic dict heading))
+;	      (lookup-put-property entry :dynamic code))
+;	    (lookup-set-link start (point) entry)))))))
+
+(defun lookup-arrange-references-url (entry)
+  (goto-char (point-min))
+  (let ((dict (lookup-entry-dictionary entry)))
+    (while (re-search-forward lookup-url-regexp nil t)
+      (let ((match-string (match-string 0)))
+        (lookup-set-link (match-beginning 0) (match-end 0) 
+                         (lookup-new-entry 'url dict match-string 
+                                           match-string))))))
 
 (defun lookup-adjust-check-references (entry)
   (lookup-map-over-property
@@ -882,7 +851,7 @@ If there is no session, default module will be returned."
       (if (> (count-windows) 1)
 	  (delete-window window)
 	(switch-to-buffer (other-buffer)))))
-  (bury-buffer buffer))
+  (when (buffer-live-p buffer) (bury-buffer buffer)))
 
 (defun lookup-full-screen (buffer)
   (delete-other-windows)
@@ -906,18 +875,16 @@ If there is no session, default module will be returned."
 ;; Setup Functions
 ;;;;;;;;;;;;;;;;;;;;
 
-(put 'lookup-set-agent-options 'lisp-indent-function 1)
-;;;###autoload
 (defun lookup-set-agent-options (id &rest options)
-  (let ((plist (lookup-assoc-ref 'lookup-agent-option-alist id)))
+  (declare (indent 1))
+  (let ((plist (lookup-assoc-get lookup-agent-option-alist id)))
     (while options
       (setq plist (plist-put plist (car options) (cadr options)))
       (setq options (cddr options)))
     (lookup-assoc-set 'lookup-agent-option-alist id plist)))
 
-(put 'lookup-set-dictionary-options 'lisp-indent-function 1)
-;;;###autoload
 (defun lookup-set-dictionary-options (id &rest options)
+  (declare (indent 1))
   "Set dictionary ID's OPTIONS plist prior to dictionary initialization."
   (let ((plist (lookup-assoc-ref 'lookup-dictionary-option-alist id)))
     (while options
@@ -925,66 +892,8 @@ If there is no session, default module will be returned."
       (setq options (cddr options)))
     (lookup-assoc-set 'lookup-dictionary-option-alist id plist)))
 
-;;;###autoload
 (defun lookup-use-support (id file)
   (lookup-assoc-set 'lookup-support-alist id file))
-
-;;;
-;;; Auto-Lookup
-;;;
-
-(defvar lookup-auto-lookup-mode nil)
-(defvar lookup-auto-lookup-timer nil)
-(defvar lookup-auto-lookup-word "")
-
-(defvar lookup-auto-lookup-interval 1.00)
-(defvar lookup-auto-lookup-open-function 'lookup-other-window)
-
-(defun lookup-toggle-auto-lookup()
-  (interactive)
-  (if lookup-auto-lookup-mode 
-      (lookup-deactivate-auto-lookup)
-    (lookup-activate-auto-lookup)))
-
-(defun lookup-activate-auto-lookup ()
-  "Activate Auto Lookup."
-  (interactive)
-  (setq lookup-auto-lookup-mode nil)
-  (unless (lookup-get-module "auto")
-    (error "Please prepare `auto' module before using auto-lookup!"))
-  (setq lookup-auto-lookup-mode t)
-  (setq lookup-auto-lookup-timer
-        (run-with-idle-timer
-         lookup-auto-lookup-interval t
-         'lookup-auto-lookup)))
-
-(defun lookup-deactivate-auto-lookup ()
-  "Deactivate Auto Lookup."
-  (interactive)
-  (setq lookup-auto-lookup-mode nil)
-  (cancel-timer lookup-auto-lookup-timer))
-
-(defun lookup-auto-lookup ()
-  "Execute Auto Lookup."
-  (when (and (not isearch-mode)
-             (not executing-kbd-macro)
-             lookup-auto-lookup-mode
-             (not (window-minibuffer-p (selected-window)))
-             (not (eq (current-buffer) (get-buffer (lookup-summary-buffer))))
-             (not (eq (current-buffer) (get-buffer (lookup-content-buffer))))
-             (not (eq (current-buffer) (get-buffer " *Dictionary List*")))
-             (not (eq (current-buffer) (get-buffer " *Search History*")))
-             (not (eq (current-buffer) (get-buffer " *Module List*"))))
-    (save-selected-window
-      (save-match-data
-        (save-excursion
-          (save-restriction
-            (let ((lookup-edit-input nil)
-                  (word (lookup-current-word))
-                  (lookup-open-function lookup-auto-lookup-open-function))
-              (when (not (equal lookup-auto-lookup-word word))
-                (lookup-word word (lookup-get-module "auto"))
-                (setq lookup-auto-lookup-word word)))))))))
 
 
 ;;;
@@ -998,14 +907,16 @@ If there is no session, default module will be returned."
     (load lookup-cache-file t)) 
   (setq lookup-search-history (lookup-new-history))
   (setq lookup-agent-list
-	(mapcar (lambda (spec) (apply #'lookup-new-agent spec))
+	(mapcar (lambda (spec) (apply 'lookup-new-agent spec))
 		(or lookup-search-agents
 		    (setq lookup-search-agents '((ndtut))))))
   (setq lookup-dictionary-list
 	(apply 'append
 	       (mapcar 'lookup-agent-dictionaries lookup-agent-list)))
+  (setq lookup-search-modules
+        (mapcar 'list (mapcar 'car lookup-module-attributes)))
   (setq lookup-module-list
-	(mapcar (lambda (spec) (apply #'lookup-new-module spec))
+	(mapcar (lambda (spec) (apply 'lookup-new-module spec))
 		(or lookup-search-modules '(("default" t)))))
   (lookup-init-support-autoload)
   (run-hooks 'lookup-load-hook)
@@ -1013,17 +924,27 @@ If there is no session, default module will be returned."
 
 (defun lookup-init-support-autoload ()
   (load "support-defs")
-  (dolist (pair lookup-support-autoload-alist)
+  (dolist (pair (append lookup-support-autoload-alist 
+                        lookup-support-autoload-default-alist))
     (dolist (dict lookup-dictionary-list)
       (when (string-match (car pair) (lookup-dictionary-id dict))
 	(lookup-assoc-set 'lookup-support-alist
 			  (lookup-dictionary-id dict)
 			  (cdr pair))
         ))))
-	;;(return))))) ;; what if we stop reading after first match?
 
-(defun lookup-clear ()
-  (remove-hook 'kill-emacs-hook 'lookup-exit))
+
+;;; formatting
+
+(defun lookup-format-internal (entry functions msg)
+  (let ((n 1))
+    (dolist (func functions)
+      (when func
+	(if msg
+	    (lookup-message (concat msg (make-string (setq n (1+ n)) ?.))))
+	(widen)
+	(goto-char (point-min))
+	(funcall func entry)))))
 
 (provide 'lookup)
 

@@ -126,11 +126,11 @@ It should be set by preference file specifid by `:fmt' option."
 
 (put 'ndsrd :list #'ndsrd-list)
 (defun ndsrd-list (agent)
-  (if (and (file-exists-p (lookup-agent-location agent))
-           (executable-find ndsrd-program-name))
-      (list (lookup-new-dictionary agent ndsrd-program-name))
-    (message "ndsrd: error. data or program file missing.")
-    nil))
+  (unless (file-exists-p (lookup-agent-location agent))
+    (error "ndsrd: error. data file missing."))
+  (unless (executable-find ndsrd-program-name)
+    (error "ndsrd: error. program is missing."))
+  (list (lookup-new-dictionary agent "")))
 
 (put 'ndsrd :title ndsrd-dictionary-title)
 

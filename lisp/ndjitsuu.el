@@ -48,7 +48,7 @@
 
 (require 'lookup)
 (require 'ndsary)
-(load "support-jitsuu")
+;(load "support-jitsuu")
 
 
 
@@ -58,7 +58,7 @@
 
 (defvar ndjitsuu-tmp-directory 
   (expand-file-name (concat temporary-file-directory "/ndjitsuu"))
-  "Temporafy Directory for `ndjitsuu' files.")
+  "Temporafy Directory for NDJitsuu file.")
 
 (defvar ndjitsuu-convert-program "convert") ;; ImageMagick
 
@@ -145,7 +145,6 @@
     ( 8 . lookup-heading-3-face)
     (16 . lookup-heading-2-face)))
 
-;; TODO: support inline images.
 (defvar ndjitsuu-image-links
   '((0 . "jitsu_00001.tif")
     (1 . "jitsu_00001.tif")
@@ -202,7 +201,7 @@
              (when (and (< 0 number) (<= number ndjitsuu-oyaji-number))
                (list (lookup-new-entry 'regular dictionary string
                                        (ndjitsuu-oyaji number))))))
-          ((string-match "^[㐀-龻𠀀-𯿽]$" string) ;; １漢字検索
+          ((string-match "^\\cC$" string) ;; １漢字検索
            (let ((file-word (list (cons ndjitsuu-oyaji-index-file 
                                         (concat "《" string "》")))))
              (if (or (equal method 'suffix) (equal method 'substring))
@@ -210,7 +209,7 @@
                                                     (concat string "】")))
                                         file-word)))
              (ndjitsuu-search-files file-word)))
-          ((string-match "^[㐀-龻𠀀-𯿽][㐀-龻𠀀-𯿽]$" string) ;; ２漢字検索
+          ((string-match "^\\cC\\cC$" string) ;; ２漢字検索
            (let ((file-word (list (cons ndjitsuu-jukugo-index-file
                                         (concat "【" string "】")))))
              (ndjitsuu-search-files file-word)))
@@ -301,7 +300,7 @@
 (put 'ndjitsuu :reference-pattern
      '("<REF,\\([0-9]+\\)>\\(.+?\\)</REF>" 2 2 1))
 
-(put 'ndjitsuu :charsets (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\|[あ-ん]+\\)$" x)))
+(put 'ndjitsuu :charsets (lambda (x) (string-match "^\\(\\cC+\\|[ァ-ヺ]+\\|[あ-ん]+\\)$" x)))
 
 ;;;
 ;;; Main Program

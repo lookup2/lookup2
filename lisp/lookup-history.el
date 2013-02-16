@@ -22,8 +22,6 @@
 
 ;;; Code:
 
-(require 'lookup)
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Lookup History Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -31,6 +29,16 @@
 ;;;
 ;;; Construct Buffer
 ;;;
+
+(defun lookup-next-history (&optional arg)
+  (interactive "p")
+  (let ((session (lookup-history-move lookup-search-history (or arg 1))))
+    (lookup-session-display session))
+  (princ (lookup-history-position lookup-search-history)))
+
+(defun lookup-previous-history (&optional arg)
+  (interactive "p")
+  (lookup-next-history (- (or arg 1))))
 
 ;;;###autoload
 (defun lookup-history-display (module)
@@ -42,9 +50,9 @@
 	   (num 1) session type)
       (erase-buffer)
       (insert "Tyep `v' to visit session, `q' to leave, `?' for help.\n\n")
-      (while list
+      (dolist (item list)
 	(insert (format "%3d: " num))
-	(setq num (1+ num) session (car list)
+	(setq num (1+ num) session item
 	      type nil);(lookup-session-type session))
 	(cond
 	 (t ;(eq type 'lookup-search-query)
@@ -58,8 +66,7 @@
 	      (setq separator "/" entries (cdr entries)))))
 	 ((eq type 'lookup-select-session)
 	  (insert "Select Session")))
-	(insert "\n")
-	(setq list (cdr list)))
+	(insert "\n"))
       (goto-char (point-min))
       (forward-line (1+ (lookup-history-position lookup-search-history))))
     (set-buffer-modified-p nil)

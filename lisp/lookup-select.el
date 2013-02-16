@@ -23,8 +23,6 @@
 
 ;;; Code:
 
-(require 'lookup)
-
 (defconst lookup-select-priority-marks
   '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 
@@ -78,13 +76,16 @@
 
 `m' - select   `u' - unselect   `$' - secondary   `+' - supplement
 
-`a'(dd)    - add a dictionary   `C-k'    - remove this dictionary
-`C'(reate) - create a module    `C-y'    - yank a removed dictionary
+`a'(dd)    - add a dictionary     `C-k'    - remove this dictionary
+`A'(dd)    - add all dictionaries `C-y'    - yank a removed dictionary
+`c'(reate) - create a module
 
-`f'(ind)   - search pattern     `F'(ind) - search this dictionary
-(`i'(nfo)   - dictionary info)  `M'(enu) - show dictionary menu
+`f'(ind)   - search pattern       `F'(ind)    - search this dictionary
+`i'(nfo)   - dictionary info      `M'(enu)    - show dictionary menu
+`r'(eload) - reload settings.     `A'(dd all) - add all missing dictionaries
 
 `r' - return  `q' - leave  `g' - reset  `Q' - quit  `R' - restart
+`^' - modules
 
 Search Methods:
 
@@ -110,20 +111,24 @@ Search Methods:
   (define-key lookup-select-mode-map "+" 'lookup-select-dictionary-supplement)
 
   ;; dictionary information
-  ;(define-key lookup-select-mode-map "i" 'lookup-select-dictionary-info)
+  (define-key lookup-select-mode-map "i" 'lookup-select-dictionary-info)
   (define-key lookup-select-mode-map "M" 'lookup-select-dictionary-menu)
   (define-key lookup-select-mode-map "F" 'lookup-select-dictionary-search)
   ;; dictionary management
   (define-key lookup-select-mode-map "a" 'lookup-select-add-dictionary)
+  (define-key lookup-select-mode-map "A" 'lookup-select-add-all-dictionaries)
   (define-key lookup-select-mode-map "\ey" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-k" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-y" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map "\C-x\C-t" 'lookup-select-wrap-command)
   (define-key lookup-select-mode-map [?\C-/] 'lookup-select-wrap-command)
-  ;; general commands
+  ;; modules
+  (define-key lookup-select-mode-map "c" 'lookup-modules-create-module)
   (define-key lookup-select-mode-map "^" 'lookup-list-modules)
+  ;; general commands
   (define-key lookup-select-mode-map "g" 'lookup-select-update)
   (define-key lookup-select-mode-map "q" 'lookup-leave)
+  (define-key lookup-select-mode-map "r" 'lookup-select-reload-settings)
   )
 
 (defvar lookup-select-mode-hook nil
@@ -209,10 +214,43 @@ have found some entries, which means this dictionary cannot appear alone."
       (lookup-select-set-mark
        (lookup-assq-get lookup-select-priority-marks value)))))
 
-;(defun lookup-select-dictionary-info ()
-;  (interactive)
-;  (lookup-display-menu (lookup-current-module)
-;		       (lookup-select-this-dictionary)))
+(defun lookup-select-dictionary-info ()
+  (interactive)
+  (cl-flet ((plist-to-string-pair 
+             (plist)
+             (mapcar (lambda (item)
+                       (list (format "%s" (car item)) 
+                             (replace-regexp-in-string 
+                              "\n" "\\\\n"
+                              (format "%S" (cdr item)))))
+                     (lookup-plist-to-alist plist))))
+    (let* ((dictionary (lookup-select-this-dictionary))
+           (dictionary-options (lookup-dictionary-options dictionary))
+           (agent (lookup-dictionary-agent dictionary))
+           (agent-options (lookup-agent-options agent))
+           (priority (lookup-module-dictionary-priority 
+                      (lookup-current-module) dictionary)))
+      (with-current-buffer (lookup-get-buffer "*Dictionary Information*")
+        (let ((inhibit-read-only t))
+          (help-mode)
+          (erase-buffer)
+          (insert "Dictionary Options Information\n\n")
+          (insert " - Dictionary ID: " (lookup-dictionary-id dictionary) "\n")
+          (insert " - Agent ID:      " (lookup-agent-id agent) "\n\n")
+          (lookup-table-insert
+           " %-15t %-18s\n"
+           (append
+            '(("Dictionary Options" "")
+              ("Option Name       " "Value")
+              ("------------------" "-----"))
+            (plist-to-string-pair dictionary-options)
+            '(("" "")
+              ("Agent Options     " "")
+              ("Option Name       " "Value")
+              ("------------------" "-----"))
+            (plist-to-string-pair agent-options))))
+        (goto-char (point-min))
+        (lookup-display-buffer (current-buffer))))))
 
 (defun lookup-select-dictionary-menu (args)
   "Display selected dictionary menu.
@@ -222,10 +260,9 @@ With prefix ARGS, display menus of all dictionaries in current module ."
 	 (dicts (if args (lookup-module-dictionaries module)
                   (list (lookup-select-this-dictionary))))
 	 entries)
-    (while dicts
-      (if (memq 'menu (lookup-dictionary-methods (car dicts)))
-	  (setq entries (append (lookup-dictionary-menu (car dicts)) entries)))
-      (setq dicts (cdr dicts)))
+    (dolist (dict dicts)
+      (if (memq 'menu (lookup-dictionary-methods dict))
+	  (setq entries (append (lookup-dictionary-menu dict) entries))))
     (if entries
 	(let ((query (lookup-new-query 'reference "Menu")))
 	  (lookup-display-entries module query (nreverse entries)))
@@ -271,7 +308,7 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
           (set-difference lookup-dictionary-list dicts)))
     (if diffs
         (setf (lookup-module-dictionaries module)
-              (nconc dicts diffs))))
+              (nconc dicts (nreverse diffs)))))
   (lookup-select-update-buffer))
 
 (defun lookup-select-wrap-command (arg)
@@ -302,6 +339,12 @@ will be used instead of the usual `kill-ring'."
     ;;   (lookup-dictionary-setplist dict nil))
     (lookup-select-update-buffer)
     (message (concat message "done"))))
+
+(defun lookup-select-reload-settings ()
+  (interactive)
+  (let ((dict (lookup-select-this-dictionary)))
+    (lookup-init-support-autoload)
+    (lookup-dictionary-initialize dict)))
 
 ;;;
 ;;; Internal functions

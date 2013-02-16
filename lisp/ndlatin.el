@@ -39,27 +39,21 @@
 ;; Simply put the `ndlatin' entry in your ~/.lookup/init.el file.
 ;; Location must be specified, of your installed `words' program.
 ;;
-;;  Example: (for Macintosh)
+;;   ;; for Linux/Windows
+;;   (setq ndlatin-word-program "~/bin/words/words.exe")
+;;   ;; for Macintosh
+;;   (setq ndlatin-word-program "/Applications/Interpres.app/Contents/Resources/words")
 ;;   (setq lookup-search-agents
 ;;         '(
 ;;           ....
-;;           (ndlatin "/Library/Application Support/words/words")
+;;           (ndlatin)
 ;;           ....
 ;;           ))
-;;
-;;  Example: (for Windows & NTEmacs)
-;;   (setq lookup-search-agents
-;;         '(
-;;           ....
-;;           (ndlatin "~/bin/words/words.exe")
-;;           ....
-;;           ))
-
 
 ;;; Code:
 
 (require 'lookup)
-(defconst ndlatin-version "0.1")
+(defconst ndlatin-version "0.2")
 
 
 ;;;
@@ -70,6 +64,13 @@
   "Lookup ndlatin interface."
   :group 'lookup-agents)
 
+(defcustom ndlatin-program
+  "/Applications/Interpres.app/Contents/Resources/words"
+  "Location of Latin WORDS program"
+  :type 'string
+  :group 'ndlatin)
+;; /Library/Application Support/words/words
+
 (defcustom ndlatin-splitter 
   (if (eq system-type 'windows-nt) ";$" "")
   "Splitting regexp for output results.
@@ -79,12 +80,13 @@ fails)."
   :type 'string
   :group 'ndlatin)
 
-(defcustom ndlatin-dic-change-char "~"
+(defcustom ndlatin-dic-change-char "-"
   "Dictionary Change Command character.
-For Macintosh version (ver 1.93), it should be '>', while for
+For Macintosh version (included in Interpres), it should be '-', while for
 Windows/Linux version (ver 1.97), it should be '~'"
   :type 'string
   :group 'ndlatin)
+
 
 ;;;
 ;:: Interface
@@ -102,7 +104,6 @@ Windows/Linux version (ver 1.97), it should be '~'"
 ;;; Internal variables
 ;;;
 
-(defvar ndlatin-program nil)
 (defvar ndlatin-prompt "=>")
 (defvar ndlatin-process nil)
 (defconst ndlatin-dictionary-table
@@ -114,7 +115,7 @@ Windows/Linux version (ver 1.97), it should be '~'"
 ;;;
 
 (defun ndlatin-list (agent)
-  (ndlatin-process-open agent)
+  (ndlatin-process-open)
   (mapcar (lambda (e) (lookup-new-dictionary agent (car e)))
           ndlatin-dictionary-table))
 
@@ -123,13 +124,13 @@ Windows/Linux version (ver 1.97), it should be '~'"
       (lookup-process-kill ndlatin-process)))
 
 (defun ndlatin-dictionary-title (dictionary)
-  (ndlatin-process-open (lookup-dictionary-agent dictionary))
+  (ndlatin-process-open)
   (cadr (assoc (lookup-dictionary-name dictionary)
                ndlatin-dictionary-table)))
 
 (defun ndlatin-dictionary-search (dictionary query)
   "Search Lat-Eng or Eng-Lat DICTIONARY for QUERY."
-  (ndlatin-process-open (lookup-dictionary-agent dictionary))
+  (ndlatin-process-open)
   (let ((dictname (lookup-dictionary-name dictionary))
         (method   (lookup-query-method query))
         (string   (lookup-query-string query))
@@ -165,17 +166,16 @@ Windows/Linux version (ver 1.97), it should be '~'"
 ;;; utility functions
 ;;;
 
-(defun ndlatin-process-open (agent)
-  "Open Latin Words process with name specified by AGENT.
-It must be started with command directory."
-  (setq ndlatin-program (lookup-agent-location agent))
-  (unless ndlatin-program
-      (error "ndlatin-program location not specified!"))
+(defun ndlatin-process-open ()
+  "Open Latin Words process."
+  (unless (file-executable-p ndlatin-program)
+    (error "`ndlatin-program' (%s) is not properly specified!" ndlatin-program))
   (unless (and (processp ndlatin-process)
                (eq (process-status ndlatin-process) 'run))
     (let ((buffer (or (lookup-open-process-buffer " *ndlatin*")
                       (lookup-temp-buffer))))
       (with-current-buffer buffer
+        ;; specify default working directory by `default-directory'
         (let ((default-directory
                 (directory-file-name ndlatin-program)))
           (setq ndlatin-process

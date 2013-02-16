@@ -1,6 +1,6 @@
 ;;; lookup-types.el --- internal data types
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
-;; Copyright (C) 2009 Lookup Development Team
+;; Copyright (C) 2009,2010 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
 ;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
@@ -22,16 +22,16 @@
 ;; along with Lookup; if not, write to the Free Software Foundation,
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-;;; Code:
+;;;; Commentary:
 
-(require 'lookup-text)
-(require 'lookup-utils)
+;; Defines lookup basic data types and structures.
+
+;;;; Code:
+
+(require 'cl)
 (require 'lookup-vars)
-(require 'stem-english)
 
-;;;;;;;;;;;;;;;;;;;;
-;; Search Method
-;;;;;;;;;;;;;;;;;;;;
+;;; Search Method
 
 (defconst lookup-search-methods
   '(exact prefix suffix substring wildcard regexp keyword text))
@@ -50,9 +50,8 @@
   '(replace gaiji))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Search Query
-;;;;;;;;;;;;;;;;;;;;
+
+;;; Search Query
 
 (defstruct lookup-query method string pattern)
 
@@ -136,42 +135,39 @@
 	  (t (error "Invalid search method for wildcard: %s" method)))))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Search Module
-;;;;;;;;;;;;;;;;;;;;
+;;; Search Module
 
 (defstruct lookup-module name dictionaries bookmarks priority-alist)
 
 (defun lookup-new-module (name &rest dict-specs)
   "Create new Lookup Module from module NAME and DICT-SPECS.
-If DICT-SPECS is t, then new module will be created.
-When new dictionaries not specified by DICT-SPECS are found, they
-will be attached to the module 'default'."
+If DICT-SPECS is nil, then it will be restored from cache.
+If first element of DICT-SPECS is t, then new module will be
+created.  
+Each DICT-SPEC consists of (dict-id :option val ....)."
   (let ((module (make-lookup-module :name name))
         (dict-list (mapcar #'lookup-dictionary-id lookup-dictionary-list))
         dict-id dict dicts prio)
-    (if (eq (car dict-specs) t)
-	(setq dict-specs
-              (mapcar (lambda (x) (list (lookup-dictionary-id x)))
-                      lookup-dictionary-list)))
-    (dolist (dict-spec dict-specs)
-      (setq dict-id   (car dict-spec)
-            dict-spec (cdr dict-spec))
-      (setq dict (lookup-get-dictionary dict-id))
-      (when dict
-        (setq dict-list (remove dict-id dict-list))
-        (setq prio (if (memq :priority dict-spec)
-                       (plist-get dict-spec :priority)
-                     (or (lookup-dictionary-ref dict :priority) t)))
-        (lookup-module-dictionary-set-priority module dict prio)
-        (setq dicts (append dicts (list dict)))))
-    (if (eq name "default")
-        (dolist (dict-id dict-list)
-          (setq dict (lookup-get-dictionary dict-id))
-          (lookup-module-dictionary-set-priority module dict t)
+    (if (null dict-specs) 
+        (if lookup-cache-file
+            (lookup-restore-module-attributes module))
+      ;; if dict-specs is not null...
+      (if (eq (car dict-specs) t)
+          (setq dict-specs
+                (mapcar (lambda (x) (list (lookup-dictionary-id x)))
+                        lookup-dictionary-list)))
+      (dolist (dict-spec dict-specs)
+        (setq dict-id   (car dict-spec)
+              dict-spec (cdr dict-spec)) ; <- plist
+        (setq dict (lookup-get-dictionary dict-id))
+        (when dict
+          (setq dict-list (remove dict-id dict-list))
+          (setq prio (if (memq :priority dict-spec)
+                         (plist-get dict-spec :priority)
+                       (or (lookup-dictionary-ref dict :priority) t)))
+          (lookup-module-dictionary-set-priority module dict prio)
           (setq dicts (append dicts (list dict)))))
-    (setf (lookup-module-dictionaries module) dicts)
-    (if lookup-cache-file (lookup-restore-module-attributes module))
+      (setf (lookup-module-dictionaries module) dicts))
     module))
 
 (defun lookup-module-add-bookmark (module entry)
@@ -192,9 +188,7 @@ will be attached to the module 'default'."
     (setf (lookup-module-priority-alist module) alist)))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Search Agent
-;;;;;;;;;;;;;;;;;;;;
+;;; Search Agent
 
 (defstruct lookup-agent class location options id)
 
@@ -205,7 +199,6 @@ will be attached to the module 'default'."
 	 (opts (lookup-assoc-get lookup-agent-option-alist
 				 (lookup-agent-id agent))))
     (while options
-      ; (setq opts (plist-put opts (caar options) (cadar options)))
       (if (< (length options) 2)
           (error "Agent option %s is incorrect!" options))
       (setq opts (plist-put opts (car options) (cadr options)))
@@ -233,7 +226,7 @@ will be attached to the module 'default'."
     (if (functionp func) (apply func agent args) func)))
 
 (defun lookup-agent-dictionaries (agent)
-  (or (lookup-get-property agent 'dictionaries)
+  (or (lookup-get-property agent 'dictionaries) ;; cache
       (let ((id (lookup-agent-id agent)) dicts)
 	(message "Setting up %s..." id)
 	(setq dicts (lookup-agent-command agent :list))
@@ -246,9 +239,7 @@ will be attached to the module 'default'."
   (lookup-agent-command agent :kill))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Dictionary
-;;;;;;;;;;;;;;;;;;;;
+;;; Dictionary
 
 (defstruct lookup-dictionary agent name options id)
 
@@ -287,8 +278,8 @@ will be attached to the module 'default'."
 
 ;; options
 
-(put 'lookup-dictionary-get lisp-indent-function 2)
 (defun lookup-dictionary-get (dictionary key default)
+  (declare (indent 2))
   (or (lookup-get-property dictionary key)
       ;; Initialize
       (unless (lookup-get-property dictionary 'initialized)
@@ -360,13 +351,15 @@ will be attached to the module 'default'."
        dictionary lookup-heading-arrange-order))))
 
 (defun lookup-dictionary-arranges (dictionary arrange-order)
-  (let* ((dict-arranges       
+  ;; :arranges - additionaly do arrangements.
+  ;; :arrange-table - override upper-level arrangements.
+  (let* ((dict-arranges
           (lookup-dictionary-option dictionary :arranges))
-         (dict-arrange-table  
+         (dict-arrange-table
           (lookup-dictionary-option dictionary :arrange-table))
          (agent-arranges
           (lookup-dictionary-ref dictionary :arranges))
-         (agent-arrange-table 
+         (agent-arrange-table
           (lookup-dictionary-ref dictionary :arrange-table))
          funcs)
     (dolist (kind arrange-order)
@@ -482,9 +475,7 @@ will be attached to the module 'default'."
     (lookup-put-property dictionary 'entry-cache cache)))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Entry
-;;;;;;;;;;;;;;;;;;;;
+;;; Entry
 
 (defstruct lookup-entry type dictionary code bookmark id)
 
@@ -500,6 +491,7 @@ will be attached to the module 'default'."
     (let ((id (apply #'concat (lookup-dictionary-id dictionary)
 		     (cond ((eq type 'regular) (list "#" code))
 			   ((eq type 'dynamic) (list "?" code))
+			   ((eq type 'url)     (list "&" code))
 			   (t (list "->" (lookup-entry-code code)))))))
       (setq entry (make-lookup-entry :type type :dictionary dictionary
 				     :code code :id id)))
@@ -516,6 +508,7 @@ will be attached to the module 'default'."
       entry)))
 
 (defun lookup-new-slink (entry)
+  "Create new symbolic link entry whose head is current entry."
   (setq entry (lookup-entry-substance entry))
   (lookup-new-entry 'slink (lookup-entry-dictionary entry)
 		    entry (lookup-entry-heading entry)))
@@ -580,9 +573,7 @@ will be attached to the module 'default'."
   (lookup-entry-command entry :open))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Session
-;;;;;;;;;;;;;;;;;;;;
+;;; Session
 
 (defstruct lookup-session module query entries dictionaries excursion)
 
@@ -606,9 +597,7 @@ will be attached to the module 'default'."
   (lookup-history-push lookup-search-history session))
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; History
-;;;;;;;;;;;;;;;;;;;;
+;;; History
 
 (defstruct lookup-history stack position)
 
@@ -649,9 +638,7 @@ will be attached to the module 'default'."
 
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Image
-;;;;;;;;;;;;;;;;;;;;
+;;; Image
 
 (defun lookup-inline-image-p (type)
   "Returns non-nil if the image of type TYPE will be displayed under
@@ -707,9 +694,7 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
 
 
 
-;;;;;;;;;;;;;;;;;;;;
-;; Gaiji
-;;;;;;;;;;;;;;;;;;;;
+;;; Gaiji
 
 (defstruct lookup-gaiji glyph alter)
 
@@ -776,12 +761,6 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
       (lookup-gaiji-table-set table (caar spec) (cdar spec))
       (setq spec (cdr spec)))
     table))
-
-;;;;;;;;;;;;;;;;;;;;
-;; Media
-;;;;;;;;;;;;;;;;;;;;
-
-(defstruct lookup-media type object disposition)
 
 (provide 'lookup-types)
 

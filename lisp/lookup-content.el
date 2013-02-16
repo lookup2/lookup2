@@ -23,8 +23,6 @@
 
 ;;; Code:
 
-(require 'lookup)
-
 (defconst lookup-content-mode-help
   "Lookup Content Mode:
 
@@ -55,8 +53,7 @@
   (define-key lookup-content-mode-map "h" 'lookup-content-entry-window)
   (define-key lookup-content-mode-map "g" 'lookup-content-update)
   (define-key lookup-content-mode-map "q" 'lookup-content-leave)
-  (define-key lookup-content-mode-map
-    (if (featurep 'xemacs) 'button2 [mouse-2]) 'lookup-content-mouse-follow)
+  (define-key lookup-content-mode-map [mouse-2] 'lookup-content-mouse-follow)
   )
 
 (defvar lookup-content-mode-hook nil)
@@ -89,31 +86,34 @@
 ;;;
 
 (defun lookup-content-next-link ()
-  "次のリンクに移動する。"
+  "現在または直近のリンクに移動する。"
   (interactive)
-  (if (lookup-goto-next-link)
-      (message (lookup-entry-id (lookup-get-link (point))))
-    (if (lookup-get-link (point))
-	(error "No more link in this buffer")
-      (goto-char (point-min))
+  (or (lookup-get-link (point))
       (if (lookup-goto-next-link)
-	  (message (lookup-entry-id (lookup-get-link (point))))
-	(error "No link in this buffer")))))
+          (message (lookup-entry-id (lookup-get-link (point))))
+        (if (lookup-get-link (point))
+            (error "No more link in this buffer")
+          (goto-char (point-min))
+          (if (lookup-goto-next-link)
+              (message (lookup-entry-id (lookup-get-link (point))))
+            (error "No link in this buffer"))))))
 
 (defun lookup-content-follow-link ()
   "ポイント位置のリンクを参照する。"
   (interactive)
   (let ((entry (lookup-get-link (point))))
-    (if entry
-	(let ((entries (lookup-entry-substance entry)))
-	  (if (setq entries (if entries
-				(list entries)
-			      (lookup-entry-references entry)))
-	      (let* ((heading (lookup-entry-heading lookup-content-entry))
-		     (query (lookup-new-query 'reference heading)))
-		(lookup-display-entries (lookup-current-module) query entries))
-	    (error "This link is torn off")))
-      (error "No link here"))))
+    (if (and entry (equal 'url (lookup-entry-type entry)))
+        (browse-url (lookup-entry-code entry))
+      (if entry
+          (let ((entries (lookup-entry-substance entry)))
+            (if (setq entries (if entries
+                                  (list entries)
+                                (lookup-entry-references entry)))
+                (let* ((heading (lookup-entry-heading lookup-content-entry))
+                       (query (lookup-new-query 'reference heading)))
+                  (lookup-display-entries (lookup-current-module) query entries))
+              (error "This link is torn off")))
+        (error "No link here")))))
 
 (defun lookup-content-mouse-follow (event)
   "マウスでクリックしたリンクを参照する。"
@@ -181,29 +181,6 @@
   (interactive)
   (lookup-hide-buffer (current-buffer))
   (lookup-summary-display-content))
-
-;;;
-;;; URL Link
-;;;
-
-(defvar lookup-url-link-map (copy-keymap lookup-content-mode-map))
-(define-key lookup-url-link-map "\C-m" 'lookup-url-follow-link)
-
-(defun lookup-url-set-link (start end uri &optional object)
-  (add-text-properties 
-   start end
-   (list 'keymap lookup-url-link-map
-         'face 'lookup-reference-face
-         'mouse-face 'highlight
-         'help-echo uri
-         'lookup-tab-stop t
-         'lookup-url-link uri)
-   object))
-
-(defun lookup-url-follow-link ()
-  (interactive)
-  (let ((url (get-text-property (point) 'lookup-url-link)))
-    (browse-url url)))
 
 ;;;
 ;;; Useful functions

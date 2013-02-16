@@ -211,30 +211,6 @@
 
 <h2>Text/XML Based Dictionaries</h2>
 
-<h3>Wikipedia Abstract</h3>
-
-<ul>
-  <li><a href="http://sary.sourceforge.net/">sary</a>...Suffix Array Tool.
-  <li><a href="http://download.wikipedia.org/jawiki/latest/">Wikipedia Abstract (Japanese)</a>
-</ul>
-
-<p>
-  By using suffix array tool, look-up of single huge text file is fast
-  and simple.  `ndsary' provides an easy interface for sary (suffix
-  array tool).  Following examples shows searching of various
-  languages of Wikipedia.  Currently, Japanese, English, French, and
-  Chinese Wikipedia is supported by support-file.
-</p>
-
-<img src="wikipedia.png">
-<br/>
-<img src="wikipedia-fr.png">
-<br/>
-<img src="wikipedia-zh.png">
-
-<br/>
-<hr/>
-
 <h3>Zigen</h3>
 
 <ul>
@@ -334,20 +310,12 @@
 
 <h3> RangJung YeShe Tibetan-English Dictionary </h3>
 
-<p>Lookup supports searching "RangJung-YeShe" Tibetan Dictionary.
+<p>Lookup supports searching "RangJung-YeShe" Tibetan Dictionary.</p>
 
 <img src="rangjung.png">
 
 <br/>
 <hr/>
-
-<h3> 青空文庫 </h3>
-
-<p>Lookup supports searching 「青空文庫」 files by search-engine agent
-(HyperEstraier, SpotLight or Windows Search) and display them in
-pre-formatted text with ruby.</p>
-
-<p>note: This capability is still under development</p>
 
 <img src="aozora.png">
 

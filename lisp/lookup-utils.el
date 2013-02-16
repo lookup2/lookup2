@@ -1,4 +1,4 @@
-;;; lookup-utils.el --- Lookup various utilities
+;;; lookup-utils.el --- Lookup various utilities -*- coding: utf-8 -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -86,15 +86,16 @@
 					   (cdr args)))
     (lookup-assq-put alist (car args) (cadr args))))
 
-;; misc
+;; plist to alist 
 
-(defun lookup-grep (predicate list)
-  (let ((value nil))
-    (while list
-      (if (funcall predicate (car list))
-	  (setq value (cons (car list) value)))
-      (setq list (cdr list)))
-    (nreverse value)))
+(defun lookup-plist-to-alist (plist)
+  (let (alist)
+    (while plist
+      (push (cons (car plist) (cadr plist)) alist)
+      (setq plist (cddr plist)))
+    (nreverse alist)))
+
+;; misc
 
 (defun lookup-map-over-property (from to prop func &optional object)
   (let ((start from) end value)
@@ -110,9 +111,6 @@
 	((bobp) line)
       (forward-line -1))))
 
-(defun lookup-reverse-string (string)
-  (concat (nreverse (string-to-list string))))
-
 (defun lookup-oneline-string (string)
   (while (string-match "\n *" string)
     (setq string (replace-match " " t t string)))
@@ -124,14 +122,14 @@
 		 (concat prompt ": "))
 	       init history default inherit))
 
-(put 'lookup-with-coding-system 'lisp-indent-function 1)
 (defmacro lookup-with-coding-system (coding &rest body)
+  (declare (indent 1))
   `(let ((coding-system-for-read ,coding)
 	 (coding-system-for-write ,coding))
      ,@body))
 
-(put 'lookup-with-buffer-and-window 'lisp-indent-function 1)
 (defmacro lookup-with-buffer-and-window (buffer &rest body)
+  (declare (indent 1))
   `(let ((buffer ,buffer))
      (with-current-buffer buffer
        (save-selected-window

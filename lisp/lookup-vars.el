@@ -38,7 +38,7 @@
   "Setup variables."
   :group 'lookup)
 
-(defcustom lookup-init-directory (expand-file-name "~/.lookup")
+(defcustom lookup-init-directory (concat user-emacs-directory "/lookup")
   "*Lookup initialization directory."
   :type 'file
   :group 'lookup-setup-variables)
@@ -254,7 +254,10 @@ KEY 及び VALUE は省略可能で、エージェントに対するオプショ
   :group 'lookup)
 
 (defcustom lookup-cache-file
-  (expand-file-name "cache.el" lookup-init-directory)
+  (expand-file-name 
+   (concat "cache-" 
+           (replace-regexp-in-string "\\..+" "" system-name)
+           ".el") lookup-init-directory)
   "*Lookup disk cache file."
   :type 'file
   :group 'lookup-cache)
@@ -385,8 +388,47 @@ This hook will run just after loading `lookup-init-file' and
 (defvar lookup-search-dictionaries nil)
 (defvar lookup-window-configuration nil)
 
+(defvar lookup-support-autoload-default-alist nil)
+
 (defvar lookup-query-filters nil
   "Functions to be applied before a QUERY is queried.")
+
+(defvar lookup-url-regexp
+  "\\(https?://\\|file://\\|javascript:\\)[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+"
+  "Regular expression to search within contents.")
+
+
+;;;
+;;; Caching Variables
+;;;
+;(defvar lookup-cache-variables '(lookup-modules lookup-agents
+;                                 lookup-agent-attributes
+;                                 lookup-module-attributes
+;                                 lookup-dictionary-attributes
+;                                 lookup-entry-attributes
+;                                 lookup-bookmarks))
+
+;;;
+;;; Global commands
+;;;
+
+(defvar lookup-global-map nil)
+
+(unless lookup-global-map
+  (setq lookup-global-map (make-sparse-keymap))
+  (define-key lookup-global-map "\C-\M-n" 'lookup-next-history)
+  (define-key lookup-global-map "\C-\M-p" 'lookup-previous-history)
+  (define-key lookup-global-map "\C-\M-f" 'lookup-forward-module)
+  (define-key lookup-global-map "\C-\M-b" 'lookup-backward-module)
+  (define-key lookup-global-map "B" 'lookup-list-bookmarks)
+  (define-key lookup-global-map "H" 'lookup-list-history)
+  (define-key lookup-global-map "f" 'lookup-find-pattern)
+  (define-key lookup-global-map "o" 'lookup-open-window)
+  (define-key lookup-global-map "r" 'lookup-return)
+  (define-key lookup-global-map "q" 'lookup-suspend)
+  (define-key lookup-global-map "Q" 'lookup-exit)
+  (define-key lookup-global-map "R" 'lookup-restart)
+  (define-key lookup-global-map "?" 'lookup-help))
 
 (provide 'lookup-vars)
 

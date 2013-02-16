@@ -37,7 +37,7 @@
 ;; (setq looukp-search-agents
 ;;       '(
 ;;         .....
-;;         (nddsl "~/edicts/hydcd")  ; directory where `*.dsl.ary' file exists.
+;;         (nddsl "~/edicts/hydcd")  ; directory where `*.utf8.dsl.ary' file exists.
 ;;         ...))
 
 ;;; Code:
@@ -59,11 +59,12 @@
 ;;;
 
 (defvar nddsl-entry-tags '("\n" . "\n"))
+(defvar nddsl-content-tags '("\n\n" . "\n\n"))
 (defvar nddsl-content-start "\n\n")
 (defvar nddsl-content-end   "\n\n")
 (defvar nddsl-entry-content-end "[")
-(defun nddsl-content-tags (x)
-  (if (consp x) '("\n\n" . "[") '("\n\n" . "\n\n")))
+;;(defun nddsl-content-tags (x)
+;;  (if (consp x) '("\n\n" . "[") '("\n\n" . "\n\n")))
 
 ;;;
 ;;; Interface functions
@@ -76,13 +77,12 @@
 (put 'nddsl :list 'nddsl-list)
 (defun nddsl-list (agent)
   "Return list of dictionaries of AGENT."
-  (when (executable-find ndsary-sary-program)
-    (let* ((files (directory-files 
-                   (expand-file-name (lookup-agent-location agent))
-                   nil "\\.dsl\\.ary\\'")))
-      (mapcar (lambda (name) 
-                (lookup-new-dictionary agent (file-name-sans-extension name)))
-              files))))
+  (let* ((location (lookup-agent-location agent))
+         (files (directory-files location nil "\\.utf8\\.dsl\\.ary\\'")))
+    (if (null files) (error "nddsl: DSL file wity sary index not found! (%s)" location))
+    (mapcar (lambda (name) 
+              (lookup-new-dictionary agent (file-name-sans-extension name)))
+            files)))
 
 (put 'nddsl :title 'nddsl-title)
 (defun nddsl-title (dictionary)
@@ -92,46 +92,44 @@
                 (lookup-agent-location 
                  (lookup-dictionary-agent dictionary))))
          (result
-          (lookup-with-coding-system 'utf-8
-            (ndsary-file-content file "#NAME"))))
+          (car (lookup-with-coding-system 'utf-8
+                 (ndtext-process 'ndsary 'search file "#NAME\t" 'text)))))
     (if (and result 
-             (string-match "\"\\(.+\\)\"" result))
-        (match-string 1 result)
+             (string-match "\"\\(.+\\)\"" (elt result 2)))
+        (match-string 1 (elt result 2))
       name)))
 
 (put 'nddsl :search 'nddsl-dictionary-search)
 (defun nddsl-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((string      (lookup-query-string query))
-        (method      (lookup-query-method query))
-        (file        (expand-file-name
-                      (lookup-dictionary-name dictionary)
-                      (lookup-agent-location
-                       (lookup-dictionary-agent dictionary))))
+  (let ((string  (lookup-query-string query))
+        (method  (lookup-query-method query))
+        (dict-id (lookup-dictionary-id dictionary))
+        (file    (expand-file-name
+                  (lookup-dictionary-name dictionary)
+                  (lookup-agent-location
+                   (lookup-dictionary-agent dictionary))))
         entries)
-    (setq entries
-          (lookup-with-coding-system 'utf-8
-            (ndsary-file-search
-             file string method nddsl-entry-tags
-             'nddsl-content-tags nddsl-entry-tags)))
-    (mapcar
-     (lambda (x) (lookup-new-entry
-                  'regular dictionary (car x) (cdr x)))
-     entries)))
+    (loop for (code head val) in 
+          (ndtext-process 'ndsary 'search file string method
+                          nddsl-content-tags nddsl-entry-tags)
+          for entry = (lookup-new-entry 'regular dictionary code head)
+          do (puthash (cons dict-id code) val ndtext-cache)
+          collect entry)))
 
 (put 'nddsl :content 'nddsl-entry-content)
 (defun nddsl-entry-content (entry)
   "Return string content of ENTRY."
   (let* ((code (lookup-entry-code entry))
          (dict (lookup-entry-dictionary entry))
+         (dict-id (lookup-dictionary-id dictionary))
          (file (expand-file-name
                 (lookup-dictionary-name dictionary)
                 (lookup-agent-location
                  (lookup-dictionary-agent dictionary)))))
-    (lookup-with-coding-system 'utf-8
-      (ndsary-file-content
-       file code
-       nddsl-content-start nddsl-content-end))))
+    (or (gethash (cons dict-id code) ndtext-cache)
+        (ndtext-process 'ndtext 'get file code method
+                        nddsl-content-tags nddsl-entry-tags))))
 
 ;;;
 ;;; Formatting Functions

@@ -109,14 +109,14 @@
 ;;; macros
 ;;;
 
-(put 'ndict-with-agent 'lisp-indent-function 1)
 (defmacro ndict-with-agent (agent &rest body)
+  (declare (indent 1))
   `(let ((ndict-current-agent ,agent)
 	   (ndict-current-process (ndict-agent-process ,agent)))
      ,@body))
 
-(put 'ndict-with-dictionary 'lisp-indent-function 1)
 (defmacro ndict-with-dictionary (dictionary &rest body)
+  (declare (indent 1))
   `(ndict-with-agent (lookup-dictionary-agent ,dictionary)
      (let ((ndict-current-dictionary ,dictionary))
        ,@body)))
@@ -235,8 +235,8 @@
     (set-process-query-on-exit-flag process nil)
     process))
 
-(put 'ndict-process-require 'lisp-indent-function 1)
 (defun ndict-process-require (command &optional filter)
+  (declare (indent 1))
   (lookup-process-require ndict-current-process (concat command "\n")
 			  "^[245][0-8][0-9] .*\n" filter))
 

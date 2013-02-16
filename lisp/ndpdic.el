@@ -20,11 +20,16 @@
 ;; along with Lookup; if not, write to the Free Software Foundation,
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-;;; Documentation:
+;;; Commentary:
 
 ;; This is agent program for `PDIC' format.
+;;
+;; PDIC specification::
+;; http://homepage3.nifty.com/TaN/unicode/dic-spec.html
 
-;;; Usage: Put the XXX.dic files into a folder and specify that folder for ndpdic agent.
+;;; Usage: 
+
+;; Put the XXX.dic files into a folder and specify that folder for ndpdic agent.
 ;; 
 ;; (setq lookup-search-agents
 ;;       '(
@@ -41,26 +46,166 @@
 ;; (You need at least 1G memory, it would take 10 minutes for 2GHz machine 
 ;; for huge file such as Eijiro.)
 
+;;; Code:
+
+(require 'bocu)
+(require 'lookup-utils)
+
 ;;;
 ;;; Customizable Variables
 ;;;
 
 (defvar ndpdic-max-hits 150)
-
-(defvar ndpdic-grep-program "grep")
-
-(defvar ndpdic-grep-options (list (format "--max-count=%d" ndpdic-max-hits) "-e"))
+;;(defvar ndpdic-grep-program "grep")
+;;(defvar ndpdic-grep-options (list (format "--max-count=%d" ndpdic-max-hits) "-e"))
 
 (defvar ndpdic-extended-attributes
-  '((0 . (lambda (x) (concat (ndpdic-bocu-to-str x) "\n")))
-    (1 . (lambda (x) (concat "【用例】" (ndpdic-bocu-to-str x) "\n")))
-    (2 . (lambda (x) (concat "【発音】" (ndpdic-bocu-to-str x) "\n")))))
+  '((0 . (lambda (x) (concat (bocu-to-str x) "\n")))
+    (1 . (lambda (x) (concat "【用例】" (bocu-to-str x) "\n")))
+    (2 . (lambda (x) (concat "【発音】" (bocu-to-str x) "\n")))))
+
+;;;
+;;; Interface functions
+;;;
+
+;; If there is a separate index file, you can search in suffix, substring, etc.
+(put 'ndpdic :methods 'ndpdic-dictionary-methods)
+(defun ndpdic-dictionary-methods (dictionary)
+  "Return methods of DICTIONARY."
+  (let ((index (ndpdic-dictionary-index dictionary)))
+    (if index '(exact prefix suffix substring wildcard regexp)
+      '(exact prefix))))
+
+(put 'ndpdic :list 'ndpdic-list)
+(defun ndpdic-list (agent)
+  "Return dictionaries in AGENT."
+  (let ((dir (lookup-agent-location agent))
+        files ndpdic dict dicts)
+    (assert (file-directory-p dir) nil "ndpdic: directory %s is not found." dir)
+    (setq files (directory-files (expand-file-name dir)
+                                 nil ndpdic-extension-regexp))
+    (loop for file in files do
+          (setq dict (lookup-new-dictionary agent file))
+          (setq ndpdic (ndpdic (concat dir "/" file)))
+          (lookup-put-property dict :ndpdic ndpdic)
+          collect dict)))
+
+(put 'ndpdic :title 'ndpdic-title)
+(defun ndpdic-title (dictionary)
+  "Return title of DICTIONARY."
+  (replace-regexp-in-string
+   "^.*/\\([^/]+\\)$" "\\1"
+   (lookup-dictionary-name dictionary)))
+
+(put 'ndpdic :search 'ndpdic-search)
+(defun ndpdic-search (dictionary query)
+  "Return entries for DICTIONARY QUERY."
+  (let ((index (ndpdic-dictionary-index dictionary))
+        (query-method (lookup-query-method query))
+        query-regexp dir file block-index entries)
+    (if (or (null index)
+            (equal query-method 'exact)
+            (equal query-method 'prefix))
+        ;; normal PDIC search
+        (ndpdic-search-normal dictionary query)
+      ;(ndpdic-search-extended dictionary query)
+      (error "not supported yet.")
+      )))
+
+;;;
+;;; Structure
+;;;
+
+(defstruct ndpdic 
+  filename headername dictitle version lword liapa block-size
+  index-block header-size index-size empty-block nindex nblock
+  nword dicorder dictype attrlen os olenumber dummy-lid
+  index-blkbit dummy0 extheader empty-block2 nindex2 nblock2
+  crypt update-count dummy00 dicident derefid dummy
+  extended-header block-index block-entries-hash)
+
+(defun ndpdic-read-chars (len)
+  (prog1 (buffer-substring (point) (+ (point) len))
+    (goto-char (+ (point) len))))
+(defun ndpdic-read-byte ()
+  (prog1 (char-after (point)) (goto-char (1+ (point)))))
+(defun ndpdic-read-short ()
+  (prog1 (+ (char-after (point)) (* 256 (char-after (1+ (point)))))
+    (goto-char (+ (point) 2))))
+(defun ndpdic-read-long ()
+  (prog1 (+ (char-after (point)) (* 256 (char-after (1+ (point))))
+            (* 65536 (char-after (+ 2 (point)))) 
+            (* 16777216 (char-after (+ 3 (point)))))
+    (goto-char (+ (point) 4))))
+
+(defun ndpdic (file)
+  "Return ndpdic object representing FILE pdic data."
+  (assert (file-exists-p file) nil "%s not found!" file)
+  (let ((o (make-ndpdic :filename file)))
+    (flet ((char (len) (ndpdic-read-chars len))
+           (byte ()    (ndpdic-read-byte))
+           (short ()   (ndpdic-read-short))
+           (ushort ()  (ndpdic-read-short))
+           (long  ()   (ndpdic-read-long))
+           (ulong ()   (ndpdic-read-long)))
+      (with-temp-buffer
+        (set-buffer-multibyte nil)
+        (insert-file-contents-literally file nil 0 1024)
+        (setf (ndpdic-headername o)   (char 100))
+        (setf (ndpdic-dictitle o)     (char 40))
+        (setf (ndpdic-version o)      (short))
+        (assert (< #x600 (ndpdic-version o)) nil
+                "Version of PDIC `%s' file is old (%04X) and not supported!" 
+                file (ndpdic-version o))
+        (setf (ndpdic-lword o)        (short))
+        (setf (ndpdic-liapa o)        (short))
+        (setf (ndpdic-block-size o)   (short))
+        (setf (ndpdic-index-block o)  (short))
+        (setf (ndpdic-header-size o)  (short))
+        (setf (ndpdic-index-size o)   (short))
+        (setf (ndpdic-empty-block o)  (short))
+        (setf (ndpdic-nindex o)       (short))
+        (setf (ndpdic-nblock o)       (short))
+        (setf (ndpdic-nword o)        (ulong))
+        (setf (ndpdic-dicorder o)     (byte))
+        (setf (ndpdic-dictype o)      (byte))
+        (setf (ndpdic-attrlen o)      (byte))
+        (setf (ndpdic-os o)           (byte))
+        (setf (ndpdic-olenumber o)    (long))
+        (setf (ndpdic-dummy-lid o)    (char 10))
+        (setf (ndpdic-index-blkbit o) (byte))
+        (setf (ndpdic-dummy0 o)       (byte))
+        (setf (ndpdic-extheader o)    (ulong))
+        (setf (ndpdic-empty-block2 o) (long))
+        (setf (ndpdic-nindex2 o)      (ulong))
+        (setf (ndpdic-nblock2 o)      (ulong))
+        (setf (ndpdic-crypt o)        (char 8))
+        (setf (ndpdic-update-count o) (ulong))
+        (setf (ndpdic-dummy00 o)      (char 4))
+        (setf (ndpdic-dicident o)     (char 8))
+        (setf (ndpdic-derefid o)      (char 8))
+        (setf (ndpdic-dummy o)        (char 24))
+        ;;
+        (setf (ndpdic-block-index o) (make-vector (ndpdic-nindex2 o) nil))
+        (setf (ndpdic-block-entries-hash o) (make-hash-table :test 'equal))
+        )
+      (with-temp-buffer
+        (set-buffer-multibyte nil)
+        (insert-file-contents-literally
+         file nil (ndpdic-index-start o)
+         (ndpdic-data-start o) (ndpdic-data-start o))
+        (loop for i from 0 below (ndpdic-nindex2 o) do
+              (aset (ndpdic-block-index o) i
+                    (if (= (ndpdic-index-blkbit o) 0) (short) (long)))
+              (ndpdic-proceed-to-null)))
+      o ;; single `o' char!
+      )))
 
 ;;;
 ;;; Interface Functions
 ;;;
 
-(defvar ndpdic-extension-regexp "\\.dic\\'")
+(defvar ndpdic-extension-regexp "\\.dic\\|\\.DIC\\'")
 
 (defun ndpdic-dictionary-index (dictionary)
   "Return optional index file for DICTIONARY if exists."
@@ -74,106 +219,22 @@
               (expand-file-name index location))))
     (if (and index (file-exists-p index)) index)))
 
-(put 'ndpdic :methods 'ndpdic-dictionary-methods)
-(defun ndpdic-dictionary-methods (dictionary)
-  "Return methods of DICTIONARY."
-  (let ((index (ndpdic-dictionary-index dictionary)))
-    (if index '(exact prefix suffix substring wildcard regexp)
-      '(exact prefix))))
-
-(put 'ndpdic :list 'ndpdic-list)
-(defun ndpdic-list (agent)
-  "Return a list of dictionary of AGENT."
-  (let ((dir (lookup-agent-location agent)))
-    (if (file-directory-p dir)
-        (let ((files (directory-files (expand-file-name dir)
-                                      nil ndpdic-extension-regexp))
-              dicts)
-          (dolist (file files)
-            (if (> #x500 (ndpdic-file-version (expand-file-name file dir)))
-                (message 
-                 "Version of PDIC `%s' file is old and not supported!" file)
-              (setq dicts
-                    (cons (lookup-new-dictionary agent file) dicts))))
-          (nreverse dicts))
-      (message "ndpdic: directory %s is not found." dir)
-      nil)))
-
-(put 'ndpdic :title 'ndpdic-title)
-(defun ndpdic-title (dictionary)
-  "Return title of DICTIONARY."
-  (replace-regexp-in-string
-   "^.*/\\([^/]+\\)$" "\\1"
-   (lookup-dictionary-name dictionary)))
-
-(put 'ndpdic :search 'ndpdic-dictionary-search)
-(defun ndpdic-dictionary-search (dictionary query)
-  "Return entries for DICTIONARY QUERY."
-  (let ((index (ndpdic-dictionary-index dictionary))
-        (query-method (lookup-query-method query))
-        query-regexp dir file block-index entries)
-    (if (or (null index)
-            (equal query-method 'exact)
-            (equal query-method 'prefix))
-        ;; normal PDIC search
-        (ndpdic-dictionary-search-normal dictionary query)
-      ;; regular expression search
-      (setq query-regexp (replace-regexp-in-string "$\\'" "	"
-                          (lookup-query-to-regexp query))
-            dir          (lookup-agent-location
-                          (lookup-dictionary-agent dictionary))
-            file         (expand-file-name
-                          (lookup-dictionary-name dictionary) dir)
-            block-index  (ndpdic-block-index file))
-      (with-temp-buffer
-        (lookup-with-coding-system 'utf-8
-          (apply 'call-process
-                 ndpdic-grep-program nil t nil
-                 (append ndpdic-grep-options
-                         (list query-regexp index))))
-        (goto-char (point-min))
-        (while (re-search-forward
-                "^\\(.+?	\\)\\([-]+\\)\\|\\([0-9A-F]+\\)" nil t)
-          (let* ((word (match-string 1))
-                 (hex1 (match-string 2))
-                 (hex2 (match-string 3))
-                 (hex (if hex1 (+ (* (- (elt hex1 0) 16) 65536)
-                                  (* (- (elt hex1 1) 16) 4096)
-                                  (* (- (elt hex1 2) 16) 256)
-                                  (* (- (elt hex1 3) 16) 16)
-                                  (- (elt hex1 4) 16))
-                        (string-to-number hex2 16)))
-                 (headers (ndpdic-entries file (elt block-index hex)))
-                 (header (find-if (lambda (x) (string-match word x)) headers)))
-            (if header
-                (setq entries (cons
-                               (lookup-new-entry
-                                'regular dictionary header
-                                (if (string-match "	" header)
-                                    (substring header (match-end 0))))
-                               entries))))))
-      (nreverse entries))))
-
-(defun ndpdic-dictionary-search-normal (dictionary query)
+(defun ndpdic-search-normal (dictionary query)
   "Return list of entries for DICTIONARY QUERY."
   (let* ((query-method (lookup-query-method query))
          (query-string
           (concat (lookup-query-string query)
                   (if (eq query-method 'exact) "\\(	\\|$\\)")))
-         (dir (lookup-agent-location 
-               (lookup-dictionary-agent dictionary)))
-         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
+         (ndpdic (lookup-get-property dictionary :ndpdic))
          (result
-          (ndpdic-binary-search file query-string)))
+          (ndpdic-binary-search ndpdic query-string)))
     (when result
       (setq result
             (remove-if
              (lambda (x) (null (string-match
                                 (concat "^" query-string) x)))
-             (append (ndpdic-entries file (car result))
-                     (ndpdic-entries file (cdr result)))))
-      ;;(if (> (length result) ndpdic-max-hits)
-      ;;    )
+             (append (ndpdic-entries ndpdic (car result))
+                     (ndpdic-entries ndpdic (cdr result)))))
       (mapcar (lambda (x) (lookup-new-entry
                            'regular dictionary x
                            (if (string-match "	" x)
@@ -187,111 +248,9 @@
          (dictionary (lookup-entry-dictionary entry))
          (dir (lookup-agent-location
                (lookup-dictionary-agent dictionary)))
-         (file (expand-file-name (lookup-dictionary-name dictionary) dir))
-         (result (car (ndpdic-binary-search file code))))
-    (ndpdic-entry-content file result code)))
-
-;; Hash variables 
-;; (in future, move them to lookup hash tables)
-
-(defvar ndpdic-block-index-hash
-  (make-hash-table :test 'equal)
-  "Hash table for file -> block-index table.")
-
-(defvar ndpdic-block-entries-hash
-  (make-hash-table :test 'equal)
-  "Hash table for file -> (block -> entries) table.")
-
-;;;
-;;; BOCU Decoder
-;;;
-
-(defun bocu-read-decode-trail-char (reg)
-  "BOCU trail char in REG to be decoded."
-  `(read-if (,reg > #x20) (,reg -= 13) 
-     (if (,reg >= #x1c) (,reg -= 12)   
-       (if (,reg >= #x10) (,reg -= 10) 
-         (,reg -= 1)))))               
-
-(define-ccl-program decode-bocu
-  `(4
-    ((r4 = #x40)
-     (r3 = ,(charset-id-internal 'unicode))
-     (loop
-      (read r0)
-      ;; Diff calculation phase
-      (if (r0 <= #x20) (r1 = r0)
-        (if (r0 == #x21)
-            ((r1 = -14536567)
-             ,(bocu-read-decode-trail-char 'r2)
-             (r1 += (r2 * 59049))
-             ,(bocu-read-decode-trail-char 'r2)
-             (r1 += (r2 * 243))
-             ,(bocu-read-decode-trail-char 'r2)
-             (r1 += r2))
-          (if (r0 < #x25)
-              ((r1 = (((r0 - #x25) * 59049) - 10513))
-               ,(bocu-read-decode-trail-char 'r2)
-               (r1 += (r2 * 243))
-               ,(bocu-read-decode-trail-char 'r2)
-               (r1 += r2))
-            (if (r0 < #x50)
-                ((r1 = (((r0 - #x50) * 243) - 64))
-                 ,(bocu-read-decode-trail-char 'r2)
-                 (r1 += r2))
-              (if (r0 < #xd0)
-                  (r1 = (r0 - #x90))
-                (if (r0 < #xfb)
-                    ((r1 = (((r0 - #xd0) * 243) + 64))
-                     ,(bocu-read-decode-trail-char 'r2)
-                     (r1 += r2))
-                  (if (r0 < #xfe)
-                      ((r1 = (((r0 - #xfb) * 59049) + 10513))
-                       ,(bocu-read-decode-trail-char 'r2)
-                       (r1 += (r2 * 243))
-                       ,(bocu-read-decode-trail-char 'r2)
-                       (r1 += r2))
-                    (if (r0 == #xfe)
-                        ((r1 = 187660)
-                         ,(bocu-read-decode-trail-char 'r2)
-                         (r1 += (r2 * 59049))
-                         ,(bocu-read-decode-trail-char 'r2)
-                         (r1 += (r2 * 243))
-                         ,(bocu-read-decode-trail-char 'r2)
-                         (r1 += r2)
-                         ;; ignore case: `r0 = #xff'
-                         )))))))))
-      ;; output stage
-      (if (r0 <= #x20) 
-          ((if (r0 != 13) (write r0))
-           (if (r0 < #x20) (r4 = #x40)))
-        (if (r0 < #xff)
-            ((r1 += r4)
-             (if (r1 < 0) (r1 = 0)) ; error recovery
-             (write-multibyte-character r3 r1)
-             ;; cp renewal stage
-             (if (r1 < #x20) (r4 = #x40) ; reset
-               (if (r1 == #x20) (r4 = r4) ; space → keep
-                 ((r5 = (r1 >= #x3040))
-                  (r6 = (r1 <= #x309f))
-                  (if (r5 & r6) (r4 = #x3070)
-                    ((r5 = (r1 >= #x4e00))
-                     (r6 = (r1 <= #x9fa5))
-                     (if (r5 & r6) (r4 = #x7711)
-                       ((r5 = (r1 >= #xac00))
-                        (r6 = (r1 <= #xd7a3))
-                        (if (r5 & r6) (r4 = #xc1d1)
-                          ((r5 = (r1 & #xff))
-                           ;; As of 2009/8/27, #xffffff00 is treated as float.
-                           ;;(r6 = (r1 & #xffffff00)) ;; FIXME
-                           (r6 = (r1 & -256))
-                           (if (r5 < #x80) (r4 = (r6 + #x40))
-                             (r4 = (r6 + #xc0)))))))))))))))
-      (repeat)))))
-
-(defun ndpdic-bocu-to-str (string)
-  "Decode BOCU STRING to Emacs String."
-  (ccl-execute-on-string 'decode-bocu '[0 0 0 0 0 0 0 0 0] string))
+         (ndpdic (lookup-get-property dictionary :ndpdic))
+         (result (car (ndpdic-binary-search ndpdic code))))
+    (ndpdic-entry-content ndpdic result code)))
 
 ;;;
 ;;; Basic Functions
@@ -347,119 +306,38 @@
     (goto-char (+ 4 (point)))
     int))
 
-(defun ndpdic-file-version (file)
-  "Header lowrd value for FILE."
-  (ndpdic-file-short file 140))
+(defun ndpdic-index-start (ndpdic)
+  "Index start point of NDPDIC."
+  (+ (ndpdic-header-size ndpdic)
+     (ndpdic-extheader ndpdic)))
 
-(defun ndpdic-file-lword (file)
-  "Header lowrd value for FILE."
-  (ndpdic-file-short file 142))
-
-(defun ndpdic-file-ljapa (file)
-  "Header lowrd value for FILE."
-  (ndpdic-file-short file 144))
-
-(defun ndpdic-file-block-size (file)
-  "Header block_size value for FILE."
-  (ndpdic-file-short file 146))
-
-(defun ndpdic-file-index-block (file)
-  "Header index_block value for FILE."
-  (ndpdic-file-short file 148))
-
-(defun ndpdic-file-header-size (file)
-  "Header header_size value for FILE."
-  (ndpdic-file-short file 150))
-
-(defun ndpdic-file-nword (file)
-  "Header nword value for FILE."
-  (ndpdic-file-int file 160))
-
-(defun ndpdic-file-dicorder (file)
-  "Header dicorder value for FILE."
-  (ndpdic-file-byte file 164))
-
-(defun ndpdic-file-dictype (file)
-  "Header dictype value for FILE."
-  (ndpdic-file-byte file 165))
-
-(defun ndpdic-file-os (file)
-  "Header os value for FILE."
-  (ndpdic-file-byte file 167))
-
-(defun ndpdic-file-index-blkbit (file)
-  "Header index-blkbit value for FILE."
-  (ndpdic-file-byte file 182))
-
-(defun ndpdic-file-extheader (file)
-  "Header extheader value for FILE."
-  (ndpdic-file-int file 184))
-
-(defun ndpdic-file-empty-block (file)
-  "Header empty_block value for FILE."
-  (ndpdic-file-int file 188))
-
-(defun ndpdic-file-nindex2 (file)
-  "Header nindex2 value for FILE."
-  (ndpdic-file-int file 192))
-
-(defun ndpdic-file-nblock2 (file)
-  "Header nblock2 value for FILE."
-  (ndpdic-file-int file 196))
-
-(defun ndpdic-file-crypt (file)
-  "Header extheader value for FILE."
-  (ndpdic-file-content file 200 208))
-
-(defun ndpdic-file-index-start (file)
-  "Index start point of FILE."
-  (+ (ndpdic-file-header-size file)
-     (ndpdic-file-extheader file)))
-
-(defun ndpdic-file-data-start (file &optional block)
-  "Data start point in FILE of BLOCK number."
+(defun ndpdic-data-start (ndpdic &optional block)
+  "Data start point in NDPDIC of BLOCK number."
   (unless block (setq block 0))
-  (+ (ndpdic-file-index-start file) ; 1024
-     (* (ndpdic-file-block-size file) ; 1024
-        (+ (ndpdic-file-index-block file) block))))
+  (+ (ndpdic-index-start ndpdic) ; 1024
+     (* (ndpdic-block-size ndpdic) ; 1024
+        (+ (ndpdic-index-block ndpdic) block))))
 
 (defun ndpdic-proceed-to-null ()
   "Proceed to next point of null character or eobp.
 `char-before' a new point should be null character."
   (interactive)
-  (if (not (eobp)) (forward-char))
-  (while (not (or (eobp) (eq (char-before (point)) 0)))
-    (forward-char)))
+  (search-forward " " nil t))
 
-(defun ndpdic-block-index (file)
-  "Construct Block Index of FILE.  Result will be cached."
-  (or
-   (gethash (expand-file-name file) ndpdic-block-index-hash)
-   (let* ((blocks (make-vector (ndpdic-file-nindex2 file) nil))
-          (blkbit (ndpdic-file-index-blkbit file))
-          (i 0))
-     (with-temp-buffer
-       (set-buffer-multibyte nil)
-       (insert-file-contents-literally
-        file nil (ndpdic-file-index-start file)
-        (ndpdic-file-data-start file))
-       (goto-char (point-min))
-       (while (not (eobp))
-         (when (< i (length blocks))
-           (aset blocks i
-                 (if (= blkbit 0) (ndpdic-buffer-short)
-                   (ndpdic-buffer-int)))
-           (setq i (1+ i)))
-         (if (= (char-after (point)) 0) (goto-char (point-max))
-           (ndpdic-proceed-to-null))))
-     (puthash (expand-file-name file) blocks ndpdic-block-index-hash)
-     blocks)))
+(defun ndpdic-proceed-to-null-string ()
+  "Proceed to next point of null character or eobp.
+`char-before' a new point should be null character."
+  (interactive)
+  (let ((start-point (point)))
+    (search-forward " " nil t)
+    (buffer-substring start-point (point))))
 
-(defun ndpdic-insert-block-contents (file block)
-  "Insert content of FILE's BLOCK to current buffer.
+(defun ndpdic-insert-block-contents (ndpdic block)
+  "Insert content of NDPDIC's BLOCK to current buffer.
 Return a size of `Field-Length' of the block."
-  (let* ((start (ndpdic-file-data-start file block))
-         (block-size (ndpdic-file-block-size file))
+  (let* ((file (ndpdic-filename ndpdic))
+         (start (ndpdic-data-start ndpdic block))
+         (block-size (ndpdic-block-size ndpdic))
          (block-num (ndpdic-file-short file start))
          (fl-size (if (eq (logand block-num #x8000) 0) 2 4))
          (block-num (logand block-num #x7fff)))
@@ -490,22 +368,20 @@ then it proceeds to next point."
       (setq word-data (concat (substring prev-word-data 0 compress) word-data))
       (setq content-start (point))
       (goto-char (+ start field-size))
-      (list (ndpdic-bocu-to-str word-data)
+      (list (bocu-to-str word-data)
             kind content-start word-data))))
 
-(defun ndpdic-entries (file block)
-  "Get all entries in FILE at BLOCK.
+(defun ndpdic-entries (ndpdic block)
+  "Get all entries in NDPDIC at BLOCK.
 Return the list of entry words.  Result will be cached."
-  (let ((block-entries-hash (gethash (expand-file-name file) ndpdic-block-entries-hash))
+  (assert (integerp block))
+  (let ((block-entries-hash (ndpdic-block-entries-hash ndpdic))
         fl-size word-spec (word-data "") words)
-    (when (null block-entries-hash)
-      (setq block-entries-hash (make-hash-table))
-      (puthash (expand-file-name file) block-entries-hash ndpdic-block-entries-hash))
     (or
      (gethash block block-entries-hash)
      (with-temp-buffer
        (set-buffer-multibyte nil)
-       (setq fl-size (ndpdic-insert-block-contents file block))
+       (setq fl-size (ndpdic-insert-block-contents ndpdic block))
        (goto-char (+ 2 (point-min)))
        (while (not (eobp))
          (setq word-spec (ndpdic-entries-next-word word-data fl-size))
@@ -514,12 +390,12 @@ Return the list of entry words.  Result will be cached."
            (setq word-data (elt word-spec 3))))
        (puthash block (nreverse words) block-entries-hash)))))
 
-(defun ndpdic-entry-content (file block entry)
+(defun ndpdic-entry-content (ndpdic block entry)
   "Get content of FILE, BLOCK, and  ENTRY."
   (let* (fl-size word word-spec (word-data "") content)
     (with-temp-buffer
       (set-buffer-multibyte nil)
-      (setq fl-size (ndpdic-insert-block-contents file block))
+      (setq fl-size (ndpdic-insert-block-contents ndpdic block))
       (goto-char (+ 2 (point-min)))
       (while (not (eobp))
         (setq word-spec (ndpdic-entries-next-word word-data fl-size))
@@ -574,7 +450,7 @@ Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
          (substring entry (match-end 0)) entry)
      "\n"
      (if (= extended 0)
-         (ndpdic-bocu-to-str (buffer-substring from to))
+         (bocu-to-str (buffer-substring from to))
        (mapconcat (lambda (x)
                     (if (assq (car x) ndpdic-extended-attributes)
                         (apply (cdr (assq (car x) ndpdic-extended-attributes))
@@ -585,19 +461,21 @@ Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
 ;; binary search
 
 (defun ndpdic-compare-entry (entry entries)
-  "Judege if ENTRY is larger, smaller, or inclusive of ENTRIES.
+  "Check if ENTRY is larger, smaller, or inclusive of ENTRIES.
 Comparison is done lexicographicaly.
 If larger, t. smaller, nil.  equal, 0 will be returned."
+  (assert (stringp entry) t "ENTRY must be string.")
   (if (string-lessp entry (car entries)) nil
     (if (string-lessp (car (last entries)) entry) t 0)))
 
-(defun ndpdic-binary-search (file entry)
-  "Find block in FILE which includes ENTRY.
+(defun ndpdic-binary-search (ndpdic entry)
+  "Find block in NDPDIC which includes string ENTRY.
 Return value would be (block . next-block)."
-  (let* ((block-index (ndpdic-block-index file))
+  (assert (stringp entry) t "ENTRY must be string ... %s" entry)
+  (let* ((block-index (ndpdic-block-index ndpdic))
          (start 0) (end (length block-index))
          (middle (/ end 2))
-         (entries (ndpdic-entries file (aref block-index middle)))
+         (entries (ndpdic-entries ndpdic (aref block-index middle)))
          result)
     (while
         (progn
@@ -607,7 +485,7 @@ Return value would be (block . next-block)."
       (if result (setq start middle)
         (setq end middle))
       (setq middle (/ (+ start end) 2))
-      (setq entries (ndpdic-entries file (aref block-index middle))))
+      (setq entries (ndpdic-entries ndpdic (aref block-index middle))))
     (if (and (numberp result) (= 0 result))
         (cons (aref block-index middle)
               (if (/= (1- (length block-index)) middle)

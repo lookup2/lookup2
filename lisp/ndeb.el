@@ -22,9 +22,9 @@
 
 ;;; Code:
 
-(defconst ndeb-version "0.1")
 (require 'lookup)
 (require 'ndeb-binary)
+(defconst ndeb-version "0.1")
 
 ;;;
 ;;; Customizable variables
@@ -39,6 +39,7 @@
   :type 'string
   :group 'ndeb)
 
+;; '-i' may be attached to MacPorts version of eblook.
 (defcustom ndeb-program-arguments '("-q" "-e" "euc-jp")
   "*A list of arguments for eblook."
   :type '(repeat (string :tag "option"))
@@ -84,6 +85,15 @@
 	  (sexp :tag "other"))
   :group 'ndeb)
 
+(defcustom ndeb-gaiji-map-directory (concat lookup-init-directory "/epwing-gaiji")
+  "Default directory to search for GAIJI file if not found in dictionaries' directory."
+  :type '(choice 
+	  (list :tag "step" (const -) (integer :tag "count" :value 2))
+	  (number :tag "scale factor" :value 0.8)
+	  (function :tag "function")
+	  (sexp :tag "other"))
+  :group 'ndeb)
+
 (defface ndeb-bold-face
   '((t (:weight bold)))
   "Face used to bold text."
@@ -104,7 +114,29 @@
 
 
 ;;;
-;;; Interfaces
+;;; Internal variables
+;;;
+
+(defvar ndeb-process nil
+  "Process object for ndeb agents.")
+
+(defvar ndeb-status nil
+  "process stataus cache.")
+
+(defvar ndeb-vars nil
+  "process variables cache.")
+
+(defvar ndeb-current-agent nil)
+
+(defvar ndeb-current-dictionary nil)
+
+(defvar ndeb-support-escape-text nil
+  "Positive numeric value means that eblook supports text escape.
+Zero or negative value mean that feature is not supported.
+Nil means it has not been checked yet.")
+
+;;;
+;:: types
 ;;;
 
 ;; lookup entry command
@@ -138,7 +170,6 @@
                   ndeb-arrange-decode-entity
                   )
        (gaiji     lookup-arrange-gaijis)
-       ;(media    lookup-arrange-media)              ; default
        (reference ndeb-arrange-paged-reference
                   ndeb-arrange-squeezed-references
                   lookup-arrange-references)
@@ -161,14 +192,7 @@
 
 (put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
-;;(put 'ndeb :charsets '(ascii japanese-jisx0208))
 (put 'ndeb :charsets '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
-
-;(put'ndeb :font      nil)
-
-;(put'ndeb :heading   nil)
-;(put'ndeb :dynamic   nil)
-
 
 
 ;;;
@@ -199,28 +223,8 @@
   '(("italic" . ndeb-italic-face)
     ("bold" . ndeb-bold-face)
     ("em" . ndeb-emphasis-face)))
-;;;
-;;; Internal variables
-;;;
 
-(defvar ndeb-process nil
-  "Process object for ndeb agents.")
-
-(defvar ndeb-status nil
-  "process stataus cache.")
-
-(defvar ndeb-vars nil
-  "process variables cache.")
-
-(defvar ndeb-current-agent nil)
-
-(defvar ndeb-current-dictionary nil)
-
-(defvar ndeb-support-escape-text nil
-  "Positive numeric value means that eblook supports text escape.
-Zero or negative value mean that feature is not supported.
-Nil means it has not been checked yet.")
-
+
 ;; ndeb entry:
 ;;
 ;; CODE    - entry specific code (e.g. "2c00:340") by eblook `search' command
@@ -233,8 +237,8 @@ Nil means it has not been checked yet.")
 ;;; macros
 ;;;
 
-(put 'ndeb-with-agent 'lisp-indent-function 1)
 (defmacro ndeb-with-agent (agent &rest body)
+  (declare (indent 1))
   "Switch eblook's context to AGENT and execute BODY."
   `(let (book appendix)
      (ndeb-process-open)
@@ -252,8 +256,8 @@ Nil means it has not been checked yet.")
        (lookup-put-property ndeb-current-agent :ndeb-dict nil))
      ,@body))
 
-(put 'ndeb-with-dictionary 'lisp-indent-function 1)
 (defmacro ndeb-with-dictionary (dictionary &rest body)
+  (declare (indent 1))
   `(ndeb-with-agent (lookup-dictionary-agent ,dictionary)
      (let ((ndeb-current-dictionary ,dictionary))
        (unless (eq ,dictionary
@@ -330,11 +334,7 @@ Nil means it has not been checked yet.")
 
 ;; <:list>
 (defun ndeb-list (agent)
-  (let ((gaiji-file (lookup-agent-option agent :gaiji-file)))
-    (if gaiji-file
-        (setf (lookup-agent-option agent :gaiji-table)
-              (ndeb-parse-gaiji-file gaiji-file))))
-  (when (and ndeb-program-name (file-exists-p (lookup-agent-location agent)))
+  (when ndeb-program-name
     (ndeb-with-agent agent
       (ndeb-process-require 
        "list"
@@ -371,6 +371,7 @@ Nil means it has not been checked yet.")
 
 ;; <:menu>
 (defun ndeb-dictionary-menu (dictionary)
+  (ndeb-initialize-dictionary dictionary)
   (ndeb-with-dictionary dictionary
   (let ((string (ndeb-dictionary-get-info dictionary "search methods"))
         menu content image-menu image-content copyright copyright-content)
@@ -393,6 +394,7 @@ Nil means it has not been checked yet.")
 ;; <:search>
 (defun ndeb-dictionary-search (dictionary query)
   "Search EB DICTIONARY for QUERY."
+  (ndeb-initialize-dictionary dictionary)
   (ndeb-with-dictionary dictionary
     (let ((method (lookup-query-method query))
 	  (string (lookup-query-string query))
@@ -400,7 +402,7 @@ Nil means it has not been checked yet.")
 	  cmd)
       (setq string
             (replace-regexp-in-string 
-             "[㐀-鿿𠀀-𯿽]"
+             "\\cC"
              (lambda (ch) (if (encode-char (string-to-char ch) 'japanese-jisx0208)
                               ch (format "%X" (string-to-char ch))))
              string))
@@ -434,6 +436,9 @@ Nil means it has not been checked yet.")
       (ndeb-process-require cmd
         (lambda (process)
 	  (let (code heading dupchk entry entries)
+            ;(save-excursion
+            ;  (while (re-search-forward "^.*empty.*" nil t)
+            ;    (message "warining! %s" (match-string 0))))
 	    (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)\t\\(.*\\)" nil t)
 	      (setq code (match-string 1) heading (match-string 2))
 	      ;; 同じエントリがあるかチェックする。
@@ -483,13 +488,14 @@ Nil means it has not been checked yet.")
 
 ;; <:content>
 (defun ndeb-entry-content (entry)
+  (ndeb-initialize-dictionary (lookup-entry-dictionary entry))
   (or (lookup-get-property entry 'ndeb-content)
       (ndeb-with-dictionary (lookup-entry-dictionary entry)
         (if ndeb-max-text 
             (ndeb-process-require-set "max-text" ndeb-max-text))
         ;; processing `stop-code' if necessary.
         (let* ((dictionary (lookup-entry-dictionary entry))
-               (stop (lookup-dictionary-option dictionary ':stop-code t))
+               (stop (lookup-dictionary-option dictionary :stop-code t))
                (last (lookup-get-property ndeb-current-agent 'ndeb-stop)))
           (unless (eq stop last)
             (ndeb-process-require-set "stop-code" stop)
@@ -507,6 +513,25 @@ Nil means it has not been checked yet.")
 ;;;
 ;;; Internal functions
 ;;;
+
+(defun ndeb-initialize-dictionary (dictionary)
+  (let ((initialized (lookup-dictionary-option dictionary :initialized)))
+    (unless initialized
+      (let* ((agent (lookup-dictionary-agent dictionary))
+             (agent-location (lookup-agent-location agent))
+             (agent-name (file-name-nondirectory agent-location))
+             ;; Emacs BUG :: directory-files can't do CI search even if case-fold-search is t.
+             (dict-name (upcase (lookup-dictionary-name dictionary)))
+             (dict-location (concat agent-location "/" dict-name))
+             (gaiji-file
+              (or (lookup-agent-option agent :gaiji-file)
+                  (car (directory-files dict-location t "\\.map$"))
+                  (car (directory-files ndeb-gaiji-map-directory t (concat dict-name ".map")))
+                  (car (directory-files ndeb-gaiji-map-directory t (concat agent-name ".map"))))))
+        (if gaiji-file
+            (setf (lookup-dictionary-option dictionary :gaiji-table)
+                  (ndeb-parse-gaiji-file gaiji-file))))
+      (lookup-dictionary-set-option dictionary :initialized t))))
 
 (defun ndeb-parse-gaiji-file (gaiji-file)
   "Return lookup-gaiji-table from specified EBStudio-style GAIJI-FILE."
@@ -562,7 +587,7 @@ Nil means it has not been checked yet.")
 
 (defun ndeb-arrange-squeezed-references (entry)
   (if (lookup-dictionary-option
-       (lookup-entry-dictionary entry) ':squeezed nil)
+       (lookup-entry-dictionary entry) :squeezed nil)
       (while (search-forward-regexp "→□\\(#0001\\|<gaiji:z0001>\\)?" nil t)
 	(replace-match ""))))
 
@@ -628,7 +653,7 @@ Nil means it has not been checked yet.")
 	  (beg-end (match-end 0))
 	  (level (- (string-to-number (match-string 1))
 		    (or 
-		     (lookup-dictionary-option dictionary ':minimum-indent t)
+		     (lookup-dictionary-option dictionary :minimum-indent t)
 		     ndeb-minimum-indent)))
 	  indent-end point)
       (delete-region beg-beg (point))
@@ -659,7 +684,7 @@ Nil means it has not been checked yet.")
 	       (equal (match-string 1) "/"))
 	  (let ((end-beg (match-beginning 0))
 		(height (or (lookup-dictionary-option
-			     dictionary ':script-height t)
+			     dictionary :script-height t)
 			    ndeb-default-script-height)))
 	    (goto-char end-beg)
 	    (add-text-properties

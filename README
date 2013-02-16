@@ -1,7 +1,7 @@
-Lookup $B$O(B Emacs $B$G;H$($k<-=q8!:w%=%U%H$G$9!#(BCD-ROM $B<-=q$d<-=q%5!<%P$J$I!"(B
-$BMM!9$J<-=q$+$iE}0l$5$l$?A`:n$G8!:w$,9T$J$($^$9!#(B
+Lookup は Emacs で使える辞書検索ソフトです。CD-ROM 辞書や辞書サーバなど、
+様々な辞書から統一された操作で検索が行なえます。
 
-$B%$%s%9%H!<%k(B
+インストール
 ------------
 
   % ./configure --with-emacs=emacs \
@@ -9,14 +9,14 @@ Lookup $B$O(B Emacs $B$G;H$($k<-=q8!:w%=%U%H$G$9!#(BCD-ROM $B<-=q$d<-=q%5!<
                 --infodir=/your/home/emacs/info
   % make install
 
-$BC1$K(B configure && make install $B$H$9$k$H!"(BEmacs $B$N(B site-lisp $B%G%#%l%/%H%j(B
-(i.e., /usr/local/share/emacs/site-lisp) $B$N2<$K(B lookup $B$H$$$&%G%#%l%/%H(B
-$B%j$,:n$i$l!"$=$3$K%U%!%$%k$,%3%T!<$5$l$^$9!#(B
+単に configure && make install とすると、Emacs の site-lisp ディレクトリ
+(i.e., /usr/local/share/emacs/site-lisp) の下に lookup というディレクト
+リが作られ、そこにファイルがコピーされます。
 
-$B;H$$J}(B
+使い方
 ------
 
-~/.emacs.el $B$K!"Nc$($P<!$N$h$&$K=q$$$F2<$5$$!#(B
+~/.emacs.el に、例えば次のように書いて下さい。
 
   (define-key ctl-x-map "l" 'lookup)
   (define-key ctl-x-map "y" 'lookup-region)
@@ -24,24 +24,14 @@ Lookup $B$O(B Emacs $B$G;H$($k<-=q8!:w%=%U%H$G$9!#(BCD-ROM $B<-=q$d<-=q%5!<
 
   (load "lookup-autoloads")
   (setq lookup-search-agents
-        '((ndtp "dserver")
-          (ndeb "/usr/local/dict/epwing")
+        '((ndeb "/usr/local/dict/epwing")
           (ndspell)))
 
-M-x lookup $B$G(B Lookup $B$r5/F0$7$^$9!#(BM-x lookup-region $B$G!"A*BrHO0O$NJ8;z(B
-$BNs$r8!:w$7$^$9!#(BM-x lookup-pattern $B$G!"8!:w8l$rF~NO$7$F8!:w$7$^$9!#>\$7(B
-$B$/$O!"ImB0$N%^%K%e%"%k$r;2>H$7$F2<$5$$!#(B
+M-x lookup で Lookup を起動します。M-x lookup-region で、選択範囲の文字
+列を検索します。M-x lookup-pattern で、検索語を入力して検索します。詳し
+くは、附属のマニュアルを参照して下さい。
 
-$B%+%9%?%^%$%:(B
+カスタマイズ
 ------------
 
-~/.lookup/init.el $B$G(B Lookup $B$N@_Dj$r$^$H$a$F9T$J$&$3$H$,=PMh$^$9!#(B
-
-$B:G?7>pJs(B
---------
-
-  http://openlab.ring.gr.jp/lookup/
-
-Lookup $B$K4X$9$k>pJs8r49$O!"@lMQ$N%a!<%j%s%0%j%9%H$K$F9T$o$l$F$$$^$9!#(B
-$B;22C$r4uK>$9$kJ}$O!"(B`lookup-ja-request@ring.gr.jp' $B08$F$K!"K\J8$K(B
-subscribe $B$H=q$$$?%a!<%k$rAw$C$F2<$5$$!#(B
+~/.emacs.d/lookup/init.el で Lookup の設定をまとめて行なうことが出来ます。

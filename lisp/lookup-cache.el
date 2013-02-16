@@ -25,16 +25,19 @@
 (require 'lookup)
 
 (defconst lookup-dump-functions
-  '(lookup-dump-modules
-    lookup-dump-agent-attributes
-    lookup-dump-module-attributes
+  '(lookup-dump-agent-attributes
     lookup-dump-dictionary-attributes
+    lookup-dump-module-attributes
     lookup-dump-entry-attributes))
 
-(defvar lookup-agent-attributes nil)
-(defvar lookup-module-attributes nil)
-(defvar lookup-dictionary-attributes nil)
-(defvar lookup-entry-attributes nil)
+(defvar lookup-agent-attributes nil
+  "Agent attributes restored from cache.")
+(defvar lookup-dictionary-attributes nil
+  "Dictionary attributes restored from cache.")
+(defvar lookup-module-attributes nil
+  "Module attributes restored from cache.")
+(defvar lookup-entry-attributes nil
+  "Entry attributes restored from cache.")
 
 ;; 
 (defvar lookup-cache-bookmarks nil)
@@ -65,25 +68,6 @@
 
 
 ;;;
-;;; Search modules
-;;;
-
-(defun lookup-dump-modules ()
-  (setq lookup-search-modules
-	(mapcar (lambda (module)
-		  (cons (lookup-module-name module)
-			(mapcar (lambda (dict)
-				  (lookup-dump-modules-dictionary module dict))
-				(lookup-module-dictionaries module))))
-		lookup-module-list))
-  (lookup-dump-list 'lookup-search-modules 2))
-
-(defun lookup-dump-modules-dictionary (module dict)
-  (list (lookup-dictionary-id dict)
-	:priority (lookup-module-dictionary-priority module dict)))
-
-
-;;;
 ;;; Agent attributes
 ;;;
 
@@ -93,7 +77,10 @@
 		  (list (lookup-agent-id agent)
 			(cons 'dictionaries
 			      (mapcar 'lookup-dictionary-name
-				      (lookup-agent-dictionaries agent)))))
+				      (lookup-agent-dictionaries agent)))
+                        ;(cons 'options
+                        ;      (lookup-agent-options agent))
+                        ))
 		lookup-agent-list))
   (lookup-dump-list 'lookup-agent-attributes 2))
 
@@ -103,7 +90,9 @@
     (lookup-put-property
      agent 'dictionaries
      (mapcar (lambda (name) (lookup-new-dictionary agent name))
-	     (lookup-assq-get alist 'dictionaries)))))
+	     (lookup-assq-get alist 'dictionaries)))
+    ;(setf (lookup-agent-options agent) (lookup-assq-get alist 'options))
+    ))
 
 
 ;;;
@@ -111,30 +100,46 @@
 ;;;
 
 (defun lookup-dump-module-attributes ()
-  (dolist (module lookup-module-list)
-    (let (alist)
-      (let ((marks (mapcar 'lookup-entry-id
-			   (lookup-module-bookmarks module))))
-	(if marks (lookup-assq-set 'alist 'bookmarks marks)))
-      (lookup-assoc-set 'lookup-module-attributes
-			(lookup-module-name module) alist)))
+  (setq lookup-module-attributes
+	(mapcar (lambda (module)
+		  (list (lookup-module-name module)
+                        (cons 'dictionaries
+                              (mapcar 'lookup-dictionary-id
+                                      (lookup-module-dictionaries module)))
+                        (cons 'priority-alist
+                              (mapcar (lambda (x) (cons (lookup-dictionary-id (car x)) (cdr x)))
+                                      (lookup-module-priority-alist module)))
+			(cons 'bookmarks
+                              (mapcar 'lookup-entry-id
+                                      (lookup-module-bookmarks module)))
+                        ))
+		lookup-module-list))
   (lookup-dump-list 'lookup-module-attributes 3))
 
-;(defun lookup-dump-module-attributes--session (session)
-;  (let ((type (lookup-session-type session)))
-;    (cond ((eq type 'lookup-select-session) (list type))
-;	  ((eq type 'lookup-search-query)
-;	   (let ((query (lookup-session-query session)))
-;	     (cons type (list (lookup-query-method query)
-;			      (lookup-query-string query)
-;			      (lookup-query-pattern query))))))))
+;(defun lookup-dump-module-attributes ()
+;  (dolist (module lookup-module-list)
+;    (let (alist)
+;      (let ((marks (mapcar 'lookup-entry-id
+;			   (lookup-module-bookmarks module))))
+;	(if marks (lookup-assq-set 'alist 'bookmarks marks)))
+;      (lookup-assoc-set 'lookup-module-attributes
+;			(lookup-module-name module) alist)
+;      )
+;;  (lookup-dump-list 'lookup-module-attributes 3))
 
 (defun lookup-restore-module-attributes (module)
   (let ((alist (lookup-assoc-ref 'lookup-module-attributes
-				 (lookup-module-name module))))
-    (let ((marks (mapcar 'lookup-get-entry-create
-			 (lookup-assq-ref 'alist 'bookmarks))))
-      (setf (lookup-module-bookmarks module) marks))))
+                                 (lookup-module-name module))))
+    (let ((dictionaries (mapcar 'lookup-get-dictionary
+                                (lookup-assq-ref 'alist 'dictionaries))))
+      (setf (lookup-module-dictionaries module) dictionaries))
+    (let ((priority-alist (mapcar (lambda (x)
+                                    (cons (lookup-get-dictionary (car x)) (cdr x)))
+                                  (lookup-assq-ref 'alist 'priority-alist))))
+      (setf (lookup-module-priority-alist module) priority-alist))
+    (let ((bookmarks (mapcar 'lookup-get-entry-create
+                             (lookup-assq-ref 'alist 'bookmarks))))
+      (setf (lookup-module-bookmarks module) bookmarks))))
 
 
 ;;;
@@ -146,7 +151,11 @@
 	(mapcar (lambda (dict)
 		  (list (lookup-dictionary-id dict)
 			(cons 'title (lookup-dictionary-title dict))
-			(cons 'methods (lookup-dictionary-methods dict))))
+			(cons 'methods (lookup-dictionary-methods dict))
+                        ;; dictionary options are put by support files.
+                        ;(cons 'options
+                        ;      (lookup-dictionary-options dict))))
+                        ))
 		lookup-dictionary-list))
   (lookup-dump-list 'lookup-dictionary-attributes 2))
 

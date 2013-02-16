@@ -92,14 +92,15 @@
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
                        (lookup-dictionary-agent dictionary)))))
-    (mapcar
-     (lambda (x) (lookup-new-entry
-                  'regular dictionary (car x) (cdr x)))
-     (lookup-with-coding-system 'cp932-dos
-       (ndsary-file-searches
-        file string method ndbtonic-entry-tags-list
-        ndbtonic-content-tags ndbtonic-code-tags 
-        ndbtonic-head-tags)))))
+    (loop for (code head val) in (ndtext-search-multiple 
+                                  'ndsary file string method
+                                  ndbtonic-content-tags 
+                                  ndbtonic-entry-tags-list
+                                  ndbtonic-head-tags ndbtonic-code-tags
+                                  'cp932-dos)
+          for entry = (lookup-new-entry 'regular dictionary code head)
+          do (puthash (cons dict-id code) val ndtext-cache)
+          collect entry)))
 
 (put 'ndbtonic :content 'ndbtonic-entry-content)
 (defun ndbtonic-entry-content (entry)
