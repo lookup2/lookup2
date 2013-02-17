@@ -37,6 +37,7 @@
 ;;; Code:
 
 (require 'lookup-vars)
+(require 'stem-english)
 
 ;;;
 ;;; Customizable Variables
@@ -97,12 +98,11 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
          (split-string (japanese-hiragana (buffer-string)))
          :test 'equal)))))
 
-;;;###autoload
 (defun lookup-text-get-readings (str)
   "STR を漢字ひらがな変換して得られた結果のリストを返す関数.
 変換できない文字が含まれていた場合は、nilを返す。"
   (if (and (lookup-text-charsetsp str '(japanese-jisx0208))
-           (string-match "^[あ-んア-ンー一-鿿]+$" str))
+           (string-match "^\\(\\cH\\|\\cK\\|\\cC\\)+$" str))
       (let ((readings (gethash str lookup-text-reading-hash)))
         (unless readings
           (setq readings (lookup-text-mecab-get-readings str))
@@ -139,28 +139,17 @@ If ANY kanji failed to be converted, then nil will be returned."
 ;;;
 
 (defun lookup-text-charsetsp (string charsets)
-  "Determines if all of chars in STRING belongs to any of CHARSETS list.
+  "Determines if all of chars in STRING belongs to any of CHARSETS (or scripts).
 If CHARSETS if function, then result of applying the function to
 the string will be returned.  If CHARSETS is null, it returns t."
   (if (null charsets) t
     (if (functionp charsets) (funcall charsets string)
-      (let ((flag t) (chars (string-to-list string)) charsets-2)
-        (while (and flag chars)
-          (setq charsets-2 charsets flag nil)
-          (while (and (null flag) charsets-2)
-            (if (encode-char (car chars) (car charsets-2))
-                (setq flag t)
-              (setq charsets-2 (cdr charsets-2))))
-          (setq chars (cdr chars)))
-        flag))))
-
-(defun lookup-text-cjk-p (string)
-  "Determines if STRING consists of CJK Unified Ideogrphs."
-  (if (string-match "^\\cC+$" string) t))
-
-(defun lookup-text-single-cjk-p (string)
-  "Determines if STRING is one single CJK Unified Ideogrph."
-  (if (string-match "^\\cC$" string) t))
+      (loop for char in (string-to-list string)
+            always
+            (loop for charset in charsets
+                  thereis
+                  (or (and (charsetp charset) (encode-char char charset))
+                      (equal (aref char-script-table char) charset)))))))
 
 ;;;
 ;;; query-filter

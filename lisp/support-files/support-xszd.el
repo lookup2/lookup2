@@ -60,7 +60,7 @@
             :entry-tags   '("**" . "\n")
             :content-tags '("**" . "\n*")
             :coding 'utf-8
-            :charsets 'lookup-text-single-cjk-p
+            :charsets (lambda (x) (string-match "^\\cC$" x))
             :arranges '((replace support-xszd-arrange-structure))))
 
 ;;; support-xszd.el ends here

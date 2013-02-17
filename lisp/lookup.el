@@ -64,12 +64,12 @@ If you have already started lookup, display the last status of buffers."
           (lookup-initialize))
       (lookup-select-dictionaries (lookup-default-module)))))
 
-(defun lookup-kill ()
-  "Force Lookup to be quiet when you exit Emacs.
-This can be used when you cannot finish Emacs because of an error of Lookup."
-  (interactive)
-  (lookup-clear)
-  (message "OK, you can exit Emacs"))
+;(defun lookup-kill ()
+;  "Force Lookup to be quiet when you exit Emacs.
+;This can be used when you cannot finish Emacs because of an error of Lookup."
+;  (interactive)
+;  (lookup-clear)
+;  (message "OK, you can exit Emacs"))
 
 (defun lookup-debug ()
   "Toggle Lookup debug mode."
@@ -151,8 +151,9 @@ Type `\\[lookup]' to back to Lookup."
   "Exit Lookup and related processes."
   (interactive)
   (if (not lookup-last-session)
-      (if (called-interactively-p) (error "Lookup is not started"))
-    (when (or (not (called-interactively-p))
+      (if (called-interactively-p 'any)
+          (error "Lookup is not started"))
+    (when (or (not (called-interactively-p 'any))
 	      (y-or-n-p "Are you sure to exit Lookup? "))
       (lookup-with-message "Exiting Lookup"
 	(if lookup-cache-file (lookup-dump-cache lookup-cache-file))
@@ -180,7 +181,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 (defun lookup-restart ()
   "Exit Lookup, initialize it again, and restart."
   (interactive)
-  (when (or (not (called-interactively-p))
+  (when (or (not (called-interactively-p 'interactive))
 	    (yes-or-no-p "Are you sure to restart Lookup? "))
     (setq lookup-property-table nil)
     (setq lookup-current-session nil)
@@ -932,19 +933,6 @@ If there is no session, default module will be returned."
 			  (lookup-dictionary-id dict)
 			  (cdr pair))
         ))))
-
-
-;;; formatting
-
-(defun lookup-format-internal (entry functions msg)
-  (let ((n 1))
-    (dolist (func functions)
-      (when func
-	(if msg
-	    (lookup-message (concat msg (make-string (setq n (1+ n)) ?.))))
-	(widen)
-	(goto-char (point-min))
-	(funcall func entry)))))
 
 (provide 'lookup)
 

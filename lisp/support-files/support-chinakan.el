@@ -97,7 +97,7 @@
 (setq lookup-support-options
       (list :title "支那文を讀む爲の漢字典"
             :coding 'utf-8-dos
-            ;; :charsets '(han kana)
+            :charsets '(han kana)
             :entry-tags-list 'support-chinakan-entry-tags-list
             :content-tags '("\n" . "\n")
             :code-tags  '("" . ",")

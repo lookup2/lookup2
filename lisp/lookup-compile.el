@@ -4,7 +4,7 @@
 
 (defun lookup-bytecomp ()
   (setq lookup-byte-compiling t)
-  (mapcar 'load command-line-args-left)
+  (mapc 'load command-line-args-left)
   (mapc 'byte-compile-file command-line-args-left))
 
 (defun lookup-autoload ()

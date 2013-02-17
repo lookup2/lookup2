@@ -154,7 +154,7 @@
       (setq contents (concat header contents)))
     (kill-new contents)
     (if transient-mark-mode (setq deactivate-mark t))
-    (when (interactive-p)
+    (when (called-interactively-p 'interactive)
       (if (pos-visible-in-window-p (mark) (selected-window))
 	  (let ((inhibit-quit t))
 	    (save-excursion (goto-char (mark)) (sit-for 1)))

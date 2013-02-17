@@ -146,7 +146,7 @@ If first element of DICT-SPECS is t, then new module will be
 created.  
 Each DICT-SPEC consists of (dict-id :option val ....)."
   (let ((module (make-lookup-module :name name))
-        (dict-list (mapcar #'lookup-dictionary-id lookup-dictionary-list))
+        (dict-list (mapcar 'lookup-dictionary-id lookup-dictionary-list))
         dict-id dict dicts prio)
     (if (null dict-specs) 
         (if lookup-cache-file
@@ -416,17 +416,21 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-dictionary-search (dictionary query)
   (let ((method  (lookup-query-method query))
+        (string  (lookup-query-string query))
+        (charsets (lookup-dictionary-option dictionary :charsets t))
         (filters (lookup-dictionary-query-filters dictionary)))
-    (when (eq method 'default)
-      (setf (lookup-query-method query) 
-            (lookup-dictionary-default-method dictionary)))
-    (let* ((queries (if filters (lookup-filter-query query filters)
-                      (list query)))
-	   (entries (lookup-dictionary-search-multiple
-		     dictionary queries)))
-      (run-hook-with-args 'lookup-after-dictionary-search-hook
-			  dictionary entries)
-      entries)))
+    ;; check if string satisfies requirements
+    (when (lookup-text-charsetsp string charsets)
+      (when (eq method 'default)
+        (setf (lookup-query-method query) 
+              (lookup-dictionary-default-method dictionary)))
+      (let* ((queries (if filters (lookup-filter-query query filters)
+                        (list query)))
+             (entries (lookup-dictionary-search-multiple
+                       dictionary queries)))
+        (run-hook-with-args 'lookup-after-dictionary-search-hook
+                            dictionary entries)
+        entries))))
 
 (defun lookup-dictionary-search-multiple (dictionary queries)
   (let* ((entries
@@ -443,18 +447,16 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-dictionary-search-internal (dictionary query)
   (let ((string   (lookup-query-string query))
-        (charsets (lookup-dictionary-option dictionary :charsets t))
         entries)
     (if (null (memq (lookup-query-method query) lookup-search-methods))
               (error "Invalid method!"))
-    (when (lookup-text-charsetsp string charsets)
-      (unless lookup-force-update
-        (setq entries (lookup-dictionary-search-cache-get dictionary query)))
-      (unless entries
-        (setq entries (or (lookup-regular-search dictionary query) 'no-exists))
-        (lookup-dictionary-search-cache-put dictionary query entries))
-      (unless (eq entries 'no-exists)
-        entries))))
+    (unless lookup-force-update
+      (setq entries (lookup-dictionary-search-cache-get dictionary query)))
+    (unless entries
+      (setq entries (or (lookup-regular-search dictionary query) 'no-exists))
+      (lookup-dictionary-search-cache-put dictionary query entries))
+    (unless (eq entries 'no-exists)
+      entries)))
 
 (defun lookup-regular-search (dictionary query)
   (lookup-dictionary-command dictionary :search query))
@@ -488,7 +490,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 	  (setq type 'link code entry)))
      ((or (eq type 'link) (eq type 'slink))
       (setq code (lookup-entry-substance code))))
-    (let ((id (apply #'concat (lookup-dictionary-id dictionary)
+    (let ((id (apply 'concat (lookup-dictionary-id dictionary)
 		     (cond ((eq type 'regular) (list "#" code))
 			   ((eq type 'dynamic) (list "?" code))
 			   ((eq type 'url)     (list "&" code))

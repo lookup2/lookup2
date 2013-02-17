@@ -257,9 +257,10 @@ based on: http://www.unicode.org/Public/UNIDATA/PropertyAliases.txt"  )
 
 ;; Query-Filter
 (defun support-ucd-query-filter (query)
-  (lookup-query-filter 
+  (lookup-query-filter
    query
-   (lambda (x) (format "%04X" (string-to-char x)))))
+   (lambda (str) 
+     (format "%04X" (string-to-char str)))))
 
 (defun support-ucd-arrange-structure (entry)
   "Arrange contents of ENTRY."
@@ -309,6 +310,7 @@ based on: http://www.unicode.org/Public/UNIDATA/PropertyAliases.txt"  )
             :content-tags '("\n" . "\n")
             :entry-tags '(" cp=\"" . "\"")
             :code-tags '(" cp=\"" . "\"")
+            :charsets (lambda (x) (string-match "^.$" x))
             :arranges '((reference support-ucd-arrange-structure))))
 
 ;;; support-ucd.el ends here

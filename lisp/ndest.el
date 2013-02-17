@@ -414,7 +414,7 @@ estcall使用時は無効。"
 
 (defun ndest-normalize-query-string (string)
   (with-temp-buffer
-    (insert-string string)
+    (insert string)
     (goto-char (point-min))
     (when (re-search-forward "^[ &|!]+" nil t)
       (replace-match "" t t))
@@ -435,18 +435,18 @@ estcall使用時は無効。"
 	  (cond
 	   ;; フレーズ検索
 	   ((string-match "^\".*\"$" word)
-	    (insert-string (substring word 1 -1)))
+	    (insert (substring word 1 -1)))
 	   ;; ワイルドカード検索
 	   ((string-match "^\\*.*\\*$" word)
-	    (insert-string (concat "[RX] " (substring word 1 -1))))
+	    (insert (concat "[RX] " (substring word 1 -1))))
 	   ;; 前方一致検索
 	   ((string-match "^\\*" word)
-	    (insert-string (concat "[BW] " (substring word 1))))
+	    (insert (concat "[BW] " (substring word 1))))
 	   ;; 後方一致検索
 	   ((string-match "\\*$" word)
-	    (insert-string (concat "[EW] " (substring word 0 -1))))
+	    (insert (concat "[EW] " (substring word 0 -1))))
 	   ;; 通常検索
-	   (t (insert-string word)))
+	   (t (insert word)))
 	  (unless (re-search-forward "[ |&!]+" nil t)
 	    (throw ':done t))
 	  (setq word (match-string 0)
@@ -457,12 +457,12 @@ estcall使用時は無効。"
 	  (cond
 	   ;; OR検索
 	   ((string-match "|" word)
-	    (insert-string " OR "))
+	    (insert " OR "))
 	   ;; ANDNOT検索
 	   ((string-match "!" word)
-	    (insert-string " ANDNOT "))
+	    (insert " ANDNOT "))
 	   ;; AND検索
-	   (t (insert-string " AND "))))))
+	   (t (insert " AND "))))))
     (buffer-string)))
 
 ;;;
@@ -541,7 +541,7 @@ estcall使用時は無効。"
   "uriがfile://で始まる場合はパス名に変換する。そうでない場合はnilを返す。"
   (when (ndest-uri-is-file uri)
     (with-temp-buffer
-      (insert-string uri)
+      (insert uri)
       (goto-char (point-min))
       (re-search-forward "^file://" nil t)
       (replace-match "" t t)
@@ -643,10 +643,10 @@ estcall使用時は無効。"
     (search-forward "\n\n" nil t)
     (delete-region (point-min) (match-beginning 0))
     (goto-char (point-min))
-    (insert-string (concat subject "\nFrom: " from "\nTo: " to "\n"))
+    (insert (concat subject "\nFrom: " from "\nTo: " to "\n"))
     (let (start end)
       (setq start (point))
-      (insert-string uri)
+      (insert uri)
       (setq end (point))
       (ndest-set-link start end nil "message/rfc822" uri file))
     (goto-char (point-min))
@@ -657,7 +657,7 @@ estcall使用時は無効。"
 	    (string (match-string 1)))
 	(replace-match "" t t)
 	(goto-char point)
-	(insert-string (concat " " string " "))
+	(insert (concat " " string " "))
 	(lookup-make-region-heading point (point) 2)))
     (goto-char (point-min))
     (lookup-arrange-fill-lines entry)))
@@ -697,8 +697,8 @@ estcall使用時は無効。"
     (goto-char (point-min))
     (let (start end)
       (setq start (point))
-      (if file (insert-string file)
-        (insert-string uri))
+      (if file (insert file)
+        (insert uri))
       (setq end (point))
       (ndest-set-link start end nil type uri file)
       (add-text-properties start end '(read-only t)) ;; added
@@ -709,7 +709,7 @@ estcall使用時は無効。"
 	  (string (match-string 1)))
       (replace-match "" t t)
       (goto-char point)
-      (insert-string (concat " " string " "))
+      (insert (concat " " string " "))
       (lookup-make-region-heading point (point) 2))))
 
 

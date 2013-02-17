@@ -59,7 +59,8 @@
 (defun lookup-modules-update-buffer ()
   (let ((line (lookup-current-line)))
     (lookup-modules-build-buffer)
-    (goto-line line)))
+    (goto-char (point-min))
+    (forward-line (1- line))))
 
 ;;;
 ;;; Modules Mode
@@ -129,13 +130,7 @@
   (setq name (replace-regexp-in-string "[\t ]+$" "" name))
   (if (lookup-get-module name)
       (error "Module `%s' already exists" name))
-  (let ((modules lookup-module-list)
-        (module (lookup-modules-this-module))
-        (new-module (lookup-new-module name t)))
-    (if (eq module (car modules))
-        (setq lookup-module-list (cons new-module modules))
-      (while (not (eq module (cadr modules))) (setq modules (cdr modules)))
-      (setcdr modules (cons new-module (cdr modules)))))
+  (push (lookup-new-module name t) lookup-module-list)
   (lookup-modules-update-buffer))
 
 (defun lookup-modules-rename-module ()

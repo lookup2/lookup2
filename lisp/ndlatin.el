@@ -92,13 +92,13 @@ Windows/Linux version (ver 1.97), it should be '~'"
 ;:: Interface
 ;;;
 
-(put 'ndlatin :list     #'ndlatin-list)
-(put 'ndlatin :kill     #'ndlatin-kill)
-(put 'ndlatin :title    #'ndlatin-dictionary-title)
+(put 'ndlatin :list     'ndlatin-list)
+(put 'ndlatin :kill     'ndlatin-kill)
+(put 'ndlatin :title    'ndlatin-dictionary-title)
 (put 'ndlatin :methods  '(exact))
 (put 'ndlatin :charsets '(ascii))
-(put 'ndlatin :search   #'ndlatin-dictionary-search)
-(put 'ndlatin :content  #'ndlatin-entry-content)
+(put 'ndlatin :search   'ndlatin-dictionary-search)
+(put 'ndlatin :content  'ndlatin-entry-content)
 
 ;;;
 ;;; Internal variables

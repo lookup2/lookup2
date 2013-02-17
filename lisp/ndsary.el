@@ -71,7 +71,7 @@
   (setq ndtext-cache (make-hash-table :test 'equal))
   (let ((directory (lookup-agent-location agent)))
     (cond
-     ((not (executable-find ndsary-sary-program))
+     ((not (executable-find ndsary-sary))
       (error "ndsary: program not found.") nil)
      ((not (file-exists-p (lookup-agent-location agent)))
       (error "ndsary: agent %s not found." 
@@ -118,7 +118,7 @@
 (defun ndsary-entry-content (entry)
   "Return string content of ENTRY."
   (let* ((dictionary (lookup-entry-dictionary entry))
-         (dict-id    (lookup-dictionary-id dictionary))
+         (dict-id    (lookup-dictionary-id dictionary)) ; file
          (heading    (lookup-entry-heading entry))
          (code       (lookup-entry-code entry))
          (coding     (or (lookup-dictionary-option dictionary :coding t)
@@ -127,7 +127,7 @@
         (destructuring-bind
             (content-tags entry-tags head-tags code-tags entry-tags-list)
             (ndtext-dictionary-options dictionary heading)
-          (ndtext-process 'ndsary 'get file code 'exact
+          (ndtext-process 'ndsary 'get dict-id code 'exact
                           content-tags entry-tags head-tags
                           code-tags coding)))))
 
@@ -140,7 +140,7 @@
 (put 'ndsary :program-symbol  'ndsary-sary)
 (put 'ndsary :max-count-check 'ndsary-max-count-check)
 
-(defun ndsary-max-count-check (sary-pattern coding)
+(defun ndsary-max-count-check (file sary-pattern coding)
   "Return nil if there are too many hits."
   (let (num status)
     (with-temp-buffer

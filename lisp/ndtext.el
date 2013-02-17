@@ -189,7 +189,7 @@
         (destructuring-bind 
             (content-tags entry-tags head-tags code-tags entry-tags-list)
             (ndtext-dictionary-options dictionary heading)
-          (ndtext-process 'ndtext 'get file code 'exact
+          (ndtext-process 'ndtext 'get dict-id code 'exact
                           content-tags entry-tags head-tags
                           code-tags coding)))))
 
@@ -291,7 +291,7 @@
       (if (or (equal action 'get)
               (and (equal action 'search)
                    (or (null max-count-check)
-                       (funcall max-count-check pattern coding))))
+                       (funcall max-count-check file pattern coding))))
           (with-temp-buffer
             ;; This newline insertion will make single-line search matches to first line.
             (if single-line (insert "\n")) 
@@ -374,8 +374,8 @@
 
 (defun ndtext-multi-line-pattern (string method content-tags tags)
   "Construct grep pattern."
-  (let ((entry-start   (ndtext-regexp-quote (car entry-tags)))
-        (entry-end     (ndtext-regexp-quote (cdr entry-tags)))
+  (let ((tag-start   (ndtext-regexp-quote (car tags)))
+        (tag-end     (ndtext-regexp-quote (cdr tags)))
         (content-start (ndtext-regexp-quote (car content-tags)))
         (content-end   (ndtext-regexp-quote (cdr content-tags)))
         (any-char (concat "(?:(?!"
@@ -384,35 +384,35 @@
     (concat
      "(?s)"             ; PCRE_DOTALL
      content-start      ; <content> 
-     (if entry-start
-         ;; * <entry> is defined
+     (if tag-start
+         ;; * <tag> is defined
          ;;   <content>..?(search-word)..(</content>)
-         ;;              exact     :: <entry>string</entry>
-         ;;              prefix    :: <entry>string
-         ;;              suffix    :: string</entry>
+         ;;              exact     :: <tag>string</tag>
+         ;;              prefix    :: <tag>string
+         ;;              suffix    :: string</tag>
          ;;              substring :: string
-         ;;              text      :: </entry>..?string
+         ;;              text      :: </tag>..?string
          (concat any-char "?"
                  (case method
                    ('exact
-                    (concat entry-start string entry-end))
+                    (concat tag-start string tag-end))
                    ('prefix
-                    (concat entry-start string))
+                    (concat tag-start string))
                    ('suffix
-                    (concat string entry-end))
+                    (concat string tag-end))
                    (t string)))
-       ;; * <entry> is not defined
+       ;; * <tag> is not defined
        ;;   <content>(search-word)..(</content>)
-       ;;              exact     :: string</entry>
+       ;;              exact     :: string</tag>
        ;;              prefix    :: string
-       ;;              suffix    :: ..?string</entry>
+       ;;              suffix    :: ..?string</tag>
        ;;              substring :: ..?string
-       ;;              text      :: ..?</entry>..string
+       ;;              text      :: ..?</tag>..string
        ;;    ※ ".." = (!</content)*
        (case method
-         ('exact (concat string entry-end))
+         ('exact (concat string tag-end))
          ('prefix string)
-         ('suffix (concat any-char "?" entry-end))
+         ('suffix (concat any-char "?" tag-end))
          (t (concat any-char "?" string))))
      any-char)))
 

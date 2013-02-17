@@ -87,8 +87,8 @@
 ;;;
 
 (put 'ndweb :methods 
-     '(exact prefix text))
-(put 'ndweb ':default-method
+     '(exact prefix))
+(put 'ndweb :default-method
      'text)
 
 
@@ -96,17 +96,17 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndweb :list #'ndweb-list)
+(put 'ndweb :list 'ndweb-list)
 (defun ndweb-list (agent)
   (list (lookup-new-dictionary agent "")))
 
-(put 'ndweb :title #'ndweb-title)
+(put 'ndweb :title 'ndweb-title)
 (defun ndweb-title (dict)
   (let* ((agent    (lookup-dictionary-agent dict))
          (url      (lookup-agent-location agent)))
     (elt (ndweb-parameters url) 0)))
     
-(put 'ndweb :search #'ndweb-search)
+(put 'ndweb :search 'ndweb-search)
 (defun ndweb-search (dict query)
   "Search web DICT for QUERY."
   (let* ((agent    (lookup-dictionary-agent dict))
@@ -119,7 +119,7 @@
               (lookup-new-entry 'regular dict term))
             terms)))
 
-(put 'ndweb :content #'ndweb-content)
+(put 'ndweb :content 'ndweb-content)
 (defun ndweb-content (entry)
   (let* ((dict     (lookup-entry-dictionary entry))
          (agent    (lookup-dictionary-agent dict))

@@ -121,14 +121,14 @@
 (defun nddsl-entry-content (entry)
   "Return string content of ENTRY."
   (let* ((code (lookup-entry-code entry))
-         (dict (lookup-entry-dictionary entry))
+         (dictionary (lookup-entry-dictionary entry))
          (dict-id (lookup-dictionary-id dictionary))
          (file (expand-file-name
                 (lookup-dictionary-name dictionary)
                 (lookup-agent-location
                  (lookup-dictionary-agent dictionary)))))
     (or (gethash (cons dict-id code) ndtext-cache)
-        (ndtext-process 'ndtext 'get file code method
+        (ndtext-process 'ndtext 'get file code 'exact
                         nddsl-content-tags nddsl-entry-tags))))
 
 ;;;

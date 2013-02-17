@@ -33,7 +33,6 @@
 
 (setq lookup-support-options
       (list
-       :sary-options '("-i")
        :coding 'utf-8
        :title 
        (cond ((string-match "b001.html" lookup-support-dictionary-id)

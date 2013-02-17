@@ -86,12 +86,13 @@
 (put 'ndbtonic :search 'ndbtonic-dictionary-search)
 (defun ndbtonic-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((string      (lookup-query-string query))
-        (method      (lookup-query-method query))
-        (file        (expand-file-name
-                      (lookup-dictionary-name dictionary)
-                      (lookup-agent-location
-                       (lookup-dictionary-agent dictionary)))))
+  (let ((string  (lookup-query-string query))
+        (method  (lookup-query-method query))
+        (dict-id (lookup-dictionary-id dictionary))
+        (file    (expand-file-name
+                  (lookup-dictionary-name dictionary)
+                  (lookup-agent-location
+                   (lookup-dictionary-agent dictionary)))))
     (loop for (code head val) in (ndtext-search-multiple 
                                   'ndsary file string method
                                   ndbtonic-content-tags 
@@ -105,16 +106,17 @@
 (put 'ndbtonic :content 'ndbtonic-entry-content)
 (defun ndbtonic-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((string     (lookup-entry-code entry))
+  (let* ((code       (lookup-entry-code entry))
          (dictionary (lookup-entry-dictionary entry))
          (file       (expand-file-name
                       (lookup-dictionary-name dictionary)
                       (lookup-agent-location
                        (lookup-dictionary-agent dictionary)))))
     (lookup-with-coding-system 'cp932-dos
-      (ndsary-file-content 
-       file  string 
-       (car ndbtonic-content-tags) (cdr ndbtonic-content-tags)))))
+      (ndtext-process 'ndsary 'get file code 'exact
+                      ndbtonic-content-tags 
+                      ndbtonic-code-tags ndbtonic-head-tags
+                      ndbtonic-code-tags 'cp932-dos))))
 
 (put 'ndbtonic :arrange-table
      '((replace   ndbtonic-arrange-replace
@@ -133,7 +135,7 @@
 
 ;; lookup content-arrangement functions and options
 (put 'ndbtonic :gaiji-regexp  "<gi set=\"unicode\" name=\"\\(.+\\)\"/>")
-(put 'ndbtonic :gaiji     #'ndbtonic-dictionary-gaiji)
+(put 'ndbtonic :gaiji     'ndbtonic-dictionary-gaiji)
 
 ;;;
 ;;; Internal Variables

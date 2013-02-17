@@ -128,7 +128,7 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndspotlight :list #'ndspotlight-list)
+(put 'ndspotlight :list 'ndspotlight-list)
 (defun ndspotlight-list (agent)
   (if (executable-find ndspotlight-search-program)
       (list (lookup-new-dictionary agent ""))
@@ -137,7 +137,7 @@
 
 (put 'ndspotlight :title ndspotlight-title)
 
-(put 'ndspotlight :search #'ndspotlight-search)
+(put 'ndspotlight :search 'ndspotlight-search)
 (defun ndspotlight-search (dictionary query)
   "Search spotlight DICTIONARY for QUERY."
   (let* ((location
@@ -187,7 +187,7 @@
           (setq entries (cons entry entries)))
         (nreverse entries)))))
 
-(put 'ndspotlight :content #'ndspotlight-content)
+(put 'ndspotlight :content 'ndspotlight-content)
 (defun ndspotlight-content (entry)
   (let* ((code (lookup-entry-code entry))
          (options (append ndspotlight-content-program-options

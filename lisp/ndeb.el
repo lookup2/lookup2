@@ -40,7 +40,9 @@
   :group 'ndeb)
 
 ;; '-i' may be attached to MacPorts version of eblook.
-(defcustom ndeb-program-arguments '("-q" "-e" "euc-jp")
+(defcustom ndeb-program-arguments
+  (if (equal system-type 'darwin) '("-q" "-e" "euc-jp" "-i")
+    '("-q" "-e" "euc-jp"))
   "*A list of arguments for eblook."
   :type '(repeat (string :tag "option"))
   :group 'ndeb)
@@ -140,17 +142,17 @@ Nil means it has not been checked yet.")
 ;;;
 
 ;; lookup entry command
-(put 'ndeb :content   #'ndeb-entry-content)
+(put 'ndeb :content   'ndeb-entry-content)
 
 ;; lookup agent command
-(put 'ndeb :list      #'ndeb-list)
-(put 'ndeb :kill      #'ndeb-kill)
+(put 'ndeb :list      'ndeb-list)
+(put 'ndeb :kill      'ndeb-kill)
 
 ;; lookup dictionary command
-(put 'ndeb :title     #'ndeb-dictionary-title)
-(put 'ndeb :methods   #'ndeb-dictionary-methods)
-(put 'ndeb :menu      #'ndeb-dictionary-menu)
-(put 'ndeb :search    #'ndeb-dictionary-search)
+(put 'ndeb :title     'ndeb-dictionary-title)
+(put 'ndeb :methods   'ndeb-dictionary-methods)
+(put 'ndeb :menu      'ndeb-dictionary-menu)
+(put 'ndeb :search    'ndeb-dictionary-search)
 
 ;; arrangements
 
@@ -185,10 +187,10 @@ Nil means it has not been checked yet.")
 
 ;; lookup content-arrangement functions and options
 (put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
-(put 'ndeb :gaiji     #'ndeb-dictionary-gaiji)
+(put 'ndeb :gaiji     'ndeb-dictionary-gaiji)
 
 (put 'ndeb :media-pattern '())
-(put 'ndeb :media     #'ndeb-dictionary-media)
+(put 'ndeb :media     'ndeb-dictionary-media)
 
 (put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
@@ -648,6 +650,7 @@ Nil means it has not been checked yet.")
           (lookup-new-entry 'regular dictionary code nil))))))))
 
 (defun ndeb-arrange-indent (entry)
+  (let ((dictionary (lookup-entry-dictionary entry)))
   (while (re-search-forward "<ind=\\([0-9]\\)>" nil t)
     (let ((beg-beg (match-beginning 0))
 	  (beg-end (match-end 0))
@@ -664,7 +667,7 @@ Nil means it has not been checked yet.")
 		       (match-beginning 0))
 		  (point-max)))
 	(set-left-margin point indent-end level)
-	(goto-char point)))))
+	(goto-char point))))))
 
 (defun ndeb-arrange-unicode (entry)
   (while (re-search-forward "<unicode>\\([0-9A-F０-９Ａ-Ｆ]+\\)</unicode>" nil t)

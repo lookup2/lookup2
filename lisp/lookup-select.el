@@ -65,7 +65,8 @@
 (defun lookup-select-update-buffer ()
   (let ((line (lookup-current-line)))
     (lookup-select-build-buffer (lookup-current-module))
-    (goto-line line)))
+    (goto-char (point-min))
+    (forward-line (1- line))))
 
 ;;;
 ;;; Select Mode

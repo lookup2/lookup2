@@ -591,7 +591,7 @@ See also `lookup-content-cite-region'."
     (lookup-summary-display-content))
   (with-current-buffer (lookup-content-buffer)
     (lookup-content-cite-region (point-max) (point-min)))
-  (when (interactive-p)
+  (when (called-interactively-p 'interactive)
     (message "Saved text for `%s'"
 	     (lookup-entry-heading (lookup-summary-this-entry)))))
 
