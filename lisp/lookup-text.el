@@ -86,17 +86,12 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
 (defun lookup-text-mecab-get-readings (str)
   (lookup-with-coding-system lookup-mecab-coding-system
     (with-temp-buffer
-      (let ((process
-             (apply 
-              'start-process 
-              `("mecab-reading" ,(current-buffer)
-                ,lookup-mecab-program
-                ,@lookup-text-mecab-readings-option))))
-        (process-send-string process (concat str "\n"))
-        (sit-for 0.1)
-        (remove-duplicates 
+      (insert str)
+      (apply 'call-process-region 1 (point-max) "mecab" t t nil 
+             lookup-text-mecab-readings-option)
+      (remove-duplicates 
          (split-string (japanese-hiragana (buffer-string)))
-         :test 'equal)))))
+         :test 'equal))))
 
 (defun lookup-text-get-readings (str)
   "STR を漢字ひらがな変換して得られた結果のリストを返す関数.
@@ -169,6 +164,9 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;; Normalize Input String
 ;;
 
+(defun lookup-query-filter-decode-url (query)
+  (lookup-query-filter query 'url-decode-url))
+
 (defun lookup-query-filter-normalize-nfc (query)
   (lookup-query-filter query 'lookup-remove-dichars 'ucs-normalize-NFC-string))
 
@@ -180,6 +178,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
   (replace-regexp-in-string "[〾󠀀-󯿽]" "" string))
 
 (add-to-list 'lookup-query-filters 'lookup-query-filter-normalize-nfkc)
+(add-to-list 'lookup-query-filters 'lookup-query-filter-decode-url)
 
 ;;
 ;; case

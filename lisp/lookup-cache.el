@@ -132,10 +132,12 @@
                                  (lookup-module-name module))))
     (let ((dictionaries (mapcar 'lookup-get-dictionary
                                 (lookup-assq-ref 'alist 'dictionaries))))
+      (setq dictionaries (delete-if 'null dictionaries))
       (setf (lookup-module-dictionaries module) dictionaries))
     (let ((priority-alist (mapcar (lambda (x)
                                     (cons (lookup-get-dictionary (car x)) (cdr x)))
                                   (lookup-assq-ref 'alist 'priority-alist))))
+      (setq priority-alist (delete-if 'null priority-alist))
       (setf (lookup-module-priority-alist module) priority-alist))
     (let ((bookmarks (mapcar 'lookup-get-entry-create
                              (lookup-assq-ref 'alist 'bookmarks))))

@@ -55,7 +55,7 @@
 ;;; Internal variables
 ;;;
 
-(defvar ndsary-sary (executable-find "sary"))
+(defvar ndsary-sary "sary")
 
 ;;;
 ;;; Interface functions

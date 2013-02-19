@@ -46,7 +46,7 @@
 
 (require 'lookup)
 (require 'ndtext)
-(load "support-jitsuu")
+(load "support-files/support-jitsuu")
 
 
 
@@ -60,18 +60,10 @@
 
 (defvar ndjitsuu-convert-program "convert") ;; ImageMagick
 
-(defvar ndjitsuu-convert-program-options 
-  '("-background"  "white"  "-fill" "black" "-transparent" "white"))
+;(defvar ndjitsuu-convert-program-options
+;  '("-background"  "white"  "-fill" "black" "-transparent" "white"))
 
 (defvar ndjitsuu-font-size-offset 12)
-
-(defvar ndjitsuu-oyaji-index-file
-  (expand-file-name "~/edicts/Jitsuu/oyaji.txt")
-  "Oyaji Index file which should be indexed by `sary'.")
-
-(defvar ndjitsuu-jukugo-index-file
-  (expand-file-name "~/edicts/Jitsuu/jukugo.txt")
-  "Jukugo Index file which should be indexed by `sary'.")
 
 ;;;
 ;;; Internal variables
@@ -303,7 +295,7 @@
           (let ((image (ndjitsuu-font-image font-code font-size (elt string 0))))
             (if (/= (length string) 1) (message "ndjitsuu: warining! length /= 1!!!"))
             (add-text-properties start end (list 'ndjitsuu-font-code font-code))
-            (lookup-img-file-insert image 'png start end))
+            (lookup-img-file-insert image 'xbm start end))
         ;; Text
         (if (and font-size
                  (/= font-size 18))
@@ -336,8 +328,13 @@
             (expand-file-name "DATA/DAT/HONMON.INF" location)
             ndjitsuu-oyaji-file 
             (expand-file-name "DATA/LST/OYAJI.LST" location)
+            ndjitsuu-oyaji-index-file
+            (expand-file-name "oyaji.txt" location)
+            ndjitsuu-jukugo-index-file
+            (expand-file-name "jukugo.txt" location)
             ndjitsuu-font-directory 
-            (expand-file-name (lookup-agent-option agent :fonts)))
+            (or (lookup-agent-option agent :fonts)
+                (expand-file-name "Fonts" location)))
       (unless (and ndjitsuu-dat-file ndjitsuu-inf-file 
                    ndjitsuu-oyaji-file ndjitsuu-font-directory )
         (error "Files and Directory not properly set.")))))
@@ -565,14 +562,15 @@ Returns image file path."
          (image-file
           (expand-file-name
            (concat ndjitsuu-tmp-directory "/"
-                              (format "%02d-%s-%04X" size font-code code) ".png")))
-         (args (append ndjitsuu-convert-program-options
+                              (format "p%02d_%s_%04X" size font-code code) ".xbm")))
+         (args (append ;ndjitsuu-convert-program-options
                        (list "-size" (format "%02dx%02d" 
                                              (+ ndjitsuu-font-size-offset size)
                                              (+ ndjitsuu-font-size-offset size))
                              "-font" font-file
                              (format "label:%c" code)
                              image-file))))
+    (lookup-debug-message "ndjitsuu-font-image:args=%s" args)
     (if (null (file-exists-p image-file))
         (lookup-with-coding-system 'utf-8
           (apply 'call-process ndjitsuu-convert-program nil nil nil args)))

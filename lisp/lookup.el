@@ -64,12 +64,12 @@ If you have already started lookup, display the last status of buffers."
           (lookup-initialize))
       (lookup-select-dictionaries (lookup-default-module)))))
 
-;(defun lookup-kill ()
-;  "Force Lookup to be quiet when you exit Emacs.
-;This can be used when you cannot finish Emacs because of an error of Lookup."
-;  (interactive)
-;  (lookup-clear)
-;  (message "OK, you can exit Emacs"))
+(defun lookup-kill ()
+  "Force Lookup to be quiet when you exit Emacs.
+This can be used when you cannot finish Emacs because of an error of Lookup."
+  (interactive)
+  (lookup-clear)
+  (message "OK, you can exit Emacs"))
 
 (defun lookup-debug ()
   "Toggle Lookup debug mode."
@@ -160,14 +160,7 @@ Type `\\[lookup]' to back to Lookup."
 	(lookup-suspend)
 	(mapc 'kill-buffer lookup-buffer-list)
 	(mapc 'lookup-agent-clear lookup-agent-list)
-	(setq lookup-buffer-list nil)
-	(setq lookup-agent-list nil)
-	(setq lookup-module-list nil)
-	(setq lookup-dictionary-list nil)
-	(setq lookup-entry-table nil)
-	(setq lookup-current-session nil)
-        (setq lookup-search-history nil)
-	(setq lookup-last-session nil)))))
+        (lookup-clear)))))
 
 (defun lookup-leave ()
   "Leave the current buffer.
@@ -260,6 +253,7 @@ See `lookup-pattern' for details."
 (defun lookup-word (word &optional module)
   "Search for the word near the cursor."
   (interactive (lookup-word-input))
+  (or module (setq module (lookup-default-module)))
   (if lookup-edit-input 
       (lookup-search-pattern module (lookup-input-pattern module word))
     (lookup-search-pattern
@@ -922,6 +916,19 @@ If there is no session, default module will be returned."
   (lookup-init-support-autoload)
   (run-hooks 'lookup-load-hook)
   (add-hook 'kill-emacs-hook 'lookup-exit))
+
+(defun lookup-clear ()
+  "Clear all related variables without calling :kill command to
+dictionaries."
+  (setq lookup-buffer-list nil)
+  (setq lookup-agent-list nil)
+  (setq lookup-module-list nil)
+  (setq lookup-dictionary-list nil)
+  (setq lookup-entry-table nil)
+  (setq lookup-current-session nil)
+  (setq lookup-search-history nil)
+  (setq lookup-last-session nil)
+  (remove-hook 'kill-emacs-hook 'lookup-exit))
 
 (defun lookup-init-support-autoload ()
   (load "support-defs")
