@@ -165,7 +165,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;;
 
 (defun lookup-query-filter-decode-url (query)
-  (lookup-query-filter query 'url-decode-url))
+  (lookup-query-filter query 'url-unhex-string))
 
 (defun lookup-query-filter-normalize-nfc (query)
   (lookup-query-filter query 'lookup-remove-dichars 'ucs-normalize-NFC-string))
