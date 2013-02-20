@@ -1,4 +1,4 @@
-;;; lookup.el --- Search interface to electronic dictionaries
+;;; lookup.el --- Search interface to electronic dictionaries -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 
@@ -116,6 +116,7 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 	  (lookup-display-entries (lookup-current-module) query entries))
       (error "This module has no bookmark"))))
 
+;;;###autoload
 (defun lookup-list-history ()
   (interactive)
   (lookup-history-display (lookup-current-module)))

@@ -1,4 +1,4 @@
-;;; lookup-select.el --- Lookup select mode
+;;; lookup-select.el --- Lookup select mode -*- lexical-binding: t -*-
 ;; Copyright (C) 2000,2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -26,20 +26,25 @@
 (defconst lookup-select-priority-marks
   '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 
+(defvar lookup-select-module nil)
+
 ;;;###autoload
 (defun lookup-select-dictionaries (module)
   (interactive (list (lookup-current-module)))
   (with-current-buffer (lookup-get-buffer " *Dictionary List*")
+    (setq lookup-select-module module)
     (lookup-select-mode)
-    (lookup-select-build-buffer module)
+    (lookup-select-build-buffer)
     (setq buffer-undo-list nil)
     (buffer-enable-undo)
     (set-buffer-modified-p nil)
     (lookup-select-goto-first)
     (lookup-pop-to-buffer (current-buffer))))
 
-(defun lookup-select-build-buffer (module)
-  (let ((inhibit-read-only t))
+(defun lookup-select-build-buffer ()
+  (let ((inhibit-read-only t)
+        (module lookup-select-module))
+    (lookup-debug-message "module=%s" lookup-select-module)
     (erase-buffer)
     (insert "Lookup (module: " (lookup-module-name module) ")\n")
     (insert "Tyep `m' to select, `u' to unselect, `q' to leave, "
@@ -64,7 +69,7 @@
 
 (defun lookup-select-update-buffer ()
   (let ((line (lookup-current-line)))
-    (lookup-select-build-buffer (lookup-current-module))
+    (lookup-select-build-buffer)
     (goto-char (point-min))
     (forward-line (1- line))))
 
@@ -139,12 +144,11 @@ Search Methods:
 
 (defun lookup-select-mode ()
   "\\{lookup-select-mode-map}"
-  (interactive)
   (kill-all-local-variables)
   (setq major-mode 'lookup-select-mode)
   (setq mode-name "Select")
   (setq mode-line-buffer-identification
-	'("Lookup:%12b <" (lookup-module-name (lookup-current-module)) ">"))
+	'("Lookup:%12b <" (lookup-module-name lookup-select-module) ">"))
   (setq lookup-help-message lookup-select-mode-help)
   (setq buffer-read-only t)
   (setq truncate-lines t)
@@ -210,7 +214,7 @@ have found some entries, which means this dictionary cannot appear alone."
     (when dict
       (if (equal value 'default) 
           (setq value (or (lookup-dictionary-option dict :priority t) t)))
-      (setf (lookup-module-dictionary-priority (lookup-current-module) dict)
+      (setf (lookup-module-dictionary-priority lookup-select-module dict)
 	    value)
       (lookup-select-set-mark
        (lookup-assq-get lookup-select-priority-marks value)))))
@@ -230,7 +234,7 @@ have found some entries, which means this dictionary cannot appear alone."
            (agent (lookup-dictionary-agent dictionary))
            (agent-options (lookup-agent-options agent))
            (priority (lookup-module-dictionary-priority 
-                      (lookup-current-module) dictionary)))
+                      lookup-select-module dictionary)))
       (with-current-buffer (lookup-get-buffer "*Dictionary Information*")
         (let ((inhibit-read-only t))
           (help-mode)
@@ -257,7 +261,7 @@ have found some entries, which means this dictionary cannot appear alone."
   "Display selected dictionary menu.
 With prefix ARGS, display menus of all dictionaries in current module ."
   (interactive "P")
-  (let* ((module (lookup-current-module))
+  (let* ((module lookup-select-module)
 	 (dicts (if args (lookup-module-dictionaries module)
                   (list (lookup-select-this-dictionary))))
 	 entries)
@@ -286,12 +290,12 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
   (let ((lookup-search-dictionaries (list (lookup-select-this-dictionary)))
         (lookup-max-hits (or max-hits lookup-max-hits))
         (lookup-force-update (and max-hits t)))
-    (lookup-search-pattern (lookup-current-module) pattern)))
+    (lookup-search-pattern lookup-select-module pattern)))
 
 (defun lookup-select-add-dictionary (dictionary)
   "Add a DICTIONARY into the current module."
-  (interactive (list (lookup-input-dictionary (lookup-current-module))))
-  (let* ((module (lookup-current-module))
+  (interactive (list (lookup-input-dictionary lookup-select-module)))
+  (let* ((module lookup-select-module)
 	 (dict (lookup-select-this-dictionary))
 	 (dicts (lookup-module-dictionaries module)))
     (if (eq dict (car dicts))
@@ -303,7 +307,7 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
 (defun lookup-select-add-all-dictionaries ()
   "Add all dictionaries into the current module at the end."
   (interactive)
-  (let* ((module (lookup-current-module))
+  (let* ((module lookup-select-module)
 	 (dicts (lookup-module-dictionaries module))
          (diffs
           (set-difference lookup-dictionary-list dicts)))
@@ -333,7 +337,7 @@ will be used instead of the usual `kill-ring'."
 
 (defun lookup-select-update ()
   (interactive)
-  (let* ((module (lookup-current-module))
+  (let* ((module lookup-select-module)
 	 (message (format "Updating %s..." (lookup-module-name module))))
     (message message)
     ;; (dolist (dict (lookup-module-dictionaries module))
@@ -377,7 +381,7 @@ will be used instead of the usual `kill-ring'."
   "Reset the current module dictionaries with their priorities."
   (save-excursion
     (lookup-select-goto-first)
-    (let ((module (lookup-current-module)) dict dicts)
+    (let ((module lookup-select-module) dict dicts)
       (while (setq dict (lookup-select-this-dictionary))
 	(setf (lookup-module-dictionary-priority module dict)
 	      (car (rassq (char-after (point))

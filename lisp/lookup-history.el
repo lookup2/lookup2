@@ -1,4 +1,4 @@
-;;; lookup-history.el --- Lookup History mode
+;;; lookup-history.el --- Lookup History mode -*- lexical-binding: t -*-
 ;; Copyright (C) 2000,2009 Lookup Development Team
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -40,7 +40,6 @@
   (interactive "p")
   (lookup-next-history (- (or arg 1))))
 
-;;;###autoload
 (defun lookup-history-display (module)
   "Display lookup histories of MODULE."
   (with-current-buffer (lookup-get-buffer " *Search History*")
