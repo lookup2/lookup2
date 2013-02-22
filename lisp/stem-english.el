@@ -1,17 +1,16 @@
-;;; stem.el ---- routines for stemming
-;;; $Id: stem-english.el,v 1.5 2009/03/07 17:34:07 kawabata Exp $
+;;; stem.el ---- routines for stemming -*- lexical-binding: t -*-
 
 ;;; Author: Tsuchiya Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: stemming
 
 ;;; Commentary:
 
-;; $BO@J8!X(BAn algorithm for suffix stripping (M.F.Porter)$B!Y$K5-=R$5$l$F(B
-;; $B$$$k%"%k%4%j%:%`$K4p$E$$$F!"1QC18l$N8lHx$r<h$j=|$/$?$a$N%i%$%V%i%j!#(B
-;; $BMxMQ5Z$S:FG[I[$N:]$O!"(BGNU $B0lHL8xMQ5vBz=q$NE,Ev$J%P!<%8%g%s$K$7$?$,$C(B
-;; $B$F2<$5$$!#(B
+;; 論文『An algorithm for suffix stripping (M.F.Porter)』に記述されて
+;; いるアルゴリズムに基づいて、英単語の語尾を取り除くためのライブラリ。
+;; 利用及び再配布の際は、GNU 一般公用許諾書の適当なバージョンにしたがっ
+;; て下さい。
 
-;; $B0l<!G[I[85(B
+;; 一次配布元
 ;;    http://www-nagao.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html
 
 
@@ -19,108 +18,110 @@
 
 (provide 'stem-english)
 
-(defvar stem:minimum-word-length 4 "Porter $B$N%"%k%4%j%:%`$,E,MQ$G$-$k:G>.8lD9(B")
+(defvar stem:minimum-word-length 4 "Porter のアルゴリズムが適用できる最小語長")
+(defvar stem:stem nil)
+(defvar stem:str nil)
 
 
 ;;;============================================================
-;;;	$BHs8x3+4X?t(B
+;;;	非公開関数
 ;;;============================================================
 
-;; $BF0:nB.EY$r8~>e$5$;$k$?$a$K!"4X?tFbIt$G30ItJQ?t$r$$$8$C$F$$$k(B
-;; $B4X?t$,$"$j!"M=4|$7$J$$I{:nMQ$,H/@8$9$k2DG=@-$,9b$$!#=>$C$F!"(B
-;; $BHs8x3+4X?t$rD>@\8F$S=P$9$3$H$OHr$1$k$3$H!#(B
+;; 動作速度を向上させるために、関数内部で外部変数をいじっている
+;; 関数があり、予期しない副作用が発生する可能性が高い。従って、
+;; 非公開関数を直接呼び出すことは避けること。
 
 ;;------------------------------------------------------------
-;;	stemming-rule $B$N>r7o@a$r5-=R$9$k4X?t72(B
+;;	stemming-rule の条件節を記述する関数群
 ;;------------------------------------------------------------
 
 (defsubst stem:match (arg) "\
-$BJQ?t(B str $B$r8!::$9$kHs8x3+4X?t(B ($B8l44$NItJ,$rJQ?t(B stem $B$KBeF~$9$k(B)"
+変数 stem:str を検査する非公開関数 (語幹の部分を変数 stem:stem に代入する)"
   (and
-   (string-match arg str)
-   (setq stem (substring str 0 (match-beginning 0)))))
+   (string-match arg stem:str)
+   (setq stem:stem (substring stem:str 0 (match-beginning 0)))))
 
 (defsubst stem:m () "\
-$BJQ?t(B stem $B$K4^$^$l$F$$$k(B VC $B$N?t$r5a$a$kHs8x3+4X?t(B"
+変数 stem:stem に含まれている VC の数を求める非公開関数"
   (save-match-data
     (let ((pos 0)(m 0))
-      (while (string-match "\\(a\\|e\\|i\\|o\\|u\\|[^aeiou]y+\\)[aeiou]*" stem pos)
+      (while (string-match "\\(a\\|e\\|i\\|o\\|u\\|[^aeiou]y+\\)[aeiou]*" stem:stem pos)
 	(setq m (1+ m))
 	(setq pos (match-end 0)))
-      (if (= pos (length stem)) (1- m) m))))
+      (if (= pos (length stem:stem)) (1- m) m))))
 
 (defsubst stem:m> (i) "\
-$BJQ?t(B stem $B$K4^$^$l$F$$$k(B VC $B$N?t$N>r7o$r5-=R$9$kHs8x3+4X?t(B"
+変数 stem:stem に含まれている VC の数の条件を記述する非公開関数"
   (< i (stem:m)))
 
 (defsubst stem:m= (i) "\
-$BJQ?t(B stem $B$K4^$^$l$F$$$k(B VC $B$N?t$N>r7o$r5-=R$9$kHs8x3+4X?t(B"
+変数 stem:stem に含まれている VC の数の条件を記述する非公開関数"
   (= i (stem:m)))
 
 (defsubst stem:*v* () "\
-$BJQ?t(B stem $B$,Jl2;$r4^$s$G$$$k$+8!::$9$k4X?t(B"
+変数 stem:stem が母音を含んでいるか検査する関数"
   (save-match-data
-    (if (string-match "\\(a\\|e\\|i\\|o\\|u\\|[^aeiou]y\\)" stem) t)))
+    (if (string-match "\\(a\\|e\\|i\\|o\\|u\\|[^aeiou]y\\)" stem:stem) t)))
 
 (defsubst stem:*o () "\
-$BJQ?t(B stem $B$,(B cvc $B$N7A$G=*$C$F$$$k$+8!::$9$k4X?t(B"
+変数 stem:stem が cvc の形で終っているか検査する関数"
   (save-match-data
-    (if (string-match "[^aeiou][aeiouy][^aeiouwxy]$" stem) t)))
+    (if (string-match "[^aeiou][aeiouy][^aeiouwxy]$" stem:stem) t)))
 
 
 
 ;;------------------------------------------------------------
-;;	stemming-rule $B$r5-=R$7$?4X?t72(B
+;;	stemming-rule を記述した関数群
 ;;------------------------------------------------------------
 
-(defun stem:step1a (str) "$BBh(B1a$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((s)(stem))
+(defun stem:step1a (str) "第1a段階の stemming rule (非公開関数)"
+  (let (s stem:stem (stem:str str))
     (if (setq s (cond
 		 ((stem:match "sses$") "ss")
 		 ((stem:match "ies$")  "i")
 		 ((stem:match "ss$")   "ss")
 		 ((stem:match "s$")    "")))
-	(concat stem s)
-      str)))
+	(concat stem:stem s)
+      stem:str)))
 
 
-(defun stem:step1b (str) "$BBh(B1b$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((s)(stem))
+(defun stem:step1b (str) "第1b段階の stemming rule (非公開関数)"
+  (let (s stem:stem (stem:str str))
     (cond
      ((and (stem:match "eed$") (stem:m> 0))
-      (concat stem "ee"))
-     ((or (and (not stem) (stem:match "ed$") (stem:*v*))
+      (concat stem:stem "ee"))
+     ((or (and (not stem:stem) (stem:match "ed$") (stem:*v*))
 	  (and (stem:match "ing$") (stem:*v*)))
       (if (and (stem:m= 1) (stem:*o))
-	  (concat stem "e")
-	(setq str stem)
+	  (concat stem:stem "e")
+	(setq stem:str stem:stem)
 	(if (setq s (cond
 		     ((stem:match "at$") "ate")
 		     ((stem:match "bl$") "ble")
 		     ((stem:match "iz$") "ize")
 		     ((stem:match "\\([^lsz]\\)\\1$")
-		      (substring str (match-beginning 1) (match-end 1)))))
-	    (concat stem s)
-	  str)))
-     (t str))))
+		      (substring stem:str (match-beginning 1) (match-end 1)))))
+	    (concat stem:stem s)
+	  stem:str)))
+     (t stem:str))))
 
 
-(defun stem:step1c (str) "$BBh(B1c$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((stem))
+(defun stem:step1c (str) "第1c段階の stemming rule (非公開関数)"
+  (let (stem:stem (stem:str str))
     (if (and (stem:match "y$")
 	     (stem:*v*))
-	(concat stem "i")
-      str)))
+	(concat stem:stem "i")
+      stem:str)))
 
 
-(defun stem:step1 (str) "$BBh(B1$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
+(defun stem:step1 (str) "第1段階の stemming rule (非公開関数)"
   (stem:step1c
    (stem:step1b
     (stem:step1a str))))
 
 
-(defun stem:step2 (str) "$BBh(B2$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((s)(stem))
+(defun stem:step2 (str) "第2段階の stemming rule (非公開関数)"
+  (let (s stem:stem (stem:str str))
     (if (and
 	 (setq s (cond
 		  ((stem:match "ational$") "ate")
@@ -144,12 +145,12 @@
 		  ((stem:match "iviti$")   "ive")
 		  ((stem:match "biliti$")  "ble")))
 	 (stem:m> 0))
-	(concat stem s)
-      str)))
+	(concat stem:stem s)
+      stem:str)))
 
 
-(defun stem:step3 (str) "$BBh(B3$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((s)(stem))
+(defun stem:step3 (str) "第3段階の stemming rule (非公開関数)"
+  (let (s stem:stem (stem:str str))
     (if (and
 	 (setq s (cond
 		  ((stem:match "icate$") "ic")
@@ -160,12 +161,12 @@
 		  ((stem:match "ful$")   "")
 		  ((stem:match "ness$")  "")))
 	 (stem:m> 0))
-	(concat stem s)
-      str)))
+	(concat stem:stem s)
+      stem:str)))
 
 
-(defun stem:step4 (str) "$BBh(B4$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((stem))
+(defun stem:step4 (str) "第4段階の stemming rule (非公開関数)"
+  (let (stem:stem (stem:str str))
     (if (and (or
 	      (stem:match "al$")
 	      (stem:match "ance$")
@@ -178,8 +179,8 @@
 	      (stem:match "ement$")
 	      (stem:match "ment$")
 	      (stem:match "ent$")
-	      (and (string-match "[st]\\(ion\\)$" str)
-		   (setq stem (substring str 0 (match-beginning 1))))
+	      (and (string-match "[st]\\(ion\\)$" stem:str)
+		   (setq stem:stem (substring stem:str 0 (match-beginning 1))))
 	      (stem:match "ou$")
 	      (stem:match "ism$")
 	      (stem:match "ate$")
@@ -188,20 +189,20 @@
 	      (stem:match "ive$")
 	      (stem:match "ize$"))
 	     (stem:m> 1))
-	stem str)))
+	stem:stem stem:str)))
 
 
-(defun stem:step5 (str) "$BBh(B5$BCJ3,$N(B stemming rule ($BHs8x3+4X?t(B)"
-  (let ((stem))
+(defun stem:step5 (str) "第5段階の stemming rule (非公開関数)"
+  (let (stem:stem (stem:str str))
     (if (or
 	 (and (stem:match "e$")
 	      (or (stem:m> 1)
 		  (and (stem:m= 1)
 		       (not (stem:*o)))))
 	 (and (stem:match "ll$")
-	      (setq stem (concat stem "l"))
+	      (setq stem:stem (concat stem "l"))
 	      (stem:m> 1)))
-	stem str)))
+	stem:stem stem:str)))
 
 
 (defvar stem:irregular-verb-alist
@@ -837,25 +838,25 @@
     ("wrote" "write")
     ("writ" "write")
     ("written" "write"))
-  "$BIT5,B'F0;l$H867A$NO"A[G[Ns(B")
+  "不規則動詞と原形の連想配列")
 
 
 (defun stem:extra (str) "\
-$BF0;l(B/$B7AMF;l$N3hMQ7A$HL>;l$NJ#?t7A$N3hMQ8lHx$r<h$j=|$/Hs8x3+4X?t(B
-$BM?$($i$l$?8l$N867A$H$7$F2DG=@-$N$"$k8l$N%j%9%H$rJV$9(B"
+動詞/形容詞の活用形と名詞の複数形の活用語尾を取り除く非公開関数
+与えられた語の原形として可能性のある語のリストを返す"
   (or (assoc str stem:irregular-verb-alist)
       (if (string= str "as") (list "as"))
-      (let (c l stem)
+      (let (c l stem:stem (stem:str str))
 	(setq l (cond
-		 ;; $BHf3S5i(B/$B:G>e5i(B
+		 ;; 比較級/最上級
 		 ((stem:match "\\([^aeiou]\\)\\1e\\(r\\|st\\)$")
-		  (list (substring str (match-beginning 1) (match-end 1))
-			(substring str (match-beginning 0) (match-beginning 2))))
+		  (list (substring stem:str (match-beginning 1) (match-end 1))
+			(substring stem:str (match-beginning 0) (match-beginning 2))))
 		 ((stem:match "\\([^aeiou]\\)ie\\(r\\|st\\)$")
 		  (setq c (substring str (match-beginning 1) (match-end 1)))
 		  (list c (concat c "y") (concat c "ie")))
 		 ((stem:match "e\\(r\\|st\\)$") '("" "e"))
-		 ;; 3$BC18=(B/$BJ#?t7A(B
+		 ;; 3単現/複数形
 		 ((stem:match "ches$") '("ch" "che"))
 		 ((stem:match "shes$") '("sh" "che"))
 		 ((stem:match "ses$") '("s" "se"))
@@ -863,51 +864,51 @@
 		 ((stem:match "zes$") '("z" "ze"))
 		 ((stem:match "ves$") '("f" "fe"))
 		 ((stem:match "\\([^aeiou]\\)oes$")
-		  (setq c (substring str -4 -3))
+		  (setq c (substring stem:str -4 -3))
 		  (list c (concat c "o") (concat c "oe")))
 		 ((stem:match "\\([^aeiou]\\)ies$")
-		  (setq c (substring str -4 -3))
+		  (setq c (substring stem:str -4 -3))
 		  (list c (concat c "y") (concat c "ie")))
 		 ((stem:match "es$") '("" "e"))
 		 ((stem:match "s$") '(""))
-		 ;; $B2a5n7A(B/$B2a5nJ,;l(B
+		 ;; 過去形/過去分詞
 		 ((stem:match "\\([^aeiou]\\)ied$")
-		  (setq c (substring str -4 -3))
+		  (setq c (substring stem:str -4 -3))
 		  (list c (concat c "y") (concat c "ie")))
 		 ((stem:match "\\([^aeiou]\\)\\1ed$")
-		  (list (substring str -4 -3)
-			(substring str -4 -1)))
+		  (list (substring stem:str -4 -3)
+			(substring stem:str -4 -1)))
 		 ((stem:match "cked$") '("c" "cke"))
 		 ((stem:match "ed$") '("" "e"))
-		 ;; $B8=:_J,;l(B
+		 ;; 現在分詞
 		 ((stem:match "\\([^aeiou]\\)\\1ing$")
-		  (list (substring str -5 -4)))
+		  (list (substring stem:str -5 -4)))
 		 ((stem:match "ing$") '("" "e"))
 		 ))
-	(append (mapcar (lambda (s) (concat stem s)) l)
-		(list str))
+	(append (mapcar (lambda (s) (concat stem:stem s)) l)
+		(list stem:str))
 	)))
 
 
 
 ;;;============================================================
-;;;	$B8x3+4X?t(B
+;;;	公開関数
 ;;;============================================================
 
 (defun stem:stripping-suffix (str) "\
-$B3hMQ8lHx$r<h$j=|$/4X?t(B
-$BM?$($i$l$?8l$N85$N8l$H$7$F2DG=@-$N$"$k8l$N<-=q=g$N%j%9%H$rJV$9(B"
+活用語尾を取り除く関数
+与えられた語の元の語として可能性のある語の辞書順のリストを返す"
   (save-match-data
     (delq nil (let ((w ""))
 		(mapcar
 		 (function (lambda (x) (if (string= x w) nil (setq w x))))
 		 (sort (append
-			;; $BBgJ8;z$r>.J8;z$KJQ49(B
+			;; 大文字を小文字に変換
 			(list (prog1 str (setq str (downcase str))))
-			;; $BFH<+$N%R%e!<%j%9%F%#%C%/%9$rE,MQ(B
+			;; 独自のヒューリスティックスを適用
 			(stem:extra str)
 			(if (> (length str) stem:minimum-word-length)
-			    ;; $BC18lD9$,>r7o$rK~$?$;$P!"(BPorter $B$N%"%k%4%j%:%`$rE,MQ(B
+			    ;; 単語長が条件を満たせば、Porter のアルゴリズムを適用
 			    (mapcar
 			     (lambda (func)
 			       (setq str (funcall func str)))
@@ -916,23 +917,23 @@
 
 ;;;###autoload
 (defun stem-english (str)
-;;  "$B3hMQ8lHx$r<h$j=|$/4X?t(B
-;; $BM?$($i$l$?8l$N85$N8l$H$7$F2DG=@-$N$"$k8l$NJ8;zNsD9$N>:=g$N%j%9%H$rJV$9(B"
+;;  "活用語尾を取り除く関数
+;; 与えられた語の元の語として可能性のある語の文字列長の昇順のリストを返す"
   (sort (stem:stripping-suffix str)
 	(function (lambda (a b) (< (length a) (length b))))))
 
-;; $B$3$N(B stem-english $B$NF0:n$O!"(B
+;; この stem-english の動作は、
 ;; 
 ;;     Id: stem.el,v 1.4 1998/11/30 09:27:27 tsuchiya Exp tsuchiya
 ;; 
-;; $B0JA0$N%P!<%8%g%s$N(B stem.el $B$GDj5A$5$l$F$$$?(B stem:stripping-suffix 
-;; $B$NF0:n$H8_49$G$"$k!#8=:_$N(B stem:stripping-suffix $B$O<-=q=g$N%j%9%H$r(B
-;; $BJV$9$?$a!"0[$J$kF0:n$H$9$k$h$&$K$J$C$F$$$k$N$GCm0U$9$k$3$H!#(B
+;; 以前のバージョンの stem.el で定義されていた stem:stripping-suffix 
+;; の動作と互換である。現在の stem:stripping-suffix は辞書順のリストを
+;; 返すため、異なる動作とするようになっているので注意すること。
 
 
-;;; Porter $B$N%"%k%4%j%:%`$rE,MQ$9$k4X?t(B
+;;; Porter のアルゴリズムを適用する関数
 (defun stem:stripping-inflection (word) "\
-Porter $B$N%"%k%4%j%:%`$K4p$E$$$FGI@88l$r=hM}$9$k4X?t(B"
+Porter のアルゴリズムに基づいて派生語を処理する関数"
   (save-match-data
     (stem:step5
      (stem:step4
