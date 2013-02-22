@@ -1,4 +1,4 @@
-;;; ndspotlight.el --- search agent for MacOS SpotLight
+;;; ndspotlight.el --- search agent for MacOS SpotLight -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 Taichi KAWABATA <kawabata.taichi@gmail.com>
 
 ;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>

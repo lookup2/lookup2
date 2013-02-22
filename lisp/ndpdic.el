@@ -1,4 +1,4 @@
-;;; ndpdic.el --- Lookup `PDIC' interface  -*- coding: utf-8 -*-
+;;; ndpdic.el --- Lookup `PDIC' interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>
@@ -349,21 +349,22 @@ then it proceeds to next point."
 (defun ndpdic-entries (ndpdic block)
   "Get all entries in NDPDIC at BLOCK.
 Return the list of entry words.  Result will be cached."
-  (assert (integerp block))
-  (let ((block-entries-hash (ndpdic-block-entries-hash ndpdic))
-        fl-size word-spec (word-data "") words)
-    (or
-     (gethash block block-entries-hash)
-     (with-temp-buffer
-       (set-buffer-multibyte nil)
-       (setq fl-size (ndpdic-insert-block-contents ndpdic block))
-       (goto-char (+ 2 (point-min)))
-       (while (not (eobp))
-         (setq word-spec (ndpdic-entries-next-word word-data fl-size))
-         (if (null word-spec) (goto-char (point-max))
-           (setq words (cons (car word-spec) words))
-           (setq word-data (elt word-spec 3))))
-       (puthash block (nreverse words) block-entries-hash)))))
+  (if (null block) nil
+    (assert (integerp block))
+    (let ((block-entries-hash (ndpdic-block-entries-hash ndpdic))
+          fl-size word-spec (word-data "") words)
+      (or
+       (gethash block block-entries-hash)
+       (with-temp-buffer
+         (set-buffer-multibyte nil)
+         (setq fl-size (ndpdic-insert-block-contents ndpdic block))
+         (goto-char (+ 2 (point-min)))
+         (while (not (eobp))
+           (setq word-spec (ndpdic-entries-next-word word-data fl-size))
+           (if (null word-spec) (goto-char (point-max))
+             (setq words (cons (car word-spec) words))
+             (setq word-data (elt word-spec 3))))
+         (puthash block (nreverse words) block-entries-hash))))))
 
 (defun ndpdic-entry-content (ndpdic block entry)
   "Get content of FILE, BLOCK, and  ENTRY."

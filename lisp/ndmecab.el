@@ -1,4 +1,4 @@
-;;; ndmecab.el --- Lookup Mecab interface
+;;; ndmecab.el --- Lookup Mecab interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 

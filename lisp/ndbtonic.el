@@ -1,4 +1,4 @@
-;;; ndbtonic.el --- Lookup BTONIC dictionary interface -*- coding: utf-8 -*-
+;;; ndbtonic.el --- Lookup BTONIC dictionary interface -*- lexical-binding: t -*-
 
 ;; Keywords: dictionary
 

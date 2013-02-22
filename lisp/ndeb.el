@@ -1,4 +1,4 @@
-;;; ndeb.el --- eblook interface
+;;; ndeb.el --- eblook interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2006 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
@@ -432,7 +432,7 @@ Nil means it has not been checked yet.")
 	(unless (eq method last)
 	  ;; 必要のあるときだけ search-method を設定する。ndeb-dict に同じ。
 	  (ndeb-process-require-set "search-method"
-			    (lookup-assq-ref 'ndeb-method-table method))
+			    (lookup-assq-get ndeb-method-table method))
 	  (lookup-put-property ndeb-current-agent 'ndeb-method method))
 	(setq cmd (format "search \"%s\"" (ndeb-escape-query string)))))
       (ndeb-process-require cmd
@@ -723,8 +723,8 @@ Nil means it has not been checked yet.")
 	  (let ((end-beg (match-beginning 0))
 		(end-end (match-end 0)))
 	    (add-text-properties beg-end end-beg
-				 `(face ,(or (lookup-assoc-ref
-					      'ndeb-faces-table class)
+				 `(face ,(or (lookup-assoc-get
+					      ndeb-faces-table class)
 					     default)))
 	    (delete-region end-beg end-end)
 	    (delete-region beg-beg beg-end)
@@ -738,26 +738,26 @@ Nil means it has not been checked yet.")
     (while (re-search-forward "&\\(amp\\|lt\\|gt\\);" nil t)
       (let* ((pos (match-beginning 0))
 	     (properties (text-properties-at pos)))
-	(replace-match (lookup-assoc-ref
-			'ndeb-entities-table (match-string 1)) t t)
+	(replace-match (lookup-assoc-get
+			ndeb-entities-table (match-string 1)) t t)
 	(set-text-properties pos (1+ pos) properties)
 	(goto-char (1+ pos))))))
 
 ;;; Get/Set functions
 
 (defun ndeb-status-get (key)
-  (lookup-assq-ref 'ndeb-status key))
+  (lookup-assq-get ndeb-status key))
 
 (defun ndeb-status-set (key value)
   (setq ndeb-status
-	(lookup-assq-set 'ndeb-status key value)))
+	(lookup-assq-put ndeb-status key value)))
 
 (defun ndeb-vars-get (var)
-  (lookup-assoc-ref 'ndeb-vars var))
+  (lookup-assoc-get ndeb-vars var))
 
 (defun ndeb-vars-set (var value)
   (setq ndeb-vars
-	(lookup-assoc-set 'ndeb-vars var value)))
+	(lookup-assoc-put ndeb-vars var value)))
 
 (provide 'ndeb)
 

@@ -1,4 +1,4 @@
-;;; ndweb.el --- search agent for `Open Search'
+;;; ndweb.el --- search agent for `Open Search' -*- lexical-binding: t -*-
 ;; Copyright (C) 2010 Taichi KAWABATA <kawabata.taichi@gmail.com>
 
 ;; Author: Taichi KAWABATA <kawabata.taichi@gmail.com>
@@ -134,63 +134,67 @@
 ;;; Internal functions
 ;;;
 
-(defmacro ndweb-with-url (url &rest body)
-  (declare (indent 1))
-  `(let* ((buffer 
-           (url-retrieve-synchronously ,url)))
-     (when buffer
-       (switch-to-buffer buffer)
-       (set-buffer-multibyte t)
-       (prog1 (progn ,@body)
-         (kill-buffer buffer)))))
+;(defmacro ndweb-with-url (url &rest body)
+;  (declare (indent 1))
+;  `(let* ((buffer 
+;           (url-retrieve-synchronously ,url)))
+;     (when buffer
+;       (switch-to-buffer buffer)
+;       (set-buffer-multibyte t)
+;       (prog1 (progn ,@body)
+;         (kill-buffer buffer)))))
+;
+;(defun ndweb-url-contents (url)
+;  (ndweb-with-url url
+;    (buffer-string)))
+;
+;(defun ndweb-opensearch-url (url)
+;  (ndweb-with-url url
+;    (goto-char (point-min))
+;    (when (re-search-forward ndweb-description-regexp nil t)
+;      (let ((search-url (match-string 1)))
+;        ;; when it begins with "/", attach parent url to it.
+;        (if (string-match "^/" search-url)
+;            (concat (replace-regexp-in-string "\\(://[^/]+/\\).*" "\\1" url)
+;                    search-url)
+;          search-url)))))
+;
+;(defun ndweb-opensearch-xml (url)
+;  (ndweb-with-url url
+;    (xml-parse-region (point-min) (point-max))))
+;
+;(defun ndweb-parse-xml (xml)
+;  "XMLデータから、encoding情報等を取り出す。"
+;  (let (open name ienc html sugg)
+;    (setq open (assq 'OpenSearchDescription xml)
+;          name (caddr (assq 'ShortName open))
+;          ienc (caddr (assq 'InputEncoding open))
+;          html (find-if (lambda (x)
+;                          (and (equal (car-safe x) 'Url)
+;                               (member '(type . "text/html") (cadr x))))
+;                        open)
+;          sugg (find-if (lambda (x)
+;                          (and (equal (car-safe x) 'Url)
+;                               (member '(type . "application/x-suggestions+json")
+;                                       (cadr x))))
+;                        open))
+;    (list name ienc (assoc-default 'template (cadr html))
+;                    (assoc-default 'template (cadr sugg)))))
 
-(defun ndweb-url-contents (url)
-  (ndweb-with-url url
-    (buffer-string)))
-
-(defun ndweb-opensearch-url (url)
-  (ndweb-with-url url
-    (goto-char (point-min))
-    (when (re-search-forward ndweb-description-regexp nil t)
-      (let ((search-url (match-string 1)))
-        ;; when it begins with "/", attach parent url to it.
-        (if (string-match "^/" search-url)
-            (concat (replace-regexp-in-string "\\(://[^/]+/\\).*" "\\1" url)
-                    search-url)
-          search-url)))))
-
-(defun ndweb-opensearch-xml (url)
-  (ndweb-with-url url
-    (xml-parse-region (point-min) (point-max))))
-
-(defun ndweb-parse-xml (xml)
-  "XMLデータから、encoding情報等を取り出す。"
-  (let (open name ienc html sugg)
-    (setq open (assq 'OpenSearchDescription xml)
-          name (caddr (assq 'ShortName open))
-          ienc (caddr (assq 'InputEncoding open))
-          html (find-if (lambda (x)
-                          (and (equal (car-safe x) 'Url)
-                               (member '(type . "text/html") (cadr x))))
-                        open)
-          sugg (find-if (lambda (x)
-                          (and (equal (car-safe x) 'Url)
-                               (member '(type . "application/x-suggestions+json")
-                                       (cadr x))))
-                        open))
-    (list name ienc (assoc-default 'template (cadr html))
-                    (assoc-default 'template (cadr sugg)))))
+(defun ndweb-get-json (url word)
+  (let* ((buffer (url-retrieve-synchronously 
+                  (replace-regexp-in-string "{searchTerms}"
+                                            (url-encode-url word) url))))
+    (prog1
+        (with-current-buffer buffer
+          (set-buffer-multibyte t)
+          (goto-char (point-min))
+          (search-forward "\n\n")
+          (json-read))
+      (kill-buffer buffer))))
 
 (defun ndweb-parameters (domain)
   (assoc-default domain ndweb-predefined-agents))
-
-(defun ndweb-get-json (url word)
-  "json URL にアクセスして、結果のJSONを取得する。"
-  (ndweb-with-url (replace-regexp-in-string "{searchTerms}"
-                                            (url-encode-url word) url)
-    (goto-char (point-min))
-    (search-forward "\n\n")
-    (json-read)))
 
 (provide 'ndweb)
 

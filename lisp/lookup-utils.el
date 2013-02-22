@@ -1,4 +1,4 @@
-;;; lookup-utils.el --- Lookup various utilities -*- coding: utf-8 -*-
+;;; lookup-utils.el --- Lookup various utilities -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -39,6 +39,9 @@
       (acons key value (lookup-assq-del alist key))
     (lookup-assq-del alist key)))
 
+(defmacro lookup-assq-set (symbol key value)
+  `(set ,symbol (lookup-assq-put (eval ,symbol) ,key ,value)))
+
 ;; alist by assoc
 
 (defsubst lookup-assoc-get (alist key)
@@ -52,32 +55,21 @@
       (acons key value (lookup-assoc-del alist key))
     (lookup-assoc-del alist key)))
 
-;; alist set/ref
-
-(defsubst lookup-assq-ref (symbol key)
-  (lookup-assq-get (symbol-value symbol) key))
-
-(defsubst lookup-assq-set (symbol key value)
-  (set symbol (lookup-assq-put (symbol-value symbol) key value)))
-
-(defsubst lookup-assoc-ref (symbol key)
-  (lookup-assoc-get (symbol-value symbol) key))
-
-(defsubst lookup-assoc-set (symbol key value)
-  (set symbol (lookup-assoc-put (symbol-value symbol) key value)))
+(defmacro lookup-assoc-set (symbol key value)
+  `(set ,symbol (lookup-assoc-put (eval ,symbol) ,key ,value)))
 
 ;; multi put/get
 
-(defsubst lookup-multi-get (symbol &rest args)
-  (lookup-multi-get-1 (symbol-value symbol) args))
+(defun lookup-multi-get (alist &rest args)
+  (lookup-multi-get-1 alist args))
 
 (defun lookup-multi-get-1 (alist args)
   (if args
       (lookup-multi-get-1 (lookup-assq-get alist (car args)) (cdr args))
     alist))
 
-(defsubst lookup-multi-put (symbol &rest args)
-  (set symbol (lookup-multi-put-1 (symbol-value symbol) args)))
+(defun lookup-multi-put (alist &rest args)
+  (lookup-multi-put-1 alist args))
 
 (defun lookup-multi-put-1 (alist args)
   (if (cddr args)
@@ -146,7 +138,7 @@
       (unless (eq (aref format (match-end 1)) ?%)
 	(when (eq (aref format (match-end 1)) ?t)
 	  (setq width (string-to-number (match-string 1 format)))
-	  (lookup-assq-set 'width-alist n (cons width (abs width)))
+	  (setq width-alist (lookup-assq-put width-alist n (cons width (abs width))))
 	  (setq format-list
 		(cons n (cons (substring format end (match-beginning 0))
 			      format-list))
@@ -165,7 +157,7 @@
 		  (lambda (element)
 		    (if (stringp element)
 			element
-		      (let* ((pair (lookup-assq-ref 'width-alist element))
+		      (let* ((pair (lookup-assq-get width-alist element))
 			     (string (if (> (car pair) 0)
 					 (number-to-string (cdr pair))
 				       (number-to-string (- (cdr pair))))))
@@ -180,10 +172,11 @@
 (defvar lookup-property-table nil)
 
 (defun lookup-get-property (obj key)
-  (lookup-multi-get 'lookup-property-table obj key))
+  (lookup-multi-get lookup-property-table obj key))
 
 (defun lookup-put-property (obj key val)
-  (lookup-multi-put 'lookup-property-table obj key val))
+  (setq lookup-property-table
+        (lookup-multi-put lookup-property-table obj key val)))
 
 ;;;
 ;;; Lookup current-word

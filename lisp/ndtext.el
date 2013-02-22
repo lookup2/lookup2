@@ -1,4 +1,4 @@
-;;; ndtext.el --- Lookup text dictionary search interface -*- coding: utf-8 -*-
+;;; ndtext.el --- Lookup text dictionary search interface -*- lexical-binding: t -*-
 
 ;; Keywords: dictionary
 

@@ -44,7 +44,6 @@
 (defun lookup-select-build-buffer ()
   (let ((inhibit-read-only t)
         (module lookup-select-module))
-    (lookup-debug-message "module=%s" lookup-select-module)
     (erase-buffer)
     (insert "Lookup (module: " (lookup-module-name module) ")\n")
     (insert "Tyep `m' to select, `u' to unselect, `q' to leave, "

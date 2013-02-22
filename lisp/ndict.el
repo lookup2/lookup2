@@ -1,4 +1,4 @@
-;;; ndict.el --- Lookup DICT client
+;;; ndict.el --- Lookup DICT client -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>

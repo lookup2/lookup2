@@ -1,4 +1,4 @@
-;;; ndsrd.el --- search agent for 小学館『ランダムハウス英語辞典』
+;;; ndsrd.el --- search agent for 小学館『ランダムハウス英語辞典』 -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 

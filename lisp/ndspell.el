@@ -1,4 +1,4 @@
-;;; ndspell.el --- Lookup spell checker
+;;; ndspell.el --- Lookup spell checker -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 

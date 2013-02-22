@@ -1,4 +1,4 @@
-;;; ndbuffer.el --- Lookup `buffer' interface -*- coding: utf-8 -*-
+;;; ndbuffer.el --- Lookup `buffer' interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 KAWABATA Taichi <kawabata.taichi@gmail.com>
 
 ;; Keywords: dictionary

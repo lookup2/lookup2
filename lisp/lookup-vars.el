@@ -1,4 +1,4 @@
-;;; lookup-vars.el --- Lookup global variables
+;;; lookup-vars.el --- Lookup global variables -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -397,6 +397,8 @@ This hook will run just after loading `lookup-init-file' and
   "\\(https?://\\|file://\\|javascript:\\)[-_.!~*'()a-zA-Z0-9;/?:@&=+$,%#]+"
   "Regular expression to search within contents.")
 
+;; lookup-select module
+(defvar lookup-select-module nil)
 
 ;;;
 ;;; Caching Variables

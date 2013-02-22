@@ -1,4 +1,4 @@
-;;; bocu.el --- BOCU decoding software  -*- coding: utf-8 -*-
+;;; bocu.el --- BOCU decoding software -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>

@@ -1,4 +1,4 @@
-;;; ndsary.el --- Lookup `sary' interface -*- coding: utf-8 -*-
+;;; ndsary.el --- Lookup `sary' interface -*- lexical-binding: t -*-
 
 ;; Keywords: dictionary
 

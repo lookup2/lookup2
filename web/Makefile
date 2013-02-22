@@ -15,5 +15,4 @@ clean::
 install:: all
 	rsync -av -e ssh --delete --exclude=CVS --exclude='*~' \
 	  --exclude='Makefile*' --exclude='*.in' --exclude="*.scm" \
-	  * $(SF_USERNAME),lookup@web.sourceforge.net:/home/groups/l/lo/lookup/htdocs
-#	(cd ja && $(MAKE) install)
+	  * kawabata@web.sourceforge.net:/home/project-web/lookup/htdocs

@@ -1,4 +1,4 @@
-;;; ndest.el --- search agent for Hyper Estraier
+;;; ndest.el --- search agent for Hyper Estraier -*- lexical-binding: t -*-
 ;; Copyright (C) 2007 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 
@@ -333,9 +333,8 @@ estcall使用時は無効。"
 		   (lookup-assoc-del url-http-real-basic-auth-storage key))))
       (cond
        ((consp proxy)
-	(setq url-proxy-services
-	      (lookup-assoc-set url-proxy-services "http"
-				(format "%s:%d" (car proxy) (cdr proxy)))))
+        (lookup-assoc-set 'url-proxy-services "http"
+                          (format "%s:%d" (car proxy) (cdr proxy)))
        (proxy
 	(setq url-proxy-services
 	      (lookup-assoc-del url-proxy-services "http"))))
@@ -493,9 +492,9 @@ estcall使用時は無効。"
 (defun ndest-follow-link ()
   (interactive)
   (let* ((links (ndest-get-link (point)))
-	 (type (lookup-assq-ref links 'type))
-	 (uri (lookup-assq-ref links 'uri))
-	 (file (or (lookup-assq-ref links 'file)
+	 (type (lookup-assq-get links 'type))
+	 (uri (lookup-assq-get links 'uri))
+	 (file (or (lookup-assq-get links 'file)
 		   (ndest-uri-to-filepath uri)))
 	 params param fn)
     (setq params
@@ -524,10 +523,10 @@ estcall使用時は無効。"
   "カーソル位置のリンク先のURIを表示し、kill-ringに保存する。prefix argumentがあり、URIがfile://で始まる場合はパス名が保存される。"
   (interactive "P")
   (let* ((links (ndest-get-link (point)))
-	 (uri (lookup-assq-ref links 'uri)))
+	 (uri (lookup-assq-get links 'uri)))
     (when arg
       (setq uri (or (and (ndest-uri-is-file uri)
-			 (or (lookup-assq-ref links 'file)
+			 (or (lookup-assq-get links 'file)
 			     (ndest-uri-to-filepath uri)))
 		    uri)))
     (message "%s" uri)
@@ -673,7 +672,7 @@ estcall使用時は無効。"
   (while (re-search-forward "&\\(gt\\|lt\\|amp\\|nbsp\\);" nil t)
     (let ((string (match-string 1)))
       (replace-match 
-       (lookup-assoc-ref
+       (lookup-assoc-get
 	'(("gt"  . ">")
 	  ("lt"  . "<")
 	  ("amp" . "&")

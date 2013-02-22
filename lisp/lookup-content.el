@@ -1,4 +1,4 @@
-;;; lookup-content.el --- Lookup Content mode
+;;; lookup-content.el --- Lookup Content mode -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 

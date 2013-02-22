@@ -1,4 +1,4 @@
-;;; ndeb-binary.el --- binary data support for ndeb agent
+;;; ndeb-binary.el --- binary data support for ndeb agent -*- lexical-binding: t -*-
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
@@ -372,12 +372,12 @@ command defined in `ndeb-binary-extract-commands'."
 (defun ndeb-binary-bind-temporary-file (dictionary type target parameters)
   (let* ((binaries (lookup-get-property dictionary 'binary-files))
 	 (id (cons type target))
-	 (file (lookup-assoc-ref 'binaries id)))
+	 (file (lookup-assoc-get binaries id)))
     (if file
 	(setq ndeb-binary-files
 	      (lookup-assoc-set
 	       'ndeb-binary-files file
-	       (1+ (or (lookup-assoc-ref 'ndeb-binary-files file) 0))))
+	       (1+ (or (lookup-assoc-get ndeb-binary-files file) 0))))
       (setq file (ndeb-binary-make-temp-name type))
       (lookup-put-property
        dictionary 'binary-files (cons (cons id file) binaries))
@@ -389,7 +389,7 @@ command defined in `ndeb-binary-extract-commands'."
     file))
 
 (defun ndeb-binary-make-temp-name (type)
-  (let* ((suffix (lookup-assq-ref 'ndeb-binary-extensions type))
+  (let* ((suffix (lookup-assq-get ndeb-binary-extensions type))
 	 (max-rest 10)
 	 (rest max-rest)
 	 name)
@@ -401,7 +401,7 @@ command defined in `ndeb-binary-extract-commands'."
 		     (when suffix
 		       (setq file (concat file "." suffix)))
 		     (unless (or (file-exists-p file)
-				 (lookup-assoc-ref 'ndeb-binary-files file))
+				 (lookup-assoc-get ndeb-binary-files file))
 		       (throw 'done file)))
 		   (when (eq rest max-rest)
 		     (ndeb-binary-flush-tables))
@@ -412,7 +412,7 @@ command defined in `ndeb-binary-extract-commands'."
 
 (defun ndeb-binary-unbind-temporary-file (file)
   (setq file (expand-file-name file))
-  (let ((lock (lookup-assoc-ref 'ndeb-binary-files file)))
+  (let ((lock (lookup-assoc-get ndeb-binary-files file)))
     (when lock
       (if (>= lock 2)
 	  (setq ndeb-binary-files
@@ -438,7 +438,7 @@ See `ndeb-binary-extract-commands' for the available binary types and
 corresponding eblook commands."
   (let ((case-fold-search nil)
 	(command (apply 'format
-			(lookup-assq-ref 'ndeb-binary-extract-commands type)
+			(lookup-assq-get ndeb-binary-extract-commands type)
 			(append (list target) params))))
     (ndeb-with-dictionary dictionary
       (save-match-data
@@ -470,7 +470,7 @@ corresponding eblook commands."
 (defun ndeb-binary-process-sentinel (process event)
   (when (string-match "^\\(exited\\|finished\\)" event)
     (let* ((pid (process-id process))
-	   (file (lookup-assq-ref 'ndeb-binary-processes pid)))
+	   (file (lookup-assq-get ndeb-binary-processes pid)))
       (ndeb-binary-unbind-temporary-file file)
       (setq ndeb-binary-processes
 	    (lookup-assq-del ndeb-binary-processes pid)))))
@@ -480,11 +480,11 @@ corresponding eblook commands."
   (interactive)
   (let* ((dictionary (lookup-entry-dictionary lookup-content-entry))
 	 (link (ndeb-binary-get-link (point)))
-	 (type (lookup-assq-ref 'link 'type))
-	 (target (lookup-assq-ref 'link 'target))
+	 (type (lookup-assq-get link 'type))
+	 (target (lookup-assq-get link 'target))
 	 (id (cons type target))
-	 (parameters (lookup-assq-ref 'link 'parameters))
-	 (program (lookup-assq-ref 'ndeb-binary-programs type))
+	 (parameters (lookup-assq-get link 'parameters))
+	 (program (lookup-assq-get ndeb-binary-programs type))
 	 file)
     (if (null program)
 	(call-interactively 'ndeb-binary-extract-link)
@@ -622,7 +622,7 @@ FILE and confirm overwriting if necessary."
 		  (error "No binary at point"))))
      (list ref
 	   (read-file-name (format "Save %s into file: "
-				   (lookup-assq-ref 'ref 'type)))
+				   (lookup-assq-get ref 'type)))
 	   t)))
   (setq file (expand-file-name file))
   (and confirm
@@ -630,9 +630,9 @@ FILE and confirm overwriting if necessary."
        (or (y-or-n-p (format "File %s exists; overwrite? " file))
 	   (error "Canceled")))
   (ndeb-binary-extract (lookup-entry-dictionary lookup-content-entry)
-		       (lookup-assq-ref 'link 'type)
-		       (lookup-assq-ref 'link 'target)
-		       (lookup-assq-ref 'link 'parameters)
+		       (lookup-assq-get link 'type)
+		       (lookup-assq-get link 'target)
+		       (lookup-assq-get link 'parameters)
 		       file))
 
 (defun ndeb-binary-play-with-mci (dictionary type target parameters file)
@@ -689,10 +689,10 @@ Using this function with :snd-autoplay option is not recommendable."
   "Play first link of ndeb contents. Binary types to play is decided by `ndeb-play-binaries-from-entry'."
   (interactive "p")
   (let ((types
-	 (or (lookup-assoc-ref 'ndeb-play-binaries-from-entry
+	 (or (lookup-assoc-get ndeb-play-binaries-from-entry
 			       (this-command-keys))
 	     ;; when called with prefix argument.
-	     (lookup-assoc-ref 'ndeb-play-binaries-from-entry
+	     (lookup-assoc-get ndeb-play-binaries-from-entry
 			       (and
 				(string-match
 				 (format "^\\(.+%s\\)\\([^0-9].*$\\)"
@@ -1044,7 +1044,7 @@ Using this function with :snd-autoplay option is not recommendable."
     (mapc
      (lambda (elt)
        (let* ((file (cdr elt))
-	      (lock (lookup-assoc-ref 'ndeb-binary-files file)))
+	      (lock (lookup-assoc-get ndeb-binary-files file)))
 	 (if (or (null lock)
 		 (and (eq lock 0)
 		      (null (file-exists-p file))))

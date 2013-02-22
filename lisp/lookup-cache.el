@@ -1,4 +1,4 @@
-;;; lookup-cache.el --- disk cache routines
+;;; lookup-cache.el --- disk cache routines -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>
@@ -85,7 +85,7 @@
   (lookup-dump-list 'lookup-agent-attributes 2))
 
 (defun lookup-restore-agent-attributes (agent)
-  (let ((alist (lookup-assoc-ref 'lookup-agent-attributes
+  (let ((alist (lookup-assoc-get lookup-agent-attributes
 				 (lookup-agent-id agent))))
     (lookup-put-property
      agent 'dictionaries
@@ -107,7 +107,9 @@
                               (mapcar 'lookup-dictionary-id
                                       (lookup-module-dictionaries module)))
                         (cons 'priority-alist
-                              (mapcar (lambda (x) (cons (lookup-dictionary-id (car x)) (cdr x)))
+                              (mapcan (lambda (x)
+                                        (if (car x)
+                                            (list (cons (lookup-dictionary-id (car x)) (cdr x)))))
                                       (lookup-module-priority-alist module)))
 			(cons 'bookmarks
                               (mapcar 'lookup-entry-id
@@ -121,26 +123,27 @@
 ;    (let (alist)
 ;      (let ((marks (mapcar 'lookup-entry-id
 ;			   (lookup-module-bookmarks module))))
-;	(if marks (lookup-assq-set 'alist 'bookmarks marks)))
-;      (lookup-assoc-set 'lookup-module-attributes
-;			(lookup-module-name module) alist)
+;	(if marks (setq alist (lookup-assq-put alist 'bookmarks marks))))
+;      (setq lookup-module-attributes 
+;            (lookup-assoc-put lookup-module-attributes
+;			(lookup-module-name module) alist))
 ;      )
 ;;  (lookup-dump-list 'lookup-module-attributes 3))
 
 (defun lookup-restore-module-attributes (module)
-  (let ((alist (lookup-assoc-ref 'lookup-module-attributes
+  (let ((alist (lookup-assoc-get lookup-module-attributes
                                  (lookup-module-name module))))
     (let ((dictionaries (mapcar 'lookup-get-dictionary
-                                (lookup-assq-ref 'alist 'dictionaries))))
+                                (lookup-assq-get alist 'dictionaries))))
       (setq dictionaries (delete-if 'null dictionaries))
       (setf (lookup-module-dictionaries module) dictionaries))
     (let ((priority-alist (mapcar (lambda (x)
                                     (cons (lookup-get-dictionary (car x)) (cdr x)))
-                                  (lookup-assq-ref 'alist 'priority-alist))))
+                                  (lookup-assq-get alist 'priority-alist))))
       (setq priority-alist (delete-if 'null priority-alist))
       (setf (lookup-module-priority-alist module) priority-alist))
     (let ((bookmarks (mapcar 'lookup-get-entry-create
-                             (lookup-assq-ref 'alist 'bookmarks))))
+                             (lookup-assq-get alist 'bookmarks))))
       (setf (lookup-module-bookmarks module) bookmarks))))
 
 
@@ -162,7 +165,7 @@
   (lookup-dump-list 'lookup-dictionary-attributes 2))
 
 (defun lookup-restore-dictionary-attributes (dictionary)
-  (dolist (pair (lookup-assoc-ref 'lookup-dictionary-attributes
+  (dolist (pair (lookup-assoc-get lookup-dictionary-attributes
 				  (lookup-dictionary-id dictionary)))
     (lookup-put-property dictionary (car pair) (cdr pair))))
 
@@ -181,14 +184,14 @@
       (when plist
 	(setq heading (lookup-get-property entry 'original-heading))
 	(setq plist (plist-put plist 'heading heading)))
-      (let ((alist (lookup-assoc-ref 'lookup-entry-attributes id)))
+      (let ((alist (lookup-assoc-get lookup-entry-attributes id)))
 	(setq alist (lookup-assoc-put alist (lookup-entry-code entry) plist))
 	(lookup-assoc-set 'lookup-entry-attributes id alist))))
   (lookup-dump-list 'lookup-entry-attributes 2))
 
 (defun lookup-restore-entry-attributes (entry)
   (let* ((id (lookup-dictionary-id (lookup-entry-dictionary entry)))
-	 (alist (lookup-assoc-ref 'lookup-entry-attributes id))
+	 (alist (lookup-assoc-get lookup-entry-attributes id))
 	 (plist (lookup-assoc-get alist (lookup-entry-code entry))))
     (when plist
       (lookup-put-property entry 'original-heading

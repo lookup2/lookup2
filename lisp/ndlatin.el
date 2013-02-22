@@ -1,4 +1,4 @@
-;;; ndlatin.el --- agents for `word-latin'
+;;; ndlatin.el --- agents for `word-latin' -*- lexical-binding: t -*-
 ;; Copyright (C) 2007 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: KAWABATA, Taichi <kawabata.taichi@gmail.com>

@@ -454,6 +454,9 @@ candidates."
                   (lookup-summary-append entries)
                 (setq found t)
                 (let ((session (lookup-new-session mod query entries)))
+                  ;; when new session is created, then module for
+                  ;; select buffer will become invaild.
+                  (setq lookup-select-module nil)
                   (lookup-session-open session)))))))
       (cond
        ((not valid) (error "[%s] No valid dictionary for method `%s'"
@@ -721,9 +724,10 @@ link-item, heading, or code may be integer or function."
 (defun lookup-current-module ()
   "Return current session module.
 If there is no session, default module will be returned."
-  (let ((session (lookup-current-session)))
-    (if session (lookup-session-module session)
-      (lookup-default-module))))
+  (or lookup-select-module
+      (let ((session (lookup-current-session)))
+        (if session (lookup-session-module session)
+          (lookup-default-module)))))
 
 (defun lookup-default-module ()
   "Default module of current buffer."
@@ -882,7 +886,7 @@ If there is no session, default module will be returned."
 (defun lookup-set-dictionary-options (id &rest options)
   (declare (indent 1))
   "Set dictionary ID's OPTIONS plist prior to dictionary initialization."
-  (let ((plist (lookup-assoc-ref 'lookup-dictionary-option-alist id)))
+  (let ((plist (lookup-assoc-get lookup-dictionary-option-alist id)))
     (while options
       (setq plist (plist-put plist (car options) (cadr options)))
       (setq options (cddr options)))

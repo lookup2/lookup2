@@ -1,4 +1,4 @@
-;;; ndcookie.el --- Lookup from cookie file
+;;; ndcookie.el --- Lookup from cookie file -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 
 ;; Author: Keisuke Nishida <knishida@ring.gr.jp>

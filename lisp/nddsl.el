@@ -1,4 +1,4 @@
-;;; nddsl.el --- Lookup `DSL' interface -*- coding: utf-8 -*-
+;;; nddsl.el --- Lookup `DSL' interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 KAWABATA Taichi <kawabata.taichi@gmail.com>
 
 ;; Keywords: dictionary

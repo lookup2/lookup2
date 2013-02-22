@@ -1,4 +1,4 @@
-;;; lookup-summary.el --- Lookup Summary mode
+;;; lookup-summary.el --- Lookup Summary mode -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 

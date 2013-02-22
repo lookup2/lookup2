@@ -1,4 +1,4 @@
-;;; lookup-types.el --- internal data types
+;;; lookup-types.el --- internal data types -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009,2010 Lookup Development Team
 
@@ -256,7 +256,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
       (when file
 	(let ((lookup-support-agent (lookup-agent-class
 				     (lookup-dictionary-agent dictionary)))
-	      (lookup-support-dictionary-id 
+	      (lookup-support-dictionary-id
                (lookup-dictionary-id dictionary))
 	      (lookup-support-options nil))
 	  (load file)
@@ -467,13 +467,14 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
   (let ((method (lookup-query-method query))
 	(string (lookup-query-string query))
 	(cache (lookup-get-property dictionary 'entry-cache)))
-    (lookup-multi-get 'cache method (intern string lookup-obarray))))
+    (lookup-multi-get cache method (intern string lookup-obarray))))
 
 (defun lookup-dictionary-search-cache-put (dictionary query entries)
   (let ((method (lookup-query-method query))
 	(string (lookup-query-string query))
 	(cache (lookup-get-property dictionary 'entry-cache)))
-    (lookup-multi-put 'cache method (intern string lookup-obarray) entries)
+    (setq cache
+          (lookup-multi-put cache method (intern string lookup-obarray) entries))
     (lookup-put-property dictionary 'entry-cache cache)))
 
 

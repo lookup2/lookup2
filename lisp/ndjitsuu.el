@@ -1,4 +1,4 @@
-;;; ndjitsuu.el --- Lookup `jitsuu' interface -*- coding: utf-8 -*-
+;;; ndjitsuu.el --- Lookup `jitsuu' interface -*- lexical-binding: t -*-
 ;; Copyright (C) 2009 KAWABATA Taichi <kawabata.taichi@gmail.com>
 
 ;; Keywords: dictionary

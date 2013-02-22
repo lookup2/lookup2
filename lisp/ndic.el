@@ -1,4 +1,4 @@
-;;; ndic.el --- Lookup by `dict'-format dictionaries
+;;; ndic.el --- Lookup by `dict'-format dictionaries -*- lexical-binding: t -*-
 ;; Copyright (C) 2000 Keisuke Nishida <knishida@ring.gr.jp>
 ;; Copyright (C) 2009 Lookup Development Team
 
