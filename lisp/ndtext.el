@@ -263,7 +263,7 @@
 (defun ndtext-search-multiple
   (agent file string method &optional content-tags entry-tags-list
    head-tags code-tags coding)
-  (remove-duplicates
+  (cl-remove-duplicates
    (loop for entry-tags in entry-tags-list
          nconc (ndtext-process agent 'search file string
                                method content-tags

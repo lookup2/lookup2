@@ -25,9 +25,7 @@
 
 (defvar lookup-modules-killed-modules nil)
 
-;;;###autoload
-(defun lookup-list-modules ()
-  (interactive)
+(defun lookup-modules-display ()
   (with-current-buffer (lookup-get-buffer " *Module List*")
     (setq lookup-modules-killed-modules nil)
     (lookup-modules-mode)
@@ -208,13 +206,13 @@ will be used instead of the usual `kill-ring'."
   "Reset the current module settings as of buffer."
   (save-excursion
     (lookup-modules-goto-first)
-    (let ((old-modules lookup-module-list) module modules)
+    (let (module modules)
       (while (setq module (lookup-modules-this-module))
 	(setq modules (cons module modules))
 	(forward-line))
       (setq lookup-modules-killed-modules
-            (nunion lookup-modules-killed-modules
-                    (set-difference lookup-module-list modules)))
+            (cl-nunion lookup-modules-killed-modules
+                       (cl-set-difference lookup-module-list modules)))
       (setq lookup-module-list (nreverse modules)))))
 
 (provide 'lookup-modules)

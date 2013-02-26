@@ -39,6 +39,9 @@
 (require 'lookup-vars)
 (require 'stem-english)
 
+(declare-function copy-lookup-query "lookup-types" (query))
+(declare-function lookup-new-query "lookup-types" (method string &optional pattern))
+
 ;;;
 ;;; Customizable Variables
 ;;;
@@ -89,7 +92,7 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
       (insert str)
       (apply 'call-process-region 1 (point-max) "mecab" t t nil 
              lookup-text-mecab-readings-option)
-      (remove-duplicates 
+      (cl-remove-duplicates
          (split-string (japanese-hiragana (buffer-string)))
          :test 'equal))))
 
@@ -150,71 +153,74 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;;; query-filter
 ;;;
 
-(defun lookup-query-filter (query &rest functions)
-  "Create a new query from QUERY whose string with FUNCTIONS applied."
-  (let ((string (lookup-query-string query)))
-    (when string
-      (setq query (copy-lookup-query query))
-      (setf (lookup-query-string query)
-            (dolist (function functions string)
-              (setq string (funcall function string))))
-      query)))
+(defmacro lookup-new-query-filter (query function)
+  "Create a new query filter with string-convert FUNCTION applied.
+FUNCTION may return multiple candidate values."
+  `(let* ((string (lookup-query-string ,query))
+          (method (lookup-query-method ,query))
+          (results (funcall ,function string)))
+     (if (not (listp results)) (setq results (list results)))
+     (mapcar (lambda (result)
+               (lookup-new-query method result)) results)))
 
 ;;
 ;; Normalize Input String
 ;;
 
 (defun lookup-query-filter-decode-url (query)
-  (lookup-query-filter query 'url-unhex-string))
+  (lookup-new-query-filter query 'url-unhex-string))
 
 (defun lookup-query-filter-normalize-nfc (query)
-  (lookup-query-filter query 'lookup-remove-dichars 'ucs-normalize-NFC-string))
+  (lookup-new-query-filter query 'ucs-normalize-NFC-string))
 
 (defun lookup-query-filter-normalize-nfkc (query)
-  (lookup-query-filter query 'lookup-remove-dichars 'ucs-normalize-NFKC-string))
+  (lookup-new-query-filter query 'ucs-normalize-NFKC-string))
 
-(defun lookup-remove-dichars (string)
+(defun lookup-remove-default-ignorables (string)
   "remove Default Ignorable characters."
   (replace-regexp-in-string "[〾󠀀-󯿽]" "" string))
 
+(defun lookup-query-filter-remove-default-ignorables (query)
+  (lookup-new-query-filter query 'lookup-remove-default-ignorables))
+
 (add-to-list 'lookup-query-filters 'lookup-query-filter-normalize-nfkc)
 (add-to-list 'lookup-query-filters 'lookup-query-filter-decode-url)
+(add-to-list 'lookup-query-filters 'lookup-query-filter-remove-default-ignorables)
 
 ;;
 ;; case
 ;;
 
 (defun lookup-query-filter-downcase (query)
-  (lookup-query-filter query 'downcase))
+  (lookup-new-query-filter query 'downcase))
 
 (add-to-list 'lookup-query-filters 'lookup-query-filter-downcase)
 
 ;;
-;; Stem English
+;; English Stemming filter
 ;;
 
 (defun lookup-query-filter-stem-english (query)
   (require 'stem-english)
   (let* ((string (downcase (lookup-query-string query)))
-         (method (lookup-query-method query))
-         strings)
+         (method (lookup-query-method query)))
     (if (or (equal method 'exact) (equal method 'keyword))
         (mapcar 
          (lambda (x) (lookup-new-query method x))
          (cons string
-               (remove-if 
+               (cl-remove-if
                 (lambda (x) (< (length x) 4))
                 (cdr (nreverse (stem-english string))))))
       query)))
+
+;; misc. filters
 
 (defun lookup-query-filter-kanji-to-kana (query)
   (mapcar (lambda (x) (lookup-new-query (lookup-query-method query) x))
           (lookup-text-get-readings (lookup-query-string query))))
 
-(defun lookup-query-filter-hiragana-to-katakana (query)
-  (setf (lookup-query-string query)
-        (japanese-katakana (lookup-query-string (copy-lookup-query query))))
-  query)
+(defun lookup-query-filter-to-katakana (query)
+  (lookup-new-query-filter query 'japanese-katakana))
 
 (defun lookup-decompose-alphabet-chars (chars)
   "Decompose alphabet characters CHARS."
@@ -231,7 +237,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
     (while (/= (length chars) (length new-chars))
       (setq chars new-chars)
       (setq new-chars
-            (remove-if 
+            (cl-remove-if
              (lambda (x)
                (let ((ccc 
                       (get-char-code-property x 'canonical-combining-class)))
@@ -240,12 +246,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
     (apply 'string chars)))
 
 (defun lookup-query-filter-remove-accents (query)
-  (setf (lookup-query-string query)
-        (lookup-remove-alphabet-accents (lookup-query-string query)))
-  query)
-
-;; remove from list if you don't like.
-;; (add-to-list 'lookup-query-filters 'lookup-query-filter-remove-accents)
+  (lookup-new-query-filter query 'lookup-remove-alphabet-accents))
 
 ;;
 ;; 日本の旧字・新字の対応
@@ -346,10 +347,6 @@ the string will be returned.  If CHARSETS is null, it returns t."
 (defun lookup-text-old-to-new (str)
   "Convert old Kanji in STR to new Kanji."
   (let* ((chars (string-to-list str))
-         ;; remove IVS characters
-         (chars (remove-if (lambda (x) (and (< #xe0000 x)
-                                            (< x #xeffff)))
-                           chars))
          (chars (mapcar (lambda (x)
                           (or (car (rassoc x lookup-text-old-new-alist)) x))
                         chars)))

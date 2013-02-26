@@ -104,7 +104,7 @@
          (result (ndpdic-binary-search ndpdic query-string)))
     (when result
       (setq result
-            (remove-if
+            (cl-remove-if
              (lambda (x) (null (string-match
                                 (concat "^" query-string) x)))
              (append (ndpdic-entries ndpdic (car result))
@@ -142,7 +142,7 @@
 ;;; Structure
 ;;;
 
-(defstruct ndpdic 
+(cl-defstruct ndpdic 
   filename headername dictitle version lword liapa block-size
   index-block header-size index-size empty-block nindex nblock
   nword dicorder dictype attrlen os olenumber dummy-lid
@@ -389,10 +389,10 @@ Return the list of entry words.  Result will be cached."
 (defun ndpdic-adjust-content (entry kind from to &optional field-size-length)
   "Retrieve ENTRY contents of KIND from FROM to TO buffer.
 Optional argument FIELD-SIZE-LENGTH specifies size of binary data length field."
-  (let ((word-level (logand #x0f kind))
+  (let (;(word-level (logand #x0f kind))
         (extended   (logand #x10 kind))
-        (memorize   (logand #x20 kind))
-        (modified   (logand #x40 kind))
+        ;(memorize   (logand #x20 kind))
+        ;(modified   (logand #x40 kind))
         extended-data start ext-val data-item)
     ;; Parse Extended Data
     (when (/= extended 0)

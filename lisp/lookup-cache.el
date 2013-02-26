@@ -22,7 +22,7 @@
 
 ;;; Code:
 
-(require 'lookup)
+(require 'lookup-vars)
 
 (defconst lookup-dump-functions
   '(lookup-dump-agent-attributes
@@ -107,10 +107,10 @@
                               (mapcar 'lookup-dictionary-id
                                       (lookup-module-dictionaries module)))
                         (cons 'priority-alist
-                              (mapcan (lambda (x)
-                                        (if (car x)
-                                            (list (cons (lookup-dictionary-id (car x)) (cdr x)))))
-                                      (lookup-module-priority-alist module)))
+                              (cl-mapcan (lambda (x)
+                                           (if (car x)
+                                               (list (cons (lookup-dictionary-id (car x)) (cdr x)))))
+                                         (lookup-module-priority-alist module)))
 			(cons 'bookmarks
                               (mapcar 'lookup-entry-id
                                       (lookup-module-bookmarks module)))
@@ -135,12 +135,12 @@
                                  (lookup-module-name module))))
     (let ((dictionaries (mapcar 'lookup-get-dictionary
                                 (lookup-assq-get alist 'dictionaries))))
-      (setq dictionaries (delete-if 'null dictionaries))
+      (setq dictionaries (cl-delete-if 'null dictionaries))
       (setf (lookup-module-dictionaries module) dictionaries))
     (let ((priority-alist (mapcar (lambda (x)
                                     (cons (lookup-get-dictionary (car x)) (cdr x)))
                                   (lookup-assq-get alist 'priority-alist))))
-      (setq priority-alist (delete-if 'null priority-alist))
+      (setq priority-alist (cl-delete-if 'null priority-alist))
       (setf (lookup-module-priority-alist module) priority-alist))
     (let ((bookmarks (mapcar 'lookup-get-entry-create
                              (lookup-assq-get alist 'bookmarks))))

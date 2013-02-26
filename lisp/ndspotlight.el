@@ -191,8 +191,7 @@
 (defun ndspotlight-content (entry)
   (let* ((code (lookup-entry-code entry))
          (options (append ndspotlight-content-program-options
-                          (list code)))
-         point)
+                          (list code))))
     (with-temp-buffer
       (lookup-with-coding-system 'utf-8
         (apply 'call-process ndspotlight-content-program 

@@ -2,7 +2,6 @@
 ;; Copyright (C) 1999-2002 Lookup Development Team <lookup@ring.gr.jp>
 
 ;; Author: Satomi I. <satomi@ring.gr.jp>
-;; Version: $Id: ndeb-binary.el,v 1.13 2009/05/12 00:59:47 kawabata Exp $
 
 ;; This file is part of Lookup.
 
@@ -21,9 +20,6 @@
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ;;; Code:
-
-;;(require 'cl)
-;;(load "cl-seq")
 
 ;;;
 ;;; Customizable variables
@@ -482,7 +478,6 @@ corresponding eblook commands."
 	 (link (ndeb-binary-get-link (point)))
 	 (type (lookup-assq-get link 'type))
 	 (target (lookup-assq-get link 'target))
-	 (id (cons type target))
 	 (parameters (lookup-assq-get link 'parameters))
 	 (program (lookup-assq-get ndeb-binary-programs type))
 	 file)

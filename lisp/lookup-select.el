@@ -309,7 +309,7 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
   (let* ((module lookup-select-module)
 	 (dicts (lookup-module-dictionaries module))
          (diffs
-          (set-difference lookup-dictionary-list dicts)))
+          (cl-set-difference lookup-dictionary-list dicts)))
     (if diffs
         (setf (lookup-module-dictionaries module)
               (nconc dicts (nreverse diffs)))))

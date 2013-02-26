@@ -19,8 +19,8 @@
 (provide 'stem-english)
 
 (defvar stem:minimum-word-length 4 "Porter のアルゴリズムが適用できる最小語長")
-(defvar stem:stem nil)
-(defvar stem:str nil)
+(defvar stem:stem)
+(defvar stem:str)
 
 
 ;;;============================================================
@@ -200,7 +200,7 @@
 		  (and (stem:m= 1)
 		       (not (stem:*o)))))
 	 (and (stem:match "ll$")
-	      (setq stem:stem (concat stem "l"))
+	      (setq stem:stem (concat stem:stem "l"))
 	      (stem:m> 1)))
 	stem:stem stem:str)))
 

@@ -527,7 +527,8 @@ Nil means it has not been checked yet.")
              (dict-location (concat agent-location "/" dict-name))
              (gaiji-file
               (or (lookup-agent-option agent :gaiji-file)
-                  (car (directory-files dict-location t "\\.map$"))
+                  (and (file-directory-p dict-location)
+                       (car (directory-files dict-location t "\\.map$")))
                   (car (directory-files ndeb-gaiji-map-directory t (concat dict-name ".map")))
                   (car (directory-files ndeb-gaiji-map-directory t (concat agent-name ".map"))))))
         (if gaiji-file
@@ -653,7 +654,7 @@ Nil means it has not been checked yet.")
   (let ((dictionary (lookup-entry-dictionary entry)))
   (while (re-search-forward "<ind=\\([0-9]\\)>" nil t)
     (let ((beg-beg (match-beginning 0))
-	  (beg-end (match-end 0))
+	  ;; (beg-end (match-end 0))
 	  (level (- (string-to-number (match-string 1))
 		    (or 
 		     (lookup-dictionary-option dictionary :minimum-indent t)

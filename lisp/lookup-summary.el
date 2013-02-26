@@ -109,11 +109,10 @@
 	(if (and content lookup-enable-format (not lookup-force-update))
 	    (insert content)
 	  (lookup-with-message (format "Inserting `%s'" (lookup-entry-heading entry))
-	    (let ((dictionary (lookup-entry-dictionary entry)))
-	      (insert (lookup-entry-content entry))
-	      (when lookup-enable-format
-		(lookup-arrange-content entry)
-		(lookup-put-property entry 'content (buffer-string))))))
+            (insert (lookup-entry-content entry))
+            (when lookup-enable-format
+              (lookup-arrange-content entry)
+              (lookup-put-property entry 'content (buffer-string)))))
 	(if lookup-enable-format (lookup-adjust-content entry)))
       ;; arrange functions might change the buffer mode
       (lookup-content-mode)

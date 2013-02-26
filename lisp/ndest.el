@@ -219,7 +219,7 @@ estcall使用時は無効。"
 	(setq ic ndest-iconv-coding-system-for-write)
       (setq ic (symbol-name ndest-process-coding-system-for-write))
       (let ((params ndest-coding-system-table)
-	    param tmp)
+	    param)
 	(while params
 	  (setq param (car params))
 	  (when (string-match (car param) ic)

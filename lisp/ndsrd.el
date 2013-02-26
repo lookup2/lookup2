@@ -184,7 +184,7 @@ It should be set by preference file specifid by `:fmt' option."
         ndsrd-temp-files)
   (setq ndsrd-temp-files nil)
   (if (and (file-directory-p ndsrd-temporary-directory)
-           (null (set-difference 
+           (null (cl-set-difference 
              (directory-files ndsrd-temporary-directory)
              '("." "..") :test 'equal)))
       (delete-directory ndsrd-temporary-directory)))

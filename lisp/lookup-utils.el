@@ -22,9 +22,7 @@
 
 ;;; Code:
 
-(require 'cl)
 (require 'lookup-vars)
-(require 'lookup-text)
 
 ;; alist by assq
 
@@ -88,6 +86,9 @@
     (nreverse alist)))
 
 ;; misc
+
+(defsubst lookup-temp-buffer ()
+  (generate-new-buffer " *Lookup temp buffer*"))
 
 (defun lookup-map-over-property (from to prop func &optional object)
   (let ((start from) end value)
@@ -226,6 +227,9 @@
 ;;;
 ;;; Lookup process
 ;;;
+
+(defsubst lookup-open-process-buffer (name)
+  (if lookup-enable-debug (generate-new-buffer name)))
 
 (defvar lookup-process-output-start nil)
 (defvar lookup-process-output-value nil)

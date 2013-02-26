@@ -132,7 +132,6 @@ Windows/Linux version (ver 1.97), it should be '~'"
   "Search Lat-Eng or Eng-Lat DICTIONARY for QUERY."
   (ndlatin-process-open)
   (let ((dictname (lookup-dictionary-name dictionary))
-        (method   (lookup-query-method query))
         (string   (lookup-query-string query))
         (output))
     (if (equal dictname "le")
@@ -149,9 +148,9 @@ Windows/Linux version (ver 1.97), it should be '~'"
                    (string-match "UNKNOWN" output)))
       (setq output (replace-regexp-in-string "\n\n+" "\n" output))
       (setq output (split-string output ndlatin-splitter t))
-      (setq output (remove-duplicates output :test 'equal))
+      (setq output (cl-remove-duplicates output :test 'equal))
       (setq output
-            (remove-if ;; remove empty output
+            (cl-remove-if ;; remove empty output
              (lambda (x) (not (string-match "[a-zA-Z]" x))) output))
       (mapcar (lambda (x) (lookup-new-entry 'regular dictionary
                                             x string))

@@ -158,7 +158,7 @@
 			(if entries (setq search-found t))
 			entries))
 		    (lookup-module-dictionaries module)))
-      (setq entries (remove-if 
+      (setq entries (cl-remove-if
                      (lambda (x) (equal (lookup-entry-type x) 'dynamic))
                      (apply 'append entries)))
       (setq entries (mapcar 'lookup-new-slink entries))

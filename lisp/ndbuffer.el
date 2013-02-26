@@ -123,7 +123,7 @@
 (defun ndbuffer-search-multiple
   (file string method &optional content-tags entry-tags-list
    head-tags code-tags)
-  (remove-duplicates
+  (cl-remove-duplicates
    (loop for entry-tags in entry-tags-list
          nconc (ndbuffer-search file string
                                 method content-tags

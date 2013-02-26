@@ -22,6 +22,9 @@
 
 ;;; Code:
 
+(declare-function lookup-dictionary-title "lookup-types" (dictionary))
+(declare-function lookup-entry-heading "lookup-types" (entry))
+
 ;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables
 ;;;;;;;;;;;;;;;;;;;;

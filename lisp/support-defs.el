@@ -1,4 +1,4 @@
-;;; support-defs.el --- autoload definition of support files
+;;; support-defs.el --- autoload definition of support files -*- lexical-binding: t -*-
 
 ;; Add your dictionary freely!
 
@@ -53,6 +53,8 @@
         ("/jargon" . "support-jargon")
         ("/vera" . "support-vera")
 
+        ;; muller
+        ("/muller-all\\.xml" . "support-muller")
         ))
 
 ;;; support-defs.el ends here

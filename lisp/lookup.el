@@ -23,11 +23,7 @@
 
 ;;; Code:
 
-(require 'cl)
-
 (require 'lookup-types)
-(require 'lookup-utils)
-(require 'lookup-vars)
 (require 'lookup-select)
 (require 'lookup-content)
 (require 'lookup-summary)
@@ -120,6 +116,11 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 (defun lookup-list-history ()
   (interactive)
   (lookup-history-display (lookup-current-module)))
+
+;;;###autoload
+(defun lookup-list-modules ()
+  (interactive)
+  (lookup-modules-display))
 
 (defun lookup-open-window ()
   (interactive)
@@ -403,8 +404,8 @@ If MODULE is specified, then dictionaries NOT in a module are shown as
 candidates."
   (let ((table (mapcar (lambda (dict) (lookup-dictionary-id dict))
                        (if module
-                           (set-difference lookup-dictionary-list
-                                           (lookup-module-dictionaries module))
+                           (cl-set-difference lookup-dictionary-list
+                                              (lookup-module-dictionaries module))
                          lookup-dictionary-list))))
     (if (null table)
         (error "Module has all dictionaries"))
@@ -739,16 +740,16 @@ If there is no session, default module will be returned."
       (car lookup-module-list))))
 
 (defun lookup-get-module (name &optional module-list)
-  (car (member-if (lambda (module) (equal (lookup-module-name module) name))
-		  (or module-list lookup-module-list))))
+  (car (cl-member-if (lambda (module) (equal (lookup-module-name module) name))
+                     (or module-list lookup-module-list))))
 
 (defun lookup-get-agent (id)
-  (car (member-if (lambda (agent) (equal (lookup-agent-id agent) id))
-		  lookup-agent-list)))
+  (car (cl-member-if (lambda (agent) (equal (lookup-agent-id agent) id))
+                     lookup-agent-list)))
 
 (defun lookup-get-dictionary (id)
-  (car (member-if (lambda (dict) (equal (lookup-dictionary-id dict) id))
-		  lookup-dictionary-list)))
+  (car (cl-member-if (lambda (dict) (equal (lookup-dictionary-id dict) id))
+                     lookup-dictionary-list)))
 
 (defun lookup-entry-list ()
   (let (entries)
@@ -795,12 +796,6 @@ If there is no session, default module will be returned."
 
 (defsubst lookup-summary-buffer () lookup-summary-buffer)
 (defsubst lookup-content-buffer () lookup-content-buffer)
-
-(defsubst lookup-temp-buffer ()
-  (generate-new-buffer " *Lookup temp buffer*"))
-
-(defsubst lookup-open-process-buffer (name)
-  (if lookup-enable-debug (generate-new-buffer name)))
 
 (defvar lookup-start-window nil)
 (defvar lookup-main-window nil)

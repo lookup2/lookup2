@@ -108,8 +108,7 @@
         (file    (expand-file-name
                   (lookup-dictionary-name dictionary)
                   (lookup-agent-location
-                   (lookup-dictionary-agent dictionary))))
-        entries)
+                   (lookup-dictionary-agent dictionary)))))
     (loop for (code head val) in 
           (ndtext-process 'ndsary 'search file string method
                           nddsl-content-tags nddsl-entry-tags)
@@ -200,9 +199,7 @@
 
 (defun nddsl-arrange-fill (entry)
   (while (re-search-forward "\\[m\\([0-9]\\)\\]" nil t)
-    (let ((beg-beg (match-beginning 0))
-	  (beg-end (match-end 0))
-	  (level (- (string-to-number (match-string 1))
+    (let ((level (- (string-to-number (match-string 1))
 		     nddsl-minimum-indent))
 	  indent-end point)
       (when (> level 0)

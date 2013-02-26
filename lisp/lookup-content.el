@@ -195,7 +195,7 @@
     (let (entries)
       (lookup-map-over-property
        (point-min) (point-max) 'lookup-reference
-       (lambda (start end entry)
+       (lambda (entry)
 	 (setq entries (cons entry entries))))
       (nreverse entries))))
 
