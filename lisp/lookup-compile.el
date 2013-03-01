@@ -8,9 +8,11 @@
 
 (defun lookup-autoload ()
   (require 'autoload)
+  (setq generated-autoload-file
+	(expand-file-name "lookup-autoloads.el" default-directory)
+	backup-enable-predicate 'ignore)
   (mapc (lambda (file)
-          (update-file-autoloads file nil
-           (expand-file-name "lookup-autoloads.el" default-directory)))
+          (update-file-autoloads file t))
         command-line-args-left))
 
 ;;; lookup-compile.el ends here
