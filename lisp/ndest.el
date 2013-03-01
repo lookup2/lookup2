@@ -340,7 +340,7 @@ estcall使用時は無効。"
 	      (lookup-assoc-del url-proxy-services "http"))))
       (setq data (url-retrieve-synchronously uri)))
     (insert-string (decode-coding-string
-		    (with-current-buffer data (buffer-string)) 'utf-8))))
+		    (with-current-buffer data (buffer-string)) 'utf-8)))))
 
 (put 'ndest :content 'ndest-entry-content)
 (defun ndest-entry-content (entry)
