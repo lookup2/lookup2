@@ -1,4 +1,6 @@
+AUTOMAKE_OPTIONS = foreign
 SUBDIRS = lisp texi
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 autom4te.cache \
 	configure config.h.in install-sh missing mkinstalldirs \
-	stamp-h.in COPYING INSTALL Makefile.in 
+	stamp-h.in COPYING INSTALL Makefile.in
+EXTRA_DIST = README.md
