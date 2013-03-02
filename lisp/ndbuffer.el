@@ -152,8 +152,8 @@ Extractions are done in accordance with follows."
           ;; stop before `content-end'.
           (setq end (match-beginning 0))
           (save-restriction
-            (narrow-to-regin (match-beginning 0) 
-                             (- (match-end 0) (length content-end)))
+            (narrow-to-region (match-beginning 0) 
+			      (- (match-end 0) (length content-end)))
             (goto-char (point-min))
             (let (code head val)
               (when (re-search-forward (concat head-start "\\(.+?\\)" 
