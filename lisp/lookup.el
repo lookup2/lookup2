@@ -178,10 +178,10 @@ Otherwise, this is the same with \\[lookup-previous-history]."
   (interactive)
   (when (or (not (called-interactively-p 'interactive))
 	    (yes-or-no-p "Are you sure to restart Lookup? "))
+    (lookup-exit)
     (setq lookup-property-table nil)
     (setq lookup-current-session nil)
     (setq lookup-module-list nil)
-    (lookup-exit)
     (lookup)))
 
 (defun lookup-help ()

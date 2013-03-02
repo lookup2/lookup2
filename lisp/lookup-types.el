@@ -416,6 +416,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
         (charsets (lookup-dictionary-option dictionary :charsets t))
         (filters (lookup-dictionary-query-filters dictionary)))
     ;; check if string satisfies requirements
+    (lookup-debug-message "charsets=%s" charsets)
     (when (lookup-text-charsetsp string charsets)
       (when (eq method 'default)
         (setf (lookup-query-method query) 
