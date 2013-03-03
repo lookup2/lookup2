@@ -336,6 +336,19 @@ If process is not run, silently remove the process and re-create new process."
       (lookup-process-kill (cdar lookup-get-process-alist))
       (setq lookup-get-process-alist (cdr lookup-get-process-alist)))))
 
+
+(defvar lookup-message nil)
+
+(defmacro lookup-with-message (msg &rest body)
+  (declare (indent 1))
+  `(let ((lookup-message ,msg))
+     (message "%s..." lookup-message)
+     (prog1 (progn ,@body)
+       (message "%s...done" lookup-message))))
+
+(defun lookup-message (msg)
+  (message "%s... (%s)" lookup-message msg))
+
 (provide 'lookup-utils)
 
 ;;; lookup-utils.el ends here
