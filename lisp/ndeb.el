@@ -734,7 +734,7 @@ Nil means it has not been checked yet.")
 	    (add-text-properties beg-end end-beg
 				 `(face ,(or (lookup-assoc-get
 					      ndeb-faces-table class)
-					     default)))
+					     'default)))
 	    (delete-region end-beg end-end)
 	    (delete-region beg-beg beg-end)
             (goto-char beg-beg))))
