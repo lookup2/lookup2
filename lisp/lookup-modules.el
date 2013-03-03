@@ -23,6 +23,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
 (defvar lookup-modules-killed-modules nil)
 
 (defun lookup-modules-display ()

@@ -31,6 +31,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup)
 (require 'lookup-content)
 (require 'ndeb-binary)

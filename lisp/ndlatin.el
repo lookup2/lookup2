@@ -52,6 +52,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup)
 (defconst ndlatin-version "0.2")
 

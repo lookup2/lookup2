@@ -22,6 +22,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup-vars)
 
 (defconst lookup-dump-functions
