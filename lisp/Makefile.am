@@ -1,11 +1,12 @@
-SOURCES = lookup.el lookup-utils.el lookup-types.el lookup-vars.el	\
-	lookup-cache.el lookup-summary.el lookup-content.el		\
-	lookup-select.el lookup-modules.el lookup-history.el		\
-	lookup-text.el stem-english.el ndbtonic.el ndcookie.el		\
-	ndeb.el ndeb-binary.el nddsl.el ndic.el ndict.el ndjitsuu.el	\
-	ndlatin.el ndpdic.el ndsary.el ndbuffer.el ndspell.el		\
-	ndspotlight.el ndsrd.el ndtut.el ndest.el ndtext.el ndweb.el	\
-	support-defs.el bocu.el support-files/support-chinakan.el	\
+SOURCES = bocu.el stem-english.el lookup-types.el lookup.el		\
+	lookup-utils.el lookup-vars.el lookup-cache.el			\
+	lookup-summary.el lookup-content.el lookup-select.el		\
+	lookup-modules.el lookup-history.el lookup-text.el		\
+	ndbtonic.el ndcookie.el ndeb.el ndeb-binary.el nddsl.el		\
+	ndic.el ndict.el ndjitsuu.el ndlatin.el ndpdic.el ndsary.el	\
+	ndbuffer.el ndspell.el ndspotlight.el ndsrd.el ndtut.el		\
+	ndest.el ndtext.el ndweb.el support-defs.el			\
+	support-files/support-chinakan.el				\
 	support-files/support-eijiro-pdic.el				\
 	support-files/support-eijiro.el					\
 	support-files/support-jitsuu.el					\
