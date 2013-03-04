@@ -24,6 +24,7 @@
 
 (declare-function lookup-dictionary-title "lookup-types" (dictionary))
 (declare-function lookup-entry-heading "lookup-types" (entry))
+(declare-function lookup-entry-dictionary "lookup-types")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;; Custom Variables

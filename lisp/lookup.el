@@ -89,13 +89,6 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 ;;; Internal Functions
 (defvar lookup-message nil)
 
-(defmacro lookup-with-message (msg &rest body)
-  (declare (indent 1))
-  `(let ((lookup-message ,msg))
-     (message "%s..." lookup-message)
-     (prog1 (progn ,@body)
-       (message "%s...done" lookup-message))))
-
 (defun lookup-message (msg)
   (message "%s... (%s)" lookup-message msg))
 

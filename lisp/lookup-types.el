@@ -28,8 +28,6 @@
 
 ;;;; Code:
 
-(require 'cl)
-(require 'lookup-vars)
 (require 'lookup-utils)
 
 (declare-function lookup-restore-module-attributes "lookup-cache" (&rest specs))
