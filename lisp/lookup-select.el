@@ -23,6 +23,8 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+
 (defconst lookup-select-priority-marks
   '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 

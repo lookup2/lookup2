@@ -22,7 +22,7 @@
 
 ;; ndbtonic.el provides the suffix array index searching capability
 ;; for BTONIC dictionary by using `sary' program
-;; (http://www.namazu.org/sary/).
+;; (http://www.namazu.org/sary/) and BTONIC2xml.rb (v1.10).
 ;;
 ;; To use this agent, you must uncompress XXX.EXI format file to
 ;; XXXX.xml file, and then `mksary -s' (or `mkary -so' if you like)

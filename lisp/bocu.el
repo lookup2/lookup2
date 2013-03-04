@@ -24,12 +24,13 @@
 
 ;; This decodes BOCU (Binary Ordered Compression of Unicode) string.
 
-(defun bocu-read-decode-trail-char (reg)
-  "BOCU trail char in REG to be decoded."
-  `(read-if (,reg > #x20) (,reg -= 13) 
-     (if (,reg >= #x1c) (,reg -= 12)   
-       (if (,reg >= #x10) (,reg -= 10) 
-         (,reg -= 1)))))               
+(eval-and-compile
+  (defun bocu-read-decode-trail-char (reg)
+    "BOCU trail char in REG to be decoded."
+    `(read-if (,reg > #x20) (,reg -= 13) 
+	      (if (,reg >= #x1c) (,reg -= 12)   
+		(if (,reg >= #x10) (,reg -= 10) 
+		  (,reg -= 1))))))
 
 (define-ccl-program decode-bocu
   `(4

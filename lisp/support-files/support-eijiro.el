@@ -20,6 +20,7 @@
 ;; Support file for text version of "英辞郎"
 
 ;;; Code:
+(eval-when-compile (require 'cl))
 
 (defvar support-eijiro-option-list
   '(("/EIJI-"

@@ -23,8 +23,16 @@
 ;;; Code:
 
 (require 'lookup)
-(require 'ndeb-binary)
 (defconst ndeb-version "0.1")
+
+(autoload 'ndeb-arrange-xbm "ndeb-binary")
+(autoload 'ndeb-arrange-bmp "ndeb-binary")
+(autoload 'ndeb-arrange-jpeg "ndeb-binary")
+(autoload 'ndeb-arrange-image-page "ndeb-binary")
+(autoload 'ndeb-arrange-wave "ndeb-binary")
+(autoload 'ndeb-arrange-mpeg "ndeb-binary")
+(autoload 'ndeb-arrange-snd-autoplay "ndeb-binary")
+(autoload 'ndeb-binary-clear "ndeb-binary")
 
 ;;;
 ;;; Customizable variables
@@ -726,7 +734,7 @@ Nil means it has not been checked yet.")
 	    (add-text-properties beg-end end-beg
 				 `(face ,(or (lookup-assoc-get
 					      ndeb-faces-table class)
-					     default)))
+					     'default)))
 	    (delete-region end-beg end-end)
 	    (delete-region beg-beg beg-end)
             (goto-char beg-beg))))

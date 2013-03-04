@@ -30,8 +30,6 @@
 ;; `ndjitsuu-convert-gaiji-to-ucs' function equipped in this file, and
 ;; then they should be saved by `UTF-8' encoding.
 ;;
-;; After that, these two files should be indexed by `mksary' program.
-;;
 ;; Usage:
 ;;
 ;; (setq lookup-search-agents

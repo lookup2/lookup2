@@ -14,14 +14,9 @@
 ;;    http://www-nagao.kuee.kyoto-u.ac.jp/member/tsuchiya/sdic/index.html
 
 
-;; -*- Emacs-Lisp -*-
-
-(provide 'stem-english)
-
 (defvar stem:minimum-word-length 4 "Porter のアルゴリズムが適用できる最小語長")
 (defvar stem:stem)
 (defvar stem:str)
-
 
 ;;;============================================================
 ;;;	非公開関数
@@ -940,3 +935,5 @@ Porter のアルゴリズムに基づいて派生語を処理する関数"
       (stem:step3
        (stem:step2
 	(stem:step1 word)))))))
+
+(provide 'stem-english)

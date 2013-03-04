@@ -31,7 +31,7 @@
 ;;       '(....
 ;;         (ndweb "k.hatena.ne.jp")
 ;;         (ndweb "ja.wikipedia.org")
-;;        ))
+;;        ....))
 
 ;;; Code:
 

@@ -1,13 +1,15 @@
 ## Lookup for Emacs
 
 *Lookup* is an integrated user interface for various dictionaries.
- You can search various on-line and off-line dictionaries
- simultaneously with lookup.
+You can search various on-line and off-line dictionaries
+simultaneously with lookup.
 
 ## Installation
 
 For now, simply download the archive and place the contents of `lisp`
 folder into your site-lisp.
+
+When proper installer is completed, it should be installed via following command.
 
 ```
 % ./configure --with-emacs=emacs \

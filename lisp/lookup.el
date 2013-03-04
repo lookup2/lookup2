@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup-types)
 (require 'lookup-select)
 (require 'lookup-content)
@@ -79,20 +80,6 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 (defun lookup-debug-message (format-string &rest args)
   (if lookup-enable-debug
       (apply 'message (concat "lookup-debug:" format-string) args)))
-
-
-;;; Internal Functions
-(defvar lookup-message nil)
-
-(defmacro lookup-with-message (msg &rest body)
-  (declare (indent 1))
-  `(let ((lookup-message ,msg))
-     (message "%s..." lookup-message)
-     (prog1 (progn ,@body)
-       (message "%s...done" lookup-message))))
-
-(defun lookup-message (msg)
-  (message "%s... (%s)" lookup-message msg))
 
 
 
