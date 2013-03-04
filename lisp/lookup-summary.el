@@ -22,9 +22,7 @@
 ;; Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ;;; Code:
-(require 'lookup-utils)
 
-;;;###autoload
 (defun lookup-summary-display (session)
   (with-current-buffer (lookup-get-buffer (lookup-summary-buffer))
     (let ((query (lookup-session-query session))
@@ -269,6 +267,7 @@
   ;; search-with-this-dictionary
   (define-key lookup-summary-mode-map "F" 'lookup-summary-dictionary-search)
   (define-key lookup-summary-mode-map "f" 'lookup-summary-follow-first-link)
+  (define-key lookup-summary-mode-map "b" 'lookup-summary-follow-last-link)
   )
 
 (defvar lookup-summary-mode-hook nil)
@@ -465,12 +464,21 @@ Overview モードになっている場合にはそれを解除し、Content バ
       (lookup-display-buffer (current-buffer)))))
 
 (defun lookup-summary-follow-first-link ()
-  "エントリ本文の最初のリンクへジャンプする。"
+  "エントリ本文の最初のリンクのリンク先へジャンプする。"
   (interactive)
   (lookup-with-buffer-and-window (lookup-content-buffer)
     (goto-char (point-min))
     (when (or (lookup-get-link (point))
               (lookup-content-next-link))
+      (lookup-content-follow-link))))
+
+(defun lookup-summary-follow-last-link ()
+  "エントリ本文の最後のリンクのリンク先へジャンプする。"
+  (interactive)
+  (lookup-with-buffer-and-window (lookup-content-buffer)
+    (goto-char (point-max))
+    (when (or (lookup-get-link (point))
+              (lookup-content-previous-link))
       (lookup-content-follow-link))))
 
 (defun lookup-summary-mark ()
@@ -501,6 +509,7 @@ Overview モードになっている場合にはそれを解除し、Content バ
 (defun lookup-summary-bookmark ()
   (interactive)
   (let ((entry (lookup-summary-this-entry)) memo)
+    (identity memo) ;; memo will be used in future.
     (when entry
       (when (or (not (stringp (lookup-entry-bookmark entry)))
 		(progn (setq memo (lookup-summary-memorandum-display))

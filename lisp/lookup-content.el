@@ -98,6 +98,13 @@
               (message (lookup-entry-id (lookup-get-link (point))))
             (error "No link in this buffer"))))))
 
+(defun lookup-content-previous-link ()
+  (interactive)
+  (or (lookup-get-link (point))
+      (if (lookup-goto-previous-link)
+          (message (lookup-entry-id (lookup-get-link (point))))
+        (error "No more link in this buffer"))))
+
 (defun lookup-content-follow-link ()
   "ポイント位置のリンクを参照する。"
   (interactive)
