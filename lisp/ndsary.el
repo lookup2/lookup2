@@ -62,7 +62,7 @@
 ;;;
 
 (put 'ndsary :methods 'ndsary-dictionary-methods)
-(defun ndsary-dictionary-methods (dictionary)
+(defun ndsary-dictionary-methods (ignored)
   `(exact prefix suffix substring))
 
 (put 'ndsary :list 'ndsary-list)
@@ -100,8 +100,7 @@
                    (lookup-agent-location
                     (lookup-dictionary-agent dictionary))))
          (coding  (or (lookup-dictionary-option dictionary :coding t)
-                      'utf-8))
-        entries)
+                      'utf-8)))
     (destructuring-bind
         (content-tags entry-tags head-tags code-tags entry-tags-list)
         (ndtext-dictionary-options dictionary string)
@@ -125,7 +124,7 @@
                          'utf-8)))
     (or (gethash (cons dict-id code) ndtext-cache)
         (destructuring-bind
-            (content-tags entry-tags head-tags code-tags entry-tags-list)
+            (content-tags entry-tags head-tags code-tags ignored)
             (ndtext-dictionary-options dictionary heading)
           (ndtext-process 'ndsary 'get dict-id code 'exact
                           content-tags entry-tags head-tags
@@ -153,7 +152,7 @@
               (y-or-n-p 
                (format "ndsary: %s are hit.  Display them all?" num))) t)))
 
-(defun ndsary-options (action single-line content-tags)
+(defun ndsary-options (ignored single-line content-tags)
   ;; ACTION is ignored.
   (unless single-line (list "-s" (car content-tags) "-e" (cdr content-tags))))
 
@@ -162,6 +161,7 @@
   "Costruct search pattern from query STRING and METHOD for `sary'.
 If START tag is provided, then that will be attached.
 If END tag is provided, then that will also be attached."
+  (identity content-tags) (identity single-line)
   ;;(if (and (or (null start) (null end))
   ;;         (or (equal method 'suffix)
   ;;             (equal method 'substring)

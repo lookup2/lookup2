@@ -25,24 +25,24 @@
 ;; for DSL (dictionary specification language) format dictionaries.
 ;; DSL is specified by Lingvo (http://www.lingvo.com/).
 ;;
-;; To use this agent, you must convert DSL file (UTF-16LE) to UTF-8
-;; encoding, then make suffix array for them.
-;; 
-;; Example:
-;; % nkf -Lu -w -W16 < dict.dsl > dict.utf8.dsl
-;; % mksary -c utf-8 dict.utf8.dsl
+;; This agent can work with three kinds of backend agents, 
+;; namely, ndsary, ndtext or ndbuffer backends.
 ;;
+;; You can specify backends by `:backend' option.  Default backend is
+;; `ndbuffer'.  You must convert DSL file to UTF-8 format if you want
+;; to use `ndtext' or `ndsary' backend. 
+;; 
 ;; Setup Example:
 ;;
 ;; (setq looukp-search-agents
 ;;       '(
 ;;         .....
-;;         (nddsl "~/edicts/hydcd")  ; directory where `*.utf8.dsl.ary' file exists.
+;;         (nddsl "~/edicts/hydcd" :backend ndsary) ; you need "XXX.dsl.ary" for sary backend.
 ;;         ...))
 
 ;;; Code:
 
-(require 'lookup)
+(require 'ndbuffer)
 (require 'ndsary)
 
 
@@ -50,8 +50,6 @@
 ;;; Customizable Variables
 ;;;
 
-(defvar nddsl-sary-program "sary")
-(defvar nddsl-sary-program-options '())
 (defvar nddsl-minimum-indent 1)
 
 ;;;
@@ -71,14 +69,20 @@
 ;;;
 
 (put 'nddsl :methods 'nddsl-dictionary-methods)
-(defun nddsl-dictionary-methods (dictionary)
+(defun nddsl-dictionary-methods (ignored)
+  ;; DICTIONARY is ignored.
   '(exact prefix suffix substring text))
 
 (put 'nddsl :list 'nddsl-list)
 (defun nddsl-list (agent)
   "Return list of dictionaries of AGENT."
   (let* ((location (lookup-agent-location agent))
-         (files (directory-files location nil "\\.utf8\\.dsl\\.ary\\'")))
+         (backend  (nddsl-agent-backend agent))
+         (extension (if (equal backend 'ndsary) ".ary"
+                      (or (lookup-agent-option agent :extension)
+                          ".dsl")))
+         (files (directory-files location nil
+                                 (concat (regexp-quote extension) "\\'"))))
     (if (null files) (error "nddsl: DSL file wity sary index not found! (%s)" location))
     (mapcar (lambda (name) 
               (lookup-new-dictionary agent (file-name-sans-extension name)))
@@ -87,13 +91,15 @@
 (put 'nddsl :title 'nddsl-title)
 (defun nddsl-title (dictionary)
   "Return title of DICTIONARY."
-  (let* ((name (lookup-dictionary-name dictionary))
+  (let* ((name    (lookup-dictionary-name dictionary))
+         (agent   (lookup-dictionary-agent dictionary))
+         (backend  (nddsl-agent-backend agent))
          (file (expand-file-name name
                 (lookup-agent-location 
                  (lookup-dictionary-agent dictionary))))
          (result
           (car (lookup-with-coding-system 'utf-8
-                 (ndtext-process 'ndsary 'search file "#NAME\t" 'text)))))
+                 (ndtext-process backend 'search file "#NAME\t" 'text)))))
     (if (and result 
              (string-match "\"\\(.+\\)\"" (elt result 2)))
         (match-string 1 (elt result 2))
@@ -102,15 +108,16 @@
 (put 'nddsl :search 'nddsl-dictionary-search)
 (defun nddsl-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let ((string  (lookup-query-string query))
-        (method  (lookup-query-method query))
-        (dict-id (lookup-dictionary-id dictionary))
-        (file    (expand-file-name
-                  (lookup-dictionary-name dictionary)
-                  (lookup-agent-location
-                   (lookup-dictionary-agent dictionary)))))
+  (let* ((string  (lookup-query-string query))
+         (method  (lookup-query-method query))
+         (dict-id (lookup-dictionary-id dictionary))
+         (agent   (lookup-dictionary-agent dictionary))
+         (backend (nddsl-agent-backend agent))
+         (file    (expand-file-name
+                   (lookup-dictionary-name dictionary)
+                   (lookup-agent-location agent))))
     (loop for (code head val) in 
-          (ndtext-process 'ndsary 'search file string method
+          (ndtext-process backend 'search file string method
                           nddsl-content-tags nddsl-entry-tags)
           for entry = (lookup-new-entry 'regular dictionary code head)
           do (puthash (cons dict-id code) val ndtext-cache)
@@ -119,16 +126,28 @@
 (put 'nddsl :content 'nddsl-entry-content)
 (defun nddsl-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((code (lookup-entry-code entry))
+  (let* ((code       (lookup-entry-code entry))
          (dictionary (lookup-entry-dictionary entry))
-         (dict-id (lookup-dictionary-id dictionary))
+         (agent      (lookup-dictionary-agent dictionary))
+         (backend    (nddsl-agent-backend agent))
+         (dict-id    (lookup-dictionary-id dictionary))
          (file (expand-file-name
                 (lookup-dictionary-name dictionary)
-                (lookup-agent-location
-                 (lookup-dictionary-agent dictionary)))))
+                (lookup-agent-location agent))))
     (or (gethash (cons dict-id code) ndtext-cache)
-        (ndtext-process 'ndtext 'get file code 'exact
+        (ndtext-process backend 'get file code 'exact
                         nddsl-content-tags nddsl-entry-tags))))
+
+;;;
+;;; Misc functions
+;;;
+
+(defun nddsl-agent-backend (agent)
+  (let ((backend (or (lookup-agent-option agent :backend)
+                    'ndbuffer)))
+    (unless (memq backend '(ndtext ndsary ndbuffer))
+      (error "Improper backend specified! agent=%s" agent))
+    backend))
 
 ;;;
 ;;; Formatting Functions
@@ -140,7 +159,8 @@
        (reference nddsl-arrange-reference)
        (fill      nddsl-arrange-fill)))
 
-(defun nddsl-arrange-replaces (entry)
+(defun nddsl-arrange-replaces (ignored)
+  ;; ENTRY is ignored
   (if (looking-at "\n+") (replace-match ""))
   (while (re-search-forward "<<" nil t)
     (replace-match "«") )
@@ -148,7 +168,8 @@
   (while (re-search-forward ">>" nil t)
     (replace-match "»")))
 
-(defun nddsl-arrange-structure (entry)
+(defun nddsl-arrange-structure (ignored)
+  ;; ENTRY is ignored
   (if (re-search-forward "^[ \t]" nil t)
       (lookup-make-region-heading (point-min) (1- (match-beginning 0)) 1))
   (goto-char (point-min))
@@ -197,7 +218,8 @@
       (lookup-put-property entry :dynamic heading)
       (lookup-set-link start end entry))))
 
-(defun nddsl-arrange-fill (entry)
+(defun nddsl-arrange-fill (ignored)
+  ;; ENTRY is ignored
   (while (re-search-forward "\\[m\\([0-9]\\)\\]" nil t)
     (let ((level (- (string-to-number (match-string 1))
 		     nddsl-minimum-indent))

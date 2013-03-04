@@ -28,29 +28,24 @@
 
 ;;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'lookup-vars)
 (require 'lookup-utils)
-;; (require 'lookup-text)
+(require 'lookup-text)
 
 (declare-function lookup-restore-module-attributes "lookup-cache" (&rest specs))
 (declare-function lookup-restore-agent-attributes  "lookup-cache" (agent))
 (declare-function lookup-restore-dictionary-attributes "lookup-cache" (dictionary))
 (declare-function lookup-restore-entry-attributes "lookup-cache" (entry))
 
-(declare-function lookup-debug-message "lookup" (format-string &rest args))
-(declare-function lookup-filter-query "lookup" (query filters))
-(declare-function lookup-format-internal "lookup" (entry functions msg))
 (declare-function lookup-get-dictionary "lookup" (id))
 (declare-function lookup-get-entry "lookup" (id))
 (declare-function lookup-put-entry "lookup" (entry))
-
-(declare-function lookup-summary-display-content "lookup-session" ())
-
+(declare-function lookup-filter-query "lookup" (query filters))
 (declare-function lookup-search-excursion "lookup-summary" ())
+(declare-function lookup-summary-display-content "lookup-session" ())
+(declare-function lookup-format-internal "lookup" (entry functions msg))
 (declare-function lookup-summary-display "lookup-summary" (session))
-
-(declare-function lookup-text-charsetsp "lookup-text" (string charsets))
 
 ;;; Search Method
 
@@ -421,7 +416,6 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
         (charsets (lookup-dictionary-option dictionary :charsets t))
         (filters (lookup-dictionary-query-filters dictionary)))
     ;; check if string satisfies requirements
-    (lookup-debug-message "charsets=%s" charsets)
     (when (lookup-text-charsetsp string charsets)
       (when (eq method 'default)
         (setf (lookup-query-method query) 

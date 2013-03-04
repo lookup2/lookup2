@@ -46,7 +46,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup)
 (require 'ndtext)
 
@@ -93,8 +92,8 @@
         (content-tags entry-tags code-tags head-tags entry-tags-list)
         (ndtext-dictionary-options dictionary string)
       (if entry-tags (setq entry-tags-list (list entry-tags)))
-      (loop for (code head val) in (ndbuffer-search-multiple
-                                    file string method
+      (loop for (code head val) in (ndtext-search-multiple
+                                    'ndbuffer file string method
                                     content-tags entry-tags-list
                                     head-tags code-tags)
             for entry = (lookup-new-entry 'regular dictionary code head)
@@ -112,48 +111,43 @@
         (destructuring-bind 
             (content-tags entry-tags code-tags head-tags ignored)
             (ndtext-dictionary-options dictionary heading)
-          (ndbuffer-content file code content-tags entry-tags
-                            head-tags code-tags)))))
+          (ndtext-process 'ndbuffer 'get dict-id code 'exact
+                          content-tags entry-tags head-tags
+                          code-tags)))))
 
 ;;;
 ;;; Main Function
 ;;;
 
-(defun ndbuffer-search-multiple
-  (file string method &optional content-tags entry-tags-list
-   head-tags code-tags)
-  (cl-remove-duplicates
-   (loop for entry-tags in entry-tags-list
-         nconc (ndbuffer-search file string
-                                method content-tags
-                                entry-tags head-tags
-                                code-tags))
-   :test (lambda (x y) (string= (car x) (car y)))))
-
-(defun ndbuffer-search (file string method content-tags entry-tags head-tags code-tags)
+(defun ndbuffer-process (action file string method content-tags entry-tags head-tags code-tags)
   "Extract entries in FILE with STRING, METHOD, ENTRY-START and ENTRY-END.
 REGULAR indicates if search is regular (not used for now)."
-  (destructuring-bind
-      (content-tags entry-tags head-tags code-tags)
-      (ndtext-normalize-options string method content-tags entry-tags head-tags code-tags)
-    (let* ((regexp (ndbuffer-regexp string method entry-tags))
-           (content-start (regexp-quote (car content-tags)))
-           (content-end   (regexp-quote (cdr content-tags)))
-           (code-start    (regexp-quote (car code-tags)))
-           (code-end      (regexp-quote (cdr code-tags)))
-           result start end)
-      (with-current-buffer (find-file-noselect file)
-        (save-excursion
-          (goto-char (point-min))
-          (while (re-search-forward regexp nil t)
-            (save-excursion
-              (or (re-search-forward content-end nil t)
-                  (goto-char (point-max)))
-              (setq end (point)))
-            (save-excursion
-              (or (re-search-backward content-start)
-                  (goto-char (point-min)))
-              (setq start (point)))
+  (let* ((regexp (case action
+                   ('search (ndbuffer-regexp string method entry-tags))
+                   ('get    (ndbuffer-regexp string 'exact code-tags))))
+         (content-start (regexp-quote (car content-tags)))
+         (content-end   (regexp-quote (cdr content-tags)))
+         (code-start    (regexp-quote (car code-tags)))
+         (code-end      (regexp-quote (cdr code-tags)))
+         result start end (hits 0))
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (goto-char (point-min))
+        (lookup-debug-message "regexp=%s" regexp)
+        (while (and (< hits lookup-max-hits)
+                    (re-search-forward regexp nil t))
+          (save-excursion
+            (or (re-search-forward content-end nil t)
+                (goto-char (point-max)))
+            (setq end (point)))
+          (save-excursion
+            (or (re-search-backward content-start)
+                (goto-char (point-min)))
+            (setq start (point)))
+          ;; collect results
+          (if (equal action 'get)
+              (setq result (buffer-substring-no-properties start end)
+                    hits   lookup-max-hits)
             (save-restriction
               (narrow-to-region start end)
               (goto-char (point-min))
@@ -161,43 +155,44 @@ REGULAR indicates if search is regular (not used for now)."
                 (if (functionp head-tags) 
                     (setq head (funcall head-tags (buffer-substring start end)))
                   (when (re-search-forward (concat (car head-tags) "\\(.+?\\)" 
-                                                   (cdr head-tags) nil t))
+                                                   (cdr head-tags)) nil t)
                     (setq head (match-string-no-properties 1))))
                 (goto-char (point-min))
                 (when (re-search-forward (concat code-start "\\(.+?\\)" 
                                                  code-end) nil t)
                   (setq code (match-string-no-properties 1)))
                 (when (and code head)
+                  (cl-incf hits)
                   (push (list code head (buffer-substring-no-properties start end))
                         result)))
-              (goto-char (point-max))))))
-      result)))
+              (goto-char (point-max)))))))
+    result))
 
-(defun ndbuffer-content (file code content-tags entry-tags
-                              head-tags code-tags)
-  (destructuring-bind
-      (content-tags ignored ignored code-tags)
-      (ndtext-normalize-options code 'exact content-tags entry-tags head-tags code-tags)
-    (let* ((regexp (ndbuffer-regexp code 'exact code-tags))
-           (content-start (regexp-quote (car content-tags)))
-           (content-end   (regexp-quote (cdr content-tags)))
-           result start end)
-      (with-current-buffer (find-file-noselect file)
-        (save-excursion
-          (goto-char (point-min))
-          (while (re-search-forward regexp nil t)
-            (save-excursion
-              (or (re-search-forward content-end nil t)
-                  (goto-char (point-max)))
-              (setq end (point)))
-            (save-excursion
-              (or (re-search-backward content-start)
-                  (goto-char (point-min)))
-              (setq start (point)))
-            (push (buffer-substring-no-properties start end)
-                  result)
-            (goto-char (point-max)))))
-      result)))
+;(defun ndbuffer-content (file code content-tags entry-tags
+;                              head-tags code-tags)
+;  (destructuring-bind
+;      (content-tags ignored ignored code-tags)
+;      (ndtext-normalize-options code 'exact content-tags entry-tags head-tags code-tags)
+;    (let* ((regexp (ndbuffer-regexp code 'exact code-tags))
+;           (content-start (regexp-quote (car content-tags)))
+;           (content-end   (regexp-quote (cdr content-tags)))
+;           result start end)
+;      (with-current-buffer (find-file-noselect file)
+;        (save-excursion
+;          (goto-char (point-min))
+;          (while (re-search-forward regexp nil t)
+;            (save-excursion
+;              (or (re-search-forward content-end nil t)
+;                  (goto-char (point-max)))
+;              (setq end (point)))
+;            (save-excursion
+;              (or (re-search-backward content-start)
+;                  (goto-char (point-min)))
+;              (setq start (point)))
+;            (push (buffer-substring-no-properties start end)
+;                  result)
+;            (goto-char (point-max)))))
+;      result)))
 
 (defun ndbuffer-regexp (string method tags)
   "Construct regular expression."

@@ -96,7 +96,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup)
 
 
@@ -130,7 +129,7 @@
 ;;;
 
 (put 'ndtext :methods 'ndtext-dictionary-methods)
-(defun ndtext-dictionary-methods (dictionary)
+(defun ndtext-dictionary-methods (ignored)
   '(exact prefix suffix substring)) ;; text))
 
 (put 'ndtext :list 'ndtext-list)
@@ -168,8 +167,7 @@
                    (lookup-agent-location
                     (lookup-dictionary-agent dictionary))))
          (coding  (or (lookup-dictionary-option dictionary :coding t)
-                      'utf-8))
-         entries)
+                      'utf-8)))
     (destructuring-bind 
         (content-tags entry-tags head-tags code-tags entry-tags-list)
         (ndtext-dictionary-options dictionary string)
@@ -194,7 +192,7 @@
                          'utf-8)))
     (or (gethash (cons dict-id code) ndtext-cache)
         (destructuring-bind 
-            (content-tags entry-tags head-tags code-tags entry-tags-list)
+            (content-tags entry-tags head-tags code-tags ignored)
             (ndtext-dictionary-options dictionary heading)
           (ndtext-process 'ndtext 'get dict-id code 'exact
                           content-tags entry-tags head-tags
@@ -202,6 +200,7 @@
 
 (defun ndtext-dictionary-options (dictionary string)
   "Obtain needed options from DICTIONARY and STRING."
+  (identity string) ;; avoid warning
   (let ((content-tags    (lookup-dictionary-option dictionary :content-tags t))
         (entry-tags      (lookup-dictionary-option dictionary :entry-tags t))
         (head-tags       (lookup-dictionary-option dictionary :head-tags t))
@@ -230,7 +229,6 @@
         (error "ndtext: `grep' is not GNU grep.") nil)))
     (setq ndtext-initialized t)))
 
-;;
 ;; |                       | search                  | get                      |
 ;; |-----------------------+-------------------------+--------------------------|
 ;; | max-count-option      | maxhits=lookup-max-hits | maxhits=1                |
@@ -267,6 +265,10 @@
 (put 'ndtext :program-symbol  'ndtext-grep)
 (put 'ndtext :max-count-check nil)
 
+;;;
+;;; ndtext/ndsary common search interface
+;;;
+
 (defun ndtext-search-multiple
   (agent file string method &optional content-tags entry-tags-list
    head-tags code-tags coding)
@@ -278,6 +280,7 @@
                                code-tags coding))
    :test (lambda (x y) (string= (car x) (car y)))))
 
+(declare-function ndbuffer-process "ndbuffer")
 (defun ndtext-process
   (agent action file string method &optional content-tags entry-tags
    head-tags code-tags coding)
@@ -286,30 +289,37 @@
   (destructuring-bind
       (content-tags entry-tags head-tags code-tags)
       (ndtext-normalize-options string method content-tags entry-tags head-tags code-tags)
-    (let* ((single-line (equal content-tags '("\n" . "\n")))
-           (options (funcall (get agent :options) action single-line content-tags))
-           (pattern (funcall (get agent :pattern)
-                             string (if (eq action 'search) method 'exact) content-tags 
-                             (if (eq action 'search) entry-tags code-tags) single-line))
-           (max-count-check (get agent :max-count-check))
-           (program (eval (get agent :program-symbol)))
-           (arguments (append options (list pattern (file-truename file))))
-           status)
-      (if (or (equal action 'get)
-              (and (equal action 'search)
-                   (or (null max-count-check)
-                       (funcall max-count-check file pattern coding))))
-          (with-temp-buffer
-            ;; This newline insertion will make single-line search matches to first line.
-            (if single-line (insert "\n")) 
-            (lookup-debug-message "ndtext:program=%s, args=%s" program arguments)
-            (lookup-with-coding-system coding
-              (setq status (apply 'call-process program nil t nil arguments)))
-            (if (< 1 status)
-                (let ((content (buffer-string)))
-                  (error "ndtext: %s returned %s.  buffer=%s" program status content)))
-            (if (equal action 'get) (buffer-string)
-              (ndtext-collect-results content-tags code-tags head-tags single-line)))))))
+    (if (equal agent 'ndbuffer)
+        ;; ndbuffer
+        (ndbuffer-process action file
+                          string method content-tags entry-tags head-tags code-tags)
+      ;; ndsary/ndtext
+      (let* ((single-line (equal content-tags '("\n" . "\n")))
+             (options (funcall (get agent :options) action single-line content-tags))
+             (pattern (funcall (get agent :pattern)
+                               string (if (eq action 'search) method 'exact) content-tags 
+                               (if (eq action 'search) entry-tags code-tags) single-line))
+             (max-count-check (get agent :max-count-check))
+             (program (eval (get agent :program-symbol)))
+             (arguments (append options (list pattern (file-truename file))))
+             status)
+        (if (or (equal action 'get)
+                (and (equal action 'search)
+                     (or (null max-count-check)
+                         (funcall max-count-check file pattern coding))))
+            (with-temp-buffer
+              ;; This newline insertion will make single-line search matches to first line.
+              (if single-line (insert "\n")) 
+              (lookup-debug-message "ndtext:program=%s, args=%s" program arguments)
+              (lookup-with-coding-system coding
+                (setq status (apply 'call-process program nil t nil arguments)))
+              (if (< 1 status)
+                  (let ((content (buffer-string)))
+                    (error "ndtext: %s returned %s.  buffer=%s" program status content)))
+              (if (equal action 'get) (buffer-string)
+                (ndtext-collect-results content-tags code-tags head-tags single-line))))))))
+
+;;; common to ndtext/ndsary
 
 (defun ndtext-collect-results (content-tags code-tags head-tags single-line)
   "Collect results from buffer."
@@ -353,7 +363,10 @@
           (push (list code head content) results)))
     (nreverse results)))
 
-(defun ndtext-options (action single-line content-tags)
+
+;;; `ndtext' specific functions
+
+(defun ndtext-options (action single-line ignored) ;; content-tags
   `(,ndtext-grep-max-count-option 
     ,(if (eq action 'get) "1" (format "%d" lookup-max-hits))
     ,@(if single-line ndtext-grep-single-line-options ndtext-grep-multi-line-options)))
@@ -384,7 +397,6 @@
   (let ((tag-start   (ndtext-regexp-quote (car tags)))
         (tag-end     (ndtext-regexp-quote (cdr tags)))
         (content-start (ndtext-regexp-quote (car content-tags)))
-        (content-end   (ndtext-regexp-quote (cdr content-tags)))
         (any-char (concat "(?:(?!"
                           (ndtext-regexp-quote (cdr content-tags))
                           ").)*")))
