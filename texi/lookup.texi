@@ -1,15 +1,13 @@
 \input texinfo    @c -*- texinfo -*-
 @c %**start of header
-@setfilename lookup.info
+@setfilename .info
 @settitle Lookup User's Manual
 
 
 @c Version and Contact Info
 @set AUTHOR Nishida Keisuke (Updated by KAWABATA Taichi)
 
-@c
 @documentencoding UTF-8
-@c
 @c Use proper quote and backtick for code sections in PDF output
 @set txicodequoteundirected
 @set txicodequotebacktick
@@ -65,7 +63,6 @@
 * List of Supported Dictionaries::  
 * Making new Search Agents::    
 * Making new Support Files::    
-* List of Sample Dictionries::  
 * Concept index::               
 * Key index::                   
 * Command and function index::  
@@ -89,10 +86,13 @@ Search Agents
 
 Dictionaries
 
-* Dictionary Options::          
+* Dictionary Selection Buffer::  
+* Setting Dictionary Options::  
+* Common Dictionary Options::   
 
 Queries
 
+* Query commands::              
 * Query by pattern::            
 * Query by word::               
 * Query Filters::               
@@ -111,7 +111,9 @@ List of Search Agents
 * ndeb::                        
 * ndtext::                      
 * ndsary::                      
+* ndbuffer::                    
 * ndlatin::                     
+* ndweb::                       
 * ndic::                        
 * ndict::                       
 * ndjitsuu::                    
@@ -125,6 +127,22 @@ List of Search Agents
 ndtext
 
 * ndtext summary::              
+* Text Dictionary Architecture::  
+* Supported Options::           
+
+ndsary
+
+* ndtext summary::              
+* ndsary options::              
+
+ndbuffer
+
+* ndbuffer summary::            
+* ndbuffer options::            
+
+ndjitsuu
+
+* Summary::                     
 
 ndbtonic
 
@@ -133,14 +151,18 @@ ndbtonic
 List of Supported Dictionaries
 
 * EPWING/EBXA dictionaries::    
-* SDIC Dictionary::             
-* RangJung Yeshe Dicitionary::  
+* Text/XML dictionaries::       
 
 EPWING/EBXA dictionaries
 
 * FPWBooks::                    
 * EPWING for classics::         
 * LDOCE5-FPW::                  
+
+Text/XML dictionaries
+
+* SDIC Dictionary::             
+* RangJung Yeshe Dicitionary::  
 
 @end detailmenu
 @end menu
@@ -162,30 +184,11 @@ EPWING/EBXA dictionaries
 
 @node Summary
 @section Summary
-Lookup is a searching tool for various dictionaries and external
-resources.  Typical dictionaries supported by this program includes
-the followings:
+Lookup is a unified searching tool for various internal and
+external resources, especially for linguistic dictionaries.
+Typical dictionaries supported by lookup include:
 
 @itemize
-@item 
-Text-based dictionaries
-(Use of Suffix Array tool (sary) for better performance is also supported)
-
-@item 
-EPWING dictionaries
-
-@item 
-Search Engines (Spotlight, Hyperestraier)
-
-@item 
-Web Search Engines (OpenSearch)
-
-@item 
-Spell Checking
-
-@item 
-Scanned Paper Dictionaries (index text is needed.)
-
 @item 
 Text-based dictionaries
 (Use of Suffix Array tool (sary) for better performance is also supported)
@@ -222,8 +225,9 @@ follow the following procedure to install Lookup program.
 @node Setup
 @section Setup
 You will need some dictionaries that Lookup @ref{Search Agents,}
-supports.  For on-line available dictionaries, see @ref{List of Sample Dictionries,}.  When you install the dictionaries, you need to
-specify @ref{Search Agents,} with their locations.  For example:
+supports.  For on-line available dictionaries, see @ref{List of Supported Dictionaries,}.  When you install the dictionaries, you
+need to specify @ref{Search Agents,} with their locations.  For
+example:
 
 @lisp
 (setq lookup-search-agents '((ndeb "~/path/to/dict_dir_1/")
@@ -250,15 +254,14 @@ Additionaly, you might want to set as follows, or you might just
 
 You may write your settings to
 ~/.emacs.d/lookup/init.el.  It is recommended to write
-all lookup settings to this file, except for autoloadings and key
-bindings settings.
+all lookup settings to this file, except for autoload settings and
+key-binding settings.
 
 @node Startup
 @section Startup
 
 After you set up the dictionary, type @code{M-x lookup} to start lookup.
 You will typically see the following sceen.
-
 
 @verbatim
 ======== Lookup Windows ==================================================
@@ -284,21 +287,59 @@ Tyep `m' to select, `u' to unselect, `q' to leave, `?' for help.
 
 
 
+This buffer is called @emph{Dictionary Selection Buffer}.  In the above
+example, several dictionaries are available.  There are asterisks
+(@code{*}) in front of each dictionary IDs.  These indicates that all
+dictionaries will be looked up in single query.  Usually, all
+dictionaries are selected at first.
+
+
+
 This is a list of dictionaries you can lookup.  @emph{Dictionary ID}
-consists of @strong{Agent ID} + "@code{:}" + @strong{agent location}.  @emph{Methods} shows
-which methods are supported in each dictionary.  For example,
-@code{=><.....} means that this dictionary supports @strong{exact}, @strong{prefix}
-and @strong{suffix} search methods.
+consists of @strong{Agent ID} + "@code{:}" + @strong{agent location}.  
 
 
 
-This displays 
+@emph{Titles} may be displayed with query results.  @emph{Titles} may be
+changed to your preferred name via option specification.
+
+
+
+@emph{Methods} shows which search methods are supported by each
+dictionary.  For example, @code{=><.....} means that this dictionary
+supports @strong{exact}, @strong{prefix} and @strong{suffix} search methods.
+
+Help will be displayed by pressing ?.  Pressing
+qburies a buffer.  These key roles are common to other
+kind of buffers.
 
 @node Search
 @section Search
 
 Try typing @code{M-x lookup-pattern} and you will be prompted for
-patterns to search.
+patterns to search.  Pressing 
+
+@verbatim
+======== Lookup Windows ==================================================
+--------------------------------------------------------------------------
+国語辞典            @point{}テスト
+英和辞典            test
+
+
+--------------------------------------------------------------------------
+-U:%*  Lookup: *Entry* @{*:test@} [2]      (Entry Abbrev)--L1--C20
+--------------------------------------------------------------------------
+テスト
+[名] 1. 試験....
+
+
+
+
+--------------------------------------------------------------------------
+-U:%*  Lookup: *Content* @{テスト@}      (Content Abbrev)--L1--C0--
+--------------------------------------------------------------------------
+===========================================================================
+@end verbatim
 
 @node View
 @section View
@@ -307,7 +348,7 @@ patterns to search.
 @chapter Search Agents
 @emph{Search Agents} will search specific format of dictionaries in
 specified @strong{location}.  For historical reason, typical search agents
-has the name which begins from @verb{~nd~} (e.g. @verb{~ndeb~}, @verb{~ndict~}, @verb{~ndtext~},
+has the name which begins from @code{nd} (e.g. @code{ndeb}, @code{ndict}, @code{ndtext},
 etc.)
 
 You can specify the search agents by @code{lookup-search-agents} variable.
@@ -338,30 +379,7 @@ respectively.
 @node Agent Options
 @section Agent Options
 
-@node Dictionaries
-@chapter Dictionaries
-@emph{Dictionaries} are entities that explain the meaning of specified
-word or pattern.  @emph{Search Agents} will look for @emph{dictionaries}, and
-user can not specify them directly.
-
-
-@menu
-* Dictionary Options::          
-@end menu
-
-@node Dictionary Options
-@section Dictionary Options
-You can not directy specify the options to dictionaries, as
-dictionaries are indirectly specifed by searc agents.  You may
-specify dictionary options via @emph{support-files}.
-
-Followings are dictionary options, which can be specified by
-support files.
-
 @table @samp
-@item :title
-Dictionary title.
-
 @item :charsets
 Charsets that dictionary supports.  Queries whose
 string do not belong to specified charsets are not
@@ -381,37 +399,150 @@ functions.
 
 @end table
 
-@node Queries
-@chapter Queries
-Queries
+@node Dictionaries
+@chapter Dictionaries
+@emph{Dictionaries} are entities that explain the meaning of specified
+word or pattern.  @emph{Search Agents} will look for @emph{dictionaries}, and
+user can not specify them directly.
 
 
 @menu
+* Dictionary Selection Buffer::  
+* Setting Dictionary Options::  
+* Common Dictionary Options::   
+@end menu
+
+@node Dictionary Selection Buffer
+@section Dictionary Selection Buffer
+
+Dictionaries can be selected in @emph{Dictionary Selection Buffer}.
+Following keys can be used in this buffer.
+
+@table @samp
+@item m(@code{lookup-select-dictionary-select})
+Select
+dictionary in current position.
+
+
+@item M-m(@code{lookup-select-dictionary-select-all})
+Select
+all dictionaries in the buffer.
+
+
+@item u(@code{lookup-select-dictionary-select-unselect})
+Unselect
+dictionary.
+
+
+@item U(@code{lookup-select-dictionary-unselect-all})
+Unselect
+all dictionaries.
+
+@end table
+
+@node Setting Dictionary Options
+@section Setting Dictionary Options
+You can specify dictionary options in three ways.
+@itemize
+@item 
+@code{lookup-dictionary-options-alist} variable
+
+@item 
+@code{lookup-set-dictionary-option} function
+
+@item 
+use @emph{support-files} and @code{lookup-support-autoload-alist} variable.
+
+@end itemize
+
+You have to specify @strong{dictionary-id} that are displayed in
+@ref{Dictionary Selection Buffer,} in @code{lookup-dictionary-options-alist}.
+
+@lisp
+(setq lookup-dictionary-options-alist
+      '(("ndeb:/cdrom/EIWA" ':title "英和辞典")
+        ("ndeb:/cdrom/WAEI" ':title "和英辞典")))
+@end lisp
+
+Dictionaries are indirectly specifed by searc agents.  You may
+specify dictionary options via @emph{support-files}.  If you create your
+own dictionary, you may distribute @emph{support-file} to let users
+search your dictionary.
+
+@node Common Dictionary Options
+@section Common Dictionary Options
+
+Usually Agent options are inherited to dictionary options.  Because
+of this, you may set @ref{Agent Options,} individually by Dictionaries.
+
+Besides agent options, following dictionary options may be used.
+
+@table @samp
+@item :title
+Dictionary title.
+
+@end table
+
+@node Queries
+@chapter Queries
+You need to query to search dictinaries for words.  
+
+
+@menu
+* Query commands::              
 * Query by pattern::            
 * Query by word::               
 * Query Filters::               
 @end menu
 
+@node Query commands
+@section Query commands
+You can query by patterns, such as "testi*" etc.
+@table @samp
+@item lookup-pattern
+Look-up dictionary by pattern.
+
+@item lookup-pattern-full-screen
+Likewise
+
+@item lookup-pattern-other-frame
+Likewise
+
+@item lookup-word
+Look-up dictionary by word.
+
+@item lookup-word-full-screen
+Likewise.
+
+@item lookup-word-other-frame
+Likewise.
+
+@end table
+
 @node Query by pattern
 @section Query by pattern
-You can query by patterns, such as "testi*" etc.
-@itemize
-@item 
-lookup-pattern
+When you look-up the dictionary by pattern, following patterns can
+be specified.
+@table @samp
+@item @code{word}
+search by word.  Standard method for query.
 
-@end itemize
+@item @code{word*}
+search by prefix matching.
 
-@itemize
-@item 
-lookup-pattern-full-screen
+@item @code{*word}
+search by suffix matching.
 
-@end itemize
+@item @code{*word*}
+search by substring matching.
 
-@itemize
-@item 
-lookup-pattern-other-frame
+@item ~'word'~
+search by exact matching.
 
-@end itemize
+@item @code{@@word}
+search by keyword matching.
+
+@end table
 
 @node Query by word
 @section Query by word
@@ -452,7 +583,7 @@ around the point.
 @subsection Mecab
 You may use mecab to search for agents.  Please make sure that
 your dictinaries encoding (UTF-8 is strongly recommended) and
-@verb{~lookup-mecab-coding~} are the same.
+@code{lookup-mecab-coding} are the same.
 You may use this For dictionary which only supports Hiragana Entries,
 
 @node English Stemmer
@@ -496,7 +627,9 @@ Gaiji Replacements
 * ndeb::                        
 * ndtext::                      
 * ndsary::                      
+* ndbuffer::                    
 * ndlatin::                     
+* ndweb::                       
 * ndic::                        
 * ndict::                       
 * ndjitsuu::                    
@@ -526,6 +659,8 @@ the @code{HONMON} file exists to @code{lookup-search-agents}.
 
 @menu
 * ndtext summary::              
+* Text Dictionary Architecture::  
+* Supported Options::           
 @end menu
 
 @node ndtext summary
@@ -534,31 +669,208 @@ the @code{HONMON} file exists to @code{lookup-search-agents}.
 text-based dictionary by `GNU grep'.  It utilizes the multi-line
 search feature of GNU grep to search structured document.
 
+@node Text Dictionary Architecture
+@subsection Text Dictionary Architecture
+Typical text-based dictionaries are constructed by XML some other
+kind of markups.  Some dictionaries consists of single-line
+entries.  XML-based dictionaries are usually tagged as 
+follows:
+
+@verbatim
+<dictionary>
+...
+  <content>
+    <code>0123</code>
+    <head>free</head>
+    <entry>free</entry>
+    <entry>feely</entry>
+    <entry>freedom</entry>
+    <explanation>
+      ....
+    </explanation>
+  </content>
+ ....
+ </dictionary>
+@end verbatim
+
+In the above example, each entry of XML-based dictionary file is
+contained by @code{<content>} tags, and for each @code{<content>} element,
+there are single @code{<code>} element and one or more @code{<entry>}
+elements.
+
+@code{<content>} tags may be new-line character if dictionary is
+single-line based.  @code{<code>} and @code{<head>} entries may be identical
+in some dictionaries.  In this agent, you can specify these tags
+and the agent will automatically construct regular expression for
+GREP program for search.
+
+@node Supported Options
+@subsection Supported Options
+
+Following Options are supported.
+
+@multitable {aaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaa} {aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa}
+@headitem option
+@tab value
+@tab note
+@item :content-tags
+@tab ("<content>" . "</content>")
+@tab multi-line
+@item 
+@tab nil
+@tab default: (". "")
+@item 
+@tab ("" . "")
+@tab single-line
+@item 
+@tab function
+@tab argument: string (:search)
+@item 
+@tab 
+@tab code  (:content)
+@item 
+@tab 
+@tab return: tags
+@item :entry-tags-list
+@tab (entry-tags entry-tags@dots{})
+@tab 
+@item :entry-tags
+@tab ("<entry"> . "</entry>")
+@tab 
+@item 
+@tab nil
+@tab default: (nil . "")
+@item 
+@tab (nil . "</entry>")
+@tab content-start = line beginning
+@item 
+@tab function
+@tab argument: string (:search)
+@item 
+@tab 
+@tab code  (:content)
+@item 
+@tab 
+@tab return: tags
+@item :head-tags
+@tab ("<head>" . "</head>")
+@tab 
+@item 
+@tab nil
+@tab default: :entry-tags
+@item 
+@tab (nil . "</head>")
+@tab head-start = line beginning
+@item 
+@tab function
+@tab argument: content
+@item 
+@tab 
+@tab return:   head-value
+@item :code-tags
+@tab ("<code>" . "</code>")
+@tab 
+@item 
+@tab nil
+@tab default: :entry-tags
+@item 
+@tab (nil . "</code>")
+@tab code-start = line beginning
+@item 
+@tab function
+@tab argument: string (:search)
+@item 
+@tab 
+@tab code  (:content)
+@item 
+@tab 
+@tab return :  tags
+@item :extension
+@tab ".xml"
+@tab (not used in ndsary.)
+@item 
+@tab nil
+@tab default: ".txt" is used.
+@end multitable
+
 @node ndsary
 @section ndsary
+
+@menu
+* ndtext summary::              
+* ndsary options::              
+@end menu
+
+@node ndtext summary
+@subsection Summary
 @code{ndsary} will search for text with help of Suffix Array utility
-(@uref{http://sary.sourceforge.net/,sary}).
+(@uref{http://sary.sourceforge.net/,sary}).  This is suitable for
+large-sized text dictionary, but you will need suffix array index
+to use it.
+
+@node ndsary options
+@subsection Supported Options
+@code{ndsary} supports all all @code{ndtext} options except @code{:extension}.
+Files are automatically located as they should have the extension
+"@code{.ary}".
+
+@node ndbuffer
+@section ndbuffer
+
+@menu
+* ndbuffer summary::            
+* ndbuffer options::            
+@end menu
+
+@node ndbuffer summary
+@subsection Summary
+@code{ndbuffer} is a search agent for text-based dictionary.  This
+agent will keep the contents of dictionary inside buffer, so
+searching speed is relatively fast, but it requires large memory.
+Because this search agent do not require Unix tools such as
+"grep", this search agent is suitable for Microsoft Windows
+systems.
+
+@node ndbuffer options
+@subsection Supported Options
+@code{ndbuffer} supports all @code{ndtext} options.
 
 @node ndlatin
 @section ndlatin
-@verb{~ndlatin~} is a search agent that lets you access @emph{WORDS for Latin}
+@code{ndlatin} is a search agent that lets you access @emph{WORDS for Latin}
 by William Whitaker.  Requirements varies on various computers.
 
-If you are using @emph{MacOS X}, @emph{WORD for Latin} is included in
+If you are using MacOS X, @emph{WORD for Latin} is included in
 Open-Source software called @emph{Interpres.app}
 (@uref{https://sites.google.com/site/erikandremendoza/}).  After the
 installation of Interpres, add the following line in your set-up
 file.  (Make sure that file does exist there and is executable.)
 @lisp
 (setq ndlatin-program "/Applications/Interpres.app/Contents/Resources/words")
+(setq lookup-search-agents
+      '(...
+        (ndlatin)
+        ...))
 @end lisp
 
 If you are using Windows or Linux, you may find the program via
 Wikipedia (@uref{http://en.wikipedia.org/wiki/William_Whitaker%27s_Words})
 page.
 
-After you set the @verb{~ndlatin-program~} properly, just add @verb{~(ndlatin)~}
-to your @verb{~lookup-search-agents~} variable.
+@node ndweb
+@section ndweb
+@code{ndweb} is a search agent for Web Resources which supports
+OpenSearch protocol.  
+
+To use this agent, you need to specify the URL for OpenSearch, as
+follows.  Currently, only web services listed in
+@code{ndweb-predefined-agents} are supported.
+@lisp
+(setq lookup-search-agents
+      '(...
+        (ndweb "http://www.google.com/")
+        ...))
+@end lisp
 
 @node ndic
 @section ndic
@@ -572,6 +884,13 @@ specified by @uref{http://tools.ietf.org/html/rfc2229,RFC2229}.
 
 @node ndjitsuu
 @section ndjitsuu
+
+@menu
+* Summary::                     
+@end menu
+
+@node Summary
+@subsection Summary
 @code{ndjitsuu} is a search agent for Jitsuu dictionary.  You will need
 to prepare the index file equipped in this archive to create the
 dictionary.
@@ -579,9 +898,9 @@ dictionary.
 @node ndsrd
 @section ndsrd
 @verb{~ndsrd~} is an agent for "Shōgakukan Random House Dictionary".  To
-use this agent, you must install @verb{~csrd~}.
-(@uref{http://openlab.ring.gr.jp/edict/csrd/}).  There is a bug in @verb{~csrd~}
-program, which can be fixed by @verb{~csrd.c.diff.gz~}.
+use this agent, you must install
+@uref{http://openlab.ring.gr.jp/edict/csrd/,@code{csrd}}.  There is a bug
+in @code{csrd} program, which can be fixed by @verb{~csrd.c.diff.gz~}.
 
 To use this search agent, you will need to install the @verb{~csrd~} program.
 @example
@@ -679,8 +998,7 @@ dictionary options for some specific dictionaries.
 
 @menu
 * EPWING/EBXA dictionaries::    
-* SDIC Dictionary::             
-* RangJung Yeshe Dicitionary::  
+* Text/XML dictionaries::       
 @end menu
 
 @node EPWING/EBXA dictionaries
@@ -703,7 +1021,7 @@ Format.
 @subsection FPWBooks
 @uref{http://openlab.ring.gr.jp/edict/fpw/,FPWBooks} are the EPWING
 dictionaries created by
-@ref{FREEPWING,,@uref{http://www.sra.co.jp/people/m-kasahr/freepwing/}}.
+@uref{http://www.sra.co.jp/people/m-kasahr/freepwing/,FREEPWING}.
 
 @node EPWING for classics
 @subsection EPWING for classics
@@ -716,15 +1034,25 @@ Sanskrit.
 @uref{http://www.geocities.jp/taka_depo/,LDOCE5-FPW} is a tool to
 convert LDOCE5 DVD Dictionary to EPWING format.
 
+@node Text/XML dictionaries
+@section Text/XML dictionaries
+Text or XML based dictionaries should be used with @code{ndsary},
+@code{ndbuffer}, or @code{ndtext} agent.
+
+
+@menu
+* SDIC Dictionary::             
+* RangJung Yeshe Dicitionary::  
+@end menu
+
 @node SDIC Dictionary
-@section SDIC Dictionary
+@subsection SDIC Dictionary
 @code{support-sdic.el} provides support for
 @uref{http://www.namazu.org/~tsuchiya/sdic/index.html,SDIC}
-dictionaries.  It should be used with @code{ndsary}, @code{ndbuffer}, or
-@code{ndtext} agent.
+dictionaries.  
 
 @node RangJung Yeshe Dicitionary
-@section RangJung Yeshe Dicitionary
+@subsection RangJung Yeshe Dicitionary
 
 @node Making new Search Agents
 @appendix Making new Search Agents
@@ -733,10 +1061,6 @@ This section is to be written in future.
 @node Making new Support Files
 @appendix Making new Support Files
 This section is to be written in future.
-
-@node List of Sample Dictionries
-@appendix List of Sample Dictionries
-This chapter describes some major Open-Source dictionaries that may be used with Lookup
 
 @node Concept index
 @unnumbered Concept index
