@@ -1,4 +1,4 @@
-;;; ndpdic.el --- Lookup `PDIC' interface -*- lexical-binding: t -*-
+;;; ndpdic.el --- Lookup `PDIC' interface -*- coding: utf-8; lexical-binding: t -*-
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; Author: KAWABATA Taichi <kawabata.taichi@gmail.com>

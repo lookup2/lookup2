@@ -39,33 +39,39 @@
 ;; </content>
 ;; ....
 ;;
-;; | option        | value                        | note                           |
-;; |---------------+------------------------------+--------------------------------|
-;; | :content-tags | ("<content>" . "</content>") | multi-line                     |
-;; |               | nil                          | default: ("\n . "\n")          |
-;; |               | ("\n" . "\n")                | single-line                    |
-;; |               | function                     | argument: string/heading       |
-;; |---------------+------------------------------+--------------------------------|
-;; | :entry-tags   | ("<entry"> . "</entry>")     |                                |
-;; |               | nil                          | default: (nil . "\t")          |
-;; |               | (nil . "</entry>")           | content-start = line beginning |
-;; |               | function                     | argument: string method        |
-;; |               |                              | return: tags                   |
-;; |---------------+------------------------------+--------------------------------|
-;; | :head-tags    | ("<head>" . "</head>")       |                                |
-;; |               | nil                          | default: :entry-tags           |
-;; |               | (nil . "</head>")            | head-start = line beginning    |
-;; |               | function                     | argument: content              |
-;; |               |                              | return:   head value           |
-;; |---------------+------------------------------+--------------------------------|
-;; | :code-tags    | ("<code>" . "</code>")       |                                |
-;; |               | nil                          | default: :entry-tags           |
-;; |               | (nil . "</code>")            | code-start = line beginning    |
-;; |               | function                     | argument: string/heading       |
-;; |               |                              | return :  tags                 |
-;; |---------------+------------------------------+--------------------------------|
-;; | :extension    | ".xml"                       | (not used in ndsary.)          |
-;; |               | nil                          | default: ".txt" is used.       |
+;; | option           | value                        | note                           |
+;; |------------------+------------------------------+--------------------------------|
+;; | :content-tags    | ("<content>" . "</content>") | multi-line                     |
+;; |                  | nil                          | default: ("\n . "\n")          |
+;; |                  | ("\n" . "\n")                | single-line                    |
+;; |                  | function                     | argument: string (:search)     |
+;; |                  |                              |           code  (:content)     |
+;; |                  |                              | return: tags                   |
+;; |------------------+------------------------------+--------------------------------|
+;; | :entry-tags-list | (entry-tags entry-tags...)   |                                |
+;; |------------------+------------------------------+--------------------------------|
+;; | :entry-tags      | ("<entry"> . "</entry>")     |                                |
+;; |                  | nil                          | default: (nil . "\t")          |
+;; |                  | (nil . "</entry>")           | content-start = line beginning |
+;; |                  | function                     | argument: string (:search)     |
+;; |                  |                              |           code  (:content)     |
+;; |                  |                              | return: tags                   |
+;; |------------------+------------------------------+--------------------------------|
+;; | :head-tags       | ("<head>" . "</head>")       |                                |
+;; |                  | nil                          | default: :entry-tags           |
+;; |                  | (nil . "</head>")            | head-start = line beginning    |
+;; |                  | function                     | argument: content              |
+;; |                  |                              | return:   head-value           |
+;; |------------------+------------------------------+--------------------------------|
+;; | :code-tags       | ("<code>" . "</code>")       |                                |
+;; |                  | nil                          | default: :entry-tags           |
+;; |                  | (nil . "</code>")            | code-start = line beginning    |
+;; |                  | function                     | argument: string (:search)     |
+;; |                  |                              |           code  (:content)     |
+;; |                  |                              | return :  tags                 |
+;; |------------------+------------------------------+--------------------------------|
+;; | :extension       | ".xml"                       | (not used in ndsary.)          |
+;; |                  | nil                          | default: ".txt" is used.       |
 ;;
 ;;; Usage:
 ;;
@@ -167,7 +173,7 @@
         (content-tags entry-tags head-tags code-tags entry-tags-list)
         (ndtext-dictionary-options dictionary string)
       (if entry-tags (setq entry-tags-list (list entry-tags)))
-      (loop for (code head val) in (ndtext-search-multiple 
+      (loop for (code head val) in (ndtext-search-multiple
                                     'ndtext file string method
                                     content-tags entry-tags-list
                                     head-tags code-tags coding)

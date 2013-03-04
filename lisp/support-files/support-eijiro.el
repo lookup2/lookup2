@@ -37,7 +37,7 @@
                         (string-match regexp lookup-support-dictionary-id))
                       support-eijiro-option-list))
        '(:content-tags ("\n" . "\n") 
-         :entry-tags ("■" . "  ")
+         :entry-tags-list (("■" . "  ") ("■" . " : "))
          :head-tags ("■" . " : ")
          :code-tags ("■" . " : "))))
 
