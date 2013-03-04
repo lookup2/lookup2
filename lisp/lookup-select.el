@@ -23,8 +23,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-
 (defconst lookup-select-priority-marks
   '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 
@@ -234,8 +232,9 @@ have found some entries, which means this dictionary cannot appear alone."
            (dictionary-options (lookup-dictionary-options dictionary))
            (agent (lookup-dictionary-agent dictionary))
            (agent-options (lookup-agent-options agent))
-           (priority (lookup-module-dictionary-priority 
-                      lookup-select-module dictionary)))
+           ;(priority (lookup-module-dictionary-priority 
+           ;           lookup-select-module dictionary))
+           )
       (with-current-buffer (lookup-get-buffer "*Dictionary Information*")
         (let ((inhibit-read-only t))
           (help-mode)
@@ -317,7 +316,8 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
               (nconc dicts (nreverse diffs)))))
   (lookup-select-update-buffer))
 
-(defun lookup-select-wrap-command (arg)
+(defun lookup-select-wrap-command (ignored)
+  ;; ARG is ignored
   "Call the corresponding global command with keys and reset dictionaries.
 This command should be binded for the same keys with the commands
 `kill-line', `yank', `yank-pop',`transpose-lines', or `undo'.

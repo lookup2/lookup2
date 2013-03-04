@@ -46,7 +46,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup)
 (require 'bocu)
 
@@ -68,7 +67,8 @@
 ;;;
 
 (put 'ndpdic :methods 'ndpdic-dictionary-methods)
-(defun ndpdic-dictionary-methods (dictionary)
+(defun ndpdic-dictionary-methods (ignored)
+  ;; DICTIONARY is ignored
   "Return methods of DICTIONARY."
   '(exact prefix))
 
@@ -76,7 +76,7 @@
 (defun ndpdic-list (agent)
   "Return dictionaries in AGENT."
   (let ((dir (lookup-agent-location agent))
-        files ndpdic dict dicts)
+        files ndpdic dict)
     (assert (file-directory-p dir) nil "ndpdic: directory %s is not found." dir)
     (setq files (directory-files (expand-file-name dir)
                                  nil ndpdic-extension-regexp))
@@ -369,14 +369,13 @@ Return the list of entry words.  Result will be cached."
 
 (defun ndpdic-entry-content (ndpdic block entry)
   "Get content of FILE, BLOCK, and  ENTRY."
-  (let* (fl-size word word-spec (word-data "") content)
+  (let* (fl-size word-spec (word-data "") content)
     (with-temp-buffer
       (set-buffer-multibyte nil)
       (setq fl-size (ndpdic-insert-block-contents ndpdic block))
       (goto-char (+ 2 (point-min)))
       (while (not (eobp))
         (setq word-spec (ndpdic-entries-next-word word-data fl-size))
-        (setq word (car word-spec))
         (setq word-data (elt word-spec 3))
         (if (null word-spec) (goto-char (point-max))
           (when (equal entry (car word-spec))

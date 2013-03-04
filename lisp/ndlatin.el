@@ -52,7 +52,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup)
 (defconst ndlatin-version "0.2")
 
@@ -120,7 +119,8 @@ Windows/Linux version (ver 1.97), it should be '~'"
   (mapcar (lambda (e) (lookup-new-dictionary agent (car e)))
           ndlatin-dictionary-table))
 
-(defun ndlatin-kill (agent)
+(defun ndlatin-kill (ignored)
+  ;; AGENT is ignored
   (if ndlatin-process
       (lookup-process-kill ndlatin-process)))
 

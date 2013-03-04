@@ -31,7 +31,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup)
 (require 'lookup-content)
 (require 'ndeb-binary)
@@ -179,7 +178,8 @@ It should be set by preference file specifid by `:fmt' option."
   (or (lookup-get-property entry 'ndsrd-content) "(forgot)"))
 
 (put 'ndsrd :kill 'ndsrd-kill)
-(defun ndsrd-kill (agent)
+(defun ndsrd-kill (ignored)
+  ;; AGENT is ignored
   (mapc (lambda (x)
           (if (file-exists-p x) (delete-file x)))
         ndsrd-temp-files)

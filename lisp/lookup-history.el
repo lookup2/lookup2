@@ -40,7 +40,8 @@
   (interactive "p")
   (lookup-next-history (- (or arg 1))))
 
-(defun lookup-history-display (module)
+(defun lookup-history-display (ignored)
+  ;; MODULE is ignored
   "Display lookup histories of MODULE."
   (with-current-buffer (lookup-get-buffer " *Search History*")
     (lookup-history-mode)

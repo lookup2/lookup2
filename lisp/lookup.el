@@ -23,7 +23,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'lookup-types)
 (require 'lookup-select)
 (require 'lookup-content)
@@ -80,6 +79,20 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 (defun lookup-debug-message (format-string &rest args)
   (if lookup-enable-debug
       (apply 'message (concat "lookup-debug:" format-string) args)))
+
+
+;;; Internal Functions
+(defvar lookup-message nil)
+
+(defmacro lookup-with-message (msg &rest body)
+  (declare (indent 1))
+  `(let ((lookup-message ,msg))
+     (message "%s..." lookup-message)
+     (prog1 (progn ,@body)
+       (message "%s...done" lookup-message))))
+
+(defun lookup-message (msg)
+  (message "%s... (%s)" lookup-message msg))
 
 
 
@@ -295,7 +308,8 @@ See `lookup-region' for details."
     (lookup-region start end module)))
 
 ;;;###autoload
-(defun lookup-selection (click)
+(defun lookup-selection (ignored)
+  ;; CLICK is ignored
   "Search for the mouse's selection."
   (interactive "e")
   (lookup-word (current-kill 0 t)))
@@ -499,10 +513,12 @@ candidates."
 
 ;; structure
 
-(defun lookup-arrange-structure (entry)
+(defun lookup-arrange-structure (ignored)
+  ;; ENTRY is ignored
   (lookup-make-region-heading (point) (line-end-position) 1))
 
-(defun lookup-adjust-hide-examples (entry)
+(defun lookup-adjust-hide-examples (ignored)
+  ;; ENTRY is ignored
   (unless lookup-enable-example
     (lookup-map-over-property
      (point-min) (point-max) 'face
@@ -593,7 +609,8 @@ link-item, heading, or code may be integer or function."
                          (lookup-new-entry 'url dict match-string 
                                            match-string))))))
 
-(defun lookup-adjust-check-references (entry)
+(defun lookup-adjust-check-references (ignored)
+  ;; ENTRY is ignored
   (lookup-map-over-property
    (point-min) (point-max) 'lookup-reference
    (lambda (start end entry)
@@ -620,7 +637,8 @@ link-item, heading, or code may be integer or function."
           (goto-char start)
 	  (lookup-gaiji-insert gaiji))))))
 
-(defun lookup-adjust-show-gaijis (entry)
+(defun lookup-adjust-show-gaijis (ignored)
+  ;; ENTRY is ignored
   (when lookup-enable-gaiji
     (lookup-map-over-property
      (point-min) (point-max) 'lookup-gaiji
@@ -629,9 +647,11 @@ link-item, heading, or code may be integer or function."
 
 ;; fill
 
-(defun lookup-arrange-nofill (entry))
+(defun lookup-arrange-nofill (ignored))
+;; ENTRY is ignored
 
-(defun lookup-arrange-fill-lines (entry)
+(defun lookup-arrange-fill-lines (ignored)
+  ;; ENTRY is ignored
   "Fill lines except `read-only' property region."
   (text-mode)
   (let ((fill-column (if (integerp lookup-fill-column)

@@ -23,9 +23,6 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(require 'lookup-utils)
-
 (defvar lookup-modules-killed-modules nil)
 
 (defun lookup-modules-display ()
@@ -149,7 +146,8 @@
     (setf (lookup-module-name module) new-name))
   (lookup-modules-update-buffer))
 
-(defun lookup-modules-wrap-command (arg)
+(defun lookup-modules-wrap-command (ignored)
+  ;; ARG is ignored
   "Call the corresponding global command with keys and reset dictionaries.
 This command should be binded for the same keys with the commands
 `kill-line', `yank', `yank-pop',`transpose-lines', or `undo'.
