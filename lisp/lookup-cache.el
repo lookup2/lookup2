@@ -22,8 +22,9 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(require 'lookup-vars)
+(require 'lookup-types)
+(declare-function lookup-get-dictionary "lookup")
+(declare-function lookup-entry-list "lookup")
 
 (defconst lookup-dump-functions
   '(lookup-dump-agent-attributes

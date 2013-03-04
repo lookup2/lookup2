@@ -36,12 +36,8 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(require 'lookup-vars)
+(require 'lookup-types)
 (require 'stem-english)
-
-(declare-function copy-lookup-query "lookup-types" (query))
-(declare-function lookup-new-query "lookup-types" (method string &optional pattern))
 
 ;;;
 ;;; Customizable Variables

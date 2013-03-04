@@ -22,7 +22,9 @@
 
 ;;; Code:
 
+(require 'cl)
 (require 'lookup-vars)
+(declare-function lookup-text-wakati "lookup-text")
 
 ;; alist by assq
 
@@ -34,7 +36,7 @@
 
 (defun lookup-assq-put (alist key value)
   (if value
-      (acons key value (lookup-assq-del alist key))
+      (cl-acons key value (lookup-assq-del alist key))
     (lookup-assq-del alist key)))
 
 (defmacro lookup-assq-set (symbol key value)
@@ -100,7 +102,7 @@
 
 (defun lookup-current-line ()
   (save-excursion
-    (do ((line 1 (1+ line)))
+    (cl-do ((line 1 (1+ line)))
 	((bobp) line)
       (forward-line -1))))
 
@@ -335,19 +337,6 @@ If process is not run, silently remove the process and re-create new process."
     (while lookup-get-process-alist
       (lookup-process-kill (cdar lookup-get-process-alist))
       (setq lookup-get-process-alist (cdr lookup-get-process-alist)))))
-
-
-(defvar lookup-message nil)
-
-(defmacro lookup-with-message (msg &rest body)
-  (declare (indent 1))
-  `(let ((lookup-message ,msg))
-     (message "%s..." lookup-message)
-     (prog1 (progn ,@body)
-       (message "%s...done" lookup-message))))
-
-(defun lookup-message (msg)
-  (message "%s... (%s)" lookup-message msg))
 
 (provide 'lookup-utils)
 

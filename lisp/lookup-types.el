@@ -28,10 +28,9 @@
 
 ;;;; Code:
 
-(eval-when-compile (require 'cl))
+(require 'cl)
 (require 'lookup-vars)
 (require 'lookup-utils)
-(require 'lookup-text)
 
 (declare-function lookup-restore-module-attributes "lookup-cache" (&rest specs))
 (declare-function lookup-restore-agent-attributes  "lookup-cache" (agent))
@@ -46,6 +45,7 @@
 (declare-function lookup-summary-display-content "lookup-session" ())
 (declare-function lookup-format-internal "lookup" (entry functions msg))
 (declare-function lookup-summary-display "lookup-summary" (session))
+(declare-function lookup-text-charsetsp "lookup-text")
 
 ;;; Search Method
 

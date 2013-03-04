@@ -30,6 +30,11 @@
 (require 'lookup-modules)
 (require 'lookup-history)
 (require 'lookup-text)
+(require 'lookup-cache)
+
+(defvar lookup-start-window nil)
+(defvar lookup-main-window nil)
+(defvar lookup-sub-window nil)
 
 ;(unless lookup-byte-compiling
 ;  (load "lookup-autoloads"))
@@ -803,10 +808,6 @@ If there is no session, default module will be returned."
 
 (defsubst lookup-summary-buffer () lookup-summary-buffer)
 (defsubst lookup-content-buffer () lookup-content-buffer)
-
-(defvar lookup-start-window nil)
-(defvar lookup-main-window nil)
-(defvar lookup-sub-window nil)
 
 (defun lookup-get-buffer (name)
   (let ((buffer (get-buffer-create name)))

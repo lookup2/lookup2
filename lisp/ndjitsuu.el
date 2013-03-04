@@ -75,12 +75,14 @@
 (defvar ndjitsuu-inf-table-size 8) ; start (4) length (4)
 
 ;; OYAJI
+(defvar ndjitsuu-oyaji-index-file)
 (defvar ndjitsuu-oyaji-file nil)
 (defvar ndjitsuu-oyaji-header-length 32)
 (defvar ndjitsuu-oyaji-number 7232)
 (defvar ndjitsuu-oyaji-entry-size 190)
 
 ;; JUKUGO
+(defvar ndjitsuu-jukugo-index-file)
 (defvar ndjitsuu-jukugo-header-length 32)
 (defvar ndjitsuu-jukugo-number 126189)
 (defvar ndjitsuu-jukugo-entry-size 102)

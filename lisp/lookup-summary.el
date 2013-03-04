@@ -23,137 +23,26 @@
 
 ;;; Code:
 
-(defun lookup-summary-display (session)
-  (with-current-buffer (lookup-get-buffer (lookup-summary-buffer))
-    (let ((query (lookup-session-query session))
-	  (entries (lookup-session-entries session))
-	  (excursion (lookup-session-excursion session)))
-      ;; insert entries
-      (let ((inhibit-read-only t))
-	(lookup-summary-mode)
-	(erase-buffer)
-	(mapc 'lookup-search-query-insert entries)
-	(set-buffer-modified-p nil))
-      ;; set mode line
-      (setq lookup-summary-line-module
-	    (lookup-module-name (lookup-session-module session)))
-      (setq lookup-summary-line-pattern (lookup-query-pattern query))
-      (setq lookup-summary-line-number (number-to-string (length entries)))
-      ;; display buffer
-      (if excursion
-	  (lookup-search-set-excursion excursion)
-	(lookup-pop-to-buffer (current-buffer))
-	(goto-char (point-min))
-	(lookup-summary-goto-link)
-	(if lookup-dynamic-display (sit-for 0))
-	(lookup-summary-display-content)
-	(if lookup-dynamic-display (sit-for 0))))))
+(require 'lookup-types)
+(require 'lookup-content)
+(declare-function lookup-get-buffer "lookup")
+(declare-function lookup-summary-buffer "lookup")
+(declare-function lookup-pop-to-buffer "lookup")
+(declare-function lookup-current-session "lookup")
+(declare-function lookup-content-buffer "lookup")
+(declare-function lookup-with-message "lookup")
+(declare-function lookup-arrange-content "lookup")
+(declare-function lookup-adjust-content "lookup")
+(declare-function lookup-display-buffer "lookup")
+(declare-function lookup-display-entries "lookup")
+(declare-function lookup-current-module "lookup")
+(declare-function lookup-get-link "lookup")
+(declare-function lookup-hide-buffer "lookup")
+(declare-function lookup-input-module "lookup")
+(declare-function lookup-search-query "lookup")
+(declare-function lookup-search-pattern "lookup")
+;;; variables
 
-(defun lookup-summary-append (entries)
-  (with-current-buffer (lookup-summary-buffer)
-    (save-excursion
-      (let ((inhibit-read-only t)
-	    (modified (buffer-modified-p)))
-	(goto-char (point-max))
-	(mapc 'lookup-search-query-insert entries)
-	(set-buffer-modified-p modified)))
-    (setf (lookup-session-entries lookup-current-session)
-	  (append (lookup-session-entries lookup-current-session) entries))
-    (setq lookup-summary-line-number
-	  (number-to-string (+ (string-to-number lookup-summary-line-number)
-			       (length entries))))
-    (if lookup-dynamic-display (sit-for 0))))
-
-(defun lookup-summary-expand-references (entry)
-  (let ((entries (lookup-entry-references entry)))
-    ;; rebuild buffer
-    (let ((inhibit-read-only t)
-	  (modified (buffer-modified-p))
-	  (start (line-beginning-position)))
-      (delete-region start (progn (forward-line) (point)))
-      (mapc 'lookup-search-query-insert entries)
-      (goto-char start)
-      (lookup-summary-goto-link)
-      (set-buffer-modified-p modified))
-    ;; rebuild cache
-    (let ((list (lookup-session-entries (lookup-current-session))))
-      (if (eq entry (car list))
-	  (setf (lookup-session-entries (lookup-current-session))
-		(append entries (cdr list)))
-	(while (not (eq entry (cadr list))) (setq list (cdr list)))
-	(if list (setcdr list (append entries (cddr list))))))
-    (setq lookup-summary-line-number
-	  (number-to-string (+ (string-to-number lookup-summary-line-number)
-			       (1- (length entries)))))))
-
-(defun lookup-search-query-insert (entry)
-  (lookup-search-query-insert-mark entry)
-  (insert (lookup-dictionary-heading (lookup-entry-dictionary entry)) " \n")
-  (backward-char)
-  (lookup-entry-heading-insert entry)
-  (forward-char))
-
-(defun lookup-search-query-insert-mark (entry)
-  (let ((bookmark (lookup-entry-bookmark (or (lookup-entry-substance entry)
-					     entry))))
-    (insert (if (stringp bookmark) "#" (if bookmark "!" " ")))))
-
-;; content
-
-(defun lookup-content-display (entry)
-  (with-current-buffer (lookup-get-buffer (lookup-content-buffer))
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (let ((content (lookup-get-property entry 'content)))
-	(if (and content lookup-enable-format (not lookup-force-update))
-	    (insert content)
-	  (lookup-with-message (format "Inserting `%s'" (lookup-entry-heading entry))
-            (insert (lookup-entry-content entry))
-            (when lookup-enable-format
-              (lookup-arrange-content entry)
-              (lookup-put-property entry 'content (buffer-string)))))
-	(if lookup-enable-format (lookup-adjust-content entry)))
-      ;; arrange functions might change the buffer mode
-      (lookup-content-mode)
-      (set-buffer-modified-p nil))
-    (setq lookup-content-entry entry)
-    (setq lookup-content-line-heading (lookup-entry-heading entry))
-    (lookup-display-buffer (current-buffer))))
-
-;;;
-;;; Excursion
-;;;
-
-(defun lookup-search-excursion ()
-  (let ((entry (get-buffer (lookup-summary-buffer)))
-	(content (get-buffer (lookup-content-buffer))))
-    (when entry
-      (cons (with-current-buffer entry
-	      (cons (point) (let ((window (get-buffer-window entry)))
-			      (if window (window-start window)))))
-	    (when (and content (with-current-buffer entry
-				 (lookup-summary-this-entry)))
-	      (with-current-buffer content
-		(cons (point) (let ((window (get-buffer-window content)))
-				(if window (window-start window))))))))))
-
-(defun lookup-search-set-excursion (excursion)
-  (let ((entry-point (caar excursion)) (entry-start (cdar excursion))
-	(content (cdr excursion)))
-    (lookup-pop-to-buffer (lookup-summary-buffer))
-    (goto-char entry-point)
-    (if entry-start
-	(set-window-start (selected-window) entry-start))
-    (if (eobp)
-	(lookup-summary-previous-entry)
-      (lookup-summary-display-content))
-    (when content
-      (lookup-with-buffer-and-window (lookup-content-buffer)
-	(goto-char (car content))
-	(if (cdr content)
-	    (set-window-start (selected-window) (cdr content)))))))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Lookup Summary Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -291,6 +180,137 @@
 (make-variable-buffer-local 'lookup-summary-line-pattern)
 (make-variable-buffer-local 'lookup-summary-line-number)
 
+(defun lookup-summary-display (session)
+  (with-current-buffer (lookup-get-buffer (lookup-summary-buffer))
+    (let ((query (lookup-session-query session))
+	  (entries (lookup-session-entries session))
+	  (excursion (lookup-session-excursion session)))
+      ;; insert entries
+      (let ((inhibit-read-only t))
+	(lookup-summary-mode)
+	(erase-buffer)
+	(mapc 'lookup-search-query-insert entries)
+	(set-buffer-modified-p nil))
+      ;; set mode line
+      (setq lookup-summary-line-module
+	    (lookup-module-name (lookup-session-module session)))
+      (setq lookup-summary-line-pattern (lookup-query-pattern query))
+      (setq lookup-summary-line-number (number-to-string (length entries)))
+      ;; display buffer
+      (if excursion
+	  (lookup-search-set-excursion excursion)
+	(lookup-pop-to-buffer (current-buffer))
+	(goto-char (point-min))
+	(lookup-summary-goto-link)
+	(if lookup-dynamic-display (sit-for 0))
+	(lookup-summary-display-content)
+	(if lookup-dynamic-display (sit-for 0))))))
+
+(defun lookup-summary-append (entries)
+  (with-current-buffer (lookup-summary-buffer)
+    (save-excursion
+      (let ((inhibit-read-only t)
+	    (modified (buffer-modified-p)))
+	(goto-char (point-max))
+	(mapc 'lookup-search-query-insert entries)
+	(set-buffer-modified-p modified)))
+    (setf (lookup-session-entries lookup-current-session)
+	  (append (lookup-session-entries lookup-current-session) entries))
+    (setq lookup-summary-line-number
+	  (number-to-string (+ (string-to-number lookup-summary-line-number)
+			       (length entries))))
+    (if lookup-dynamic-display (sit-for 0))))
+
+(defun lookup-summary-expand-references (entry)
+  (let ((entries (lookup-entry-references entry)))
+    ;; rebuild buffer
+    (let ((inhibit-read-only t)
+	  (modified (buffer-modified-p))
+	  (start (line-beginning-position)))
+      (delete-region start (progn (forward-line) (point)))
+      (mapc 'lookup-search-query-insert entries)
+      (goto-char start)
+      (lookup-summary-goto-link)
+      (set-buffer-modified-p modified))
+    ;; rebuild cache
+    (let ((list (lookup-session-entries (lookup-current-session))))
+      (if (eq entry (car list))
+	  (setf (lookup-session-entries (lookup-current-session))
+		(append entries (cdr list)))
+	(while (not (eq entry (cadr list))) (setq list (cdr list)))
+	(if list (setcdr list (append entries (cddr list))))))
+    (setq lookup-summary-line-number
+	  (number-to-string (+ (string-to-number lookup-summary-line-number)
+			       (1- (length entries)))))))
+
+(defun lookup-search-query-insert (entry)
+  (lookup-search-query-insert-mark entry)
+  (insert (lookup-dictionary-heading (lookup-entry-dictionary entry)) " \n")
+  (backward-char)
+  (lookup-entry-heading-insert entry)
+  (forward-char))
+
+(defun lookup-search-query-insert-mark (entry)
+  (let ((bookmark (lookup-entry-bookmark (or (lookup-entry-substance entry)
+					     entry))))
+    (insert (if (stringp bookmark) "#" (if bookmark "!" " ")))))
+
+;; content
+
+(defun lookup-content-display (entry)
+  (with-current-buffer (lookup-get-buffer (lookup-content-buffer))
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (let ((content (lookup-get-property entry 'content)))
+	(if (and content lookup-enable-format (not lookup-force-update))
+	    (insert content)
+	  (lookup-with-message (format "Inserting `%s'" (lookup-entry-heading entry))
+            (insert (lookup-entry-content entry))
+            (when lookup-enable-format
+              (lookup-arrange-content entry)
+              (lookup-put-property entry 'content (buffer-string)))))
+	(if lookup-enable-format (lookup-adjust-content entry)))
+      ;; arrange functions might change the buffer mode
+      (lookup-content-mode)
+      (set-buffer-modified-p nil))
+    (setq lookup-content-entry entry)
+    (setq lookup-content-line-heading (lookup-entry-heading entry))
+    (lookup-display-buffer (current-buffer))))
+
+;;;
+;;; Excursion
+;;;
+
+(defun lookup-search-excursion ()
+  (let ((entry (get-buffer (lookup-summary-buffer)))
+	(content (get-buffer (lookup-content-buffer))))
+    (when entry
+      (cons (with-current-buffer entry
+	      (cons (point) (let ((window (get-buffer-window entry)))
+			      (if window (window-start window)))))
+	    (when (and content (with-current-buffer entry
+				 (lookup-summary-this-entry)))
+	      (with-current-buffer content
+		(cons (point) (let ((window (get-buffer-window content)))
+				(if window (window-start window))))))))))
+
+(defun lookup-search-set-excursion (excursion)
+  (let ((entry-point (caar excursion)) (entry-start (cdar excursion))
+	(content (cdr excursion)))
+    (lookup-pop-to-buffer (lookup-summary-buffer))
+    (goto-char entry-point)
+    (if entry-start
+	(set-window-start (selected-window) entry-start))
+    (if (eobp)
+	(lookup-summary-previous-entry)
+      (lookup-summary-display-content))
+    (when content
+      (lookup-with-buffer-and-window (lookup-content-buffer)
+	(goto-char (car content))
+	(if (cdr content)
+	    (set-window-start (selected-window) (cdr content)))))))
+
+
 (defun lookup-summary-mode ()
   "\\{lookup-summary-mode-map}"
   (interactive)

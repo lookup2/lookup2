@@ -23,6 +23,18 @@
 
 ;;; Code:
 
+(require 'lookup-types)
+(declare-function lookup-get-link "lookup")
+(declare-function lookup-goto-next-link "lookup")
+(declare-function lookup-goto-previous-link "lookup")
+(declare-function lookup-display-entries "lookup")
+(declare-function lookup-current-module "lookup")
+(declare-function lookup-summary-buffer "lookup")
+(declare-function lookup-hide-buffer "lookup")
+(declare-function lookup-content-buffer "lookup")
+(declare-function lookup-content-display "lookup-summary")
+(declare-function lookup-summary-display-content "lookup-summary")
+
 (defconst lookup-content-mode-help
   "Lookup Content Mode:
 

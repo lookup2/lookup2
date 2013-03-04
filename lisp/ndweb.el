@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'json)
+(require 'lookup)
 
 ;;;
 ;;; Customizable variables

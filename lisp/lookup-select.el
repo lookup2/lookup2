@@ -23,6 +23,17 @@
 
 ;;; Code:
 
+(require 'lookup-types)
+(declare-function lookup-current-module "lookup")
+(declare-function lookup-get-buffer "lookup")
+(declare-function lookup-pop-to-buffer "lookup")
+(declare-function lookup-display-buffer "lookup")
+(declare-function lookup-display-entries "lookup")
+(declare-function lookup-search-pattern "lookup")
+(declare-function lookup-input-dictionary "lookup")
+(declare-function lookup-init-support-autoload "lookup")
+(declare-function lookup-get-dictionary "lookup")
+
 (defconst lookup-select-priority-marks
   '((t . ?*) (secondary . ?$) (supplement . ?+) (nil . ? )))
 

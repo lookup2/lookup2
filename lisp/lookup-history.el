@@ -22,6 +22,10 @@
 
 ;;; Code:
 
+(require 'lookup-types)
+(declare-function lookup-get-buffer "lookup")
+(declare-function lookup-pop-to-buffer "lookup")
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;  Lookup History Mode
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
