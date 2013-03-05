@@ -42,6 +42,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup)
 (require 'ndtext)
 (load "support-files/support-jitsuu")

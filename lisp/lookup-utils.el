@@ -22,7 +22,8 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'lookup-vars)
 (declare-function lookup-text-wakati "lookup-text")
 
@@ -52,7 +53,7 @@
 
 (defun lookup-assoc-put (alist key value)
   (if value
-      (acons key value (lookup-assoc-del alist key))
+      (cl-acons key value (lookup-assoc-del alist key))
     (lookup-assoc-del alist key)))
 
 (defmacro lookup-assoc-set (symbol key value)
@@ -109,7 +110,7 @@
 
 (defun lookup-current-line ()
   (save-excursion
-    (cl-do ((line 1 (1+ line)))
+    (do ((line 1 (1+ line)))
 	((bobp) line)
       (forward-line -1))))
 

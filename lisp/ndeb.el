@@ -23,16 +23,8 @@
 ;;; Code:
 
 (require 'lookup)
+(require 'ndeb-binary)
 (defconst ndeb-version "0.1")
-
-(autoload 'ndeb-arrange-xbm "ndeb-binary")
-(autoload 'ndeb-arrange-bmp "ndeb-binary")
-(autoload 'ndeb-arrange-jpeg "ndeb-binary")
-(autoload 'ndeb-arrange-image-page "ndeb-binary")
-(autoload 'ndeb-arrange-wave "ndeb-binary")
-(autoload 'ndeb-arrange-mpeg "ndeb-binary")
-(autoload 'ndeb-arrange-snd-autoplay "ndeb-binary")
-(autoload 'ndeb-binary-clear "ndeb-binary")
 
 ;;;
 ;;; Customizable variables
@@ -257,7 +249,7 @@ Nil means it has not been checked yet.")
              appendix (lookup-agent-option ,agent :appendix))
        (ndeb-process-require
         (concat "book " book " " appendix)
-        (lambda (process)
+        (lambda (ignored)
           (if (search-forward "invalid book" nil t)
               (error "Invalid dictionary directory: %s" book))
           (if (search-forward "invalid appendix" nil t)
@@ -346,9 +338,9 @@ Nil means it has not been checked yet.")
 (defun ndeb-list (agent)
   (when ndeb-program-name
     (ndeb-with-agent agent
-      (ndeb-process-require 
+      (ndeb-process-require
        "list"
-       (lambda (process)
+       (lambda (ignored)
          (let (dicts)
            (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)" nil t)
              (setq dicts (cons (lookup-new-dictionary ndeb-current-agent
@@ -444,8 +436,8 @@ Nil means it has not been checked yet.")
 	  (lookup-put-property ndeb-current-agent 'ndeb-method method))
 	(setq cmd (format "search \"%s\"" (ndeb-escape-query string)))))
       (ndeb-process-require cmd
-        (lambda (process)
-	  (let (code heading dupchk entry entries)
+        (lambda (ignored)
+	  (let (code heading dupchk entries)
             ;(save-excursion
             ;  (while (re-search-forward "^.*empty.*" nil t)
             ;    (message "warining! %s" (match-string 0))))
@@ -578,11 +570,11 @@ Nil means it has not been checked yet.")
       (setq alist
 	    (ndeb-with-dictionary dictionary
 	      (ndeb-process-require "subinfo"
-		(lambda (process)
+		(lambda (ignored)
 		  (let (alist)
 		    (while (re-search-forward "^ \\([^:]+\\): \\(.*\\)" nil t)
 		      (setq alist
-			    (acons (match-string 1) (match-string 2) alist)))
+			    (cl-acons (match-string 1) (match-string 2) alist)))
 		    alist)))))
       (lookup-put-property dictionary 'ndeb-alist alist))
     (lookup-assoc-get alist key)))
@@ -602,7 +594,8 @@ Nil means it has not been checked yet.")
       (while (search-forward-regexp "→□\\(#0001\\|<gaiji:z0001>\\)?" nil t)
 	(replace-match ""))))
 
-(defun ndeb-arrange-no-newline (entry)
+(defun ndeb-arrange-no-newline (ignored)
+  ;; ENTRY is ignored
   (while (search-forward "<no-newline>" nil t)
     (let ((beg-beg (match-beginning 0))
 	  (beg-end (match-end 0)))
@@ -631,7 +624,8 @@ Nil means it has not been checked yet.")
     (if (re-search-forward "\\(</prev>\\|</next>\\)" nil t)
 	(replace-match ")"))))
 
-(defun ndeb-arrange-paged-reference (entry)
+(defun ndeb-arrange-paged-reference (ignored)
+  ;; ENTRY is ignored
   (while (re-search-forward "<paged-reference=\\([0-9]+:[0-9]+\\)>" nil t)
     (let ((pos (match-string 1))
 	  (start (match-beginning 0))
@@ -678,7 +672,8 @@ Nil means it has not been checked yet.")
 	(set-left-margin point indent-end level)
 	(goto-char point))))))
 
-(defun ndeb-arrange-unicode (entry)
+(defun ndeb-arrange-unicode (ignored)
+  ;; ENTRY is ignored
   (while (re-search-forward "<unicode>\\([0-9A-F０-９Ａ-Ｆ]+\\)</unicode>" nil t)
     (replace-match 
      (save-match-data
@@ -711,7 +706,8 @@ Nil means it has not been checked yet.")
 	    (delete-region end-beg (match-end 0)))
 	(goto-char beg-beg)))))
 
-(defun ndeb-arrange-faces (entry)
+(defun ndeb-arrange-faces (ignored)
+  ;; ENTRY is ignored
   (while (re-search-forward "<\\(/?\\)em>" nil t)
     (if (equal (match-string 1) "/")
 	(replace-match "</font>" t t)
@@ -734,7 +730,7 @@ Nil means it has not been checked yet.")
 	    (add-text-properties beg-end end-beg
 				 `(face ,(or (lookup-assoc-get
 					      ndeb-faces-table class)
-					     'default)))
+					     'ndeb-italic-face))) ;; default
 	    (delete-region end-beg end-end)
 	    (delete-region beg-beg beg-end)
             (goto-char beg-beg))))
@@ -742,7 +738,8 @@ Nil means it has not been checked yet.")
 	(goto-char beg-beg)
 	(delete-region beg-beg beg-end)))))
 
-(defun ndeb-arrange-decode-entity (entry)
+(defun ndeb-arrange-decode-entity (ignored)
+  ;; ENTRY is ignored
   (when (> ndeb-support-escape-text 0)
     (while (re-search-forward "&\\(amp\\|lt\\|gt\\);" nil t)
       (let* ((pos (match-beginning 0))

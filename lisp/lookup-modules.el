@@ -25,11 +25,11 @@
 
 (require 'lookup-types)
 (require 'lookup-select)
+(eval-when-compile (require 'cl))
 (declare-function lookup-get-buffer "lookup")
 (declare-function lookup-pop-to-buffer "lookup")
 (declare-function lookup-get-module "lookup")
 (declare-function lookup-current-module "lookup")
-(declare-function lookup-with-message "lookup")
 
 (defvar lookup-modules-killed-modules nil)
 

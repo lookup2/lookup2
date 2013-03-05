@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup-types)
 (require 'lookup-select)
 (require 'lookup-content)
@@ -804,7 +805,7 @@ If there is no session, default module will be returned."
 
 (defun lookup-get-buffer (name)
   (let ((buffer (get-buffer-create name)))
-    (setq lookup-buffer-list (adjoin buffer lookup-buffer-list))
+    (setq lookup-buffer-list (cl-adjoin buffer lookup-buffer-list))
     buffer))
 
 (defun lookup-pop-to-buffer (buffer)
