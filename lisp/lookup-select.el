@@ -50,7 +50,7 @@
     (buffer-enable-undo)
     (set-buffer-modified-p nil)
     (lookup-select-goto-first)
-    (lookup-pop-to-buffer (current-buffer))))
+    (lookup-pop-to-buffer)))
 
 (defun lookup-select-build-buffer ()
   (let ((inhibit-read-only t)

@@ -808,10 +808,15 @@ If there is no session, default module will be returned."
     (setq lookup-buffer-list (cl-adjoin buffer lookup-buffer-list))
     buffer))
 
-(defun lookup-pop-to-buffer (buffer)
+(defun lookup-pop-to-buffer (&optional buffer)
+  ;; BUFFER becomes current buffer in Emacs 24.2 and later.
+  (setq buffer (or buffer (current-buffer)))
   (if (window-live-p lookup-main-window)
       (progn
-	(set-window-buffer (select-window lookup-main-window) buffer)
+	;; select-window function on Emacs 24.2 and later switches
+	;; current buffer to window's buffer.
+	(set-window-buffer lookup-main-window buffer)
+	(select-window lookup-main-window)
 	(raise-frame (window-frame lookup-main-window)))
     (setq lookup-start-window (selected-window))
     (if (> (length (window-list)) 1)

@@ -74,7 +74,7 @@
       (goto-char (point-min))
       (forward-line (1+ (lookup-history-position lookup-search-history))))
     (set-buffer-modified-p nil)
-    (lookup-pop-to-buffer (current-buffer))))
+    (lookup-pop-to-buffer)))
 
 ;;;
 ;;; History Mode

@@ -199,7 +199,7 @@
       ;; display buffer
       (if excursion
 	  (lookup-search-set-excursion excursion)
-	(lookup-pop-to-buffer (current-buffer))
+	(lookup-pop-to-buffer)
 	(goto-char (point-min))
 	(lookup-summary-goto-link)
 	(if lookup-dynamic-display (sit-for 0))
@@ -297,7 +297,7 @@
 (defun lookup-search-set-excursion (excursion)
   (let ((entry-point (caar excursion)) (entry-start (cdar excursion))
 	(content (cdr excursion)))
-    (lookup-pop-to-buffer (lookup-summary-buffer))
+    (save-current-buffer (lookup-pop-to-buffer (lookup-summary-buffer)))
     (goto-char entry-point)
     (if entry-start
 	(set-window-start (selected-window) entry-start))

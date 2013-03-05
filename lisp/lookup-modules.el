@@ -42,7 +42,7 @@
     (buffer-enable-undo)
     (set-buffer-modified-p nil)
     (lookup-modules-goto-first)
-    (lookup-pop-to-buffer (current-buffer))))
+    (lookup-pop-to-buffer)))
 
 (defun lookup-modules-build-buffer ()
   (let ((inhibit-read-only t))
