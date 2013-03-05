@@ -346,4 +346,6 @@ already done and match-data is already stored."
 (defun tibetan-acip-decode-string (str)
   (tibetan-process-string str #'tibetan-acip-decode-region))
 
+(provide 'tibet-util+)
+
 ;; tibet-util+ ends here.
