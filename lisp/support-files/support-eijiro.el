@@ -34,7 +34,7 @@
 
 (setq lookup-support-options
       (append 
-       (cdr (assoc-if (lambda (regexp) 
+       (cdr (cl-assoc-if (lambda (regexp) 
                         (string-match regexp lookup-support-dictionary-id))
                       support-eijiro-option-list))
        '(:content-tags ("\n" . "\n") 
