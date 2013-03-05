@@ -649,7 +649,7 @@ estcall使用時は無効。"
       (setq end (point))
       (ndest-set-link start end nil "message/rfc822" uri file))
     (goto-char (point-min))
-    (lookup-arrange-default-headings entry)
+    ;; (lookup-arrange-default-headings entry)
     (goto-char (point-min))
     (while (re-search-forward "\n\\([^\t\n]+\\)\t[^\n]+\n?" nil t)
       (let ((point (match-beginning 0))
