@@ -76,6 +76,13 @@
   (or (lookup-agent-option agent :coding)
       ndwnj-process-coding-system))
 
+(defun ndwnj-get-process (dictionary)
+  "Get sqlite3 process."
+  (let* ((agent   (lookup-dictionary-agent dictionary))
+         (file    (lookup-agent-location agent))
+         (coding  (ndwnj-agent-coding agent)))
+    (ndwnj-process file coding)))
+
 (put 'ndwnj :methods '(exact prefix suffix substring wild))
 (put 'ndwnj :reference-pattern '("<\\([0-9]+-[a-z]+\\):\\([^>]+\\)>" 2 2 1))
 (put 'ndwnj :arranges
@@ -83,9 +90,6 @@
        ndwnj-arrange-headings
        lookup-arrange-references
        lookup-arrange-fill-lines))
-;(put 'ndwnj :normalizers
-;     '((lookup-normalizer-wrapper downcase)
-;       ndwnj-normalizer-space-to-underscore))
 
 
 ;;;
@@ -98,6 +102,11 @@
     (when (file-exists-p location)
       (list (lookup-new-dictionary agent "")))))
 
+(put 'ndwnj :title 'ndwnj-title)
+(defun ndwnj-title (ignored)
+  ;; DICTIONARY is ignored
+  "Wordnet 日本語")
+
 (put 'ndwnj :clear 'ndwnj-clear)
 (defun ndwnj-clear (dictionary)
   (let ((process (ndwnj-get-process dictionary)))
@@ -109,8 +118,8 @@
 (put 'ndwnj :search 'ndwnj-dictionary-search)
 (defun ndwnj-dictionary-search (dictionary query)
   (let* ((method  (lookup-query-method query))
-         (string  (ndwnj-escape-string 
-                   (ndwnj-normalizer-space-to-underscore 
+         (string  (ndwnj-escape-string
+                   (ndwnj-normalize-string
                     (lookup-query-string query))))
          (process (ndwnj-get-process dictionary))
          (cmd (case method
@@ -125,15 +134,16 @@
            'regular dictionary code heading))))
 
 (put 'ndwnj :content 'ndwnj-dictionary-content)
-(defun ndwnj-dictionary-content (dictionary entry)
-  (let* ((process (ndwnj-get-process dictionary))
-         (code    (lookup-entry-code entry))
-         (heading (concat (lookup-entry-code entry)
-			  " "
-			  (lookup-entry-heading entry)))
-         (def     (ndwnj-get-definition process code))
-         (word    (ndwnj-get-words process code))
-         (link    (ndwnj-get-links process code)))
+(defun ndwnj-dictionary-content (entry)
+  (let* ((dictionary (lookup-entry-dictionary entry))
+         (process    (ndwnj-get-process dictionary))
+         (code       (lookup-entry-code entry))
+         (heading    (concat (lookup-entry-code entry)
+                             " "
+                             (lookup-entry-heading entry)))
+         (def        (ndwnj-get-definition process code))
+         (word       (ndwnj-get-words process code))
+         (link       (ndwnj-get-links process code)))
     (concat heading "\n" def "\n" word "\n" link "\n")))
 
 
@@ -155,25 +165,16 @@
 ;;; Normalizers
 ;;;
 
-(defun ndwnj-normalizer-space-to-underscore (string)
-  (list (apply 'string (mapcar (lambda (elt) (if (eq elt ? ) ?_ elt))
-			       string))))
+(defun ndwnj-normalize-string (string)
+    (replace-regexp-in-string " " "_" string))
+
+(defun ndwnj-escape-string (string)
+  (replace-regexp-in-string "'" "''" string))
 
 
 ;;;
 ;;; Internal functions
 ;;;
-
-(defun ndwnj-escape-string (string)
-  (apply 'concat (mapcar (lambda (elt) (if (eq elt ?') "''" (list elt)))
-			 string)))
-
-(defun ndwnj-get-process (dictionary)
-  "Get sqlite3 process."
-  (let* ((agent   (lookup-dictionary-agent dictionary))
-         (file    (lookup-agent-location agent))
-         (coding  (ndwnj-agent-coding agent)))
-    (ndwnj-process file coding)))
 
 (defun ndwnj-process (file coding)
   (unless (file-exists-p file) (error "ndwnj: file %s not found." file))
@@ -212,7 +213,7 @@
       (let (entries)
         (while (re-search-forward "^\\(.+\\)|\\(.+\\)|\\(.+\\)$" nil t)
           (lookup-debug-message "hit! buffer=%s" (match-string 0))
-          (push (cons (match-string 1)
+          (push (list (match-string 1)
                       (concat (match-string 2)
                               " (" (match-string 3) ")")) entries))
         (nreverse entries)))))
@@ -242,10 +243,10 @@
 	    (ndwnj-escape-string code)
 	    "' ORDER BY lang;")
     (lambda (ignored)
-      (while (re-search-forward "^\\(.+\\)|\\(.+\\)$" nil t)
-	(replace-match
-	 (concat (match-string 1) ": " (match-string 2)) t t))
-      (buffer-string))))
+      (let (results)
+        (while (re-search-forward "^\\(.+\\)|\\(.+\\)$" nil t)
+          (push (concat (match-string 1) ": " (match-string 2)) results))
+        (mapconcat 'identity (nreverse results) "\n")))))
 
 (defun ndwnj-get-links (process code)
   (ndwnj-require process
@@ -261,9 +262,8 @@
 	  (setq target (match-string 1)
 		name (match-string 2)
 		syn (match-string 3)
-                elt (concat
-		     (gethash syn results)
-		     " <" target ":" name ">"))
+                elt (concat (gethash syn results)
+                            " <" target ":" name ">"))
 	  (puthash syn elt results))
 	(maphash (lambda (x y)
                    (setq result (concat result " [" x "]" y "\n")))
