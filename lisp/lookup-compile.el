@@ -2,7 +2,7 @@
 
 (defun lookup-bytecomp ()
   (setq lookup-byte-compiling t)
-  (push "." load-path)
+  (push default-directory load-path)
   ;; (mapc 'load command-line-args-left)
   (mapc 'byte-compile-file command-line-args-left))
 
