@@ -93,43 +93,12 @@
 (put 'ndsary :search 'ndsary-dictionary-search)
 (defun ndsary-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let* ((dict-id (lookup-dictionary-id dictionary))
-         (string  (lookup-query-string query))
-         (method  (lookup-query-method query))
-         (file    (expand-file-name
-                   (lookup-dictionary-name dictionary)
-                   (lookup-agent-location
-                    (lookup-dictionary-agent dictionary))))
-         (coding  (or (lookup-dictionary-option dictionary :coding t)
-                      'utf-8)))
-    (destructuring-bind
-        (content-tags entry-tags head-tags code-tags entry-tags-list)
-        (ndtext-dictionary-options dictionary string)
-      (if entry-tags (setq entry-tags-list (list entry-tags)))
-      (loop for (code head val) in (ndtext-search-multiple 
-                                    'ndsary file string method
-                                    content-tags entry-tags-list
-                                    head-tags code-tags coding)
-            for entry = (lookup-new-entry 'regular dictionary code head)
-            do (puthash (cons dict-id code) val ndtext-cache)
-            collect entry))))
+  (ndtext-dictionary-search-common dictionary query 'ndsary))
 
 (put 'ndsary :content 'ndsary-entry-content)
 (defun ndsary-entry-content (entry)
   "Return string content of ENTRY."
-  (let* ((dictionary (lookup-entry-dictionary entry))
-         (dict-id    (lookup-dictionary-id dictionary)) ; file
-         (heading    (lookup-entry-heading entry))
-         (code       (lookup-entry-code entry))
-         (coding     (or (lookup-dictionary-option dictionary :coding t)
-                         'utf-8)))
-    (or (gethash (cons dict-id code) ndtext-cache)
-        (destructuring-bind
-            (content-tags entry-tags head-tags code-tags ignored)
-            (ndtext-dictionary-options dictionary heading)
-          (ndtext-process 'ndsary 'get dict-id code 'exact
-                          content-tags entry-tags head-tags
-                          code-tags coding)))))
+  (ndtext-entry-content-common entry 'ndsary))
 
 ;;;
 ;;; Main Program
@@ -163,18 +132,13 @@
 If START tag is provided, then that will be attached.
 If END tag is provided, then that will also be attached."
   (identity content-tags) (identity single-line)
-  ;;(if (and (or (null start) (null end))
-  ;;         (or (equal method 'suffix)
-  ;;             (equal method 'substring)
-  ;;             (equal method 'text)))
-  ;;    nil
     (concat (if (or (equal method 'exact)
                     (equal method 'prefix))
                 (or (car tags) "\n"))
             string
             (if (or (equal method 'exact)
                     (equal method 'suffix))
-                (cdr tags))));;)
+                (cdr tags))))
 
 (provide 'ndsary)
 

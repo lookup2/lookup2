@@ -82,39 +82,11 @@
 (put 'ndbuffer :search 'ndbuffer-dictionary-search)
 (defun ndbuffer-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (let* ((dict-id (lookup-dictionary-id dictionary))
-         (string  (lookup-query-string query))
-         (method  (lookup-query-method query))
-         (file    (expand-file-name
-                   (lookup-dictionary-name dictionary)
-                   (lookup-agent-location
-                    (lookup-dictionary-agent dictionary)))))
-    (destructuring-bind 
-        (content-tags entry-tags code-tags head-tags entry-tags-list)
-        (ndtext-dictionary-options dictionary string)
-      (if entry-tags (setq entry-tags-list (list entry-tags)))
-      (loop for (code head val) in (ndtext-search-multiple
-                                    'ndbuffer file string method
-                                    content-tags entry-tags-list
-                                    head-tags code-tags)
-            for entry = (lookup-new-entry 'regular dictionary code head)
-            do (puthash (cons dict-id code) val ndtext-cache)
-            collect entry))))
+  (ndtext-dictionary-search-common dictionary query 'ndbuffer))
 
 (put 'ndbuffer :content 'ndbuffer-entry-content)
 (defun ndbuffer-entry-content (entry)
-  "Return string content of ENTRY."
-  (let* ((dictionary (lookup-entry-dictionary entry))
-         (dict-id    (lookup-dictionary-id dictionary))
-         (heading    (lookup-entry-heading entry))
-         (code       (lookup-entry-code entry)))
-    (or (gethash (cons dict-id code) ndtext-cache)
-        (destructuring-bind 
-            (content-tags entry-tags code-tags head-tags ignored)
-            (ndtext-dictionary-options dictionary heading)
-          (ndtext-process 'ndbuffer 'get dict-id code 'exact
-                          content-tags entry-tags head-tags
-                          code-tags)))))
+  (ndtext-entry-content-common entry 'ndbuffer))
 
 ;;;
 ;;; Main Function
@@ -125,7 +97,7 @@
 REGULAR indicates if search is regular (not used for now)."
   (let* ((regexp (case action
                    ('search (ndbuffer-regexp string method entry-tags))
-                   ('get    (ndbuffer-regexp string 'exact code-tags))))
+                   ('get    (regexp-quote string))))
          (content-start (regexp-quote (car content-tags)))
          (content-end   (regexp-quote (cdr content-tags)))
          (code-start    (regexp-quote (car code-tags)))
@@ -159,11 +131,11 @@ REGULAR indicates if search is regular (not used for now)."
                                                    (cdr head-tags)) nil t)
                     (setq head (match-string-no-properties 1))))
                 (goto-char (point-min))
-                (when (re-search-forward (concat code-start "\\(.+?\\)" 
+                (when (re-search-forward (concat code-start ".+?"
                                                  code-end) nil t)
-                  (setq code (match-string-no-properties 1)))
+                  (setq code (match-string-no-properties 0)))
                 (when (and code head)
-                  (cl-incf hits)
+                  (incf hits)
                   (push (list code head (buffer-substring-no-properties start end))
                         result)))
               (goto-char (point-max)))))))

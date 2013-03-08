@@ -39,40 +39,45 @@
 ;; </content>
 ;; ....
 ;;
-;; | option           | value                        | note                           |
-;; |------------------+------------------------------+--------------------------------|
-;; | :content-tags    | ("<content>" . "</content>") | multi-line                     |
-;; |                  | nil                          | default: ("\n . "\n")          |
-;; |                  | ("\n" . "\n")                | single-line                    |
-;; |                  | function                     | argument: string (:search)     |
-;; |                  |                              |           code  (:content)     |
-;; |                  |                              | return: tags                   |
-;; |------------------+------------------------------+--------------------------------|
-;; | :entry-tags-list | (entry-tags entry-tags...)   |                                |
-;; |------------------+------------------------------+--------------------------------|
-;; | :entry-tags      | ("<entry"> . "</entry>")     |                                |
-;; |                  | nil                          | default: (nil . "\t")          |
-;; |                  | (nil . "</entry>")           | content-start = line beginning |
-;; |                  | function                     | argument: string (:search)     |
-;; |                  |                              |           code  (:content)     |
-;; |                  |                              | return: tags                   |
-;; |------------------+------------------------------+--------------------------------|
-;; | :head-tags       | ("<head>" . "</head>")       |                                |
-;; |                  | nil                          | default: :entry-tags           |
-;; |                  | (nil . "</head>")            | head-start = line beginning    |
-;; |                  | function                     | argument: content              |
-;; |                  |                              | return:   head-value           |
-;; |------------------+------------------------------+--------------------------------|
-;; | :code-tags       | ("<code>" . "</code>")       |                                |
-;; |                  | nil                          | default: :entry-tags           |
-;; |                  | (nil . "</code>")            | code-start = line beginning    |
-;; |                  | function                     | argument: string (:search)     |
-;; |                  |                              |           code  (:content)     |
-;; |                  |                              | return :  tags                 |
-;; |------------------+------------------------------+--------------------------------|
-;; | :extension       | ".xml"                       | (not used in ndsary.)          |
-;; |                  | nil                          | default: ".txt" is used.       |
+;; | option           | value                        | note                                |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :entry-tags-list | (entry-tags entry-tags...)   |                                     |
+;; |                  | function                     | argument: string, method            |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :entry-tags      | ("<entry"> . "</entry>")     |                                     |
+;; |                  | nil                          | default: (nil . "\t")               |
+;; |                  | (nil . "</entry>")           | content-start = line beginning      |
+;; |                  | function                     | argument: string, method            |
+;; |                  |                              | return:   entry-tags                |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :head-tags       | ("<head>" . "</head>")       |                                     |
+;; |                  | nil                          | default: :entry-tags                |
+;; |                  | (nil . "</head>")            | head-start = line beginning         |
+;; |                  | function                     | argument: content-string            |
+;; |                  |                              | return:   head-value                |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :code-tags       | ("<code>" . "</code>")       |                                     |
+;; |                  | nil                          | default: :head-tags                 |
+;; |                  | (nil . "</code>")            | code-start = line beginning         |
+;; |                  | function                     | argument: string, method, head-tags |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :content-tags    | ("<content>" . "</content>") | multi-line                          |
+;; |                  | nil                          | default: ("\n . "\n")               |
+;; |                  | ("\n" . "\n")                | single-line                         |
+;; |                  | function (:search)           | argument: string, method, code-tags |
+;; |                  | function (:content)          | argument: code, 'code, code-tags    |
+;; |------------------+------------------------------+-------------------------------------|
+;; | :extension       | ".xml"                       | (not used in ndsary.)               |
+;; |                  | nil                          | default: ".txt" is used.            |
+;; |------------------+------------------------------+-------------------------------------|
 ;;
+
+;;
+;;; Rationale (why content-tags is dependent of code-tags?)
+;;
+;; When text dictionary is multi-layered, such as "kanji" and "jukugo", then
+;; <content> tag is dependent of <code> (<head>) tags.
+;; 
 ;;; Usage:
 ;;
 ;;  Example:
@@ -160,6 +165,19 @@
 (defun ndtext-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
   (ndtext-initialize)
+  (ndtext-dictionary-search-common dictionary query 'ndtext))
+
+(put 'ndtext :content 'ndtext-entry-content)
+(defun ndtext-entry-content (entry)
+  "Return string content of ENTRY."
+  (ndtext-initialize)
+  (ndtext-entry-content-common entry 'ndtext))
+
+;;
+;; common to ndtext/ndbuffer/ndsary
+;;
+
+(defun ndtext-dictionary-search-common (dictionary query backend)
   (let* ((dict-id (lookup-dictionary-id dictionary))
          (string  (lookup-query-string query))
          (method  (lookup-query-method query))
@@ -171,37 +189,32 @@
                       'utf-8)))
     (destructuring-bind 
         (content-tags entry-tags head-tags code-tags entry-tags-list)
-        (ndtext-dictionary-options dictionary string)
+        (ndtext-dictionary-options dictionary)
       (if entry-tags (setq entry-tags-list (list entry-tags)))
       (loop for (code head val) in (ndtext-search-multiple
-                                    'ndtext file string method
+                                    backend file string method
                                     content-tags entry-tags-list
                                     head-tags code-tags coding)
             for entry = (lookup-new-entry 'regular dictionary code head)
             do (puthash (cons dict-id code) val ndtext-cache)
             collect entry))))
 
-(put 'ndtext :content 'ndtext-entry-content)
-(defun ndtext-entry-content (entry)
-  "Return string content of ENTRY."
-  (ndtext-initialize)
+(defun ndtext-entry-content-common (entry backend)
   (let* ((dictionary (lookup-entry-dictionary entry))
          (dict-id    (lookup-dictionary-id dictionary))
-         (heading    (lookup-entry-heading entry))
          (code       (lookup-entry-code entry))
          (coding     (or (lookup-dictionary-option dictionary :coding t)
                          'utf-8)))
     (or (gethash (cons dict-id code) ndtext-cache)
         (destructuring-bind 
             (content-tags entry-tags head-tags code-tags ignored)
-            (ndtext-dictionary-options dictionary heading)
-          (ndtext-process 'ndtext 'get dict-id code 'exact
+            (ndtext-dictionary-options dictionary)
+          (ndtext-process backend 'content dict-id code 'code
                           content-tags entry-tags head-tags
                           code-tags coding)))))
 
-(defun ndtext-dictionary-options (dictionary string)
+(defun ndtext-dictionary-options (dictionary)
   "Obtain needed options from DICTIONARY and STRING."
-  (identity string) ;; avoid warning
   (let ((content-tags    (lookup-dictionary-option dictionary :content-tags t))
         (entry-tags      (lookup-dictionary-option dictionary :entry-tags t))
         (head-tags       (lookup-dictionary-option dictionary :head-tags t))
@@ -233,11 +246,11 @@
 ;; |                       | search                  | get                      |
 ;; |-----------------------+-------------------------+--------------------------|
 ;; | max-count-option      | maxhits=lookup-max-hits | maxhits=1                |
-;; | grep-pattern          | entry                   | code                     |
+;; | grep-pattern          | entry                   | <code>code</code>        |
 ;; | single-line-options   | -a                      | -a                       |
 ;; | multiple-line-options | -Pzo -a                 | -Pzo -a                  |
-;; | single-line-regexp    | (..<entry>)##</entry>.. | (..<code>)##</code>..    |
-;; | multiple-line-regexp  | <c>(..<e>)..</e>..</c>  | <c>(..<co>)..</co>..</c> |
+;; | single-line-regexp    | (..<entry>)##</entry>.. | (..)<code>##</code>..    |
+;; | multiple-line-regexp  | <c>(..<e>)..</e>..</c>  | <c>(..)<co>..</co>..</c> |
 ;; | obtaining content     | ndtext-collect-results  | buffer-string            |
 
 ;; handle perl exception of `+' and `\n'.
@@ -246,33 +259,37 @@
     (replace-regexp-in-string "\\\\\\+" "+"
       (replace-regexp-in-string "\n" "\\\\n" (regexp-quote string)))))
 
-(defun ndtext-normalize-options (string method content-tags entry-tags head-tags code-tags)
-  (typecase content-tags
-    (null     (setq content-tags '("\n" . "\n")))
-    (function (setq content-tags (apply content-tags (list string)))))
-  (typecase entry-tags
-    (null     (setq entry-tags '(nil . "\t")))
-    (function (setq entry-tags (apply entry-tags (cons string method)))))
-  (typecase head-tags
-    (null     (setq head-tags entry-tags))
-    )
-  (typecase code-tags
-    (null     (setq code-tags entry-tags))
-    (function (setq code-tags (apply code-tags (list string)))))
-  (list content-tags entry-tags head-tags code-tags))
-
 (put 'ndtext :options         'ndtext-options)
 (put 'ndtext :pattern         'ndtext-pattern)
 (put 'ndtext :program-symbol  'ndtext-grep)
 (put 'ndtext :max-count-check nil)
 
 ;;;
-;;; ndtext/ndsary common search interface
+;;; ndtext/ndbuffer/ndsary common search interface
 ;;;
+
+(defun ndtext-normalize-options (string method content-tags entry-tags head-tags code-tags)
+  (typecase entry-tags
+    (null     (setq entry-tags '(nil . "\t")))
+    (function (setq entry-tags (funcall entry-tags string method))))
+  (typecase head-tags
+    (null     (setq head-tags entry-tags))
+    )
+  (typecase code-tags
+    (null     (if (functionp head-tags)
+                  (error "If head-tags is function, code-tags must not be null!")
+                (setq code-tags head-tags)))
+    (function (setq code-tags (funcall code-tags string method head-tags))))
+  (typecase content-tags
+    (null     (setq content-tags '("\n" . "\n")))
+    (function (setq content-tags (funcall content-tags string method code-tags))))
+  (list content-tags entry-tags head-tags code-tags))
 
 (defun ndtext-search-multiple
   (agent file string method &optional content-tags entry-tags-list
    head-tags code-tags coding)
+  (if (functionp entry-tags-list)
+      (setq entry-tags-list (funcall entry-tags-list string method)))
   (cl-remove-duplicates
    (loop for entry-tags in entry-tags-list
          nconc (ndtext-process agent 'search file string
@@ -285,8 +302,9 @@
 (defun ndtext-process
   (agent action file string method &optional content-tags entry-tags
    head-tags code-tags coding)
-  ;; AGENT ::= ndtext/ndsary
-  ;; ACTION ::= search/get (if get, METHOD is ignored.)
+  ;; AGENT ::= ndtext/ndbuffer/ndsary
+  ;; ACTION ::= search  (string=string, method=exact/prefix/suffix/text)
+  ;;          | content (string=code,   method=code)
   (destructuring-bind
       (content-tags entry-tags head-tags code-tags)
       (ndtext-normalize-options string method content-tags entry-tags head-tags code-tags)
@@ -304,7 +322,7 @@
              (program (eval (get agent :program-symbol)))
              (arguments (append options (list pattern (file-truename file))))
              status)
-        (if (or (equal action 'get)
+        (if (or (equal action 'content)
                 (and (equal action 'search)
                      (or (null max-count-check)
                          (funcall max-count-check file pattern coding))))
@@ -317,7 +335,7 @@
               (if (< 1 status)
                   (let ((content (buffer-string)))
                     (error "ndtext: %s returned %s.  buffer=%s" program status content)))
-              (if (equal action 'get) (buffer-string)
+              (if (equal action 'content) (buffer-string)
                 (ndtext-collect-results content-tags code-tags head-tags single-line))))))))
 
 ;;; common to ndtext/ndsary
@@ -343,8 +361,8 @@
         (narrow-to-region start end)
         (goto-char (point-min))
         ;; code
-        (re-search-forward (concat code-start "\\(.+?\\)" code-end) nil t)
-        (setq code (match-string 1))
+        (re-search-forward (concat code-start ".+?" code-end) nil t)
+        (setq code (match-string 0))
         ;; head (if only code exists)
         (when code
           (if (functionp head-tags)
@@ -354,10 +372,7 @@
                    (head-end (regexp-quote (cdr head-tags))))
               (goto-char (point-min))
               (re-search-forward (concat head-start "\\(.+?\\)" head-end) nil t)
-              (setq head (match-string 1)))
-            )
-          )
-        )
+              (setq head (match-string 1))))))
       (goto-char end)
       (lookup-debug-message "code=%s, head=%s" code head)
       (if (and code head)
@@ -369,7 +384,7 @@
 
 (defun ndtext-options (action single-line ignored) ;; content-tags
   `(,ndtext-grep-max-count-option 
-    ,(if (eq action 'get) "1" (format "%d" lookup-max-hits))
+    ,(if (eq action 'content) "1" (format "%d" lookup-max-hits))
     ,@(if single-line ndtext-grep-single-line-options ndtext-grep-multi-line-options)))
 
 (defun ndtext-pattern (string method content-tags tags single-line)
@@ -410,17 +425,14 @@
          ;;              exact     :: <tag>string</tag>
          ;;              prefix    :: <tag>string
          ;;              suffix    :: string</tag>
-         ;;              substring :: string
-         ;;              text      :: </tag>..?string
+         ;;              substring :: string (<tag>..string..</tag>)
+         ;;              text      :: string
          (concat any-char "?"
                  (case method
-                   ('exact
-                    (concat tag-start string tag-end))
-                   ('prefix
-                    (concat tag-start string))
-                   ('suffix
-                    (concat string tag-end))
-                   (t string)))
+                   ('exact (concat tag-start string tag-end))
+                   ('prefix (concat tag-start string))
+                   ('suffix (concat string tag-end))
+                   (t string))) ;; text/code
        ;; * <tag> is not defined
        ;;   <content>(search-word)..(</content>)
        ;;              exact     :: string</tag>
@@ -433,7 +445,7 @@
          ('exact (concat string tag-end))
          ('prefix string)
          ('suffix (concat any-char "?" tag-end))
-         (t (concat any-char "?" string))))
+         (t (concat any-char "?" string)))) ;; text/code
      any-char)))
 
 (provide 'ndtext)
