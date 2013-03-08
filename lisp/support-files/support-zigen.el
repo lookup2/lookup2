@@ -41,16 +41,13 @@
 ;;
 ;;  Example:
 ;;   (setq lookup-search-agents
-;;         '(
-;;           ....
-;;           (ndsary "~/edicts/zigen/")
+;;         '(....
+;;           (ndbuffer "~/edicts/zigen/")
 ;;           ....)
 
 ;;; Code:
 
 (require 'lookup)
-
-(defvar support-zigen-use-ivs-font t)
 
 ;;;
 ;;; Internal Variables
@@ -58,7 +55,7 @@
 
 (defvar support-zigen-kanji-on-start "
 					<音>")
-(defvar support-zigen-jukugo-on-start "
+(defvar support-zigen-jukugo-on-start "</見出語>
 				<音>")
 (defvar support-zigen-on-end "</音>")
 
@@ -67,43 +64,36 @@
 ;;;
 
 (defun support-zigen-entry-tags-list (string method)
-  (if (string-match "^[ァ-ヺ]+$" string)
+  (if (string-match "^\\cK+$" string) ;; katakana
       (list (cons support-zigen-kanji-on-start  support-zigen-on-end)
             (cons support-zigen-jukugo-on-start support-zigen-on-end))
-    (if (and (string-match "^[㐀-鿿𠀀-𮿿]$" string)
-             (or (equal method 'exact) (equal method 'prefix)))
-        '(("<見出字>" . "</見出字>"))
-      '(("<見出字>" . "</見出字>") ("<見出語>" . "</見出語>")))))
+    (if (string-match "^\\cC+$" string)
+        '(("<見出字>" . "</見出字>") ("<見出語>" . "</見出語>")))))
 
-(defun support-zigen-content-tags (x)
-  (if (consp x) (setq x (car x)))
-  (cond ((string-match "<見出語>" x) '("<熟語>" . "</熟語>"))
-        ((string-match support-zigen-jukugo-on-start x) 
-         '("<熟語>" . "</熟語>"))
-        ;;((string-match "<見出字>" x) '("<漢字>" . "</漢字>"))
-        ;;((string-match support-zigen-kanji-on-start x) 
-        ;;                           '("<漢字>" . "</漢字>"))
-        (t '("<漢字>" . "</漢字>"))))
-
-(defun support-zigen-code-tags (x)
-  (if (consp x) (setq x (car x)))
-  (cond ((string-match "<見出語>" x) nil)
-        ((string-match "<見出字>" x) nil)
-        ((string-match support-zigen-jukugo-on-start x) 
+(defun support-zigen-code-tags (string ignored head-tags)
+  ;; STRING is ignored
+  ;; METHOD is ignored.
+  (identity string)
+  (cond ((equal (car head-tags) support-zigen-jukugo-on-start)
          '("<見出語>" . "</見出語>"))
-        ((string-match support-zigen-kanji-on-start x) 
+        ((equal (car head-tags) support-zigen-kanji-on-start)
          '("<見出字>" . "</見出字>"))
-        (t (error "No proper CODE found!"))))
+        (t head-tags)))
+
+(defun support-zigen-content-tags (string method code-tags)
+  (if (eq method 'code)
+      (cond ((string-match "<見出語>" string) '("<熟語>" . "</熟語>"))
+            ((string-match "<見出字>" string) '("<漢字>" . "</漢字>"))
+            (t (error "support-zigen: Improper code! %s" string)))
+      (cond ((equal (car code-tags) "<見出語>") '("<熟語>" . "</熟語>"))
+            ((equal (car code-tags) "<見出字>") '("<漢字>" . "</漢字>"))
+            (t (error "support-zigen: Improper code-tag! %s" code-tags)))))
 
 (defun support-zigen-arrange-structure (entry)
   "Arrange content of ENTRY."
   (while (search-forward "	" nil t) (replace-match ""))
   (goto-char (point-min))
   (while (re-search-forward "\\(</.+?>\\)\n" nil t) (replace-match "\\1"))
-  (goto-char (point-min))
-  (if support-zigen-use-ivs-font
-      (lookup-text-new-to-old-kanji-ivs-region (point-min) (point-max)))
-  ;; XMLタグ内のIVSは削除する。
   (goto-char (point-min))
   (while (search-forward "<" nil t)
     (while (and (re-search-forward "[>󠀀-󯿽]" nil t)
@@ -147,12 +137,11 @@
 (setq lookup-support-options
       (list :title "字源"
             :coding 'utf-8-dos
-            :query-filter 'lookup-query-filter-hiragana-to-katakana
-            :charsets 
-            (lambda (x) (string-match "^\\([㐀-鿿𠀀-𮿿]+\\|[ァ-ヺ]+\\)$" x))
-            :entry-tags-list #'support-zigen-entry-tags-list
-            :content-tags 'support-zigen-content-tags
+            :query-filter 'lookup-query-filter-to-katakana
+            :charsets (lambda (x) (string-match "^\\(\\cC+\\)\\|\\(\\cK+\\)$" x))
+            :entry-tags-list 'support-zigen-entry-tags-list
             :code-tags 'support-zigen-code-tags
+            :content-tags 'support-zigen-content-tags
             :arranges '((replace support-zigen-arrange-structure))))
 
 ;;; support-zigen.el ends here
