@@ -6,10 +6,12 @@ simultaneously with lookup.
 
 ## Installation
 
-For now, simply download the archive and place the contents of `lisp`
-folder into your site-lisp.
+Download the archive and place the contents of `lisp` folder into your
+site-lisp.  You will need `cl-lib' if your Emacs is 24.2 or earlier.
+You do not need any additional library if Emacs is 24.3 or later.
 
-When proper installer is completed, it should be installed via following command.
+When proper installer is completed, it should be installed via
+following command.
 
 ```
 % ./configure --with-emacs=emacs \
