@@ -5,7 +5,7 @@ SOURCES = bocu.el stem-english.el lookup-types.el lookup-text.el	\
 	 ndeb.el ndeb-binary.el nddsl.el ndic.el ndict.el ndjitsuu.el	\
 	 ndlatin.el ndpdic.el ndsary.el ndbuffer.el ndspell.el		\
 	 ndspotlight.el ndsrd.el ndtut.el ndest.el ndtext.el ndweb.el	\
-	 ndwnj.el tibet-util+.el support-defs.el			\
+	 ndwnj.el ndzim.el ndmecab.el tibet-util+.el support-defs.el	\
 	 support-files/support-chinakan.el				\
 	 support-files/support-eijiro-pdic.el				\
 	 support-files/support-eijiro.el				\
