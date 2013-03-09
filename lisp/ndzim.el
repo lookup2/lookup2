@@ -39,18 +39,6 @@
                                "-o" "ucs_conv=1"
                                "-O" "UTF-8"))
 
-(defface ndzim-bold-face
-  '((t (:weight bold)))
-  "Face used to bold text."
-  :group 'ndzim
-  :group 'lookup-faces)
-
-(defface ndzim-italic-face
-  '((t (:slant italic)))
-  "Face used to italic text."
-  :group 'ndzim
-  :group 'lookup-faces)
-
 (put 'ndzim :methods '(exact prefix))
 
 ;;;
@@ -80,19 +68,20 @@
                    (lookup-agent-location
                     (lookup-dictionary-agent dictionary)))))
     (loop for (code head) in (ndzim-search string method file)
-          do (message "debug: code=%s head=%s" code head)
           collect (lookup-new-entry 'regular dictionary code head))))
-    
+
 (put 'ndzim :content 'ndzim-dictionary-content)
 (defun ndzim-dictionary-content (entry)
   (ndzim--check-environment)
   (let* ((dictionary (lookup-entry-dictionary entry))
-         (agent      (lookup-dictionary-agent dictionary))
-         (file       (expand-file-name
-                      (lookup-dictionary-name dictionary)
-                      (lookup-agent-location agent)))
-         (heading    (lookup-entry-heading entry)))
-    (ndzim-content heading file)))
+         (file       (ndzim--dictionary-file dictionary))
+         (code       (lookup-entry-code entry))
+         (info       (ndzim-info nil code file)))
+    (multiple-value-bind (url title redirection) info
+      (identity url) (identity title) ;; ignored
+      (when redirection
+        (setq code (car redirection))))
+    (ndzim-content code file)))
 
 (put 'ndzim :arrange-table '((reference ndzim-arrange-references
                                         ndzim-arrange-image
@@ -116,8 +105,8 @@
 ;;; Internal Functions
 ;;; 
 
-(defun ndzim-extract (url file)
-  (unless (string-match "^[AI]/" url) (error "Improper ZIM URL!"))
+(defun ndzim-dump-url (url file)
+  (unless (string-match "^[-ABIJMUVWX]/" url) (error "Improper ZIM URL!"))
   (let* ((url-file (concat temporary-file-directory "/" url))
          (directory (file-name-directory url-file)))
     (unless (file-directory-p directory) (make-directory directory))
@@ -133,14 +122,39 @@
                   (file-truename file) string)
     (let (result (count 0) (max (if (equal method 'exact) 1 lookup-max-hits)))
       (goto-char (point-min))
-      (while (and (re-search-forward "^article \\([0-9]+\\).*\t:\t\\(.+\\)" nil t)
+      (while (and (re-search-forward "^article \\([0-9]+\\).+?:\t\\(.+\\)" nil t)
                   (< count max))
-        (push (list (match-string 1) (match-string 2)) result)
+        ;; 正式には ndzim-info を使って URL を正式に取得するのが筋だが高速化のため
+        ;; URLは "A/<title>.html" だと仮定する。
+        (push (list (concat "A/" (match-string 2) ".html") (match-string 2)) result)
         (incf count))
       (nreverse result))))
 
-(defun ndzim-content (heading file)
-  (let ((url-file (ndzim-extract (concat "A/" heading ".html") file)))
+(defun ndzim-info (index url file)
+  "Get URL, Title, Redirection (URL, Title) if exists."
+  (with-temp-buffer
+    (if index
+        (call-process ndzim-dump nil (current-buffer) nil
+                      "-o" index "-i" (file-truename file))
+        (call-process ndzim-dump nil (current-buffer) nil
+                      "-u" url "-i" (file-truename file)))
+    (goto-char (point-min))
+    (let (url title namespace redirection)
+      (re-search-forward "url: *\\(.+\\)")
+      (setq url (match-string 1))
+      (re-search-forward "title: *\\(.+\\)")
+      (setq title (match-string 1))
+      (re-search-forward "namespace: *\\(.*\\)")
+      (setq namespace (match-string 1))
+      (if (re-search-forward "redirect index: *\\(.*\\)" nil t)
+          (setq redirection (match-string 1)))
+      (if redirection
+          (setq redirection (ndzim-info redirection file)))
+      (list (concat namespace "/" url) title redirection)
+      )))
+
+(defun ndzim-content (url file)
+  (let ((url-file (ndzim-dump-url url file)))
     (setq args (append ndzim-w3m-options (list url-file)))
     (with-temp-buffer
       ;;(lookup-debug-message "w3m args=%s" args)
@@ -157,10 +171,11 @@
     (while (re-search-forward "<a .*?href=\"\\(.+?\\)\".*?>\\(.+?\\)</a>" nil t)
       (let* ((href (match-string 1))
              (ref (save-match-data
-                    (if (string-match "^/A/\\(.+\\)\\.html" href)
+                    (if (string-match "^/A/\\(.+\\)\\.html$" href)
                         (match-string 1 href)))))
         (lookup-set-link (match-beginning 2) (match-end 2)
-                         (if ref (lookup-new-entry 'regular dictionary ref ref)
+                         (if ref (lookup-new-entry 'regular dictionary
+                                                   (concat "A/" ref ".html") ref)
                            (lookup-new-entry 'url dictionary href href)))
         (delete-region (match-end 2) (match-end 0))
         (delete-region (match-beginning 0) (match-beginning 2))))
@@ -173,34 +188,34 @@
     (while (re-search-forward
             "<img_alt .*?src=\"/\\(.+?\\)\".*?>\\(.+?\\)</img_alt>" nil t)
       (let* ((img-url (match-string 1))
-             (img-file (save-match-data (ndzim-extract img-url file))))
-        (lookup-img-file-insert img-file 'png (match-beginning 0) (match-end 0))))))
+             (img-file (save-match-data (ndzim-dump-url img-url file)))
+             (img-type (save-match-data
+                         (if (string-match "\\.jpg" img-file) 'jpeg 'png))))
+        (lookup-img-file-insert img-file img-type
+                                (match-beginning 0) (match-end 0))))))
 
 (defun ndzim-arrange-tags (ignored)
   (let ((case-fold-search t))
     (goto-char (point-min))
     (while (re-search-forward "<b>\\(.+?\\)</b>" nil t)
       (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face ndzim-bold-face))
+                           '(face lookup-bold-face))
       (delete-region (match-end 1) (match-end 0))
       (delete-region (match-beginning 0) (match-beginning 1)))
     (goto-char (point-min))
     (while (re-search-forward "<i>\\(.+?\\)</i>" nil t)
       (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face ndzim-italic-face))
+                           '(face lookup-italic-face))
       (delete-region (match-end 1) (match-end 0))
       (delete-region (match-beginning 0) (match-beginning 1)))
     (goto-char (point-min))
-    (while (re-search-forward "<i>\\(.+?\\)</i>" nil t)
+    (while (re-search-forward "<_SYMBOL.*?>\\(.+?\\)</_SYMBOL>" nil t)
       (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face ndzim-italic-face))
+                           '(face lookup-emphasis-face))
       (delete-region (match-end 1) (match-end 0))
       (delete-region (match-beginning 0) (match-beginning 1)))
     (goto-char (point-min))
     (while (re-search-forward "</?span.*?>" nil t)
-      (replace-match ""))
-    (goto-char (point-min))
-    (while (re-search-forward "</?_SYMBOL.*?>" nil t)
       (replace-match ""))
     (goto-char (point-min))
     (while (re-search-forward "<.+?>" nil t)

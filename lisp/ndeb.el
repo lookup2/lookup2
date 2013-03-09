@@ -22,6 +22,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'lookup)
 (defconst ndeb-version "0.1")
 
@@ -104,24 +105,6 @@
 	  (sexp :tag "other"))
   :group 'ndeb)
 
-(defface ndeb-bold-face
-  '((t (:weight bold)))
-  "Face used to bold text."
-  :group 'ndeb
-  :group 'lookup-faces)
-
-(defface ndeb-italic-face
-  '((t (:slant italic)))
-  "Face used to italic text."
-  :group 'ndeb
-  :group 'lookup-faces)
-
-(defface ndeb-emphasis-face
-  '((t (:slant italic :weight bold)))
-  "Face used to emphasized text."
-  :group 'ndeb
-  :group 'lookup-faces)
-
 
 ;;;
 ;;; Internal variables
@@ -149,9 +132,6 @@ Nil means it has not been checked yet.")
 ;:: types
 ;;;
 
-;; lookup entry command
-(put 'ndeb :content   'ndeb-entry-content)
-
 ;; lookup agent command
 (put 'ndeb :list      'ndeb-list)
 (put 'ndeb :kill      'ndeb-kill)
@@ -161,9 +141,9 @@ Nil means it has not been checked yet.")
 (put 'ndeb :methods   'ndeb-dictionary-methods)
 (put 'ndeb :menu      'ndeb-dictionary-menu)
 (put 'ndeb :search    'ndeb-dictionary-search)
+(put 'ndeb :content   'ndeb-entry-content)
 
 ;; arrangements
-
 (put 'ndeb :arrange-table
      '((replace   ndeb-arrange-auto-jump-reference
                   lookup-arrange-replaces
@@ -177,8 +157,7 @@ Nil means it has not been checked yet.")
                   ndeb-arrange-scripts
                   ndeb-arrange-faces
                   ndeb-arrange-no-newline
-                  ndeb-arrange-decode-entity
-                  )
+                  ndeb-arrange-decode-entity)
        (gaiji     lookup-arrange-gaijis)
        (reference ndeb-arrange-paged-reference
                   ndeb-arrange-squeezed-references
@@ -186,12 +165,9 @@ Nil means it has not been checked yet.")
        (structure 
                   ndeb-arrange-prev-next ; to obtain prev/next entry.
                   ndeb-arrange-indent
-                  lookup-arrange-structure
-                  )
+                  lookup-arrange-structure)
        (fill      lookup-arrange-fill-lines
-                  ndeb-arrange-snd-autoplay
-                  )
-       ))
+                  ndeb-arrange-snd-autoplay)))
 
 ;; lookup content-arrangement functions and options
 (put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
@@ -200,9 +176,11 @@ Nil means it has not been checked yet.")
 (put 'ndeb :media-pattern '())
 (put 'ndeb :media     'ndeb-dictionary-media)
 
-(put 'ndeb :reference-pattern '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
+(put 'ndeb :reference-pattern
+     '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
 
-(put 'ndeb :charsets '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
+(put 'ndeb :charsets
+     '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
 
 
 ;;;
@@ -213,10 +191,6 @@ Nil means it has not been checked yet.")
 (put 'ndeb :stop-code     nil)
 
 
-;;;;
-;;;; Iternals
-;;;;
-
 ;;;
 ;;; Internal constants
 ;;;
@@ -230,9 +204,9 @@ Nil means it has not been checked yet.")
     ("gt" . ">")))
 
 (defconst ndeb-faces-table
-  '(("italic" . ndeb-italic-face)
-    ("bold" . ndeb-bold-face)
-    ("em" . ndeb-emphasis-face)))
+  '(("italic" . lookup-italic-face)
+    ("bold" . lookup-bold-face)
+    ("em" . lookup-emphasis-face)))
 
 
 ;; ndeb entry:
@@ -284,8 +258,8 @@ Nil means it has not been checked yet.")
     (lookup-process-require 
      ndeb-process
      (concat command "\n")
-;     (concat command "\nset prompt \""
-;             ndeb-prompt-string "\"\nset prompt\n")
+     ;(concat command "\nset prompt \""
+     ;        ndeb-prompt-string "\"\nset prompt\n")
      (concat "^" ndeb-prompt-string)
      filter)))
 
@@ -738,7 +712,7 @@ Nil means it has not been checked yet.")
 	    (add-text-properties beg-end end-beg
 				 `(face ,(or (lookup-assoc-get
 					      ndeb-faces-table class)
-					     'ndeb-italic-face))) ;; default
+					     'lookup-italic-face))) ;; default
 	    (delete-region end-beg end-end)
 	    (delete-region beg-beg beg-end)
             (goto-char beg-beg))))

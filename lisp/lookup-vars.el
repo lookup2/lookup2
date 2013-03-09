@@ -308,6 +308,21 @@ KEY 及び VALUE は省略可能で、エージェントに対するオプショ
   "Comment face."
   :group 'lookup-faces)
 
+(defface lookup-bold-face
+  '((t (:weight bold)))
+  "Face used to bold text."
+  :group 'lookup-faces)
+
+(defface lookup-italic-face
+  '((t (:slant italic)))
+  "Italic face."
+  :group 'lookup-faces)
+
+(defface lookup-emphasis-face
+  '((t (:slant italic :weight bold)))
+  "Face used to emphasized text."
+  :group 'lookup-faces)
+
 (defface lookup-reference-face
   '((((class color) (background light)) (:foreground "Blue"))
     (((class color) (background dark)) (:foreground "Cyan")))
