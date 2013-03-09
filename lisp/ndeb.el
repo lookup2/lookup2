@@ -387,7 +387,7 @@ Nil means it has not been checked yet.")
     (let ((height (lookup-dictionary-option dictionary :gaiji-size t))
           (tmp    (ndeb-dictionary-get-info dictionary "font sizes"))
           xbm)
-      (when (string-match "[0-9]+$" tmp)
+      (when (string-match "[0-9]+$" tmp) ;; max size
         (setq tmp (string-to-number (match-string 0 tmp)))
         (if (eq tmp ndeb-gaiji-size)
             (progn
@@ -495,11 +495,8 @@ Nil means it has not been checked yet.")
 	    (ndeb-with-dictionary dictionary
 	      (ndeb-process-require "subinfo"
 		(lambda (_process)
-		  (let (alist)
-		    (while (re-search-forward "^ \\([^:]+\\): \\(.*\\)" nil t)
-		      (setq alist
-			    (cl-acons (match-string 1) (match-string 2) alist)))
-		    alist)))))
+                  (loop while (re-search-forward "^ \\([^:]+\\): \\(.*\\)" nil t)
+                        collect (cons (match-string 1) (match-string 2)))))))
       (lookup-put-property dictionary 'ndeb-alist alist))
     (lookup-assoc-get alist key)))
 

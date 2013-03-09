@@ -704,17 +704,17 @@ Using this function with :snd-autoplay option is not recommendable."
 (defun lookup-entry-play-ndeb-binaries-internal (types &optional num)
   (unless (listp types) (setq types (list types)))
   (let ((dictionary (lookup-entry-dictionary
-		     (lookup-entry-current-line-entry)))
+		     (lookup-summary-this-entry)))
 	autoplay)
-    (unless (lookup-entry-content-visible-p)
+    (unless (lookup-summary-content-visible-p)
       (when (setq autoplay
 		  (lookup-dictionary-option dictionary :snd-autoplay))
-	(lookup-set-dictionary-option
-	 (lookup-dictionary-id dictionary) :snd-autoplay nil))
-      (lookup-entry-display-content)
+	(setf (lookup-dictionary-option dictionary :snd-autoplay)
+              nil))
+      (lookup-summary-display-content)
       (when autoplay
-	(lookup-set-dictionary-option
-	 (lookup-dictionary-id dictionary) :snd-autoplay autoplay)))
+	(setf (lookup-dictionary-option dictionary :snd-autoplay)
+              autoplay)))
     (with-current-buffer lookup-content-buffer
       (save-excursion
 	(goto-char (point-min))
