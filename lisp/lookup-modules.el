@@ -154,8 +154,7 @@
     (setf (lookup-module-name module) new-name))
   (lookup-modules-update-buffer))
 
-(defun lookup-modules-wrap-command (ignored)
-  ;; ARG is ignored
+(defun lookup-modules-wrap-command (_arg)
   "Call the corresponding global command with keys and reset dictionaries.
 This command should be binded for the same keys with the commands
 `kill-line', `yank', `yank-pop',`transpose-lines', or `undo'.

@@ -307,8 +307,7 @@ See `lookup-region' for details."
     (lookup-region start end module)))
 
 ;;;###autoload
-(defun lookup-selection (ignored)
-  ;; CLICK is ignored
+(defun lookup-selection (_click)
   "Search for the mouse's selection."
   (interactive "e")
   (lookup-word (current-kill 0 t)))
@@ -512,12 +511,10 @@ candidates."
 
 ;; structure
 
-(defun lookup-arrange-structure (ignored)
-  ;; ENTRY is ignored
+(defun lookup-arrange-structure (_entry)
   (lookup-make-region-heading (point) (line-end-position) 1))
 
-(defun lookup-adjust-hide-examples (ignored)
-  ;; ENTRY is ignored
+(defun lookup-adjust-hide-examples (_entry)
   (unless lookup-enable-example
     (lookup-map-over-property
      (point-min) (point-max) 'face
@@ -608,8 +605,7 @@ link-item, heading, or code may be integer or function."
                          (lookup-new-entry 'url dict match-string 
                                            match-string))))))
 
-(defun lookup-adjust-check-references (ignored)
-  ;; ENTRY is ignored
+(defun lookup-adjust-check-references (_entry)
   (lookup-map-over-property
    (point-min) (point-max) 'lookup-reference
    (lambda (start end entry)
@@ -636,8 +632,7 @@ link-item, heading, or code may be integer or function."
           (goto-char start)
 	  (lookup-gaiji-insert gaiji))))))
 
-(defun lookup-adjust-show-gaijis (ignored)
-  ;; ENTRY is ignored
+(defun lookup-adjust-show-gaijis (_entry)
   (when lookup-enable-gaiji
     (lookup-map-over-property
      (point-min) (point-max) 'lookup-gaiji
@@ -646,11 +641,9 @@ link-item, heading, or code may be integer or function."
 
 ;; fill
 
-(defun lookup-arrange-nofill (ignored))
-;; ENTRY is ignored
+(defun lookup-arrange-nofill (_entry))
 
-(defun lookup-arrange-fill-lines (ignored)
-  ;; ENTRY is ignored
+(defun lookup-arrange-fill-lines (_entry)
   "Fill lines except `read-only' property region."
   (text-mode)
   (let ((fill-column (if (integerp lookup-fill-column)

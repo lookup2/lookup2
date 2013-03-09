@@ -150,11 +150,6 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndjitsuu :methods 'ndjitsuu-methods)
-(defun ndjitsuu-methods (ignored)
-  ;; DICTIONARY is ignored
-  '(exact prefix suffix substring))
-
 (put 'ndjitsuu :list 'ndjitsuu-list)
 (defun ndjitsuu-list (agent)
   "Return list of dictionaries of AGENT."
@@ -162,9 +157,12 @@
     (ndjitsuu-initialize dictionary)
     (list dictionary)))
 
+(put 'ndjitsuu :methods 'ndjitsuu-methods)
+(defun ndjitsuu-methods (_dictionary)
+  '(exact prefix suffix substring))
+
 (put 'ndjitsuu :title 'ndjitsuu-title)
-(defun ndjitsuu-title (ignored)
-  ;; DICTIONARY is ignored
+(defun ndjitsuu-title (_dictionary)
   "【字通】")
 
 (put 'ndjitsuu :search 'ndjitsuu-search)
@@ -274,8 +272,7 @@
 
 (put 'ndjitsuu :charsets (lambda (x) (string-match "^\\(\\cC+\\|\\cH+\\|\\cK+\\)$" x)))
 
-(defun ndjitsuu-arrange-replace (ignored)
-  ;; ENTRY is ignored
+(defun ndjitsuu-arrange-replace (_entry)
   "Arrange contents of ENTRY."
   (while (re-search-forward "<ST,\\([0-9]+\\)>\\(.+?\\)</ST>" nil t)
     (let* ((st-code    (string-to-number (match-string 1)))

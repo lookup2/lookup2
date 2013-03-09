@@ -77,8 +77,7 @@
          (file       (ndzim--dictionary-file dictionary))
          (code       (lookup-entry-code entry))
          (info       (ndzim-info nil code file)))
-    (multiple-value-bind (url title redirection) info
-      (identity url) (identity title) ;; ignored
+    (multiple-value-bind (_url _title redirection) info
       (when redirection
         (setq code (car redirection))))
     (ndzim-content code file)))
@@ -149,7 +148,7 @@
       (if (re-search-forward "redirect index: *\\(.*\\)" nil t)
           (setq redirection (match-string 1)))
       (if redirection
-          (setq redirection (ndzim-info redirection file)))
+          (setq redirection (ndzim-info redirection nil file)))
       (list (concat namespace "/" url) title redirection)
       )))
 
@@ -194,7 +193,7 @@
         (lookup-img-file-insert img-file img-type
                                 (match-beginning 0) (match-end 0))))))
 
-(defun ndzim-arrange-tags (ignored)
+(defun ndzim-arrange-tags (_entry)
   (let ((case-fold-search t))
     (goto-char (point-min))
     (while (re-search-forward "<b>\\(.+?\\)</b>" nil t)

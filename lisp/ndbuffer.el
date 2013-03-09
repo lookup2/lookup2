@@ -57,7 +57,7 @@
 ;;;
 
 (put 'ndbuffer :methods 'ndbuffer-dictionary-methods)
-(defun ndbuffer-dictionary-methods (ignored)
+(defun ndbuffer-dictionary-methods (_dictionary)
   '(exact prefix suffix substring)) ;text))
 
 (put 'ndbuffer :list 'ndbuffer-list)
@@ -140,32 +140,6 @@ REGULAR indicates if search is regular (not used for now)."
                         result)))
               (goto-char (point-max)))))))
     result))
-
-;(defun ndbuffer-content (file code content-tags entry-tags
-;                              head-tags code-tags)
-;  (destructuring-bind
-;      (content-tags ignored ignored code-tags)
-;      (ndtext-normalize-options code 'exact content-tags entry-tags head-tags code-tags)
-;    (let* ((regexp (ndbuffer-regexp code 'exact code-tags))
-;           (content-start (regexp-quote (car content-tags)))
-;           (content-end   (regexp-quote (cdr content-tags)))
-;           result start end)
-;      (with-current-buffer (find-file-noselect file)
-;        (save-excursion
-;          (goto-char (point-min))
-;          (while (re-search-forward regexp nil t)
-;            (save-excursion
-;              (or (re-search-forward content-end nil t)
-;                  (goto-char (point-max)))
-;              (setq end (point)))
-;            (save-excursion
-;              (or (re-search-backward content-start)
-;                  (goto-char (point-min)))
-;              (setq start (point)))
-;            (push (buffer-substring-no-properties start end)
-;                  result)
-;            (goto-char (point-max)))))
-;      result)))
 
 (defun ndbuffer-regexp (string method tags)
   "Construct regular expression."

@@ -119,8 +119,7 @@ Windows/Linux version (ver 1.97), it should be '~'"
   (mapcar (lambda (e) (lookup-new-dictionary agent (car e)))
           ndlatin-dictionary-table))
 
-(defun ndlatin-kill (ignored)
-  ;; AGENT is ignored
+(defun ndlatin-kill (_agent)
   (if ndlatin-process
       (lookup-process-kill ndlatin-process)))
 

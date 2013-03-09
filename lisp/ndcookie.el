@@ -35,8 +35,7 @@
 	  (directory-files (lookup-agent-location agent) nil "\\.lines\\'")))
 
 (put 'ndcookie :search 'ndcookie-dictionary-search)
-(defun ndcookie-dictionary-search (dictionary ignored)
-  ;; QUERY is ignored
+(defun ndcookie-dictionary-search (dictionary _query)
   (let ((file (lookup-get-property dictionary 'ndcookie-file)))
     (unless file
       (setq file (expand-file-name (lookup-dictionary-name dictionary)

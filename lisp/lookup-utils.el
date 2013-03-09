@@ -56,6 +56,8 @@
       (cl-acons key value (lookup-assoc-del alist key))
     (lookup-assoc-del alist key)))
 
+;; warning.  this function can not be used with lexically-scoped variables.
+;; see manual of `set' function for details.
 (defmacro lookup-assoc-set (symbol key value)
   `(set ,symbol (lookup-assoc-put (eval ,symbol) ,key ,value)))
 

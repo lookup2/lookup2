@@ -134,10 +134,6 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndtext :methods 'ndtext-dictionary-methods)
-(defun ndtext-dictionary-methods (ignored)
-  '(exact prefix suffix substring)) ;; text))
-
 (put 'ndtext :list 'ndtext-list)
 (defun ndtext-list (agent)
   "Return list of dictionaries of AGENT."
@@ -153,6 +149,10 @@
       (mapcar (lambda (name) 
                 (lookup-new-dictionary agent (file-name-nondirectory name)))
               (file-expand-wildcards (concat directory "/*" extension)))))))
+
+(put 'ndtext :methods 'ndtext-dictionary-methods)
+(defun ndtext-dictionary-methods (_dictionary)
+  '(exact prefix suffix substring)) ;; text))
 
 (put 'ndtext :title 'ndtext-title)
 (defun ndtext-title (dictionary)
@@ -207,7 +207,7 @@
                          'utf-8)))
     (or (gethash (cons dict-id code) ndtext-cache)
         (destructuring-bind 
-            (content-tags entry-tags head-tags code-tags ignored)
+            (content-tags entry-tags head-tags code-tags _entry-tags-list)
             (ndtext-dictionary-options dictionary)
           (ndtext-process backend 'content dict-id code 'code
                           content-tags entry-tags head-tags
@@ -382,7 +382,7 @@
 
 ;;; `ndtext' specific functions
 
-(defun ndtext-options (action single-line ignored) ;; content-tags
+(defun ndtext-options (action single-line _content-tags)
   `(,ndtext-grep-max-count-option 
     ,(if (eq action 'content) "1" (format "%d" lookup-max-hits))
     ,@(if single-line ndtext-grep-single-line-options ndtext-grep-multi-line-options)))

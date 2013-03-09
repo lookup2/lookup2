@@ -178,8 +178,7 @@ It should be set by preference file specifid by `:fmt' option."
   (or (lookup-get-property entry 'ndsrd-content) "(forgot)"))
 
 (put 'ndsrd :kill 'ndsrd-kill)
-(defun ndsrd-kill (ignored)
-  ;; AGENT is ignored
+(defun ndsrd-kill (_agent)
   (mapc (lambda (x)
           (if (file-exists-p x) (delete-file x)))
         ndsrd-temp-files)

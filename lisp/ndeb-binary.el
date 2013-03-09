@@ -495,13 +495,8 @@ corresponding eblook commands."
 	;; Get filename for MPEG playing without temporary file.
 	(let ((command (format "mpeg_path %s" target)))
 	  (setq file
-		(if (eq (lookup-agent-class
-			 (lookup-dictionary-agent dictionary))
-			'ndeb)
-		    (ndeb-with-dictionary dictionary
-		      (ndeb-process-require command))
-		  (ndebs-select-dictionary dictionary)
-		  (ndebs-require command))))
+                (ndeb-with-dictionary dictionary
+                  (ndeb-process-require command))))
 	(if (string-match "\nOK\n" file)
 	    (progn
 	      (string-match "^.+$" file)
@@ -521,7 +516,7 @@ corresponding eblook commands."
              dictionary program type target parameters file))))))))
 
 (defun ndeb-binary-play-with-external
-  (dictionary program type target parameters file)
+  (_dictionary program _type _target _parameters file)
   "Internal use. Play binary with external original mpeg movie file directly."
   (let* ((params (car program))
 	 (program (cdr program))
@@ -531,8 +526,7 @@ corresponding eblook commands."
 	(setq params (list params)))
     (when sep
       (save-match-data
-	(while (string-match "/" file)
-	  (setq file (replace-match sep t t file)))))
+        (setq file (replace-regexp-in-string "/" sep file t t))))
     (setq params (append params (list file)))
     (princ (mapconcat 'identity params " "))
     (condition-case err
@@ -632,7 +626,7 @@ FILE and confirm overwriting if necessary."
 		       (lookup-assq-get link 'parameters)
 		       file))
 
-(defun ndeb-binary-play-with-mci (dictionary type target parameters file)
+(defun ndeb-binary-play-with-mci (_dictionary _type _target _parameters file)
   "Play media link by MCI functions."
   (unless (functionp 'mw32-mci-send-string)
     (ndeb-binary-unbind-temporary-file file)
@@ -658,7 +652,7 @@ FILE and confirm overwriting if necessary."
    (t
     (error "Abnormal termination"))))
 
-(defun ndeb-binary-play-sound-file (dictionary type target parameters file)
+(defun ndeb-binary-play-sound-file (_dictionary _type _target _parameters file)
   "Play media link by play-sound-file function.
 When you use Meadow, use `ndeb-binary-play-with-mci'.
 Using this function with :snd-autoplay option is not recommendable."
@@ -912,7 +906,7 @@ Using this function with :snd-autoplay option is not recommendable."
 					  (concat id1 " " id2 " " id3 " " id4)))
 	  (error (message "%s" err)))))))
 
-(defun ndeb-arrange-image-page (entry)
+(defun ndeb-arrange-image-page (_entry)
   ;; 画像のarrange関数の後に呼ぶ事
   (when (search-forward  "<image-page>" nil t)
     (replace-match "")
@@ -995,20 +989,18 @@ Using this function with :snd-autoplay option is not recommendable."
 
 (defun ndeb-binary-clear-dictionary (dictionary)
   "Clear temporary files for DICTIONARY."
-  (let ((lookup-proceeding-message "Deleting"))
-    (mapc
-     (lambda (file)
-       (let ((name (cdr file)))
-	   (condition-case nil
-	       (progn
-		 (when (file-exists-p name)
-		   (lookup-with-message name
-		     (delete-file name)))
-		 (setq ndeb-binary-files
-		       (lookup-assoc-del ndeb-binary-files name)))
-	     (error nil))))
-     (lookup-get-property dictionary 'binary-files))
-    )
+  (mapc
+   (lambda (file)
+     (let ((name (cdr file)))
+       (condition-case nil
+           (progn
+             (when (file-exists-p name)
+               (lookup-with-message (concat "Deleting" name)
+                 (delete-file name)))
+             (setq ndeb-binary-files
+                   (lookup-assoc-del ndeb-binary-files name)))
+         (error nil))))
+   (lookup-get-property dictionary 'binary-files))
   (lookup-put-property dictionary 'binary-files nil))
 
 (defun ndeb-binary-clear (agent)

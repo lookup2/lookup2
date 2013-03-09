@@ -70,8 +70,7 @@
 ;;;
 
 (put 'nddsl :methods 'nddsl-dictionary-methods)
-(defun nddsl-dictionary-methods (ignored)
-  ;; DICTIONARY is ignored.
+(defun nddsl-dictionary-methods (_dictionary)
   '(exact prefix suffix substring text))
 
 (put 'nddsl :list 'nddsl-list)
@@ -160,8 +159,7 @@
        (reference nddsl-arrange-reference)
        (fill      nddsl-arrange-fill)))
 
-(defun nddsl-arrange-replaces (ignored)
-  ;; ENTRY is ignored
+(defun nddsl-arrange-replaces (_entry)
   (if (looking-at "\n+") (replace-match ""))
   (while (re-search-forward "<<" nil t)
     (replace-match "«") )
@@ -169,8 +167,7 @@
   (while (re-search-forward ">>" nil t)
     (replace-match "»")))
 
-(defun nddsl-arrange-structure (ignored)
-  ;; ENTRY is ignored
+(defun nddsl-arrange-structure (_entry)
   (if (re-search-forward "^[ \t]" nil t)
       (lookup-make-region-heading (point-min) (1- (match-beginning 0)) 1))
   (goto-char (point-min))
@@ -219,8 +216,7 @@
       (lookup-put-property entry :dynamic heading)
       (lookup-set-link start end entry))))
 
-(defun nddsl-arrange-fill (ignored)
-  ;; ENTRY is ignored
+(defun nddsl-arrange-fill (_entry)
   (while (re-search-forward "\\[m\\([0-9]\\)\\]" nil t)
     (let ((level (- (string-to-number (match-string 1))
 		     nddsl-minimum-indent))

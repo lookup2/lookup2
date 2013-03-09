@@ -96,8 +96,7 @@
 (defconst ndic-dictd-methods (remove 'text lookup-search-methods))
 
 (put 'ndic :methods 'ndic-dictionary-methods)
-(defun ndic-dictionary-methods (ignored)
-  ;; DICTIONARY is ignored
+(defun ndic-dictionary-methods (_dictionary)
   ndic-dictd-methods)
 
 (put 'ndic :search 'ndic-dictionary-search)

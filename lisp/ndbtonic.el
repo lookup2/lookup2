@@ -68,8 +68,7 @@
 (put 'ndbtonic :charsets '(ascii japanese-jisx0208))
 
 (put 'ndbtonic :methods 'ndbtonic-dictionary-methods)
-(defun ndbtonic-dictionary-methods (ignored)
-  ;; DICTIONARY is ignored
+(defun ndbtonic-dictionary-methods (_dictionary)
   '(exact prefix suffix substring text))
 
 (put 'ndbtonic :list 'ndbtonic-list)
@@ -172,27 +171,23 @@
 ;;; Formatting Functions
 ;;;
 
-(defun ndbtonic-arrange-replace (ignored)
-  ;; ENTRY is ignored
+(defun ndbtonic-arrange-replace (_entry)
   (while (re-search-forward "^[\t ]+" nil t)
     (replace-match "")))
 
-(defun ndbtonic-arrange-image (ignored)
-  ;; ENTRY is ignored
+(defun ndbtonic-arrange-image (_entry)
   (while (re-search-forward "<img resid=\"\\(.+?\\)\"/>" nil t)
     (replace-match "【画像】")))
 
-(defun ndbtonic-arrange-audio (ignored)
-  ;; ENTRY is ignored
+(defun ndbtonic-arrange-audio (_entry)
   (while (re-search-forward "<audio resid=\"\\(.+?\\)\"/>" nil t)
     (replace-match "【音声】")))
 
-(defun ndbtonic-dictionary-gaiji (ignored gaiji)
-  ;; DICTIONARY is ignored
+(defun ndbtonic-dictionary-gaiji (_dictionary gaiji)
   (list (apply 'string (mapcar (lambda (x) (string-to-number x 16))
                            (split-string gaiji "|" t)))))
 
-(defun ndbtonic-arrange-gaiji (ignored)
+(defun ndbtonic-arrange-gaiji (_dictionary)
   ;; for mojikyo characters, etc.
   )
 
@@ -213,7 +208,7 @@ link-item, heading, or code may be integer or function."
                                     code heading))
       (lookup-set-link start (point) entry))))
 
-(defun ndbtonic-arrange-structure (ignored)
+(defun ndbtonic-arrange-structure (_entry)
   (while (re-search-forward "<key type=\"ソート用かな\">.+?</key>" nil t)
     (replace-match ""))
   (goto-char (point-min))

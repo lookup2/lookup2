@@ -155,7 +155,7 @@
   (ndict-with-agent agent
     ;; get server information
     (let* ((server (ndict-process-require "SHOW SERVER"
-		     (lambda (ignored)
+		     (lambda (_process)
 		       (forward-line)
 		       (buffer-substring (point) (line-end-position)))))
 	   (system (if (string-match "^dictd " server) 'dictd t))
@@ -165,7 +165,7 @@
 	(setf (lookup-agent-option agent :method-table) method-table)))
     ;; get dictionary list
     (ndict-process-require "SHOW DB"
-      (lambda (ignored)
+      (lambda (_process)
 	(let (name title dicts)
 	  (when (looking-at "110")
 	    (forward-line)
@@ -197,7 +197,7 @@
       (when (or (eq 'undecided (car string-coding-systems))
                 (memq (ndict-agent-coding ndict-current-agent) string-coding-systems))
         (ndict-process-require (format "MATCH %s %s '%s'" db strategy string)
-          (lambda (ignored)
+          (lambda (_process)
             (when (looking-at "152")
               (forward-line)
               (narrow-to-region (point) (re-search-forward "^\\.$"))
@@ -216,7 +216,7 @@
     (let ((db (lookup-dictionary-name ndict-current-dictionary))
 	  (word (lookup-entry-code entry)))
       (ndict-process-require (format "DEFINE %s %s" db word)
-	(lambda (ignored)
+	(lambda (_process)
 	  (when (looking-at "150")
 	    (forward-line 2)
 	    (buffer-substring (point) (progn (re-search-forward "^\\.$")

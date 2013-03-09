@@ -33,18 +33,15 @@
   (list (lookup-new-dictionary agent "tutorial")))
 
 (put 'ndtut :search 'ndtut-dictionary-search)
-(defun ndtut-dictionary-search (dictionary ignored)
-  ;; QUERY is ignored
+(defun ndtut-dictionary-search (dictionary _query)
   (list (lookup-new-entry 'regular dictionary "")))
 
 (put 'ndtut :heading 'ndtut-entry-heading)
-(defun ndtut-entry-heading (ignored)
-  ;; ENTRY is ignored
+(defun ndtut-entry-heading (_entry)
   "Welcome to Lookup!")
 
 (put 'ndtut :content 'ndtut-entry-content)
-(defun ndtut-entry-content (ignored)
-  ;; ENTRY is ignored
+(defun ndtut-entry-content (_entry)
   "Display tutorial for dummy ENTRY."
   "Welcome to Lookup!
 

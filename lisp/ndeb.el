@@ -23,6 +23,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 (require 'lookup)
 (defconst ndeb-version "0.1")
 
@@ -107,14 +108,11 @@
 
 
 ;;;
-;;; Internal variables
+;;; Internal Variables
 ;;;
 
 (defvar ndeb-process nil
   "Process object for ndeb agents.")
-
-(defvar ndeb-status nil
-  "process stataus cache.")
 
 (defvar ndeb-vars nil
   "process variables cache.")
@@ -128,73 +126,10 @@
 Zero or negative value mean that feature is not supported.
 Nil means it has not been checked yet.")
 
-;;;
-;:: types
-;;;
-
-;; lookup agent command
-(put 'ndeb :list      'ndeb-list)
-(put 'ndeb :kill      'ndeb-kill)
-
-;; lookup dictionary command
-(put 'ndeb :title     'ndeb-dictionary-title)
-(put 'ndeb :methods   'ndeb-dictionary-methods)
-(put 'ndeb :menu      'ndeb-dictionary-menu)
-(put 'ndeb :search    'ndeb-dictionary-search)
-(put 'ndeb :content   'ndeb-entry-content)
-
-;; arrangements
-(put 'ndeb :arrange-table
-     '((replace   ndeb-arrange-auto-jump-reference
-                  lookup-arrange-replaces
-                  ndeb-arrange-xbm
-                  ndeb-arrange-bmp
-                  ndeb-arrange-jpeg
-                  ndeb-arrange-image-page
-                  ndeb-arrange-wave
-                  ndeb-arrange-mpeg
-                  ndeb-arrange-unicode
-                  ndeb-arrange-scripts
-                  ndeb-arrange-faces
-                  ndeb-arrange-no-newline
-                  ndeb-arrange-decode-entity)
-       (gaiji     lookup-arrange-gaijis)
-       (reference ndeb-arrange-paged-reference
-                  ndeb-arrange-squeezed-references
-                  lookup-arrange-references)
-       (structure 
-                  ndeb-arrange-prev-next ; to obtain prev/next entry.
-                  ndeb-arrange-indent
-                  lookup-arrange-structure)
-       (fill      lookup-arrange-fill-lines
-                  ndeb-arrange-snd-autoplay)))
-
-;; lookup content-arrangement functions and options
-(put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
-(put 'ndeb :gaiji     'ndeb-dictionary-gaiji)
-
-(put 'ndeb :media-pattern '())
-(put 'ndeb :media     'ndeb-dictionary-media)
-
-(put 'ndeb :reference-pattern
-     '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
-
-(put 'ndeb :charsets
-     '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
-
-
-;;;
-;;; Dictionary Options
-;;;
-
-;; Options used by agent.
-(put 'ndeb :stop-code     nil)
-
 
 ;;;
 ;;; Internal constants
 ;;;
-
 (defconst ndeb-method-table
   '((exact . "exact") (prefix . "word") (suffix . "endword") (wild . "wild")))
 
@@ -208,18 +143,18 @@ Nil means it has not been checked yet.")
     ("bold" . lookup-bold-face)
     ("em" . lookup-emphasis-face)))
 
-
-;; ndeb entry:
-;;
-;; CODE    - entry specific code (e.g. "2c00:340") by eblook `search' command
-;; HEADING - given by eblook `search' command
-
-(defun ndeb-new-entry (type code &optional heading)
-  (lookup-new-entry type ndeb-current-dictionary code heading))
-
 ;;;
-;;; macros
+;;; macros & basic functions
 ;;;
+
+;;; Get/Set functions
+
+(defun ndeb-vars-get (var)
+  (lookup-assoc-get ndeb-vars var))
+
+(defun ndeb-vars-set (var value)
+  (setq ndeb-vars
+	(lookup-assoc-put ndeb-vars var value)))
 
 (defmacro ndeb-with-agent (agent &rest body)
   (declare (indent 1))
@@ -231,7 +166,7 @@ Nil means it has not been checked yet.")
              appendix (lookup-agent-option ,agent :appendix))
        (ndeb-process-require
         (concat "book " book " " appendix)
-        (lambda (ignored)
+        (lambda (_process)
           (if (search-forward "invalid book" nil t)
               (error "Invalid dictionary directory: %s" book))
           (if (search-forward "invalid appendix" nil t)
@@ -247,13 +182,14 @@ Nil means it has not been checked yet.")
        (unless (eq ,dictionary
                    (lookup-get-property ndeb-current-agent :ndeb-dict))
          (ndeb-process-require
-             (concat "select " (lookup-dictionary-name ,dictionary)))
+           (concat "select " (lookup-dictionary-name ,dictionary)))
          (lookup-put-property ndeb-current-agent :ndeb-dict
                               ,dictionary))
        ,@body)))
 
 ;; send the COMMAND to `eblook' and process FILTER if given.
 (defun ndeb-process-require (command &optional filter)
+  (declare (indent 1))
   (let ((lookup-process-output-separator-lines 0))
     (lookup-process-require 
      ndeb-process
@@ -280,7 +216,6 @@ Nil means it has not been checked yet.")
 		      (lookup-temp-buffer))))
       (setq ndeb-process (apply 'start-process "ndeb" buffer
 				 ndeb-program-name ndeb-program-arguments)
-	    ndeb-status nil
 	    ndeb-vars nil)
       (set-process-coding-system ndeb-process
 				 ndeb-process-coding-system
@@ -298,8 +233,7 @@ Nil means it has not been checked yet.")
       (unless lookup-enable-debug
 	(set-process-buffer ndeb-process nil)
 	(kill-buffer buffer)))
-    ;;(ndeb-process-require-set "prompt" "")
-    (ndeb-process-require-set "prompt" ndeb-prompt-string)
+    ;; (ndeb-process-require-set "prompt" ndeb-prompt-string)
     (ndeb-process-require-set "decorate-mode" "on")
 
     ;; Check if eblook support escape text feature.
@@ -310,35 +244,68 @@ Nil means it has not been checked yet.")
     (when (> ndeb-support-escape-text 0)
       (ndeb-process-require-set "escape-text" "on"))))
 
+(defun ndeb-new-entry (type code &optional heading)
+  (lookup-new-entry type ndeb-current-dictionary code heading))
+
 
-
 ;;;
-;;; Interface Functions 
+;;; Interaces
 ;;;
 
-;; <:list>
+;; arrangements
+(put 'ndeb :arrange-table
+     '((replace   ndeb-arrange-auto-jump-reference
+                  lookup-arrange-replaces
+                  ndeb-arrange-xbm
+                  ndeb-arrange-bmp
+                  ndeb-arrange-jpeg
+                  ndeb-arrange-image-page
+                  ndeb-arrange-wave
+                  ndeb-arrange-mpeg
+                  ndeb-arrange-unicode
+                  ndeb-arrange-scripts
+                  ndeb-arrange-faces
+                  ndeb-arrange-no-newline
+                  ndeb-arrange-decode-entity)
+       (gaiji     lookup-arrange-gaijis)
+       (reference ndeb-arrange-paged-reference
+                  ndeb-arrange-squeezed-references
+                  lookup-arrange-references)
+       (structure ndeb-arrange-prev-next ; to obtain prev/next entry.
+                  ndeb-arrange-indent
+                  lookup-arrange-structure)
+       (fill      lookup-arrange-fill-lines
+                  ndeb-arrange-snd-autoplay)))
+
+(put 'ndeb :reference-pattern
+     '("<reference>\\(→?\\(\\(.\\|\n\\)*?\\)\\)</reference=\\([^>]+\\)>" 1 2 4))
+(put 'ndeb :charsets
+     '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
+(put 'ndeb :stop-code     nil)
+
+(put 'ndeb :list 'ndeb-list)
 (defun ndeb-list (agent)
   (when ndeb-program-name
     (ndeb-with-agent agent
       (ndeb-process-require
        "list"
-       (lambda (ignored)
+       (lambda (_process)
          (let (dicts)
            (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)" nil t)
-             (setq dicts (cons (lookup-new-dictionary ndeb-current-agent
-                                                      (match-string 1)) dicts)))
+             (push (lookup-new-dictionary ndeb-current-agent (match-string 1))
+                   dicts))
            (nreverse dicts)))))))
 
-;; <:kill>
+(put 'ndeb :kill 'ndeb-kill)
 (defun ndeb-kill (agent)
   (ndeb-agent-kill-process agent)
   (ndeb-binary-clear agent))
 
-;; <:title>
+(put 'ndeb :title 'ndeb-dictionary-title)
 (defun ndeb-dictionary-title (dictionary)
   (ndeb-dictionary-get-info dictionary "title"))
 
-;; <:methods>
+(put 'ndeb :methods 'ndeb-dictionary-methods)
 (defun ndeb-dictionary-methods (dictionary)
   (let ((string (ndeb-dictionary-get-info dictionary "search methods"))
         methods)
@@ -353,7 +320,7 @@ Nil means it has not been checked yet.")
           (setq methods (cons 'exact methods))))
     methods))
 
-;; <:menu>
+(put 'ndeb :menu 'ndeb-dictionary-menu)
 (defun ndeb-dictionary-menu (dictionary)
   (ndeb-initialize-dictionary dictionary)
   (ndeb-with-dictionary dictionary
@@ -375,70 +342,46 @@ Nil means it has not been checked yet.")
       )
   (nconc menu image-menu copyright))))
 
-;; <:search>
+(put 'ndeb :search 'ndeb-dictionary-search)
 (defun ndeb-dictionary-search (dictionary query)
   "Search EB DICTIONARY for QUERY."
   (ndeb-initialize-dictionary dictionary)
   (ndeb-with-dictionary dictionary
-    (let ((method (lookup-query-method query))
-	  (string (lookup-query-string query))
-	  (last (lookup-get-property ndeb-current-agent 'ndeb-method))
-	  cmd)
-      (setq string
-            (replace-regexp-in-string 
-             "\\cC"
-             (lambda (ch) (if (encode-char (string-to-char ch) 'japanese-jisx0208)
-                              ch (format "%X" (string-to-char ch))))
-             string))
-      (cond
-       ((eq method 'keyword)
-	(let (qstring)
-	  (setq qstring string)
-	  (while (string-match "[ \t　]+" qstring)
-	    (setq qstring (replace-match "=" nil t qstring)))
-	  (setq cmd
-		(format "set search-method keyword\nsearch \"=%s\"\n"
-			(ndeb-escape-query qstring)))
-	  
-	  (setq qstring string)
-	  (while (string-match "[ \t　]+" qstring)
-	    (setq qstring (replace-match "&" nil t qstring)))
-	  (setq cmd
-		(concat cmd (format "set search-method cross\nsearch \"&%s\""
-				    (ndeb-escape-query qstring))))
-	  (lookup-put-property ndeb-current-agent 'ndeb-method "cross")))
-       (t
-	(when (eq method 'substring)
-	  (setq method 'wild
-		string (concat "*" string "*")))
-	(unless (eq method last)
-	  ;; 必要のあるときだけ search-method を設定する。ndeb-dict に同じ。
-	  (ndeb-process-require-set "search-method"
-			    (lookup-assq-get ndeb-method-table method))
-	  (lookup-put-property ndeb-current-agent 'ndeb-method method))
-	(setq cmd (format "search \"%s\"" (ndeb-escape-query string)))))
-      (ndeb-process-require cmd
-        (lambda (ignored)
-	  (let (code heading dupchk entries)
-            ;(save-excursion
-            ;  (while (re-search-forward "^.*empty.*" nil t)
-            ;    (message "warining! %s" (match-string 0))))
+    (let* ((method (lookup-query-method query))
+           (string (ndeb-escape-kanji (lookup-query-string query)))
+           (last-method (lookup-get-property ndeb-current-agent 'ndeb-method))
+           (ndeb-method (or (lookup-assq-get ndeb-method-table method)
+                            (and (equal method 'keyword) "cross")
+                            (and (equal method 'substring) "wild")))
+           (command
+            (case method
+              ('keyword
+               (concat
+                "set search-method keyword\n"
+                "search \"=" (replace-regexp-in-string "[ \t　]+" "=" string) "\"\n"
+                "set search-method cross\n"
+                "search \"&" (replace-regexp-in-string "[ \t　]+" "&" string) "\""))
+              ('substring
+               (concat "search \"*" string "*\""))
+              (t 
+               (concat "search \"" (ndeb-escape-query string) "\"")))))
+      (unless (eq method last-method)
+        ;; 必要のあるときだけ search-method を設定する。ndeb-dict に同じ。
+        (ndeb-process-require-set "search-method" ndeb-method)
+        (lookup-put-property ndeb-current-agent 'ndeb-method method))
+      (ndeb-process-require command
+        (lambda (_process)
+	  (let (results)
 	    (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)\t\\(.*\\)" nil t)
-	      (setq code (match-string 1) heading (match-string 2))
-	      ;; 同じエントリがあるかチェックする。
-	      ;; これがけっこうあるんだ・・
-	      (unless (member (cons code heading) dupchk)
-		(setq entries (cons (ndeb-new-entry 'regular code heading) entries))
-		(setq dupchk (cons (cons code heading) dupchk))))
-            ;(when (re-search-forward "<more point=\\([0-9]*\\)>" nil t)
-            ;  (setq entry (ndeb-new-entry 'dynamic "more"))
-            ;  (lookup-put-property entry 'ndeb-query query)
-            ;  (lookup-put-property entry 'ndeb-offset
-            ;                       (string-to-int (match-string 1)))
-            ;  (setq entries (cons entry entries)))
-	    (nreverse entries)))))))
+              (push (cons (match-string 1) (match-string 2)) results))
+            ;; 重複の削除
+            (cl-delete-duplicates results :test 'equal)
+            (mapcar (lambda (result)
+                      (ndeb-new-entry 'regular (car result) (cdr result)))
+                    (nreverse results))))))))
 
-;; <:gaiji>
+(put 'ndeb :gaiji-regexp  "<gaiji=\\([^>]*\\)>")
+(put 'ndeb :gaiji 'ndeb-dictionary-gaiji)
 (defun ndeb-dictionary-gaiji (dictionary code)
   (ndeb-with-dictionary dictionary
     (let ((height (lookup-dictionary-option dictionary :gaiji-size t))
@@ -470,7 +413,7 @@ Nil means it has not been checked yet.")
         (when  (string-match "default_width" xbm)
           (list (vector 'xbm xbm)))))))
 
-;; <:content>
+(put 'ndeb :content 'ndeb-entry-content)
 (defun ndeb-entry-content (entry)
   (ndeb-initialize-dictionary (lookup-entry-dictionary entry))
   (or (lookup-get-property entry 'ndeb-content)
@@ -545,14 +488,13 @@ Nil means it has not been checked yet.")
       (lookup-process-kill process)
       (lookup-put-property agent 'ndeb-process nil))))
 
-
 (defun ndeb-dictionary-get-info (dictionary key)
   (let ((alist (lookup-get-property dictionary 'ndeb-alist)))
     (unless alist
       (setq alist
 	    (ndeb-with-dictionary dictionary
 	      (ndeb-process-require "subinfo"
-		(lambda (ignored)
+		(lambda (_process)
 		  (let (alist)
 		    (while (re-search-forward "^ \\([^:]+\\): \\(.*\\)" nil t)
 		      (setq alist
@@ -561,14 +503,21 @@ Nil means it has not been checked yet.")
       (lookup-put-property dictionary 'ndeb-alist alist))
     (lookup-assoc-get alist key)))
 
-(defun ndeb-escape-query (string)
-  (let ((start 0))
-    (while (string-match "\\\\" string start)
-      (setq string (replace-match "\\\\" t t string)
-	    start (1+ (match-end 0)))))
-  string)
+(defun ndeb-escape-kanji (string)
+  (replace-regexp-in-string 
+   "\\cC"
+   (lambda (ch) (if (encode-char (string-to-char ch) 'japanese-jisx0208)
+                    ch (format "%X" (string-to-char ch))))
+   string))
 
+(defun ndeb-escape-query (string)
+  (replace-regexp-in-string "\\\\" "\\\\" string t t))
+
+
+
+;;;
 ;;; Arrange fnctions
+;;;
 
 (defun ndeb-arrange-squeezed-references (entry)
   (if (lookup-dictionary-option
@@ -576,8 +525,7 @@ Nil means it has not been checked yet.")
       (while (search-forward-regexp "→□\\(#0001\\|<gaiji:z0001>\\)?" nil t)
 	(replace-match ""))))
 
-(defun ndeb-arrange-no-newline (ignored)
-  ;; ENTRY is ignored
+(defun ndeb-arrange-no-newline (_entry)
   (while (search-forward "<no-newline>" nil t)
     (let ((beg-beg (match-beginning 0))
 	  (beg-end (match-end 0)))
@@ -606,8 +554,7 @@ Nil means it has not been checked yet.")
     (if (re-search-forward "\\(</prev>\\|</next>\\)" nil t)
 	(replace-match ")"))))
 
-(defun ndeb-arrange-paged-reference (ignored)
-  ;; ENTRY is ignored
+(defun ndeb-arrange-paged-reference (_entry)
   (while (re-search-forward "<paged-reference=\\([0-9]+:[0-9]+\\)>" nil t)
     (let ((pos (match-string 1))
 	  (start (match-beginning 0))
@@ -654,8 +601,7 @@ Nil means it has not been checked yet.")
 	(set-left-margin point indent-end level)
 	(goto-char point))))))
 
-(defun ndeb-arrange-unicode (ignored)
-  ;; ENTRY is ignored
+(defun ndeb-arrange-unicode (_entry)
   (while (re-search-forward "<unicode>\\([0-9A-F０-９Ａ-Ｆ]+\\)</unicode>" nil t)
     (replace-match 
      (save-match-data
@@ -688,8 +634,7 @@ Nil means it has not been checked yet.")
 	    (delete-region end-beg (match-end 0)))
 	(goto-char beg-beg)))))
 
-(defun ndeb-arrange-faces (ignored)
-  ;; ENTRY is ignored
+(defun ndeb-arrange-faces (_entry)
   (while (re-search-forward "<\\(/?\\)em>" nil t)
     (if (equal (match-string 1) "/")
 	(replace-match "</font>" t t)
@@ -720,8 +665,7 @@ Nil means it has not been checked yet.")
 	(goto-char beg-beg)
 	(delete-region beg-beg beg-end)))))
 
-(defun ndeb-arrange-decode-entity (ignored)
-  ;; ENTRY is ignored
+(defun ndeb-arrange-decode-entity (_entry)
   (when (> ndeb-support-escape-text 0)
     (while (re-search-forward "&\\(amp\\|lt\\|gt\\);" nil t)
       (let* ((pos (match-beginning 0))
@@ -730,22 +674,6 @@ Nil means it has not been checked yet.")
 			ndeb-entities-table (match-string 1)) t t)
 	(set-text-properties pos (1+ pos) properties)
 	(goto-char (1+ pos))))))
-
-;;; Get/Set functions
-
-(defun ndeb-status-get (key)
-  (lookup-assq-get ndeb-status key))
-
-(defun ndeb-status-set (key value)
-  (setq ndeb-status
-	(lookup-assq-put ndeb-status key value)))
-
-(defun ndeb-vars-get (var)
-  (lookup-assoc-get ndeb-vars var))
-
-(defun ndeb-vars-set (var value)
-  (setq ndeb-vars
-	(lookup-assoc-put ndeb-vars var value)))
 
 (provide 'ndeb)
 

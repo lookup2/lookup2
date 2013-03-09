@@ -103,9 +103,8 @@
       (list (lookup-new-dictionary agent "")))))
 
 (put 'ndwnj :title 'ndwnj-title)
-(defun ndwnj-title (ignored)
-  ;; DICTIONARY is ignored
-  "Wordnet 日本語")
+(defun ndwnj-title (_dictionary)
+  "日本語 WordNet")
 
 (put 'ndwnj :clear 'ndwnj-clear)
 (defun ndwnj-clear (dictionary)
@@ -151,7 +150,7 @@
 ;;; Arrange functions
 ;;;
 
-(defun ndwnj-arrange-headings (ignored)
+(defun ndwnj-arrange-headings (_entry)
   (while (re-search-forward
 	  "^\\( *\\)\\(\\(\\[[^][]+\\]\\)\\|\\([a-zA-Z]+:\\)\\)" nil t)
     (cond
@@ -209,7 +208,7 @@
                        (> lookup-max-hits 0))
               (concat "LIMIT " (number-to-string lookup-max-hits)))
             ";")
-    (lambda (ignored)
+    (lambda (_process)
       (let (entries)
         (while (re-search-forward "^\\(.+\\)|\\(.+\\)|\\(.+\\)$" nil t)
           (lookup-debug-message "hit! buffer=%s" (match-string 0))
@@ -224,7 +223,7 @@
 	    "(SELECT wordid FROM sense WHERE synset = '"
 	    (ndwnj-escape-string code)
 	    "') ORDER BY lang DESC;")
-    (lambda (ignored)
+    (lambda (_process)
       (let (lemma lang elt (results (make-hash-table :test 'equal))  result)
 	(while (re-search-forward "^\\(.+\\)|\\(.+\\)$" nil t)
 	  (setq lemma (match-string 1)
@@ -242,7 +241,7 @@
     (concat "SELECT lang, def FROM synset_def WHERE synset = '"
 	    (ndwnj-escape-string code)
 	    "' ORDER BY lang;")
-    (lambda (ignored)
+    (lambda (_process)
       (let (results)
         (while (re-search-forward "^\\(.+\\)|\\(.+\\)$" nil t)
           (push (concat (match-string 1) ": " (match-string 2)) results))
@@ -256,7 +255,7 @@
 	    "WHERE synlink.synset1 = '"
 	    (ndwnj-escape-string code)
 	    "' ORDER BY synlink.link DESC, synset.name;")
-    (lambda (ignored)
+    (lambda (_process)
       (let (target name syn elt (results (make-hash-table :test 'equal)) result)
 	(while (re-search-forward "^\\(.+\\)|\\(.+\\)|\\(.+\\)$" nil t)
 	  (setq target (match-string 1)

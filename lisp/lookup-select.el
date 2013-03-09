@@ -327,8 +327,7 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
               (nconc dicts (nreverse diffs)))))
   (lookup-select-update-buffer))
 
-(defun lookup-select-wrap-command (ignored)
-  ;; ARG is ignored
+(defun lookup-select-wrap-command (_arg)
   "Call the corresponding global command with keys and reset dictionaries.
 This command should be binded for the same keys with the commands
 `kill-line', `yank', `yank-pop',`transpose-lines', or `undo'.

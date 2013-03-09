@@ -62,10 +62,6 @@
 ;;; Interface functions
 ;;;
 
-(put 'ndsary :methods 'ndsary-dictionary-methods)
-(defun ndsary-dictionary-methods (ignored)
-  `(exact prefix suffix substring))
-
 (put 'ndsary :list 'ndsary-list)
 (defun ndsary-list (agent)
   "Return list of dictionaries of AGENT."
@@ -82,6 +78,10 @@
                 (lookup-new-dictionary agent (file-name-nondirectory 
                                               (file-name-sans-extension name))))
               (file-expand-wildcards (concat directory "/*" ".ary")))))))
+
+(put 'ndsary :methods 'ndsary-dictionary-methods)
+(defun ndsary-dictionary-methods (_dictionary)
+  `(exact prefix suffix substring))
 
 (put 'ndsary :title 'ndsary-title)
 (defun ndsary-title (dictionary)
@@ -122,16 +122,13 @@
               (y-or-n-p 
                (format "ndsary: %s are hit.  Display them all?" num))) t)))
 
-(defun ndsary-options (ignored single-line content-tags)
-  ;; ACTION is ignored.
+(defun ndsary-options (_action single-line content-tags)
   (unless single-line (list "-s" (car content-tags) "-e" (cdr content-tags))))
 
-(defun ndsary-pattern (string method content-tags tags single-line)
-  ;; CONTENT-TAGS and SINGLE-LINE are ignored.
+(defun ndsary-pattern (string method _content-tags tags _single-line)
   "Costruct search pattern from query STRING and METHOD for `sary'.
 If START tag is provided, then that will be attached.
 If END tag is provided, then that will also be attached."
-  (identity content-tags) (identity single-line)
     (concat (if (or (equal method 'exact)
                     (equal method 'prefix))
                 (or (car tags) "\n"))
