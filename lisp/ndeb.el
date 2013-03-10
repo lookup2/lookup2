@@ -2,6 +2,7 @@
 ;; Copyright (C) 2006 Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
+;;         KAWABATA, Taichi <kawabata.taichi@gmail.com>
 
 ;; ndeb.el is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
@@ -68,13 +69,17 @@
   :type 'string
   :group 'ndeb)
 
-(defcustom ndeb-max-text nil
-  "*Maximum text size for ndeb agent."
+(defcustom ndeb-max-text 81920
+  "*Maximum text size for ndeb agent.
+If you encounter \"<more point=5>\" or similar message at the end
+of buffer, please increase this size, or set to 0 for unlimited."
   :type 'integer
   :group 'ndeb)
 
 (defcustom ndeb-gaiji-size 16
-  "デフォルトで使用する外字のサイズ。指定したサイズの外字が存在しない場合は指定値を越えない最大サイズを、それも存在しない場合は16ドットの外字を使用する。"
+  "デフォルトで使用する外字のサイズ。指定したサイズの外字が存在し
+ない場合は指定値を越えない最大サイズを、それも存在しない場合は16ドッ
+トの外字を使用する。"
   :type '(choice :tag "size"
 		 (const 16)
 		 (const 24)
@@ -97,13 +102,17 @@
 	  (sexp :tag "other"))
   :group 'ndeb)
 
-(defcustom ndeb-gaiji-map-directory (concat lookup-init-directory "/epwing-gaiji")
-  "Default directory to search for GAIJI file if not found in dictionaries' directory."
-  :type '(choice 
-	  (list :tag "step" (const -) (integer :tag "count" :value 2))
-	  (number :tag "scale factor" :value 0.8)
-	  (function :tag "function")
-	  (sexp :tag "other"))
+(defcustom ndeb-gaiji-map-directory (concat lookup-init-directory
+                                            "/epwing-gaiji")
+  "Default directory to search for GAIJI file if not found in
+dictionaries' directory."
+  :type 'string
+  :group 'ndeb)
+
+(defcustom ndeb-alternate-file (concat ndeb-gaiji-map-directory
+                                    "/alternate.ini")
+  "File that describes query character filter table."
+  :type 'string
   :group 'ndeb)
 
 
@@ -125,6 +134,9 @@
   "Positive numeric value means that eblook supports text escape.
 Zero or negative value mean that feature is not supported.
 Nil means it has not been checked yet.")
+
+(defvar ndeb-alternate-table nil)
+(defvar ndeb-alternate-regexp nil)
 
 
 ;;;
@@ -281,6 +293,8 @@ Nil means it has not been checked yet.")
      '(ascii japanese-jisx0213.2004-1 japanese-jisx0213-2 japanese-jisx0212))
 (put 'ndeb :stop-code     nil)
 
+(put 'ndeb :query-filter 'ndeb-query-filter-alternate)
+
 (put 'ndeb :list 'ndeb-list)
 (defun ndeb-list (agent)
   (when ndeb-program-name
@@ -374,7 +388,7 @@ Nil means it has not been checked yet.")
 	    (while (re-search-forward "^[^.]+\\. \\([^\t]+\\)\t\\(.*\\)" nil t)
               (push (cons (match-string 1) (match-string 2)) results))
             ;; 重複の削除
-            (cl-delete-duplicates results :test 'equal)
+            (setq results (delete-dups results))
             (mapcar (lambda (result)
                       (ndeb-new-entry 'regular (car result) (cdr result)))
                     (nreverse results))))))))
@@ -478,6 +492,32 @@ Nil means it has not been checked yet.")
           (setq gaiji-data (cons (list (downcase gaiji) ucs)
                                  gaiji-data)))))
     (lookup-new-gaiji-table gaiji-data)))
+
+(defun ndeb-setup-query-filter-alternate ()
+  (or ndeb-alternate-regexp
+      (when (file-exists-p ndeb-alternate-file)
+        (with-temp-buffer
+          (insert-file-contents ndeb-alternate-file)
+          (setq ndeb-alternate-table (make-hash-table))
+          (while (re-search-forward "^u\\([0-9A-F]+\\)\t\\([^\t\n]+\\)\\>" nil t)
+            (unless (equal " " (match-string 1))
+              (puthash (string-to-number (match-string 1) 16) (match-string 2)
+                       ndeb-alternate-table)))
+          (setq ndeb-alternate-regexp
+                (regexp-opt
+                 (loop for char being the hash-keys of ndeb-alternate-table
+                   collect (char-to-string char))))))))
+
+(defun ndeb-string-filter-alternate (string)
+  (if (ndeb-setup-query-filter-alternate)
+      (replace-regexp-in-string
+       ndeb-alternate-regexp
+       (lambda (str) (gethash (string-to-char str) ndeb-alternate-table))
+       string)
+    string))
+
+(defun ndeb-query-filter-alternate (query)
+  (lookup-new-query-filter query 'ndeb-string-filter-alternate))
 
 (defun ndeb-agent-kill-process (agent)
   (let ((process (lookup-get-property agent 'ndeb-process)))
