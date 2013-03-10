@@ -87,6 +87,12 @@
                                         ndzim-arrange-tags)
                              (fill      lookup-arrange-nofill)))
 
+(put 'ndzim :clear 'ndzim-clear)
+(defun ndzim-clear (_dictionary)
+  (let ((directory (concat temporary-file-directory "/ndzim/")))
+    (when (file-directory-p directory)
+      (delete-directory directory t t))))
+
 ;;; Supplementary Functions
 
 (defun ndzim--dictionary-file (dictionary)
@@ -106,10 +112,10 @@
 
 (defun ndzim-dump-url (url file)
   (unless (string-match "^[-ABIJMUVWX]/" url) (error "Improper ZIM URL!"))
-  (let* ((url-file (concat temporary-file-directory "/" url))
+  (let* ((url-file (concat temporary-file-directory "/ndzim/" url))
          (directory (file-name-directory url-file)))
-    (unless (file-directory-p directory) (make-directory directory))
-    (message "url-file=%s" url-file)
+    (unless (file-directory-p directory) (make-directory directory t))
+    (lookup-debug-message "url-file=%s" url-file)
     (unless (file-exists-p url-file)
       (call-process ndzim-dump nil (list :file url-file) nil
                     "-u" url "-d" (file-truename file)))
@@ -148,7 +154,7 @@
       (if (re-search-forward "redirect index: *\\(.*\\)" nil t)
           (setq redirection (match-string 1)))
       (if redirection
-          (setq redirection (ndzim-info redirection nil file)))
+          (cl-callf ndzim-info redirection nil file))
       (list (concat namespace "/" url) title redirection)
       )))
 
