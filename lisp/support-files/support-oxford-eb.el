@@ -1,4 +1,4 @@
-;;; support-oxford.el --- suport file for "Oxford Dictionary/Thesaurus"
+;;; support-oxford-eb.el --- suport file for "Oxford Dictionary/Thesaurus"
 ;; Copyright (C) 2000 Keisuke Nishida <knsihida@ring.gr.jp>
 
 ;; This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 (defvar ipaface 'default)
 
 (let 
-  ((encoded-oxford-gaiji-table
+  ((encoded-oxford-eb-gaiji-table
     '(
       ("h0f01" "=")
       ("h0f02" "=")
@@ -272,7 +272,7 @@
       ("h0ffd" "ô")
       ("h0ffe" "ñ")
       ("h1001" "="))))
-  (defconst oxford-gaiji-table
+  (defconst oxford-eb-gaiji-table
     (lookup-new-gaiji-table
      (mapcar 
       '(lambda (x)
@@ -281,9 +281,9 @@
              (concat "gaiji:" (car x))
            (car x))
          (cadr x)))
-      encoded-oxford-gaiji-table))))
+      encoded-oxford-eb-gaiji-table))))
 
-(defun oxford-arrange-structure (entry)
+(defun oxford-eb-arrange-structure (entry)
   (goto-char (point-min))
   (forward-line 1)
   (and
@@ -371,15 +371,14 @@
   (while (re-search-forward "/[^/]*/" nil t)
     (put-text-property (match-beginning 0)
 		       (match-end 0)
-		       'face ipaface))
-  )
+		       'face ipaface)))
 
 (setq lookup-support-options
       (list :title "Oxford Dictionary"
 	    :coding 'iso-8859-1
 	    :stop-code "0x1f090000"
-	    :gaiji-table   oxford-gaiji-table
-	    :arranges '((structure oxford-arrange-structure))
+	    :gaiji-table   oxford-eb-gaiji-table
+	    :arranges '((structure oxford-eb-arrange-structure))
             :query-filter 'lookup-query-filter-stem-english))
 
-;;; support-oxford.el ends here
+;;; support-oxford-eb.el ends here
