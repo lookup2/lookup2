@@ -23,9 +23,13 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(require 'cl-lib)
+(eval-when-compile (require 'cl-lib))
 (require 'lookup-vars)
 (declare-function lookup-text-wakati "lookup-text")
+
+;; warning.  lookup-{assq/assoc}-set functions can not be used with
+;; lexically-scoped variables.  see manual of `set' function for
+;; details.
 
 ;; alist by assq
 
@@ -56,8 +60,6 @@
       (cl-acons key value (lookup-assoc-del alist key))
     (lookup-assoc-del alist key)))
 
-;; warning.  this function can not be used with lexically-scoped variables.
-;; see manual of `set' function for details.
 (defmacro lookup-assoc-set (symbol key value)
   `(set ,symbol (lookup-assoc-put (eval ,symbol) ,key ,value)))
 
