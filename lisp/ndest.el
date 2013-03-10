@@ -18,6 +18,9 @@
 
 (require 'lookup)
 (require 'url-http)
+(declare-function navi2ch-bookmark-load-info "ext:navi2ch.el")
+(declare-function navi2ch-find-file "ext:navi2ch.el")
+(declare-function mime-view-buffer "ext:semi.el")
 
 (defconst ndest-version "0.1")
 
@@ -116,9 +119,6 @@ estcall使用時は無効。"
 
 (put 'ndest ':methods '(text keyword))
 
-;;(put 'ndest ':headings
-;;     '(ndest-arrange-heading))
-
 (put 'ndest ':arranges
      '((structure ndest-arrange-content)))
 
@@ -153,8 +153,7 @@ estcall使用時は無効。"
     ("^utf-8"             . "UTF-8")
     ("^iso-2022-jp"       . "ISO-2022-JP")
     ("^junet"             . "ISO-2022-JP")
-    )
-  )
+    ))
 
 ;;;
 ;;; Interface functions
@@ -168,14 +167,14 @@ estcall使用時は無効。"
         (list (lookup-new-dictionary agent "")))))
 
 (put 'ndest :kill 'ndest-kill)
-(defun ndest-kill (agent)
+(defun ndest-kill (_agent)
   (when (buffer-live-p ndest-mime-raw-buffer)
     (kill-buffer ndest-mime-raw-buffer))
   (when (buffer-live-p ndest-mime-view-buffer)
     (kill-buffer ndest-mime-view-buffer)))
 
 (put 'ndest :title 'ndest-title)
-(defun ndest-title (dictionary)
+(defun ndest-title (_dictionary)
   "HyperEstraier Search")
 
 (put 'ndest :search 'ndest-dictionary-search)
@@ -339,8 +338,8 @@ estcall使用時は無効。"
 	(setq url-proxy-services
 	      (lookup-assoc-del url-proxy-services "http"))))
       (setq data (url-retrieve-synchronously uri)))
-    (insert-string (decode-coding-string
-		    (with-current-buffer data (buffer-string)) 'utf-8)))))
+    (insert (decode-coding-string
+             (with-current-buffer data (buffer-string)) 'utf-8)))))
 
 (put 'ndest :content 'ndest-entry-content)
 (defun ndest-entry-content (entry)
@@ -470,10 +469,8 @@ estcall使用時は無効。"
 
 (defun lookup-entry-follow-ndest-link ()
   (interactive)
-  (let ((dictionary (lookup-entry-dictionary
-		     (lookup-entry-current-line-entry))))
-    (unless (lookup-entry-content-visible-p)
-      (lookup-entry-display-content)))
+  (unless (lookup-summary-content-visible-p)
+    (lookup-summary-display-content))
   (let ((window (get-buffer-window lookup-content-buffer)))
     (and window (select-window window)))
   (switch-to-buffer (lookup-content-buffer))
@@ -554,7 +551,7 @@ estcall使用時は無効。"
 	  (insert-char ch 1)))
       (decode-coding-string (buffer-string) 'utf-8))))
 
-(defun ndest-follow-link-with-mime-view (uri file)
+(defun ndest-follow-link-with-mime-view (_uri file)
   "rfc822形式のファイルをmime-view-bufferコマンドを使って表示する。SEMIが必要。"
   (require 'mime-view)
   (unless (assq 'lookup-content-mode mime-preview-quitting-method-alist)
@@ -575,15 +572,15 @@ estcall使用時は無効。"
 		      (buffer-name ndest-mime-view-buffer))))
 
 (defun ndest-mime-view-quit ()
-  (let ((window (get-buffer-window lookup-entry-buffer)))
+  (let ((window (get-buffer-window lookup-summary-buffer)))
     (and window (select-window window)))
-  (switch-to-buffer lookup-entry-buffer))
+  (switch-to-buffer lookup-summary-buffer))
 
 (defun ndest-follow-link-with-fiber (uri file)
   "link先の表示にfiberを起動する。"
   (start-process nil nil "fiber" (or file uri)))
 
-(defun ndest-follow-link-with-navi2ch (uri file)
+(defun ndest-follow-link-with-navi2ch (_uri file)
   "link先の表示にnavi2chを利用する。"
   (require 'navi2ch)
   (require 'navi2ch-bookmark)
@@ -615,8 +612,7 @@ estcall使用時は無効。"
 ;;    (replace-match "" t t)))
 
 (defun ndest-arrange-content (entry)
-  (let* ((links (ndest-get-link (point)))
-	 (type (or (ndest-get-header-string "@type") ""))
+  (let* ((type (or (ndest-get-header-string "@type") ""))
 	 (uri (ndest-get-header-string "@uri"))
 	 params param)
     (setq params ndest-arrange-functions)
@@ -686,7 +682,7 @@ estcall使用時は無効。"
   (goto-char (point-min)))
 ;;  (lookup-arrange-fill-lines entry))
 
-(defun ndest-arrange-plain (entry)
+(defun ndest-arrange-plain (_entry)
   (let ((uri (ndest-get-header-string "@uri"))
 	(type (or (ndest-get-header-string "@type") ""))
 	(file (and (ndest-uri-is-file uri)

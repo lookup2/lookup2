@@ -22,6 +22,9 @@
 ;;; Code:
 (require 'lookup-utils)
 (require 'ndeb)
+(declare-function mw32-mci-send-string "ext:meadow.c")
+(declare-function mw32-mci-add-notify-callback "ext:meadow.c")
+(declare-function mw32-mci-remove-notify-callback "ext:meadow.c")
 
 ;;;
 ;;; Customizable variables

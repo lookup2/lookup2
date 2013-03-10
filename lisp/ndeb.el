@@ -194,8 +194,6 @@ Nil means it has not been checked yet.")
     (lookup-process-require 
      ndeb-process
      (concat command "\n")
-     ;(concat command "\nset prompt \""
-     ;        ndeb-prompt-string "\"\nset prompt\n")
      (concat "^" ndeb-prompt-string)
      filter)))
 
@@ -332,14 +330,15 @@ Nil means it has not been checked yet.")
               content (ndeb-process-require "menu"))
         (lookup-put-property menu 'ndeb-content content))
       (when (string-match  "image_menu" string)
-        (setq image-menu (list (ndeb-new-entry 'regular "image_menu" "[Graphic menu]"))
+        (setq image-menu (list (ndeb-new-entry 'regular
+                                               "image_menu" "[Graphic menu]"))
               image-content (ndeb-process-require "image_menu"))
         (lookup-put-property image-menu 'ndeb-content image-content))
       (when (string-match "copyright" string)
-        (setq copyright (list (ndeb-new-entry 'regular "copyright" "[Copyright]"))
+        (setq copyright (list (ndeb-new-entry 'regular 
+                                              "copyright" "[Copyright]"))
               copyright-content (ndeb-process-require "copyright"))
-        (lookup-put-property copyright 'ndeb-content copyright-content))
-      )
+        (lookup-put-property copyright 'ndeb-content copyright-content)))
   (nconc menu image-menu copyright))))
 
 (put 'ndeb :search 'ndeb-dictionary-search)
