@@ -75,24 +75,20 @@
    - Web Search Engines (OpenSearch)
    - Spell Checking
    - Scanned Paper Dictionaries (index text is needed.)
-
 ** Installation
    If you clone or download the archive from github, you will have to
    follow the following procedure to install Lookup program.
-
 #+begin_example
 % ./configure --with-emacs=emacs
               --with-lispdir=/your/home/emacs/lisp
               --infodir=/your/home/emacs/info
 % make install
 #+end_example
-
 ** Setup
-   You will need some dictionaries that Lookup [[*Search Agents]]
-   supports.  For on-line available dictionaries, see [[*List of
+   You need some dictionaries that Lookup Search Agents ([[*Search
+   Agents)]] supports.  For on-line available dictionaries, see [[*List of
    Supported Dictionaries]].  When you install the dictionaries, you
-   need to specify [[*Search Agents]] with their locations.  For
-   example:
+   need to specify Search Agents with their locations.  For example:
 
 #+begin_src emacs-lisp
 (setq lookup-search-agents '((ndeb "~/path/to/dict_dir_1/")
@@ -245,6 +241,11 @@
                        arrange functions besides the default arrange
                        functions.
 
+** Agent Interfaces
+
+   - :list :: Lists dictionaries of specified interfaces.
+   - :kill :: kill agents
+
 * Dictionaries
   /Dictionaries/ are entities that explain the meaning of specified
   word or pattern.  /Search Agents/ will look for /dictionaries/, and
@@ -299,6 +300,11 @@
 
    - :title :: Dictionary title.
 
+** Dictionary Interfaces
+   - :clear :: clear dictionary
+   - :search :: search dictionary
+   - :content :: get content of entry
+
 * Queries
   You need to query to search dictinaries for words.  
 ** Query commands
@@ -351,7 +357,7 @@
 
 * Entries
   Once you query for the words, search agents will return /entries/ if
-  they are found.  /Entries/ will be displayed in /Entries buffer/.
+  they are found.  /Entries/ will be displayed in /Summary buffer/.
   {{{cindex(entries)}}}
 * Contents
   /Contents/ of entries will be displaeyd in ~*Contents*~ buffer.
@@ -361,7 +367,8 @@
    Arrangements are processed in the following order.
    - Gaiji Replacements
 * Modules
-  /Modules/ are a set of dictionaries for searching.
+  /Modules/ are a set of dictionaries.  You can specify your preferred
+  set of dictionaries as modules.
 * List of Search Agents
 ** ndeb
    ~ndeb~ is a search agent for EPWING/EBXA dictionaries.  You will
@@ -454,22 +461,6 @@
     | :extension       | ".xml"                       | (not used in ndsary.) |
     |                  | nil                          | default: ".txt" is used.       |
     
-** ndsary
-*** Summary
-    :PROPERTIES:
-    :ALT_TITLE: ndtext summary
-    :END:
-    ~ndsary~ will search for text with help of Suffix Array utility
-    ([[http://sary.sourceforge.net/][sary]]).  This is suitable for
-    large-sized text dictionary, but you will need suffix array index
-    to use it.
-*** Supported Options
-    :PROPERTIES:
-    :ALT_TITLE: ndsary options
-    :END:
-    ~ndsary~ supports all all ~ndtext~ options except ~:extension~.
-    Files are automatically located as they should have the extension
-    "~.ary~".
 ** ndbuffer
 *** Summary
     :PROPERTIES:
@@ -486,11 +477,130 @@
     :ALT_TITLE: ndbuffer options
     :END:
     ~ndbuffer~ supports all ~ndtext~ options.
-** ndlatin
-   ~ndlatin~ is a search agent that lets you access /WORDS for Latin/
-   by William Whitaker.  Requirements varies on various computers.
+** ndsary
+*** Summary
+    :PROPERTIES:
+    :ALT_TITLE: ndtext summary
+    :END:
+    ~ndsary~ will search for text with help of Suffix Array utility
+    ([[http://sary.sourceforge.net/][sary]]).  This is suitable for
+    large-sized text dictionary, but you will need suffix array index
+    to use it.
+*** Supported Options
+    :PROPERTIES:
+    :ALT_TITLE: ndsary options
+    :END:
+    ~ndsary~ supports all all ~ndtext~ options except ~:extension~.
+    Files are automatically located as they should have the extension
+    "~.ary~".
+** ndic
+   ~ndic~ is a search agent that lets you access ~dic~ format
+   dictionaries.
+** ndict
+   ~ndic~ is a search agent ~DICT~ server.  DICT protocols is
+   specified by [[http://tools.ietf.org/html/rfc2229][RFC2229]].
+** ndweb
+   ~ndweb~ is a search agent for Web Resources which supports
+   OpenSearch protocol.  
 
-   If you are using MacOS X, /WORD for Latin/ is included in
+   To use this agent, you need to specify the URL for OpenSearch, as
+   follows.  Currently, only web services listed in
+   ~ndweb-predefined-agents~ are supported.
+#+BEGIN_SRC emacs-lisp
+(setq lookup-search-agents
+      '(...
+        (ndweb "http://www.google.com/")
+        ...))
+#+END_SRC
+** ndest
+   ~ndest~ search agent for [[http://fallabs.com/hyperestraier/][HyperEstraier]] Full-Text Search engine.
+** ndzim
+   ~ndzim~ is a search agent for OpenZIM file.  OpenZIM is a file
+   format for Wiki-Based document with very high compression ration.
+   OpenZIM files are distributed from [[http://www.openzim.org][OpenZIM]] site.
+** ndjitsuu
+*** Summary
+    ~ndjitsuu~ is a search agent for Jitsuu dictionary.  You will need
+    to prepare the index file equipped in this archive to create the
+    dictionary.
+** ndsrd
+    ~ndsrd~ is an agent for "[[http://www.shogakukan.co.jp/books/detail/_isbn_4099068579][Shōgakukan Random House Dictionary]]".  To
+    use this agent, you must install
+    [[http://openlab.ring.gr.jp/edict/csrd/][~csrd~]].  There is a bug
+    in ~csrd~ program, which can be fixed by [[http://ikazuhiro.s206.xrea.com/filemgmt/index.php?id=10][~csrd.c.diff.gz~]].
+
+    To use this search agent, you will need to install the =csrd= program.
+    : cd csrd-1.0/
+    : zcat ../csrd.c.diff.gz | patch -p0 (optional)
+    : make -f makefile.unx
+    : sudo mv csrd /usr/local/bin/
+    Then, add the following agent to your =lookup-search-agents=.
+#+BEGIN_SRC emacs-lisp
+(setq lookup-search-agents
+      '(...
+        (ndsrd "/path/to/directory/")
+        ...))
+#+END_SRC
+** ndmecab
+   ~ndmecab~ is a search agent for [[http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html][mecab]] program.  With mecab, you can
+   get the readings for unknown kanji.
+** ndbtonic
+   ~ndbtonic~ search agents support BTONIC XML format dictionaries.
+   This agent is basically text searching agent, so you can sepcify
+   either ~ndbuffer~ / ~ndsary~ aget as a ~:backend~.  (You can not
+   use ~ndtext~ as backend, as encoding of BTONIC is Shift_JIS.)  You
+   must install [[http://hp.vector.co.jp/authors/VA005784/btonic/btonic2xml.html][BTONIC2xml.rb v1.10]] utility to convert to plain XML
+   file.
+*** Usage
+    You need to convert original BTONIC data to XML data and (if
+    necessary) create suffix array index as follows.
+#+begin_example
+  % ruby -Ks BTONIC2xml.rb <dictName> <outDir>
+  % cd <outDir>
+  % mksary -c shift_jis <outFile>.xml
+#+end_example
+    Then put the agent into ~lookup-search-agents~ as follows.  If you
+    do not specify ~:backend~, ~ndbuffer~ is automatically used.
+#+begin_src emacs-lisp
+(setq lookup-search-agents
+      '(...
+        (ndbtonic "/path/to/directory/" :backend ndsary)
+        ...))
+#+end_src
+** ndspell
+   ~ndspell~ let you search ambiguous spell.  You need either ~ispell~
+   or ~aspell~ program to use this agent.
+** ndcookie
+   ~ndcookie~ is a search agent just for fun, which will randomly
+   displays cookie data.  To use this agent, you need to specify Emacs
+   ~etc~ directory where ~COOKIES~ file exists.
+#+begin_src emacs-lisp
+(setq lookup-search-agents
+      '(...
+        (ndcookie "/path/to/emacs/etc/")
+        ...))
+#+end_src
+
+** ndwnj
+   ~ndwnj~ is a search agent for [[http://nlpwww.nict.go.jp/wn-ja/][Japanese WordNet]].  It is distributed
+   as sqlite3 database file.  You may specify the location of wordnet
+   file as follows.
+#+begin_src emacs-lisp
+(setq lookup-search-agents
+      '(...
+        (ndwnj "/path/to/wnjpn.db")
+       ...))
+#+end_src
+   ~ndwnj~ uses ~sqlite3~ client to browse the database.  To use this
+   search agent, you need to install ~sqlite3~ command.
+
+** ndlatin
+   ~ndlatin~ is a search agent that lets you access "/WORDS for
+   Latin/" by William Whitaker.  Requirements varies on various
+   computers.  The author has already passed away, but it is still
+   widely used as Latin dictionary.
+
+   If you are using MacOS X, "/WORD for Latin/" is included in
    Open-Source software called /Interpres.app/
    (https://sites.google.com/site/erikandremendoza/).  After the
    installation of Interpres, add the following line in your set-up
@@ -507,109 +617,18 @@
    Wikipedia (http://en.wikipedia.org/wiki/William_Whitaker%27s_Words)
    page.
 
-** ndweb
-   ~ndweb~ is a search agent for Web Resources which supports
-   OpenSearch protocol.  
-
-   To use this agent, you need to specify the URL for OpenSearch, as
-   follows.  Currently, only web services listed in
-   ~ndweb-predefined-agents~ are supported.
-#+BEGIN_SRC emacs-lisp
-(setq lookup-search-agents
-      '(...
-        (ndweb "http://www.google.com/")
-        ...))
-#+END_SRC
-** ndic
-   ~ndic~ is a search agent that lets you access ~dic~ format
-   dictionaries.
-** ndict
-   ~ndic~ is a search agent ~DICT~ server.  DICT protocols is
-   specified by [[http://tools.ietf.org/html/rfc2229][RFC2229]].
-** ndjitsuu
-*** Summary
-    ~ndjitsuu~ is a search agent for Jitsuu dictionary.  You will need
-    to prepare the index file equipped in this archive to create the
-    dictionary.
-** ndsrd
-    =ndsrd= is an agent for "Shōgakukan Random House Dictionary".  To
-    use this agent, you must install
-    [[http://openlab.ring.gr.jp/edict/csrd/][~csrd~]].  There is a bug
-    in ~csrd~ program, which can be fixed by =csrd.c.diff.gz=.
-
-    To use this search agent, you will need to install the =csrd= program.
-    : cd csrd-1.0/
-    : zcat ../csrd.c.diff.gz | patch -p0 (optional)
-    : make -f makefile.unx
-    : sudo mv csrd /usr/local/bin/
-    Then, add the following agent to your =lookup-search-agents=.
-#+BEGIN_SRC emacs-lisp
-(setq lookup-search-agents
-      '(...
-        (ndsrd "/path/to/directory/")
-        ...))
-#+END_SRC
-    Refer the following URL for more details on this dictionary.
-    - Shōgakukan Random House Dictionary :: http://www.shogakukan.co.jp/books/detail/_isbn_4099068579
-    - csrd :: http://openlab.ring.gr.jp/edict/csrd
-    - csrd patch :: http://ikazuhiro.s206.xrea.com/filemgmt/index.php?id=10
-** ndest
-   ~ndest~ search agent for
-   [[http://fallabs.com/hyperestraier/][HyperEstraier]] Full-Text
-   Search engine.
-** ndmecab
-   ~ndmecab~ is a search agent for
-   [[http://mecab.googlecode.com/svn/trunk/mecab/doc/index.html][mecab]]
-   program.
-** ndbtonic
-   ~ndbtonic~ search agents support BTONIC format dictionaries.  To
-   use this agent, you must install
-   [[http://sary.sourceforge.net/][sary]] program and
-   [[http://hp.vector.co.jp/authors/VA005784/btonic/btonic2xml.html][BTONIC2xml.rb
-   v1.10]] utility.
-*** Usage
-    You need to convert original BTONIC data to XML data and create
-    suffix array index as follows.
-#+begin_example
-  % ruby -Ks BTONIC2xml.rb <dictName> <outDir>
-  % cd <outDir>
-  % mksary -c shift_jis <outFile>.xml
-#+end_example
-    Then put the agent into ~lookup-search-agents~ as follows.
-#+begin_src emacs-lisp
-(setq lookup-search-agents
-      '(...
-        (ndbtonic "/path/to/directory/")
-        ...))
-#+end_src
-** ndspell
-   ~ndspell~ let you search ambiguous spell.  You need either ~ispell~
-   or ~aspell~ program to use this agent.
-** ndcookie
-   ~ndcookie~ is an fun agent which will randomly displays cookie
-   data.  To use this agent, you need to specify Emacs ~etc~ directory
-   where ~COOKIES~ file exists.
-#+begin_src emacs-lisp
-(setq lookup-search-agents
-      '(...
-        (ndcookie "/path/to/emacs/etc/")
-        ...))
-#+end_src
-
 * List of Supported Dictionaries
   :PROPERTIES:
   :APPENDIX:    Appendix
   :END:
-  This appendix contains various free and non-free dictionaries
-  supported by /Lookup/, and also the /support-files/ that provides
-  dictionary options for some specific dictionaries.
+  This appendix contains various free dictionaries supported by
+  /Lookup/, and also the /support-files/ that provides dictionary
+  options for some specific dictionaries.
 ** EPWING/EBXA dictionaries
    EPWING is a dictionary format specified as JIS X 4081.  There have
-   been a wide variety of commercial
-   [[http://ja.wikipedia.org/wiki/EPWING][EPWING]] Dictionaries
-   available on the market.  However, most of them are discontinued.
-   EBXA is also a dictionary format which is a predecessor of EPWING
-   Format.
+   been a wide variety of commercial [[http://ja.wikipedia.org/wiki/EPWING][EPWING]] Dictionaries available on
+   the market, though most of them are discontinued.  EB/EBXA is a
+   dictionary format which is a predecessor of EPWING Format.
 *** FPWBooks
     [[http://openlab.ring.gr.jp/edict/fpw/][FPWBooks]] are the EPWING
     dictionaries created by
@@ -630,6 +649,7 @@
     dictionaries.  
 *** RangJung Yeshe Dicitionary
     
+*** Unicode Character Database
 * Making new Search Agents
   :PROPERTIES:
   :APPENDIX:    Appendix
