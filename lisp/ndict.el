@@ -180,7 +180,7 @@
   (let ((agent (lookup-dictionary-agent dictionary)))
     (mapcar 'car (ndict-agent-method-table agent))))
 
-(put 'ndict :clear 'ndict-clear)
+(put 'ndict :kill 'ndict-kill)
 (defun ndict-clear (agent)
   (ndict-agent-kill-process agent))
 

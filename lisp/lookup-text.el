@@ -90,9 +90,8 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
       (insert str)
       (apply 'call-process-region 1 (point-max) "mecab" t t nil 
              lookup-text-mecab-readings-option)
-      (cl-remove-duplicates
-         (split-string (japanese-hiragana (buffer-string)))
-         :test 'equal))))
+      (delete-dups
+       (split-string (japanese-hiragana (buffer-string)))))))
 
 (defun lookup-text-get-readings (str)
   "STR を漢字ひらがな変換して得られた結果のリストを返す関数.

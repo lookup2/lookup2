@@ -148,7 +148,7 @@ Windows/Linux version (ver 1.97), it should be '~'"
                    (string-match "UNKNOWN" output)))
       (setq output (replace-regexp-in-string "\n\n+" "\n" output))
       (setq output (split-string output ndlatin-splitter t))
-      (setq output (cl-remove-duplicates output :test 'equal))
+      (setq output (delete-dups output))
       (setq output
             (cl-remove-if ;; remove empty output
              (lambda (x) (not (string-match "[a-zA-Z]" x))) output))

@@ -936,9 +936,8 @@ dictionaries."
                         lookup-support-autoload-default-alist))
     (dolist (dict lookup-dictionary-list)
       (when (string-match (car pair) (lookup-dictionary-id dict))
-	(lookup-assoc-set 'lookup-support-alist
-			  (lookup-dictionary-id dict)
-			  (cdr pair))
+	(lookup-use-support (lookup-dictionary-id dict)
+                            (cdr pair))
         ))))
 
 (provide 'lookup)
