@@ -71,9 +71,9 @@
         ;;; PDIC Dictionaries
         ;;; (ndpdic)
         ;; EIJIRO PDIC version
-        ("^ndpdic:.*/PDIC-UNI/.*\\.dic$" . "support-eijiro-pdic")))
+        ("^ndpdic:.*/PDIC-UNI/.*\\.dic$" . "support-eijiro-pdic")
         ;; pdic-thai
         ;; (http://www.pdicthai.com/~pdicthai/)
-        ("^ndpdic:.*/Uni-PdicThai-" . "support-pdic-thai")
+        ("^ndpdic:.*/Uni-PdicThai-" . "support-pdic-thai")))
 
 ;;; support-defs.el ends here
