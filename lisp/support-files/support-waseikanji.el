@@ -90,12 +90,9 @@
   (goto-char (point-min))
   (if (looking-at " *\n *") (replace-match "")))
 
-(defun support-waseikanji-query-filter (query)
-  (lookup-query-filter query 'japanese-katakana))
-
 (setq lookup-support-options
       (list :title "和製漢字の辞典"
-            :query-filter 'support-waseikanji-query-filter
+            :query-filter 'lookup-query-filter-to-katakana
             :entry-tags-list '(("【" . "】")
                                ("「" . "」")
                                )

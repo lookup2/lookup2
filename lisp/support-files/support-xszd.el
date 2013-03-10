@@ -37,7 +37,7 @@
 
 ;;; Code:
 
-(defvar support-xszd-use-ivs-font t)
+(defvar support-xszd-use-ivs-font nil)
 
 (defun support-xszd-arrange-structure (entry)
   "Attach contents of ENTRY a link and remove tags."

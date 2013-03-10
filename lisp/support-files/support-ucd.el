@@ -1,5 +1,5 @@
 ;;; ucd.el --- support file for "Unicode Character Database" file.
-;; Copyright (C) 2009 Lookup Development Team
+;; Copyright (C) 2013 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -257,7 +257,7 @@ based on: http://www.unicode.org/Public/UNIDATA/PropertyAliases.txt"  )
 
 ;; Query-Filter
 (defun support-ucd-query-filter (query)
-  (lookup-query-filter
+  (lookup-new-query-filter
    query
    (lambda (str) 
      (format "%04X" (string-to-char str)))))

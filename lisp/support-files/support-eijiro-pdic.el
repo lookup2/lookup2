@@ -1,4 +1,4 @@
-;;; support-eijiro.el --- suport file for "Eijiro" -*- coding: utf-8 -*-
+;;; support-eijiro-pdic.el --- suport file for "Eijiro" -*- coding: utf-8 -*-
 ;; Copyright (C) 2009 KAWABATA, Taichi <kawabata.taichi@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
@@ -19,61 +19,61 @@
 
 ;;; Code:
 
-(defvar support-eijiro-option-list
-  '(("Eijiro112.dic" 
+(require 'lookup)
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
+
+(defvar support-eijiro-pdic-option-list
+  '(("EIJI.*\\.DIC" 
      "英辞郎"
      (ascii)
      "indices/dic00.idx")
-    ("Waeiji112.dic" 
+    ("WAEI.*\\.DIC" 
      "和英辞郎"
      (ascii japanese-jisx0208)
      "indices/dic01.idx")
-    ("Ryaku112.dic" 
+    ("RYAKU.*\\.DIC" 
      "略語辞典"
      (ascii)
      "indices/dic02.idx")
-    ("Reiji112.dic" 
+    ("REIJI.*\\.DIC" 
      "例辞郎"
      (ascii japanese-jisx0208)
      "indices/dic03.idx")))
 
-(defun support-eijiro-options (dict-id)
-  (let* ((id (replace-regexp-in-string "^.+/\\([^/]+\\)$" "\\1" dict-id))
-         (options (assoc id support-eijiro-option-list))
-         (title    (elt options 1))
-         (charsets (elt options 2))
-         (index    (elt options 3)))
+(defun support-eijiro-pdic-options (dict-id)
+  (multiple-value-bind
+      (regexp title charsets index)
+      (cl-assoc-if (lambda (x) (string-match x dict-id))
+                   support-eijiro-pdic-option-list)
     `(:title    ,title
       :charsets ,charsets
       :query-filter lookup-query-filter-stem-english
-      :arranges ((reference support-eijiro-arrange-reference))
+      ; :arranges ((reference support-eijiro-pdic-arrange-reference))
       :index    ,index)))
 
-(defun support-eijiro-arrange-reference (entry)
-  (goto-char (point-min))
-  (while (re-search-forward "<→\\(.+?\\)>" nil t)
-    (support-eijiro-put-reference 
-     (match-beginning 0) (match-end 0) (match-string 1)))
-  (while (re-search-forward "◆file:\\(XXX.TXT\\)" nil t)
-    (support-eijiro-insert-file-contents (match-string 1)))
-  (while (re-search-forward "◆file:\\(YYY.HTM\\)" nil t)
-    (support-eijiro-insert-file-contents (match-string 1)))
-  (while (re-search-forward "◆file:\\(ZZZ.txt\\)" nil t)
-    (support-eijiro-insert-file-contents (match-string 1)))
-  )
+;(defun support-eijiro-pdic-arrange-reference (entry)
+;  (goto-char (point-min))
+;  (while (re-search-forward "<→\\(.+?\\)>" nil t)
+;    (support-eijiro-pdic-put-reference 
+;     (match-beginning 0) (match-end 0) (match-string 1)))
+;  (while (re-search-forward "◆file:\\(XXX.TXT\\)" nil t)
+;    (support-eijiro-pdic-insert-file-contents (match-string 1)))
+;  (while (re-search-forward "◆file:\\(YYY.HTM\\)" nil t)
+;    (support-eijiro-pdic-insert-file-contents (match-string 1)))
+;  (while (re-search-forward "◆file:\\(ZZZ.txt\\)" nil t)
+;    (support-eijiro-pdic-insert-file-contents (match-string 1))))
+;
+;(defvar dictionary nil)
+;(defun support-eijiro-pdic-put-reference (start end string)
+;  (when dictionary
+;    (let* ((entries (ndpdic-dictionary-search 
+;                    dictionary
+;                    (lookup-new-query 'exact string)))
+;           (entry (car entries)))
+;      (if entry (lookup-set-link start end entry)))))
 
-(defvar dictionary nil) ;; exploit dynamically bound `dictionary' variable
-(defun support-eijiro-put-reference (start end string)
-  (when dictionary
-    (let* ((entries (ndpdic-dictionary-search 
-                    dictionary
-                    (lookup-new-query 'exact string)))
-           (entry (car entries)))
-      (if entry (lookup-set-link start end entry)))))
+(setq lookup-support-options
+      (support-eijiro-pdic-options lookup-support-dictionary-id))
 
-(let ((options (support-eijiro-options lookup-support-dictionary-id)))
-  ;; (message "Eijiro: dict-id=%s" lookup-support-dictionary-id)
-  ;; (message "Eijiro: index of %s is set to %s" (plist-get options :title) (plist-get options :index))
-  (setq lookup-support-options options))
-
-;;; support-eijiro.el ends here
+;;; support-eijiro-pdic.el ends here

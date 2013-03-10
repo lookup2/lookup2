@@ -1,4 +1,4 @@
-;;; support-onmusic.el --- support file for "新編・音楽中辞典" file.
+;;; support-btonic-onmusic.el --- support file for "新編・音楽中辞典" file.
 ;; Copyright (C) 2009 Lookup Development Team
 
 ;; This program is free software; you can redistribute it and/or
