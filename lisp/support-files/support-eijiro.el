@@ -21,6 +21,7 @@
 
 ;;; Code:
 (eval-when-compile (require 'cl))
+(require 'cl-lib)
 
 (defvar support-eijiro-option-list
   '(("/EIJI-"

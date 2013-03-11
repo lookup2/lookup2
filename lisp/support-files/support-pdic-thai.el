@@ -9,8 +9,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup)
-(eval-when-compile (require 'cl-lib))
 
 (defvar support-pdic-thai-title-alist
   '(("Uni-PdicThai-IPA" :title "タイ日辞書")

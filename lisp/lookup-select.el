@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup-types)
 (declare-function lookup-current-module "lookup")
 (declare-function lookup-get-buffer "lookup")

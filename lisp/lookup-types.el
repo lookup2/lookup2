@@ -29,6 +29,7 @@
 ;;;; Code:
 
 (eval-when-compile (require 'cl))
+(require 'cl-lib)
 (require 'lookup-utils)
 
 (declare-function lookup-restore-module-attributes "lookup-cache" (&rest specs))

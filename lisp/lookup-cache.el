@@ -22,6 +22,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup-types)
 (declare-function lookup-get-dictionary "lookup")
 (declare-function lookup-entry-list "lookup")

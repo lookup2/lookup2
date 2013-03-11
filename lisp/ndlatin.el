@@ -52,6 +52,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup)
 (defconst ndlatin-version "0.2")
 

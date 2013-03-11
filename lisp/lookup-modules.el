@@ -23,6 +23,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup-types)
 (require 'lookup-select)
 (eval-when-compile (require 'cl))

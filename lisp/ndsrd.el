@@ -31,6 +31,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 (require 'lookup)
 (require 'lookup-content)
 (require 'ndeb-binary)

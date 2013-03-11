@@ -23,7 +23,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'cl-lib))
+(require 'cl-lib)
 (require 'lookup-vars)
 (declare-function lookup-text-wakati "lookup-text")
 

@@ -21,7 +21,7 @@
 
 (require 'lookup)
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'cl-lib))
+(require 'cl-lib)
 
 (defvar support-eijiro-pdic-option-list
   '(("EIJI.*\\.DIC" 
