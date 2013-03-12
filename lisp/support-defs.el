@@ -1,6 +1,6 @@
 ;;; support-defs.el --- autoload definition of support files -*- lexical-binding: t -*-
 
-;; Add your dictionary freely!
+;; You can set your dictionary support files to `lookup-support-autoload-alist'.
 
 (setq lookup-support-autoload-default-alist
       '(
@@ -46,7 +46,7 @@
         ;;; EPWING/EBXA Dictionaries
         ;;; (ndeb)
         ;; Oxford Dictionary/Thesaurus (EB)
-        ("^ndeb:.*/oxford" "support-oxford-eb")
+        ("^ndeb:.*/oxford" . "support-oxford-eb")
         ;; FOLDOC (http://foldoc.org/) 
         ;; FreePWing version
         ("^ndeb:.*/foldoc" . "support-foldoc-fpw")
@@ -70,6 +70,8 @@
 
         ;;; PDIC Dictionaries
         ;;; (ndpdic)
+        ;; PDIC CJ2 dictionary
+        ("^ndpdic:.*/cj2\\.dic$" . "support-pdic-cj2")
         ;; EIJIRO PDIC version
         ("^ndpdic:.*/PDIC-UNI/.*\\.dic$" . "support-eijiro-pdic")
         ;; pdic-thai
