@@ -16,6 +16,7 @@ SOURCES = bocu.el stem-english.el lookup-types.el lookup-text.el	\
 	 support-files/support-jtfrk.el					\
 	 support-files/support-onmusic.el				\
 	 support-files/support-oxford-eb.el				\
+	 support-files/support-pdic-cj2.el				\
 	 support-files/support-pdic-thai.el				\
 	 support-files/support-rangjung.el				\
 	 support-files/support-rfc1983.el				\
