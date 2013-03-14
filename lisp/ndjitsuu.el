@@ -315,6 +315,11 @@
   (goto-char (point-min))
   (while (re-search-forward "</A>" nil t) (replace-match "")))
 
+(put 'ndjitsuu :clear 'ndjitsuu-dictionary-clear)
+(defun ndjitsuu-dictionary-clear (_dictionary)
+  (when (file-directory-p ndjitsuu-tmp-directory)
+    (delete-directory ndjitsuu-tmp-directory t t)))
+
 ;;;
 ;;; Initialize
 ;;;
@@ -500,7 +505,7 @@ Optional argument SUBINDEX (string) indicates JUKUGO index."
         (setq length (ndjitsuu-str-to-int refspecs (+ char-pos 4)))
         (setq val    (ndjitsuu-str-to-int refspecs (+ char-pos 8)))
         (setq val2   (ndjitsuu-str-to-int refspecs (+ char-pos 12)))
-        (setq char-pos (+ char-pos 20))
+        (callf + char-pos 20)
         (ndjitsuu-forward-char (- start current))
         (if (= val 2)
             (insert (format "<REF,%d>" val2))
@@ -515,7 +520,7 @@ Optional argument SUBINDEX (string) indicates JUKUGO index."
         (setq val    (substring  anchorspecs char-pos (+ char-pos 4)))
         (setq start  (ndjitsuu-str-to-int anchorspecs (+ char-pos 4)))
         (setq length (ndjitsuu-str-to-int anchorspecs (+ char-pos 8)))
-        (setq char-pos (+ char-pos 12))
+        (callf + char-pos 12)
         (ndjitsuu-forward-char (- start current))
         (insert (format "<A,%s>" val))
         (ndjitsuu-forward-char length)
@@ -528,7 +533,7 @@ Optional argument SUBINDEX (string) indicates JUKUGO index."
         (setq start  (ndjitsuu-str-to-int fontspecs char-pos))
         (setq length (ndjitsuu-str-to-int fontspecs (+ char-pos 4)))
         (setq val    (ndjitsuu-str-to-int fontspecs (+ char-pos 8)))
-        (setq char-pos (+ char-pos 12))
+        (callf + char-pos 12)
         (ndjitsuu-forward-char (- start current) t)
         (insert (format "<ST,%d>" val))
         (ndjitsuu-forward-char length)
