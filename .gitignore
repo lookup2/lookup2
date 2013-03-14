@@ -1,3 +1,4 @@
+.gitignore
 *.orig
 *~
 #*
@@ -16,10 +17,27 @@
 /missing
 
 lisp/*.elc
+lisp/*/*.elc
+lisp/#*
 lisp/Makefile
 lisp/Makefile.in
 lisp/lookup-autoloads.el
+lisp/test-*
+lisp/*.txt
+misc/mksary-*
 texi/Makefile
 texi/Makefile.in
 texi/lookup.info
 texi/texinfo.tex
+texi/lookup.cp
+texi/lookup.fn
+texi/lookup.ky
+texi/lookup.old.*
+texi/lookup.pdf
+texi/lookup.pg
+texi/lookup.tmp
+texi/lookup.tp
+texi/lookup.vr
+
+lisp/old/*
+doc/*
