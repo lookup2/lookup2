@@ -305,6 +305,7 @@ Besides agent options, following dictionary options may be used.
 - :search :: search dictionary
 - :content :: get content of entry
 
+
 * Queries
   You need to query to search dictinaries for words.  
 ** Query commands
@@ -357,7 +358,7 @@ realized via emacs lisp program ~stem-english.el~.
 
 * Entries
 Once you query for the words, search agents will return /entries/ if
-they are found.  /Entries/ will be displayed in /Summary buffer/.
+they are found.  /Entries/ will be displayed in ~Summary buffer~.
 {{{cindex(entries)}}}
 * Contents
 /Contents/ of entries will be displaeyd in ~*Contents*~ buffer.
@@ -377,8 +378,22 @@ You can also set the module by ~lookup-search-modules~ variable.
 #+BEGIN_SRC emacs-lisp
 (setq lookup-search-modules '("modules" <dict-id>+)...)
 #+END_SRC
+* Cache
+Lookup will save /title/, /methods/ attributes of dictionary to cache
+file, to speed up the launching of Lookup.  It will also save the
+module dictionary informations.
+
+This means that, by modifying the cache file, you can customize the
+titles of dictionary.
+
+Cache will be saved when `lookup' /exits/ (M-x lookup-exit).  It will
+read the cache when `lookup' /starts/ (M-x lookup).  When you restart
+the Lookup, it will write and read the cache simultaneously.
+Therefore, if you want to edit the cache file, you must exit `lookup', 
+re-write cache file, then restart Emacs.
 
 * List of Search Agents
+Lookup provides various search agents.
 ** ndeb
 ~ndeb~ is a search agent for EPWING/EBXA dictionaries.  You will need
 ~eblook~ program to use this agent.  Typical specification of this
@@ -395,13 +410,14 @@ dictionary is as follows.  You need to add the directory where the
 :PROPERTIES:
 :ALT_TITLE: ndtext summary
 :END:
-~ndtext~ agent lets you access medium-sized (less than 10Mbyte)
-text-based dictionary by `GNU grep'.  It utilizes the multi-line
-search feature of GNU grep to search structured document.
+~ndtext~ agent lets you access medium-sized (less than 10Mbyte is
+recommended) UTF-8 text-based dictionary by `GNU grep'.  It utilizes
+the multi-line search feature of GNU grep to search structured
+document.
 *** Text Dictionary Architecture
-Typical text-based dictionaries are constructed by XML some other kind
-of markups.  Some dictionaries consists of single-line entries.
-XML-based dictionaries are usually tagged as follows:
+Typical text-based dictionaries are constructed by XML or some other
+kind of markups.  Some dictionaries consists of single-line entries.
+XML-based dictionaries are usually tagged like follows:
 
 #+begin_example
   <dictionary>
@@ -599,14 +615,13 @@ search agent, you need to install ~sqlite3~ command.
 ** ndlatin
 ~ndlatin~ is a search agent that lets you access "/WORDS for Latin/"
 by William Whitaker.  Requirements varies on various computers.  The
-author has already passed away, but it is still widely used as Latin
-dictionary.
+author of this software has already passed away, but it is still
+widely used as Latin dictionary.
 
 If you are using MacOS X, "/WORD for Latin/" is included in
-Open-Source software called /Interpres.app/
-(https://sites.google.com/site/erikandremendoza/).  After the
-installation of Interpres, add the following line in your set-up file.
-(Make sure that file does exist there and is executable.)
+Open-Source software called [[https://sites.google.com/site/erikandremendoza/][Interpres.app]].  After the installation of
+Interpres, add the following line in your set-up file.  (Make sure
+that file does exist there and is executable.)
 #+BEGIN_SRC emacs-lisp
 (setq ndlatin-program "/Applications/Interpres.app/Contents/Resources/words")
 (setq lookup-search-agents
