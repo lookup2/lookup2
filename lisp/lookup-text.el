@@ -94,7 +94,7 @@ Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
       (delete-dups
        (split-string (japanese-hiragana (buffer-string)))))))
 
-(defun lookup-text-get-readings (str)
+(defun lookup-text-get-kana-readings (str)
   "STR を漢字ひらがな変換して得られた結果のリストを返す関数.
 変換できない文字が含まれていた場合は、nilを返す。"
   (if (and (lookup-text-charsetsp str '(japanese-jisx0208))
@@ -215,7 +215,7 @@ FUNCTION may return multiple candidate values."
 
 (defun lookup-query-filter-kanji-to-kana (query)
   (mapcar (lambda (x) (lookup-new-query (lookup-query-method query) x))
-          (lookup-text-get-readings (lookup-query-string query))))
+          (lookup-text-get-kana-readings (lookup-query-string query))))
 
 (defun lookup-query-filter-to-katakana (query)
   (lookup-new-query-filter query 'japanese-katakana))

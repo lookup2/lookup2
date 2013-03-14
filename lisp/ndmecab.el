@@ -88,7 +88,7 @@
 (put 'ndmecab :search 'ndmecab-dictionary-search)
 (defun ndmecab-dictionary-search (dictionary query)
   (let* ((string (lookup-query-string query))
-         (readings (lookup-text-get-readings string)))
+         (readings (lookup-text-get-kana-readings string)))
     (if readings
         (list (lookup-new-entry 'regular dictionary string)))))
 
@@ -100,7 +100,7 @@
                    (cond ((eq element t) string)
                          ((eq element 'readings)
                           (mapconcat 
-                           'identity (lookup-text-get-readings string) ","))
+                           'identity (lookup-text-get-kana-readings string) ","))
                          ((stringp element) element)
                          ((listp element) (lookup-get-process-require element string))
                          (t (error "Invalid format element: %S" element))))
