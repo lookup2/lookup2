@@ -159,8 +159,8 @@
       )))
 
 (defun ndzim-content (url file)
-  (let ((url-file (ndzim-dump-url url file)))
-    (setq args (append ndzim-w3m-options (list url-file)))
+  (let* ((url-file (ndzim-dump-url url file))
+         (args (append ndzim-w3m-options (list url-file))))
     (with-temp-buffer
       ;;(lookup-debug-message "w3m args=%s" args)
       (apply 'call-process ndzim-w3m nil (current-buffer) nil args)
