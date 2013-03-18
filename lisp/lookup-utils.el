@@ -94,6 +94,12 @@
 
 ;; misc
 
+(defmacro lookup-aif (cond then &rest else) ;; anaphoric if
+  "Like `if', but the result of evaluating COND is bound to `it'."
+  (declare (debug t) (indent 2))
+  `(let ((it ,cond))
+     (if it ,then ,@else)))
+
 (defmacro lookup-with-message (msg &rest body)
   (declare (indent 1))
   `(let ((lookup-message ,msg))
