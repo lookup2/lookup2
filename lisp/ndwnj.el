@@ -231,8 +231,7 @@
 	  (setq elt (concat (gethash lang results) ", " lemma))
 	  (puthash lang elt results))
 	(maphash (lambda (x y)
-                   (setq result (concat result "  " x ": "
-                                        (substring y 2) "\n")))
+                   (callf concat result "  " x ": " (substring y 2) "\n"))
                  results)
 	result))))
 
@@ -265,7 +264,7 @@
                             " <" target ":" name ">"))
 	  (puthash syn elt results))
 	(maphash (lambda (x y)
-                   (setq result (concat result " [" x "]" y "\n")))
+                   (callf concat result " [" x "]" y "\n"))
                  results)
 	result))))
 
