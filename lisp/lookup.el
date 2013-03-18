@@ -182,6 +182,10 @@ Otherwise, this is the same with \\[lookup-previous-history]."
     (setq lookup-property-table nil)
     (setq lookup-current-session nil)
     (setq lookup-module-list nil)
+    (when (and lookup-cache-file
+               (file-exists-p lookup-cache-file)
+               (yes-or-no-p "Do you want to remove cache file?"))
+      (delete-file lookup-cache-file))
     (lookup)))
 
 (defun lookup-help ()
