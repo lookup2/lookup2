@@ -76,6 +76,9 @@
         ("^ndpdic:.*/PDIC-UNI/.*\\.dic$" . "support-eijiro-pdic")
         ;; pdic-thai
         ;; (http://www.pdicthai.com/~pdicthai/)
-        ("^ndpdic:.*/Uni-PdicThai-" . "support-pdic-thai")))
+        ("^ndpdic:.*/Uni-PdicThai-" . "support-pdic-thai")
+        
+        ;;; Web Dictionaries
+        ("^ndweb:" . "support-ndweb")))
 
 ;;; support-defs.el ends here

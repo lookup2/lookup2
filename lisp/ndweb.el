@@ -22,6 +22,12 @@
 
 ;;; Documentation
 
+;; This agent provides web-based search engine support based on
+;; OpenSearch API.  If agent location has a prefix of `mycroft:', then
+;; Microft OpenSearch interaface of
+;; http://mycroft.mozdev.org/externalos.php/" + name + ".xml" will be
+;; used.
+
 ;; Example:
 ;; 
 ;; (setq lookup-search-agents
@@ -29,20 +35,20 @@
 ;;         (ndweb "k.hatena.ne.jp")
 ;;         (ndweb "ja.wikipedia.org")
 ;;         (ndweb "mycroft:XXX")
+;;         (ndweb "www.example.com"
+;;                :self "http://www.example.com/opensearch.xml")
 ;;        ....))
-;; http://mycroft.mozdev.org/externalos.php/" + name + ".xml"
 ;;
-;; Currently, non-UTF-8 search engine and POST-method Search Engine
-;; is not supported.
+;; Currently, POST-method Search Engine is not supported.
 ;;
-;; Supported Dictionary Options
+;; Supported Agent/Dictionary Options
 ;;
 ;; |--------------+-------------------------------------|
 ;; | :self        | OpenSearch URL                      |
 ;; | :charsets    | supported character sets            |
 ;; | :title       | title                               |
 ;; | :suggestions | JSON Suggestions URL                |
-;; | :results     | HTML Results URL (mandatory)        |
+;; | :results     | HTML Results URL                    |
 ;; | :start-tag   | Text Up to this tag to be removed.  |
 ;; | :methods     | supported search methods.           |
 ;; | :encoding    | encoding of searched word           |
@@ -64,146 +70,10 @@
   "Lookup Open Search interface."
   :group 'lookup-search-agents)
 
-(defvar ndweb-site-predefined-options
-  (cl-mapcan
-   (lambda (set)
-     (let* ((default-options (butlast set 2))
-            (sites (plist-get set :sites)))
-       (mapcar (lambda (x) (append x default-options)) 
-               sites)))
-   '(;; English
-     (:charsets (ascii)
-      :sites
-      (("en.wikipedia.org"
-        :self "http://en.wikipedia.org/w/opensearch_desc.php")
-       ("en.wiktionary.org")
-       ("www.google.com" :title "Google (Firefox)"
-        :suggestions "http://suggestqueries.google.com/complete/search?hl=en&client=firefox&hjson=t&&q={searchTerms}"
-        :results "https://www.google.com/#q={searchTerms}&output=search")
-       ("www.ldoceonline.com"
-        :self "http://www.ldoceonline.com/widgets/ldoce_opensearch.xml")
-       ("dictionary.cambridge.org"
-        :self "http://dictionary.cambridge.org/gadgets/british/opensearch.xml")
-       ("mycroft:webster" :encoding iso-8859-1)
-       ("mycroft:webster-med" :encoding iso-8859-1) 
-       ("mycroft:webster-thsrs" :encoding iso-8859-1)
-       ("mycroft:oald8" :start-tag "<_id id=\"main-container\">")
-       ("mycroft:yahoo_dictionary")
-       ("www.onelook.com" :self "http://www.onelook.com/osdf.xml")
-       ("mycroft:collins-cobuild")
-       ("dictionary.reference.com"
-        :self "http://dictionary.reference.com/opensearch_desc.xml")
-       ("thesaurus.reference.com"
-        :self "http://thesaurus.reference.com/opensearch_desc.xml")
-       ("mycroft:visual-thesaurus") ; view in web browser.
-       ;; English Corpus
-       ("mycroft:bnc-ssearch" :title "British National Corpus")
-       ("erek.ta2o.net/news" :title "EReK News Corpus"
-        :results
-        "http://erek.ta2o.net/news/{searchTerms}.html")
-       ;; English Library
-       ("www.oxfordjournals.org" 
-        :self "http://www.oxfordjournals.org/resource/xml/opensearch.xml")
-       ("mycroft:blaut" :title "Brigish Library Author Search")
-       ("mycroft:bltit" :title "Brigish Library Title Search")
-       ;; English-to-Japanese
-       ("mycroft:kenkwaeichujiten-cl" :title "研究社新和英中辞典 (Excite)")
-       ("mycroft:yahoodicenjp")
-       ("mycroft:eijiro")
-       ("mycroft:eijiro-collocation" :title "英辞郎 頻度集計")
-       ("mycroft:eijiro-kwic" :title "英辞郎 整列表示")
-       ))
-     (;; Japanese
-      :charsets (ascii japanese-jisx0208)
-      :sites
-      (("ja.wikipedia.org" :self "http://ja.wikipedia.org/w/opensearch_desc.php")
-       ("ja.wiktionary.org")
-       ("k.hatena.ne.jp" :self "http://d.hatena.ne.jp/opensearch/keyword.xml"
-        :start-tag "<b><a name=\"keywordbody\"")
-       ("mycroft:shogakukadaijisen-cl" :title "小学館 大辞泉 (Yahoo)")
-       ("mycroft:sanseidoyojijukugo-c" :title "Goo 辞書")
-       ("mycroft:daijirin" :title "三省堂 大辞林 (Yahoo)" :start-tag "<_id id=\"main-d\">")
-       ("mycroft:daihyakkazensho-cl" :title "小学館 日本大百科全書 (Yahoo)")
-       ("mycroft:sanseidodaijirin-cl" :title "三省堂 大辞林 (Excite)")
-       ("mycroft:yahoodicjp_thesaurus")
-       ;; Japnese Corpus
-       ("jrek.ta2o.net/news" :title "JReK Corpus"
-        :results "http://jrek.ta2o.net/s/{searchTerms}.html")
-       ;; Japanese Misc
-       ("hanmoto.com" :title "版元ドットコム書誌検索" 
-        :self "http://hanmoto.com/bd.xml")
-       ("mycroft:goo-music")
-       ("mycroft:goo-lyrics")
-       ("reed.kuee.kyoto-u.ac.jp/cf-search" :title "格フレーム検索"
-        :encoding euc-jp
-        :results "http://reed.kuee.kyoto-u.ac.jp/cf-search/?text={searchTerms}")
-       ;; Japanese-to-English
-       ("mycroft:kenkeiwachujiten-cl" :title "研究社新英和中辞典 (Excite)")
-       ("www.excite.co.jp/dictionary"
-        :self "http://www.excite.co.jp/search/opensearch/xml/dictionary/english/")
-       ("home.alc.co.jp/db/ow/bdicn_sch"
-        :results "home.alc.co.jp/db/ow/bdicn_sch?w={searchTerms}"
-        :encoding japanese-shift_jis)
-       ("mycroft:yahoodicjpen")
-       ;; Japanese-to-Chinese
-       ("dictionary.goo.ne.jp/jc" :title "goo 日中辞書"
-         :methods (exact prefix suffix text substring)
-         :suggestions 
-         (lambda (query method _pattern)
-           (ndweb-with-url
-               (concat "http://dictionary.goo.ne.jp/srch/jc/"
-                       query
-                       (case method
-                         ('prefix "/m0u/")
-                         ('exact "/m1u/")
-                         ('suffix "/m2u")
-                         ('text "/m3u/")
-                         ('substring "/m6u/")))
-               (if (re-search-forward "<link rel=\"canonical\" href=\"http://dictionary.goo.ne.jp/leaf/jc/\\([0-9]+\\)/m0u/" nil t)
-                   (list (list (match-string 1) (lookup-query-string query)))
-                 (goto-char (point-min))
-                 (loop while (re-search-forward "<a href=\"/leaf/jc/\\([0-9]+\\)/m0u/.+?\">\\(.+?\\)</a>" nil t)
-                       collect (list (match-string 1) (match-string 2))))))
-         :results
-         "http://dictionary.goo.ne.jp/leaf/jc/{searchTerms}/m0u/")
-       ("mycroft:bitex" :title "BitEx 日中辞書")
-       ("mycroft:hjenglish-j2c" :title "沪江小D中日词典")))
-     (;; Chinese
-      :charsets (ascii chinese-gb2312)
-      :sites
-      (("zh.wikipedia.org")
-       ("zh.wiktionary.org")
-       ("www.thefreedictionary.com"
-        :self "http://www.thefreedictionary.com/_/open-search.xml")
-       ("www.iciba.com"
-        :self "http://res.iciba.com/dict/opensearch_desc.xml")
-       ;; Chinese-to-Japanese
-       ("bitex-cn.com" :title "BitEx 中日辞書"
-        :results "http://www.bitex-cn.com/search_result.php?deal_type=jp2cn&amp;keywords={searchTerms}")
-       ("www.excite.co.jp/dictionary/chinese_japanese" :title "三省堂 中日辞典 (Excite)"
-        :results
-        "http://www.excite.co.jp/dictionary/chinese_japanese/?search={searchTerms}")
-       ;("www.frelax.com" :title "書虫 Pinyin"
-       ; :results
-       ; "http://www.frelax.com/cgi-local/pinyin/hz2py.cgi?hanzi={searchTerms}&mark=3&jthz=3"
-       ; :http-method "post")
-       ("mycroft:hjenglish-c2j" :title "沪江小D日中词典")))))
-  "Pre-defined options for some searching sites.")
-      
-
 
 ;;;
 ;;; Internal Variables
 ;;;
-
-(defconst ndweb-description-regexp 
-  "type=[\"']application/opensearchdescription\\+xml[\"'] href=\\(?2:[\"']\\)\\(?1:.+?\\)\\2")
-(defconst ndweb-encoding-regexp "encoding=\\(?2:[\"']\\)\\(?1:.+?\\)\\2")
-(defconst ndweb-name-regexp "<ShortName>\\(.+?\\)</ShortName>")
-(defconst ndweb-text-regexp ;; assume GET for now
-  "type=\"text/html\" method=\"GET\" template=\"\\(.+?\\){searchTerms}\\(.*\\)\"")
-(defconst ndweb-suggest-regexp
-  "type=\"application/x-suggestions\+json\" template=\"\\(.+?\\){searchTerms}\\(.*\\)\"")
 
 (defconst ndweb-w3m         "w3m")
 (defconst ndweb-w3m-options '("-halfdump"
@@ -211,7 +81,6 @@
                               "-o" "fix_width_conv=1"
                               "-o" "ucs_conv=1"
                               "-O" "UTF-8"))
-
 
 ;;;
 ;;; Interface functions
@@ -223,23 +92,22 @@
 
 (put 'ndweb :methods 'ndweb-methods)
 (defun ndweb-methods (dict)
-  (ndweb-initialize-dictionary dict)
-  (or (lookup-dictionary-option dict :methods t)
+  (let ((methods (lookup-dictionary-option dict :methods t)))
+    (if (and methods (not (functionp methods))) methods
       (if (lookup-dictionary-option dict :suggestions t)
           '(exact prefix)
-        '(exact))))
+        '(exact)))))
 
 (put 'ndweb :title 'ndweb-title)
 (defun ndweb-title (dict)
-  (ndweb-initialize-dictionary dict)
-  (lookup-debug-message "ndweb-title: options=%s" (lookup-dictionary-options dict))
-  (lookup-dictionary-option dict :title t))
+  (let ((title (lookup-dictionary-option dict :title t)))
+    (if (and title (not (functionp title))) title
+      (error ":title options is not set! %s" dict))))
     
 (put 'ndweb :search 'ndweb-search)
 (defun ndweb-search (dict query)
   "Search web DICT for QUERY.
 If there is no `suggenstions' URL, then entry with queried  "
-  (ndweb-initialize-dictionary dict)
   (let* ((suggest (lookup-dictionary-option dict :suggestions t))
          (method  (lookup-query-method query))
          (string  (lookup-query-string query)))
@@ -254,7 +122,7 @@ If there is no `suggenstions' URL, then entry with queried  "
                                   (lookup-query-string query)
                                   (lookup-query-method query)
                                   (lookup-query-pattern query)))
-       (t (let* ((json  (if suggest (ndweb-get-json suggest string)))
+       (t (let* ((json  (if suggest (ndweb--get-json suggest string)))
                  (terms (if json (elt json 1))))
             (if (and (not (eq [] terms)) (equal method 'exact))
                 (list (aref terms 0)) terms)))))))
@@ -262,7 +130,6 @@ If there is no `suggenstions' URL, then entry with queried  "
 (put 'ndweb :content 'ndweb-content)
 (defun ndweb-content (entry)
   (let ((dict (lookup-entry-dictionary entry)))
-    (ndweb-initialize-dictionary dict)
     (let* ((results (lookup-dictionary-option dict :results t))
            (results (if (functionp results) (funcall results (lookup-entry-code entry)
                                                      (lookup-entry-heading entry)) results))
@@ -274,7 +141,7 @@ If there is no `suggenstions' URL, then entry with queried  "
                       (if encoding (encode-coding-string word encoding) word))
                      results)))
       (concat 
-       (ndweb-url-contents url)
+       (ndweb--url-contents url)
        "<a href=\"" url "\">【Original Site】</a>"))))
 
 (put 'ndweb :arrange-table '((replace ndweb-remove-to-start)
@@ -282,17 +149,6 @@ If there is no `suggenstions' URL, then entry with queried  "
                                         lookup-arrange-references-url
                                         ndweb-arrange-tags)
                              (fill      lookup-arrange-nofill)))
-
-(defun ndweb-initialize-dictionary (dict)
-  (unless (and (lookup-dictionary-option dict :results t)
-               (lookup-dictionary-option dict :title t))
-    (let* ((agent (lookup-dictionary-agent dict))
-           (site (lookup-agent-location agent))
-           (options (ndweb-site-options site)))
-      (loop for opt-name in options by 'cddr
-            do (unless (lookup-dictionary-option dict opt-name t)
-                 (setf (lookup-dictionary-option dict opt-name)
-                       (plist-get options opt-name)))))))
 
 ;;;
 ;;; Arrange functions
@@ -347,12 +203,11 @@ If there is no `suggenstions' URL, then entry with queried  "
 ;;; Internal functions
 ;;;
 
-;; When error occured during contents retrieval, signal error.
-;; Otherwise, it will not signal error.
 (defmacro ndweb-with-url (url &rest body)
   (declare (indent 1))
   `(save-excursion
-     (let* ((buffer (url-retrieve-synchronously ,(eval url))))
+     (let* ((buffer (url-retrieve-synchronously ,url)))
+       (goto-char (point-min))
        (condition-case nil
            (prog1
                (with-current-buffer buffer
@@ -361,79 +216,7 @@ If there is no `suggenstions' URL, then entry with queried  "
              (kill-buffer buffer))
          (kill-buffer buffer)))))
 
-(defun ndweb-site-options (site)
-  "Return required options (:title, :suggestions, :results) of SITE."
-  (let* ((options  (assoc-default site ndweb-site-predefined-options))
-         (title    (plist-get options :title))
-         (results  (plist-get options :results))
-         (self     (plist-get options :self)))
-    (unless (and title results)
-      (unless self
-        (setq self (ndweb-opensearch-url site)))
-      (lookup-debug-message "self=%s" self)
-      (if (null self) (error "No proper OpenSearch XML found!"))
-      (callf append options (ndweb-opensearch-options self)))
-    options))
-
-(defun ndweb-opensearch-url (site)
-  "Retrieve OpenSearch URL by link.
-If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
-  (if (string-match "^mycroft:" site)
-      (concat "http://mycroft.mozdev.org/externalos.php/" (substring site 8) ".xml")
-    (ndweb-with-url (concat "http://" site)
-      (goto-char (point-min))
-      (when (re-search-forward ndweb-description-regexp nil t)
-        (let ((opensearch-url (match-string 1)))
-          ;; when it begins with "/", attach parent url to it.
-          (if (string-match "^/" opensearch-url)
-              (concat "http://" (replace-regexp-in-string "/.*" "" site)
-                      opensearch-url)
-            opensearch-url))))))
-
-(defun ndweb-opensearch-options (url)
-  "Retrive OpenSearch options from OpenSearch URL"
-  (let* ((xml (ndweb-with-url url
-               (xml-parse-region (point-min) (point-max))))
-         (open (assq 'OpenSearchDescription xml))
-         (title (caddr (assq 'ShortName open)))
-         (encoding (caddr (assq 'InputEncoding open)))
-         (encoding (if encoding (intern (downcase encoding))))
-         (results ; element
-          (cl-find-if (lambda (x)
-                        (and (equal (car-safe x) 'Url)
-                             (member '(type . "text/html") (cadr x))))
-                      open))
-         (http-method (assoc-default 'method (cadr results)))
-         (http-method (if http-method (downcase http-method)))
-         (results-template (assoc-default 'template (cadr results)))
-         (suggests
-          (cl-find-if (lambda (x)
-                        (and (equal (car-safe x) 'Url)
-                             (member '(type . "application/x-suggestions+json")
-                                     (cadr x))))
-                      open))
-         (suggests (assoc-default 'template (cadr suggests))))
-    ;; Post の場合は、results要素の下位のParam要素のパラメータを繋げる。
-    (when (equal http-method "post")
-      (callf concat results-template "?")
-      (mapc
-       (lambda (elem) 
-         (if (equal (car-safe elem) 'Param)
-             (callf concat results-template (assoc-default 'name (cadr elem))
-                    "=" (assoc-default 'value (cadr elem)) "&")))
-       results))
-    (unless title (error "No proper OpenSearch title specified! %s" url))
-    (unless results (error "No proper OpenSearch results specified! %s" url))
-    (if (and encoding (not (coding-system-p encoding)))
-        (error "Emacs do not support encoding %s!" encoding))
-    (if (equal http-method "post")
-        (error "HTTP Post method is currently not supported!"))
-    `(:title ,title :results ,results-template
-      ,@(if http-method (list :http-method http-method))
-      ,@(if suggests (list :suggestions suggests))
-      ,@(if encoding (list :encoding encoding)))))
-
-(defun ndweb-get-json (url word)
+(defun ndweb--get-json (url word)
   (lookup-debug-message "url=%s word=%s" url word)
   (ndweb-with-url 
       ;; 前提としてUTF-8
@@ -443,15 +226,13 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
     (search-forward "\n\n")
     (json-read)))
 
-(defun ndweb-parameters (domain)
-  (assoc-default domain ndweb-predefined-agents))
-
-(defun ndweb-url-contents (url)
+(defun ndweb--url-contents (url)
   (let* ((args (append ndweb-w3m-options (list url))))
-    (with-temp-buffer
-      (lookup-debug-message "w3m args=%s" args)
-      (apply 'call-process ndweb-w3m nil (current-buffer) nil args)
-      (buffer-string))))
+    (lookup-with-coding-system 'utf-8
+      (with-temp-buffer
+        (lookup-debug-message "w3m args=%s" args)
+        (apply 'call-process ndweb-w3m nil (current-buffer) nil args)
+        (buffer-string)))))
 
 (provide 'ndweb)
 
