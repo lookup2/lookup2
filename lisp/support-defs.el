@@ -36,12 +36,16 @@
         ("/edict\\.sdic" . "support-sdic")
         ;; Unicode Char Database (http://www.unicode.org/Public/6.2.0/ucdxml/)
         ("/ucd\\..*flat\\.xml" . "support-ucd")
-        ;; 学生辞典
-        ;; (http://github.com/kawabata/kanji-database-dict/xszd.txt)
-        ("/xszd\\.txt" . "support-xszd")
         ;; 字源
         ;; http://wagang.econ.hc.keio.ac.jp/zigen
         ("/zigen\\.xml" . "support-zigen")
+        ;;; 漢字データベース
+        ;; Dicts from http://github.com/kawabata/kanji-database-dict/
+        ("/swjz\\.xml" . "support-swjz")
+        ("/sbgy\\.xml" . "support-sbgy")
+        ("/xszd\\.txt" . "support-xszd")
+        ("/dkw-word\\.txt" . "support-dkw-word")
+        ("/dkw2ucs\\.txt" . "support-dkw2ucs")
 
         ;;; EPWING/EBXA Dictionaries
         ;;; (ndeb)
@@ -56,6 +60,8 @@
         ;; V.E.R.A. (http://www.delorie.com/gnu/docs/vera/vera.html)
         ;; FreePWing version
         ("^ndeb:.*/vera" . "support-vera-fpw")
+        ;; 小学館・日中・中日辞典
+        ("^ndeb:.*/zhong_ri" . "support-zhongri")
 
         ;;; BTONIC dictionaries
         ;;; (ndbtonic)
