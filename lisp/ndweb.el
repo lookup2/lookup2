@@ -67,20 +67,33 @@
 ;;;
 
 (defgroup ndweb nil
-  "Lookup Open Search interface."
+  "Lookup Web-Search interface."
   :group 'lookup-search-agents)
 
 
 ;;;
-;;; Internal Variables
+;;; Customizable Variables
 ;;;
 
-(defconst ndweb-w3m         "w3m")
-(defconst ndweb-w3m-options '("-halfdump"
-                              "-o" "ext_halfdump=1"
-                              "-o" "fix_width_conv=1"
-                              "-o" "ucs_conv=1"
-                              "-O" "UTF-8"))
+(defgroup ndweb nil
+  "Lookup ndweb interface."
+  :group 'lookup-agents)
+
+(defcustom ndweb-w3m "w3m"
+  "*Program name of w3m."
+  :type 'string
+  :group 'ndweb)
+
+(defcustom ndweb-w3m-options '("-T" "text/html"
+                               "-halfdump"
+                               "-o" "ext_halfdump=1"
+                               "-o" "fix_width_conv=1"
+                               "-o" "ucs_conv=1"
+                               "-O" "UTF-8")
+  "*A list of arguments for w3m."
+  :type '(repeat (string :tag "option"))
+  :group 'ndweb)
+
 
 ;;;
 ;;; Interface functions
@@ -157,9 +170,8 @@ If there is no `suggenstions' URL, then entry with queried  "
 (defun ndweb-remove-to-start (entry)
   (let ((start-tag (lookup-dictionary-option
                         (lookup-entry-dictionary entry) :start-tag t)))
-    (when start-tag
-      (when (re-search-forward start-tag nil t)
-        (delete-region (point-min) (match-beginning 0))))))
+    (when (and start-tag (re-search-forward start-tag nil t))
+      (delete-region (point-min) (match-beginning 0)))))
 
 (defun ndweb-arrange-references (entry)
   (let ((dictionary (lookup-entry-dictionary entry))
@@ -207,11 +219,11 @@ If there is no `suggenstions' URL, then entry with queried  "
   (declare (indent 1))
   `(save-excursion
      (let* ((buffer (url-retrieve-synchronously ,url)))
-       (goto-char (point-min))
        (condition-case nil
            (prog1
                (with-current-buffer buffer
                  (set-buffer-multibyte t)
+                 (goto-char (point-min))
                  (progn ,@body))
              (kill-buffer buffer))
          (kill-buffer buffer)))))
@@ -222,17 +234,23 @@ If there is no `suggenstions' URL, then entry with queried  "
       ;; 前提としてUTF-8
       (replace-regexp-in-string "{searchTerms}" word url)
     (set-buffer-multibyte t)
-    (goto-char (point-min))
     (search-forward "\n\n")
     (json-read)))
 
-(defun ndweb--url-contents (url)
-  (let* ((args (append ndweb-w3m-options (list url))))
-    (lookup-with-coding-system 'utf-8
-      (with-temp-buffer
-        (lookup-debug-message "w3m args=%s" args)
-        (apply 'call-process ndweb-w3m nil (current-buffer) nil args)
-        (buffer-string)))))
+(defun ndweb--url-contents (url &optional method)
+  (let (url-request-method url-request-extra-headers url-request-data)
+    (if (equal method "post")
+        (setq url-request-method "post"
+              url-request-extra-headers 
+              '(("Content-Type" . "application/x-www-form-urlencoded"))
+              url-request-data
+              (replace-regexp-in-string "^.+\\?" "" url)))
+    (ndweb-with-url url
+      (search-forward "\n\n")
+      (delete-region (point-min) (point))
+      (apply 'call-process-region (point-min) (point-max) ndweb-w3m t
+             (current-buffer) nil ndweb-w3m-options)
+      (buffer-string))))
 
 (provide 'ndweb)
 

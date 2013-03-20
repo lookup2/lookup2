@@ -9,9 +9,11 @@
 
 ;;; Commentary:
 
-;; This file defines preset options (ndweb-site-predefined-options)
+;; This file provides preset options (ndweb-site-predefined-options)
 ;; for each web dictionaries.
+;;
 ;; This file is invoked from `support-ndweb.el' file.
+;; You can set your own dictionary options via ordinary `lookup-dictionary-option-alist'.
 ;;
 ;; Algorithm of `ndweb-site-options' is as follows.
 ;;
@@ -61,7 +63,6 @@
                dict-kind "/\\([0-9]+\\)/m0u/")
              nil t)
             (list (list (match-string 1) query))
-          (goto-char (point-min))
           (loop while (re-search-forward
                        ,(concat
                          "<a href=\"/leaf/" dict-kind 
@@ -83,7 +84,8 @@
       :sites
       (("en.wikipedia.org"
         :self "http://en.wikipedia.org/w/opensearch_desc.php")
-       ("en.wiktionary.org")
+       ("en.wiktionary.org"
+        :self "http://en.wiktionary.org/w/opensearch_desc.php")
        ("www.google.com" :title "Google (Firefox)"
         :suggestions
         "http://suggestqueries.google.com/complete/search?hl=en&client=firefox&hjson=t&&q={searchTerms}"
@@ -92,9 +94,9 @@
         :self "http://www.ldoceonline.com/widgets/ldoce_opensearch.xml")
        ("dictionary.cambridge.org"
         :self "http://dictionary.cambridge.org/gadgets/british/opensearch.xml")
-       ("mycroft:webster" :encoding iso-8859-1)
-       ("mycroft:webster-med" :encoding iso-8859-1) 
-       ("mycroft:webster-thsrs" :encoding iso-8859-1)
+       ("mycroft:webster" :title "Merriam-Webster Dictionary")
+       ("mycroft:webster-med" :title "Merriam-Webster Medical")
+       ("mycroft:webster-thsrs" :title "Merriam-Webster Thesaurus")
        ("mycroft:oald8" :start-tag "<_id id=\"main-container\">")
        ("mycroft:yahoo_dictionary")
        ("www.onelook.com" :self "http://www.onelook.com/osdf.xml")
@@ -137,7 +139,6 @@
         :suggestions
         (lambda (query method _pattern)
           (ndweb-with-url (concat "http://kotobank.jp/search/result?q=" query "&c=opensearch")
-            (goto-char (point-min))
             (mapcar
              (lambda (x) (decode-coding-string (url-unhex-string x) 'utf-8))
              (if (re-search-forward "<link rel=\"canonical\" href=\"http://kotobank.jp/word/\\(.+?\\)\"" nil t)
@@ -166,6 +167,8 @@
        ("jrek.ta2o.net/news" :title "JReK Corpus"
         :results "http://jrek.ta2o.net/s/{searchTerms}.html")
        ;; Japanese Misc
+       ("ml.naxos.jp" :title "Naxos Music Library"
+        :results "http://ml.naxos.jp/KeywordSearch.aspx?word={searchTerms}")
        ("hanmoto.com" :title "版元ドットコム書誌検索" 
         :self "http://hanmoto.com/bd.xml")
        ("mycroft:goo-music")
@@ -179,6 +182,20 @@
          :start-tag "<b><span>"
          :suggestions ,(ndweb-goo-suggestions "je2")
          :results "http://dictionary.goo.ne.jp/leaf/je2/{searchTerms}/m0u/")
+       ("rnnnews.jp"
+        :title "RNN時事英語辞典"
+        :methods (exact prefix suffix substring)
+        :suggestions
+        (lambda (query method pattern)
+          (let ((code (concat query "&m="
+                              (case method ('substring "0") ('prefix "1")
+                                    ('suffix "2") ('exact "3")))))
+            (ndweb-with-url 
+                (concat "http://rnnnews.jp/search/result/?q=" code)
+              (unless (search-forward "見つかりませんでした。" nil t)
+                (list (list code pattern))))))
+        :results 
+        "http://rnnnews.jp/search/result/?q={searchTerms}")
        ("mycroft:kenkeiwachujiten-cl" :title "研究社新英和中辞典 (Excite)")
        ("www.excite.co.jp/dictionary"
         :self "http://www.excite.co.jp/search/opensearch/xml/dictionary/english/")
@@ -241,7 +258,6 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
   (if (string-match "^mycroft:" site)
       (concat "http://mycroft.mozdev.org/externalos.php/" (substring site 8) ".xml")
     (ndweb-with-url (concat "http://" site)
-      (goto-char (point-min))
       (when (re-search-forward ndweb-description-regexp nil t)
         (let ((opensearch-url (match-string 1)))
           ;; when it begins with "/", attach parent url to it.

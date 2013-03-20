@@ -26,18 +26,13 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'cl-lib))
 (require 'lookup)
+(require 'ndweb) ;; w3m related functions and variables
 
 (defconst ndzim-version "0.1")
 
 (defvar ndzim-search         "zimsearch")
 (defvar ndzim-search-options '("--weight-dist" "0"))
 (defvar ndzim-dump           "zimdump")
-(defvar ndzim-w3m            "w3m")
-(defvar ndzim-w3m-options    '("-halfdump"
-                               "-o" "ext_halfdump=1"
-                               "-o" "fix_width_conv=1"
-                               "-o" "ucs_conv=1"
-                               "-O" "UTF-8"))
 
 (put 'ndzim :methods '(exact prefix))
 
@@ -84,7 +79,7 @@
 
 (put 'ndzim :arrange-table '((reference ndzim-arrange-references
                                         ndzim-arrange-image
-                                        ndzim-arrange-tags)
+                                        ndweb-arrange-tags)
                              (fill      lookup-arrange-nofill)))
 
 (put 'ndzim :clear 'ndzim-clear)
@@ -102,7 +97,7 @@
      (lookup-agent-location agent))))
 
 (defun ndzim--check-environment ()
-  (dolist (exec (list ndzim-search ndzim-dump ndzim-w3m))
+  (dolist (exec (list ndzim-search ndzim-dump ndweb-w3m))
     (unless (executable-find exec)
       (error "ndzim: required application `%s' can not be found." exec))))
 
@@ -155,15 +150,14 @@
           (setq redirection (match-string 1)))
       (if redirection
           (cl-callf ndzim-info redirection nil file))
-      (list (concat namespace "/" url) title redirection)
-      )))
+      (list (concat namespace "/" url) title redirection))))
 
 (defun ndzim-content (url file)
   (let* ((url-file (ndzim-dump-url url file))
-         (args (append ndzim-w3m-options (list url-file))))
+         (args (append ndweb-w3m-options (list url-file))))
     (with-temp-buffer
       ;;(lookup-debug-message "w3m args=%s" args)
-      (apply 'call-process ndzim-w3m nil (current-buffer) nil args)
+      (apply 'call-process ndweb-w3m nil (current-buffer) nil args)
       (buffer-string))))
 
 ;;;
@@ -198,33 +192,5 @@
                          (if (string-match "\\.jpg" img-file) 'jpeg 'png))))
         (lookup-img-file-insert img-file img-type
                                 (match-beginning 0) (match-end 0))))))
-
-(defun ndzim-arrange-tags (_entry)
-  (let ((case-fold-search t))
-    (goto-char (point-min))
-    (while (re-search-forward "<b>\\(.+?\\)</b>" nil t)
-      (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face lookup-bold-face))
-      (delete-region (match-end 1) (match-end 0))
-      (delete-region (match-beginning 0) (match-beginning 1)))
-    (goto-char (point-min))
-    (while (re-search-forward "<i>\\(.+?\\)</i>" nil t)
-      (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face lookup-italic-face))
-      (delete-region (match-end 1) (match-end 0))
-      (delete-region (match-beginning 0) (match-beginning 1)))
-    (goto-char (point-min))
-    (while (re-search-forward "<_SYMBOL.*?>\\(.+?\\)</_SYMBOL>" nil t)
-      (add-text-properties (match-beginning 1) (match-end 1)
-                           '(face lookup-emphasis-face))
-      (delete-region (match-end 1) (match-end 0))
-      (delete-region (match-beginning 0) (match-beginning 1)))
-    (goto-char (point-min))
-    (while (re-search-forward "</?span.*?>" nil t)
-      (replace-match ""))
-    (goto-char (point-min))
-    (while (re-search-forward "<.+?>" nil t)
-      (replace-match "")
-      )))
 
 (provide 'ndzim)
