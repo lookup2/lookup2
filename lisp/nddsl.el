@@ -83,9 +83,10 @@
                           ".dsl")))
          (files (directory-files location nil
                                  (concat (regexp-quote extension) "\\'"))))
+    (message "files=%s" files)
     (if (null files) (error "nddsl: DSL file wity sary index not found! (%s)" location))
     (mapcar (lambda (name) 
-              (lookup-new-dictionary agent (file-name-sans-extension name)))
+              (lookup-new-dictionary agent name))
             files)))
 
 (put 'nddsl :title 'nddsl-title)
