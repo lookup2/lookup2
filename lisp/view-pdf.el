@@ -19,7 +19,7 @@
 ;;; References
 ;; http://partners.adobe.com/public/developer/en/acrobat/PDFOpenParameters.pdf
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (defvar view-pdf-mac-app 'preview
   "Either `preview' or `adobe-reader' can be specified.")
