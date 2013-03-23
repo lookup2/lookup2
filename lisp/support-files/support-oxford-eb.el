@@ -20,8 +20,15 @@
 (require 'lookup)
 (defvar ipaface 'default)
 
-(let 
-  ((encoded-oxford-eb-gaiji-table
+(defconst oxford-eb-gaiji-table
+  (lookup-new-gaiji-table
+   (mapcar 
+    #'(lambda (x)
+	(list
+	 (if (eq lookup-support-agent 'ndtp)
+	     (concat "gaiji:" (car x))
+	   (car x))
+	 (cadr x)))
     '(
       ("h0f01" "=")
       ("h0f02" "=")
@@ -271,17 +278,7 @@
       ("h0ffc" "î")
       ("h0ffd" "ô")
       ("h0ffe" "ñ")
-      ("h1001" "="))))
-  (defconst oxford-eb-gaiji-table
-    (lookup-new-gaiji-table
-     (mapcar 
-      '(lambda (x)
-        (list
-         (if (eq lookup-support-agent 'ndtp)
-             (concat "gaiji:" (car x))
-           (car x))
-         (cadr x)))
-      encoded-oxford-eb-gaiji-table))))
+      ("h1001" "=")))))
 
 (defun oxford-eb-arrange-structure (entry)
   (goto-char (point-min))
