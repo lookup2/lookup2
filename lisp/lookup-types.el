@@ -270,8 +270,10 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
     ;; Load support file
     (let ((file (lookup-assoc-get lookup-support-alist id)))
       (when file
-	(let ((lookup-support-agent (lookup-agent-class
-				     (lookup-dictionary-agent dictionary)))
+	(let ((lookup-support-agent
+               (lookup-agent-class (lookup-dictionary-agent dictionary)))
+              (lookup-support-agent-options
+               (lookup-agent-options (lookup-dictionary-agent dictionary)))
 	      (lookup-support-dictionary-id
                (lookup-dictionary-id dictionary))
 	      (lookup-support-options nil))

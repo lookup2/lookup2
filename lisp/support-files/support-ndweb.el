@@ -16,6 +16,7 @@
 
 (require 'ndweb-options)
 
-(when (string-match "^ndweb:\\(.+\\)/$" lookup-support-dictionary-id)
+(when (equal lookup-support-agent "ndweb")
   (setq lookup-support-options
-        (ndweb-site-options (match-string 1 lookup-support-dictionary-id))))
+        (ndweb-site-options (match-string 1 lookup-support-dictionary-id)
+                            lookup-support-agent-options)))

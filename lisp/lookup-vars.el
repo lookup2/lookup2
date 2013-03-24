@@ -355,6 +355,11 @@ KEY 及び VALUE は省略可能で、エージェントに対するオプショ
 This variable is automatically set when loading a support file, and
 should be only refered in support files.")
 
+(defvar lookup-support-agent-options nil
+  "Symbol indicating the options of search agent that a support file applies to.
+This variable is automatically set when loading a support file,
+and should be only refered in support files.")
+
 (defvar lookup-support-dictionary-id ""
   "Symbol indicating the dictionary that a support file applies to.
 This variable is automatically set when loading a support file,
