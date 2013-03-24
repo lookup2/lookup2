@@ -289,10 +289,12 @@ based on: http://www.unicode.org/Public/UNIDATA/PropertyAliases.txt"  )
   (replace-regexp-in-string 
    "[0-9][0-9][0-9][0-9]\\.[0-9][0-9]0"
    (lambda (x) 
-     (lookup-url-set-link
+     (lookup-set-link
       0 (1- (length x))
-      (format support-ucd-kangxi-url-format
-              (string-to-number (substring x 0 4)))
+      (lookup-new-entry 
+       'url nil ;; dict
+       (format support-ucd-kangxi-url-format
+               (string-to-number (substring x 0 4))))
       x) x)
    str))
 

@@ -66,7 +66,7 @@
             :code-tags '(" id=\"" . "\" ")
             :content-tags '("<shuowen>" . "</shuowen>")
             :coding 'utf-8-dos
-            :charsets 'lookup-text-cjk-p
+            :charsets '(han)
             :arranges '((replace support-swjz-arrange-structure))))
 
 ;;; support-swjz.el ends here

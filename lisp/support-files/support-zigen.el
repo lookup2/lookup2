@@ -138,7 +138,7 @@
       (list :title "字源"
             :coding 'utf-8-dos
             :query-filter 'lookup-query-filter-to-katakana
-            :charsets (lambda (x) (string-match "^\\(\\cC+\\)\\|\\(\\cK+\\)$" x))
+            :charsets '(han kana)
             :entry-tags-list 'support-zigen-entry-tags-list
             :code-tags 'support-zigen-code-tags
             :content-tags 'support-zigen-content-tags

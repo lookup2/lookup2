@@ -89,10 +89,11 @@
               field (cdr field)))))
   (goto-char (point-min))
   (while (re-search-forward "ページ: \\([0-9]+\\)" nil t)
-    (lookup-url-set-link (match-beginning 0) (match-end 0)
-                         (format support-chinakan-url-format
-                                 (match-string 1))))
-  )
+    (lookup-set-link (match-beginning 0) (match-end 0)
+                     (lookup-new-entry
+                      'url (lookup-entry-dictionary entry)
+                      (format support-chinakan-url-format
+                              (match-string 1))))))
 
 (setq lookup-support-options
       (list :title "支那文を讀む爲の漢字典"
