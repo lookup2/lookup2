@@ -901,26 +901,28 @@ If there is no session, default module will be returned."
 ;;;
 
 (defun lookup-initialize ()
-  (load lookup-init-file t)
-  (when lookup-cache-file
-    (require 'lookup-cache)
-    (load lookup-cache-file t)) 
-  (setq lookup-search-history (lookup-new-history))
-  (setq lookup-agent-list
-	(mapcar (lambda (spec) (apply 'lookup-new-agent spec))
-		(or lookup-search-agents
-		    (setq lookup-search-agents '((ndtut))))))
-  (setq lookup-dictionary-list
-	(apply 'append
-	       (mapcar 'lookup-agent-dictionaries lookup-agent-list)))
-  (setq lookup-search-modules
-        (mapcar 'list (mapcar 'car lookup-module-attributes)))
-  (setq lookup-module-list
-	(mapcar (lambda (spec) (apply 'lookup-new-module spec))
-		(or lookup-search-modules '(("default" t)))))
-  (lookup-init-support-autoload)
-  (run-hooks 'lookup-load-hook)
-  (add-hook 'kill-emacs-hook 'lookup-exit))
+  (with-temp-buffer
+    (lookup-splash)
+    (load lookup-init-file t)
+    (when lookup-cache-file
+      (require 'lookup-cache)
+      (load lookup-cache-file t)) 
+    (setq lookup-search-history (lookup-new-history))
+    (setq lookup-agent-list
+          (mapcar (lambda (spec) (apply 'lookup-new-agent spec))
+                  (or lookup-search-agents
+                      (setq lookup-search-agents '((ndtut))))))
+    (setq lookup-dictionary-list
+          (apply 'append
+                 (mapcar 'lookup-agent-dictionaries lookup-agent-list)))
+    (setq lookup-search-modules
+          (mapcar 'list (mapcar 'car lookup-module-attributes)))
+    (setq lookup-module-list
+          (mapcar (lambda (spec) (apply 'lookup-new-module spec))
+                  (or lookup-search-modules '(("default" t)))))
+    (lookup-init-support-autoload)
+    (run-hooks 'lookup-load-hook)
+    (add-hook 'kill-emacs-hook 'lookup-exit)))
 
 (defun lookup-clear ()
   "Clear all related variables without calling :kill command to
@@ -942,8 +944,31 @@ dictionaries."
     (dolist (dict lookup-dictionary-list)
       (when (string-match (car pair) (lookup-dictionary-id dict))
 	(lookup-use-support (lookup-dictionary-id dict)
-                            (cdr pair))
-        ))))
+                            (cdr pair))))))
+
+(defun lookup-splash ()
+  "Display splash scrren in current buffer, if supported."
+  (let ((image-file
+         (concat (file-name-directory (locate-library "lookup")) "/lookup-logo.xpm")))
+    (when (and lookup-enable-splash
+               (image-type-available-p 'xpm)
+               (file-exists-p image-file))
+      (erase-buffer)
+      (display-buffer (current-buffer))
+      (let ((img (create-image image-file))
+            (fill-column (window-width)))
+        (insert (propertize " " 'display
+                            `(space :align-to (+ center (-0.5 . ,img)))))
+        (insert-image img)
+        (insert "\n\n")
+        (insert (format "\nLookup %s\n\n" lookup-version))
+        (insert "Copyright (C) 1999-2013 Lookup Development Team\n")
+        (center-region (point-min) (point))
+        (goto-char (point-min))
+        (insert-char ?\n (max 1 (/ (- (window-height) 
+                                      (count-lines (point-min) (point-max)) 6)
+                                   2)))
+        (sit-for 1)))))
 
 (provide 'lookup)
 
