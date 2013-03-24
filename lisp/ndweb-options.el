@@ -1,4 +1,4 @@
-;;; ndweb-options.el --- Web-based Dictionary Options  -*- lexical-binding: t -*-
+;;; ndweb-options.el --- Web-based Dictionary Options  -*- coding: utf-8; lexical-binding:t -*-
 
 ;; Copyright (c) KAWABATA, Taichi
 

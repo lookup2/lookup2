@@ -218,15 +218,16 @@ If there is no `suggenstions' URL, then entry with queried  "
 (defmacro ndweb-with-url (url &rest body)
   (declare (indent 1))
   `(save-excursion
-     (let* ((buffer (url-retrieve-synchronously ,url)))
+     (let* (buffer)
        (condition-case nil
-           (prog1
-               (with-current-buffer buffer
-                 (set-buffer-multibyte t)
-                 (goto-char (point-min))
-                 (progn ,@body))
+           (prog2
+             (setq buffer (url-retrieve-synchronously ,url))
+             (with-current-buffer buffer
+               (set-buffer-multibyte t)
+               (goto-char (point-min))
+               (progn ,@body))
              (kill-buffer buffer))
-         (kill-buffer buffer)))))
+         (error (when (buffer-live-p buffer) (kill-buffer buffer)))))))
 
 (defun ndweb--get-json (url word)
   (lookup-debug-message "url=%s word=%s" url word)
