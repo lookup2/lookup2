@@ -25,7 +25,6 @@
 (eval-when-compile (require 'cl))
 (require 'cl-lib)
 (require 'lookup-vars)
-(declare-function lookup-text-wakati "lookup-text")
 
 ;; warning.  lookup-{assq/assoc}-set functions can not be used with
 ;; lexically-scoped variables.  see manual of `set' function for
@@ -92,6 +91,43 @@
       (setq plist (cddr plist)))
     (nreverse alist)))
 
+;;; table
+
+(defun lookup-add-to-table (key val table)
+  (let* ((old-val (typecase table
+                    (hash-table (gethash key table))
+                    (char-table (aref table key))
+                    (symbol     (get-char-code-property key table))
+                    (t (error "Improper table! %s" table))))
+         (new-val (typecase old-val
+                    (null val)
+                    (list (if (memq val old-val) old-val (push val old-val)))
+                    (t    (list old-val val)))))
+    (typecase table 
+      (hash-table (puthash key new-val table))
+      (char-table (aset table key new-val))
+      (t (put-char-code-property key new-val table)))))
+
+;;; list thread
+
+(defun lookup-thread-list (seq &optional seqrest)
+  "Create Threaded list of SEQ."
+  ;; e.g. (lookup-thread-list '((3 4) 1 (5 6)))
+  ;;   -> ((3 1 5) (4 1 5) (3 1 6) (4 1 6))
+  (if (null seq) seqrest
+    (lookup-thread-list
+     (cdr seq)
+     (let ((elem (car seq)))
+       (if (listp elem)
+           (cl-mapcan (lambda (x) 
+                        (mapcar (lambda (y)
+                                  (append y (list x)))
+                                (or seqrest (list nil))))
+                      elem)
+         (mapcar (lambda (y)
+                   (append y (list (car seq))))
+                 (or seqrest (list nil))))))))
+
 ;; misc
 
 (defmacro lookup-aif (cond then &rest else) ;; anaphoric if
@@ -125,9 +161,7 @@
       (forward-line -1))))
 
 (defun lookup-oneline-string (string)
-  (while (string-match "\n *" string)
-    (setq string (replace-match " " t t string)))
-  string)
+  (replace-regexp-in-string "\n *" " " string))
 
 (defun lookup-read-string (prompt &optional init history default inherit)
   (read-string (if default
@@ -198,51 +232,6 @@
 (defun lookup-put-property (obj key val)
   (setq lookup-property-table
         (lookup-multi-put lookup-property-table obj key val)))
-
-;;;
-;;; Lookup current-word
-;;;
-
-(defun lookup-current-word ()
-  (save-excursion
-    (unless (eq (char-syntax (or (char-after (point)) 0)) ?w)
-      (skip-syntax-backward "^w" (line-beginning-position))
-      (if (bolp)
-          (skip-syntax-forward "^w" (line-end-position))
-        (backward-char)))
-    (let* ((ch (or (char-after (point)) 0))
-	   (charset (char-charset ch)))
-      (cond ((and (eq charset 'japanese-jisx0208)
-                  (< #x3000 ch))
-             (lookup-current-word-japanese))
-	    (t (lookup-current-word-general))))))
-
-(defun lookup-current-word-general ()
-  (if (fboundp 'thing-at-point)
-      (thing-at-point 'word)
-    (buffer-substring-no-properties
-     (progn (skip-syntax-backward "w") (point))
-     (progn (skip-syntax-forward "w") (point)))))
-
-(defun lookup-current-word-japanese ()
-  (if (not lookup-use-mecab)
-      (lookup-current-word-general)
-    (let* ((start (point))
-           (wakati 
-            (lookup-text-wakati
-             (buffer-substring (progn (skip-syntax-backward "w") (point))
-                               (progn (skip-syntax-forward "w") (point)))))
-           (regexp
-            (concat "\\(" 
-                    (mapconcat 'identity (split-string wakati "[ \n]" t)
-                               "\\)\\(" )
-                    "\\)"))
-           (n 1))
-      (if (null (re-search-backward regexp nil t))
-          (lookup-current-word-general)
-        (while (and (match-end n) (<= (match-end n) start))
-          (setq n (1+ n)))
-        (buffer-substring-no-properties (match-beginning n) (match-end n))))))
 
 ;;;
 ;;; Lookup process
