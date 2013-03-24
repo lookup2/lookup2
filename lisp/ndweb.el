@@ -41,7 +41,7 @@
 ;;
 ;; Currently, POST-method Search Engine is not supported.
 ;;
-;; Supported Agent/Dictionary Options
+;; Supported Dictionary Options (You can not specify them in agent option!)
 ;;
 ;; |--------------+-------------------------------------|
 ;; | :self        | OpenSearch URL                      |
@@ -147,6 +147,7 @@ If there is no `suggenstions' URL, then entry with queried  "
            (results (if (functionp results) (funcall results (lookup-entry-code entry)
                                                      (lookup-entry-heading entry)) results))
            (encoding (lookup-dictionary-option dict :encoding t))
+           (method   (lookup-dictionary-option dict :http-method t))
            (word    (lookup-entry-code entry))
            (url     (replace-regexp-in-string
                      "{searchTerms}"
@@ -154,7 +155,7 @@ If there is no `suggenstions' URL, then entry with queried  "
                       (if encoding (encode-coding-string word encoding) word))
                      results)))
       (concat 
-       (ndweb--url-contents url)
+       (ndweb--url-contents url method)
        "<a href=\"" url "\">【Original Site】</a>"))))
 
 (put 'ndweb :arrange-table '((replace ndweb-remove-to-start)
@@ -241,7 +242,7 @@ If there is no `suggenstions' URL, then entry with queried  "
 (defun ndweb--url-contents (url &optional method)
   (let (url-request-method url-request-extra-headers url-request-data)
     (if (equal method "post")
-        (setq url-request-method "post"
+        (setq url-request-method "POST"
               url-request-extra-headers 
               '(("Content-Type" . "application/x-www-form-urlencoded"))
               url-request-data

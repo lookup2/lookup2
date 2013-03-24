@@ -17,15 +17,15 @@
 ;;
 ;; Algorithm of `ndweb-site-options' is as follows.
 ;;
-;; (0) Dictionary's default option is taken from
+;; (1) Dictionary's default option is taken from
 ;;     `ndweb-default-options-alist'.
-;; (1) If a dictinonary has both `:results' and `:title' options,
+;; (2) If a dictinonary has both `:results' and `:title' options,
 ;;     then dictionary is O.K.
-;; (2) If a dictionary does not have neither `:results' nor `:title'
+;; (3) If a dictionary does not have neither `:results' nor `:title'
 ;;     options, then, check if a dictionary has `:self' option.
-;; (3) If a dictionary does not have `:self' option, then it is taken
+;; (4) If a dictionary does not have `:self' option, then it is taken
 ;;     from OpenSearchDescription XML file.
-;; (4) When `:self' options is identified, then identify `:title',
+;; (5) When `:self' options is identified, then identify `:title',
 ;;     `:results' and other options from OpenSearch file.
 
 ;;; Code:
@@ -231,23 +231,29 @@
        ("www.excite.co.jp/dictionary/chinese_japanese" :title "三省堂 中日辞典 (Excite)"
         :results
         "http://www.excite.co.jp/dictionary/chinese_japanese/?search={searchTerms}")
-       ;("www.frelax.com" :title "書虫 Pinyin"
-       ; :results
-       ; "http://www.frelax.com/cgi-local/pinyin/hz2py.cgi?hanzi={searchTerms}&mark=3&jthz=3"
-       ; :http-method "post")
-       ("mycroft:hjenglish-c2j" :title "沪江小D日中词典")))))
+       ("mycroft:hjenglish-c2j" :title "沪江小D日中词典")))
+     ;(;; Kanji/Hanzi
+     ; :charsets (han)
+     ; :sites
+     ; (("www.zdic.net"
+     ;   :title "漢典"
+     ;   :charsets (han)
+     ;   :results "http://www.zdic.net/sousou/?q={searchTerms}"
+     ;   :method "post")))
+     ))
   "Pre-defined options for some searching sites.")
 
-(defun ndweb-site-options (site)
+(defun ndweb-site-options (site agent-options)
   "Return required options (:title, :suggestions, :results) of SITE."
-  (let* ((options  (assoc-default site ndweb-default-options-alist))
+  (let* ((options  (append
+                    agent-options
+                    (assoc-default site ndweb-default-options-alist)))
          (title    (plist-get options :title))
          (results  (plist-get options :results))
          (self     (plist-get options :self)))
     (unless (and title results)
       (unless self
         (setq self (ndweb--opensearch-url site)))
-      (lookup-debug-message "self=%s" self)
       (if (null self) (error "No proper OpenSearch XML found!"))
       (callf append options (ndweb--opensearch-options self)))
     options))
