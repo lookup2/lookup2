@@ -42,6 +42,11 @@
   "Setup variables."
   :group 'lookup)
 
+(defcustom lookup-enable-splash t
+  "*Non-nil displays splash screen if available."
+  :type 'boolean
+  :group 'lookup-setup-variables)
+
 (defcustom lookup-init-directory (concat user-emacs-directory "/lookup")
   "*Lookup initialization directory."
   :type 'file
@@ -107,8 +112,8 @@ Dictionary option `cite-prefix' overrides this variable."
 
 (defcustom lookup-process-coding-system
   (if (memq system-type '(ms-dos windows-nt OS/2 emx))
-      'sjis-dos
-    'euc-jp)
+      'cp932
+    'utf-8)
   "*Default coding system for external processes."
   :type 'symbol
   :group 'lookup-general-options)
@@ -203,10 +208,10 @@ Dictionary option `cite-prefix' overrides this variable."
   :type 'symbol
   :group 'lookup-additional-features)
 
-(defcustom lookup-use-mecab
-  (if (executable-find lookup-mecab-program) t)
-  "*Non-nil enables Kanji extraction by using MECAB."
-  :type 'boolean
+(defcustom lookup-text-segmentize-japanese
+  (if (executable-find lookup-mecab-program) 'mecab)
+  "*Symbol `mecab' enables Japanese Segmentation by MECAB."
+  :type 'symbol
   :group 'lookup-additional-features)
 
 (defcustom lookup-enable-format t
