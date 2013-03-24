@@ -48,18 +48,19 @@
       (goto-char (marker-position marker)))))
 
 (defun support-rangjung-head-tags (content)
-  (string-match "^\\(.+?\\) - " content)
-  (let ((head (match-string 1 content)))
-    (concat head
-            " (" 
-            (tibetan-extended-wylie-decode-string head) 
-            ")")))
+  (when (string-match "^\\(.+?\\) - " content)
+    (let ((head (match-string 1 content)))
+      (concat head
+              " (" 
+              (tibetan-extended-wylie-decode-string head) 
+              ")"))))
 
 (setq lookup-support-options
       (list :title "Rangjung Yeshe"
             :query-filter 'support-rangjung-query-filter
             :content-tags '("\n" . "\n")
-            :entry-tags '("\n" . " - ")
+            :entry-tags '(nil . " - ")
+            :code-tags '(nil . " - ")
             :arranges '((structure support-rangjung-arrange-structure))
             :head-tags 'support-rangjung-head-tags))
 
