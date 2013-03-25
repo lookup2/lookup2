@@ -16,7 +16,9 @@
 
 (require 'ndweb-options)
 
-(when (equal lookup-support-agent "ndweb")
-  (setq lookup-support-options
-        (ndweb-site-options (match-string 1 lookup-support-dictionary-id)
-                            lookup-support-agent-options)))
+(if (string-match "^ndweb:\\(.+?\\)/$" lookup-support-dictionary-id)
+    (setq lookup-support-options
+          (ndweb-site-options (match-string 1 lookup-support-dictionary-id)
+                              lookup-support-agent-options))
+  (error "support-ndweb: improper dictionary id=%s" lookup-support-dictionary-id))
+  
