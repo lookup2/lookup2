@@ -201,18 +201,6 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 	(set-window-buffer lookup-start-window (current-buffer))
       (display-buffer (current-buffer))))))
 
-(defun lookup-filter-query (query filters)
-  "Apply FILTERS functions to QUERY to generate filtered queries."
-  (let ((queries (list query)) result)
-    (dolist (filter filters)
-      (setq queries 
-            (apply 'append 
-                   (mapcar (lambda (query)
-                             (setq result (apply filter (list query)))
-                             (if (listp result) result (list result)))
-                           queries))))
-    queries))
-
 (defun lookup-filter-string (string filters)
   (let ((query (lookup-new-query 'default string)))
     (lookup-query-string 
