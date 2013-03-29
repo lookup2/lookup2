@@ -41,6 +41,7 @@
 (require 'lookup-vars)
 (require 'lookup-types)
 (require 'stem-english)
+;; (define-char-code-property 'hanzi-pinyin "hanzi-py-table.elc")
 
 ;;;
 ;;; Customizable Variables
@@ -52,21 +53,12 @@
   :type 'list
   :group 'lookup-text)
 
-(defcustom lookup-text-pinyin-file (expand-file-name "~/cvs/emacs/leim/MISC-DIC/pinyin.map")
-  "*漢字ピンイン変換に使用するデータがあるファイル。
-Emacs配布の`emacs/leim/MISC-DIC/pinyin.map'を指定する。"
-  :type 'string
-  :group 'lookup-text)
-
 ;;;
 ;;; Internal Variables
 ;;;
 
 (defvar lookup-text-reading-table (make-hash-table :test 'equal)
   "漢字ひらがな変換データのキャッシュ")
-
-(defvar lookup-text-pinyin-table nil
-  "漢字ピンイン変換用ハッシュテーブル")
 
 ;;;
 ;;; Charsets Checker
@@ -157,7 +149,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
 ;;; General function
 
 (defun lookup-translate-string-by-table (str table)
-  "Translate STR by TABLE (hash-table or char-table)."
+  "Translate STR by TABLE (hash-table, char-table or char-code-property)."
   (let* ((chars (string-to-list str))
          (new-chars
           (typecase table
@@ -168,6 +160,10 @@ the string will be returned.  If CHARSETS is null, it returns t."
             (char-table
              (mapcar (lambda (char)
                        (or (aref table char) char))
+                     chars))
+            (symbol
+             (mapcar (lambda (char)
+                       (or (get-char-code-property char table) char))
                      chars))))
          (new-chars-list (lookup-thread-list new-chars)))
     (mapcar (lambda (x) (apply 'lookup-concat x)) new-chars-list)))
@@ -203,24 +199,10 @@ If it is not Kanji string, then it returns nil."
 
 ;;; Hanzi to Pinyin
 
-(defun lookup-text-load-pinyin-file ()
-  (unless lookup-text-pinyin-table
-    (setq lookup-text-pinyin-table (make-hash-table :test 'equal))
-    (with-temp-buffer
-      (let ((coding-system-for-read 'euc-china)
-            pinyin)
-        (insert-file-contents lookup-text-pinyin-file)
-        (goto-char (point-min))
-        (while (re-search-forward "^\\([a-z]+\\)	\\(.+\\)" nil t)
-          (setq pinyin (match-string 1))
-          (dolist (char (string-to-list (match-string 2)))
-            (lookup-add-to-table char pinyin lookup-text-pinyin-table)))))))
-
 (defun lookup-text-hanzi-to-pinyin (str)
   "Convert Kanji STR to Pinyin."
-  (when (file-exists-p lookup-text-pinyin-file)
-    (lookup-text-load-pinyin-file)
-    (lookup-translate-string-by-table str lookup-text-pinyin-table)))
+  (require 'hanzi-py-table)
+  (lookup-translate-string-by-table str 'hanzi-pinyin))
 
 ;;; Japanese Old Kanji to New Kanji and vice versa
 
