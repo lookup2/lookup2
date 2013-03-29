@@ -22,7 +22,7 @@
 
 ;;; Documentation:
 
-;; This decodes BOCU (Binary Ordered Compression of Unicode) string.
+;; This decodes BOCU (Binary Ordered Compression for Unicode) string.
 
 (eval-and-compile
   (defun bocu-read-decode-trail-char (reg)

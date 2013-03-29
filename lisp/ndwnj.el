@@ -2,6 +2,7 @@
 ;; Copyright (C) 2009  Kazuhiro Ito <kzhr@d1.dion.ne.jp>
 
 ;; Author: Kazuhiro Ito <kzhr@d1.dion.ne.jp>
+;; Modified by: Kawabata Taichi
 
 ;; ndwnj.el is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by
