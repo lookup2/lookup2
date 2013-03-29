@@ -17,6 +17,8 @@
 (require 'lookup)
 (require 'lookup-text)
 
+(defvar zhongri-hanzi-to-pinyin t)
+
 (defun zhongri-dictionary-arrange-gaiji (entry)
   (let* ((case-fold-search nil)
          (dictionary (lookup-entry-dictionary entry))
@@ -34,12 +36,18 @@
                       (- (string-to-number (match-string 2 code) 16) 128)))))
     (goto-char (point-min))))
 
+(defun zhongri-query-filter (query)
+  (lookup-new-query-filter 
+   query
+   (lambda (string)
+     (cons string (lookup-text-hanzi-to-pinyin string)))))
+
 ;; If you use "EB Kanji Indexer" 
 ;; (http://www31.ocn.ne.jp/~h_ishida/EBKIdx.html), you can search 
 ;; EBXA-C dictionaries with Japanese Kanji.
 (setq lookup-support-options
       `(:arranges ((gaiji zhongri-dictionary-arrange-gaiji))
-        ,@(when (file-exists-p lookup-text-pinyin-file)
-            (list :query-filter 'lookup-query-filter-hanzi-to-pinyin))))
+        :query-filter zhongri-query-filter))
+        ;:query-filter lookup-query-filter-hanzi-to-pinyin))
 
 ;;; support-zhongri.el ends here
