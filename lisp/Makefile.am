@@ -1,12 +1,13 @@
-SOURCES = bocu.el stem-english.el view-pdf.el lookup-types.el		\
-	 lookup-text.el lookup.el lookup-utils.el lookup-vars.el	\
-	 lookup-cache.el lookup-summary.el lookup-content.el		\
-	 lookup-select.el lookup-modules.el lookup-history.el		\
-	 ndbtonic.el ndcookie.el ndeb.el ndeb-binary.el nddsl.el	\
-	 ndic.el ndict.el ndjitsuu.el ndlatin.el ndpdic.el ndsary.el	\
-	 ndbuffer.el ndspell.el ndspotlight.el ndsrd.el ndtut.el	\
-	 ndest.el ndtext.el ndweb.el ndwnj.el ndzim.el ndmecab.el	\
-	 ndwdsgrep.el tibet-util+.el support-defs.el ndweb-options.el	\
+SOURCES = bocu.el stem-english.el hanzi-py-table.el view-pdf.el		\
+	 lookup-types.el lookup-text.el lookup.el lookup-utils.el	\
+	 lookup-vars.el lookup-cache.el lookup-summary.el		\
+	 lookup-content.el lookup-select.el lookup-modules.el		\
+	 lookup-history.el ndbtonic.el ndcookie.el ndeb.el		\
+	 ndeb-binary.el nddsl.el ndic.el ndict.el ndjitsuu.el		\
+	 ndlatin.el ndpdic.el ndsary.el ndbuffer.el ndspell.el		\
+	 ndspotlight.el ndsrd.el ndtut.el ndest.el ndtext.el ndweb.el	\
+	 ndwnj.el ndzim.el ndmecab.el ndwdsgrep.el tibet-util+.el	\
+	 support-defs.el ndweb-options.el				\
 	 support-files/support-chinakan.el				\
 	 support-files/support-dkw-word.el				\
 	 support-files/support-dkw2ucs.el				\
@@ -35,7 +36,7 @@ SOURCES = bocu.el stem-english.el view-pdf.el lookup-types.el		\
 	 support-files/support-zhongri.el				\
 	 support-files/support-zigen.el
 ELCFILES = $(SOURCES:.el=.elc)
-EXTRA_DIST = $(SOURCES) lookup-compile.el
+EXTRA_DIST = $(SOURCES) lookup-compile.el lookup-logo.xpm
 INSTALLFILES = $(SOURCES) $(ELCFILES) lookup-autoloads.el
 CLEANFILES = $(ELCFILES)
 MAINTAINERCLEANFILES = Makefile.in lookup-autoloads.el
