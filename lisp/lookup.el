@@ -934,16 +934,32 @@ dictionaries."
 	(lookup-use-support (lookup-dictionary-id dict)
                             (cdr pair))))))
 
+(eval-and-compile
+  (defvar lookup-splash-file-name "/lookup-logo.xpm")
+
+  (defvar lookup-splash-image
+    (eval-when-compile
+      (let ((file (concat "." lookup-splash-file-name)))
+	(when (and (boundp 'lookup-byte-compiling)
+		   lookup-byte-compiling
+		   (file-exists-p file))
+	  (with-temp-buffer
+	    (insert-file-contents-literally file)
+	    (buffer-string))))))
+  )
+
 (defun lookup-splash ()
   "Display splash scrren in current buffer, if supported."
-  (let ((image-file
-         (concat (file-name-directory (locate-library "lookup")) "/lookup-logo.xpm")))
+  (let* ((image-file (concat (file-name-directory (locate-library "lookup"))
+			     lookup-splash-file-name))
+	 (filep (file-exists-p image-file)))
     (when (and lookup-enable-splash
                (image-type-available-p 'xpm)
-               (file-exists-p image-file))
+               (or filep lookup-splash-image))
       (erase-buffer)
       (display-buffer (current-buffer))
-      (let ((img (create-image image-file))
+      (let ((img (create-image (if filep image-file lookup-splash-image)
+			       'xpm (null filep)))
             (fill-column (window-width)))
         (insert (propertize " " 'display
                             `(space :align-to (+ center (-0.5 . ,img)))))
