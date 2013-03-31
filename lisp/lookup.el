@@ -935,7 +935,7 @@ dictionaries."
                             (cdr pair))))))
 
 (eval-and-compile
-  (defvar lookup-splash-file-name "/lookup-logo.xpm")
+  (defvar lookup-splash-file-name "/lookup-logo.png")
 
   (defvar lookup-splash-image
     (eval-when-compile
@@ -954,12 +954,12 @@ dictionaries."
 			     lookup-splash-file-name))
 	 (filep (file-exists-p image-file)))
     (when (and lookup-enable-splash
-               (image-type-available-p 'xpm)
+               (image-type-available-p 'png)
                (or filep lookup-splash-image))
       (erase-buffer)
       (display-buffer (current-buffer))
       (let ((img (create-image (if filep image-file lookup-splash-image)
-			       'xpm (null filep)))
+			       'png (null filep)))
             (fill-column (window-width)))
         (insert (propertize " " 'display
                             `(space :align-to (+ center (-0.5 . ,img)))))

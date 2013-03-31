@@ -36,7 +36,7 @@ SOURCES = bocu.el stem-english.el hanzi-py-table.el view-pdf.el		\
 	 support-files/support-zhongri.el				\
 	 support-files/support-zigen.el
 ELCFILES = $(SOURCES:.el=.elc)
-EXTRA_DIST = $(SOURCES) lookup-compile.el lookup-logo.xpm
+EXTRA_DIST = $(SOURCES) lookup-compile.el lookup-logo.png
 INSTALLFILES = $(SOURCES) $(ELCFILES) lookup-autoloads.el
 CLEANFILES = $(ELCFILES)
 MAINTAINERCLEANFILES = Makefile.in lookup-autoloads.el
