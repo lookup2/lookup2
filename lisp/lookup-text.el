@@ -402,7 +402,7 @@ FUNCTION may return multiple results."
                (cl-remove-if
                 (lambda (x) (< (length x) 4))
                 (cdr (nreverse (stem-english string))))))
-      query)))
+      (list query))))
 
 ;;; misc. filters
 
