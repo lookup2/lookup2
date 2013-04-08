@@ -365,7 +365,7 @@ See `lookup-secondary' for details."
   "History of inputed dictionary-IDs.")
 
 (defun lookup-input-pattern (module &optional default)
-  (or default (setq default (lookup-current-word)))
+  (callf or default (lookup-current-word) "")
   (setq default (lookup-filter-string default lookup-query-filters))
   (if (string-equal default "") (setq default nil))
   (lookup-read-string
