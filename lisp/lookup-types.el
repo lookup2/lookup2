@@ -152,24 +152,15 @@
 
 ;; Query Filters
 
-;(defun lookup-filter-query (query filters)
-;  "Apply FILTERS functions to QUERY to generate filtered queries."
-;  (let ((queries (list query)) result)
-;    (dolist (filter filters)
-;      (setq queries 
-;            (apply 'append 
-;                   (mapcar (lambda (query)
-;                             (setq result (apply filter (list query)))
-;                             (if (listp result) result (list result)))
-;                           queries))))
-;    queries))
-
 (defun lookup-filter-query (query filters)
   "Apply FILTERS functions to QUERY to generate filtered queries."
   (let ((queries (list query)))
     (dolist (filter filters)
       (setq queries 
-            (cl-mapcan (lambda (query) (funcall filter query)) queries)))
+            (cl-mapcan (lambda (query)
+                         (let ((result (funcall filter query)))
+                           (if (listp result) result (list result))))
+                       queries)))
     (delete-dups queries)))
 
 
