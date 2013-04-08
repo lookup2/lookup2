@@ -242,7 +242,7 @@
   (if (and (equal method 'text)
            (lookup-text-cjk-p string))
       '(("" . ""))
-    (cond ((lookup-text-single-cjk-p string)
+    (cond ((lookup-text-charsetsp string '(han))
            '((">" . "<note>")
              (">" . "<added_note>")
              (">" . "<headnote>")
