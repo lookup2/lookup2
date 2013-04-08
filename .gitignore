@@ -39,5 +39,5 @@ texi/lookup.tmp
 texi/lookup.tp
 texi/lookup.vr
 
-lisp/old/*
+lisp/x-old/*
 doc/*
