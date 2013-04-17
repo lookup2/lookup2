@@ -82,7 +82,12 @@
 (put 'ndbuffer :search 'ndbuffer-dictionary-search)
 (defun ndbuffer-dictionary-search (dictionary query)
   "Return entry list of DICTIONARY for QUERY."
-  (ndtext-dictionary-search-common dictionary query 'ndbuffer))
+  (condition-case error
+      (ndtext-dictionary-search-common dictionary query 'ndbuffer)
+    ('error 
+     ;; If user does not want to load a large file, return nil. (abort-if-file-too-large)
+     (if (equal (cadr error) "Aborted") nil
+       (error "ndbuffer-dictionary-search error=%s" error)))))
 
 (put 'ndbuffer :content 'ndbuffer-entry-content)
 (defun ndbuffer-entry-content (entry)
