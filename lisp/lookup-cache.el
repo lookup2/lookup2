@@ -81,8 +81,6 @@
 			(cons 'dictionaries
 			      (mapcar 'lookup-dictionary-name
 				      (lookup-agent-dictionaries agent)))
-                        ;(cons 'options
-                        ;      (lookup-agent-options agent))
                         ))
 		lookup-agent-list))
   (lookup-dump-list 'lookup-agent-attributes 2))
@@ -120,18 +118,6 @@
                         ))
 		lookup-module-list))
   (lookup-dump-list 'lookup-module-attributes 3))
-
-;(defun lookup-dump-module-attributes ()
-;  (dolist (module lookup-module-list)
-;    (let (alist)
-;      (let ((marks (mapcar 'lookup-entry-id
-;			   (lookup-module-bookmarks module))))
-;	(if marks (setq alist (lookup-assq-put alist 'bookmarks marks))))
-;      (setq lookup-module-attributes 
-;            (lookup-assoc-put lookup-module-attributes
-;			(lookup-module-name module) alist))
-;      )
-;;  (lookup-dump-list 'lookup-module-attributes 3))
 
 (defun lookup-restore-module-attributes (module)
   (let ((alist (lookup-assoc-get lookup-module-attributes

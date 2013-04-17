@@ -894,7 +894,7 @@ If there is no session, default module will be returned."
     (load lookup-init-file t)
     (when lookup-cache-file
       (require 'lookup-cache)
-      (load lookup-cache-file t)) 
+      (load lookup-cache-file t))
     (setq lookup-search-history (lookup-new-history))
     (setq lookup-agent-list
           (mapcar (lambda (spec) (apply 'lookup-new-agent spec))
