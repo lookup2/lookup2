@@ -41,19 +41,21 @@
 ;;
 ;; Currently, POST-method Search Engine is not supported.
 ;;
-;; Supported Dictionary Options (You can not specify them in agent option!)
-;;
-;; |--------------+-------------------------------------|
-;; | :self        | OpenSearch URL                      |
-;; | :charsets    | supported character sets            |
-;; | :title       | title                               |
-;; | :suggestions | JSON Suggestions URL                |
-;; | :results     | HTML Results URL                    |
-;; | :start-tag   | Text Up to this tag to be removed.  |
-;; | :methods     | supported search methods.           |
-;; | :encoding    | encoding of searched word           |
-;; | :http-method | "get" or "post" (not supported yet) |
-;; |--------------+-------------------------------------|
+;; Supported Dictionary Options
+;; (*) … mandatory options
+;; |--------------+--------------------------------+-------------------------|
+;; | Option Name  | Desc                           | Default                 |
+;; |--------------+--------------------------------+-------------------------|
+;; | :self        | OpenSearch URL                 | agent location          |
+;; | :charsets    | supported character sets       | <:self> or none         |
+;; | :title *     | title                          | <:self>                 |
+;; | :suggestions | JSON Suggestions URL           | <:self>                 |
+;; | :results *   | HTML Results URL               | <:self>                 |
+;; | :start-tag   | Text up to this to be removed. | none                    |
+;; | :methods     | supported search methods.      | <:suggestions> or exact |
+;; | :encoding    | encoding of searched word      | <:self> or utf-8        |
+;; | :http-method | "get"  or "post"               | <:self> or "get"        |
+;; |--------------+--------------------------------+-------------------------|
 
 ;;; Code:
 
@@ -69,15 +71,6 @@
 (defgroup ndweb nil
   "Lookup Web-Search interface."
   :group 'lookup-search-agents)
-
-
-;;;
-;;; Customizable Variables
-;;;
-
-(defgroup ndweb nil
-  "Lookup ndweb interface."
-  :group 'lookup-agents)
 
 (defcustom ndweb-w3m "w3m"
   "*Program name of w3m."
@@ -96,6 +89,18 @@
 
 
 ;;;
+;;; Internal Variables
+;;;
+
+;;; internal variables
+(defconst ndweb-description-regexp
+  "type=[\"']application/opensearchdescription\\+xml[\"'] href=\\(?2:[\"']\\)\\(?1:.+?\\)\\2")
+
+(defconst ndweb-options
+  '(:charsets :title :results :start-tag :methods :encoding :http-method :suggestions))
+
+
+;;;
 ;;; Interface functions
 ;;;
 
@@ -105,6 +110,7 @@
 
 (put 'ndweb :methods 'ndweb-methods)
 (defun ndweb-methods (dict)
+  (ndweb-initialize dict)
   (let ((methods (lookup-dictionary-option dict :methods t)))
     (if (and methods (not (functionp methods))) methods
       (if (lookup-dictionary-option dict :suggestions t)
@@ -113,6 +119,7 @@
 
 (put 'ndweb :title 'ndweb-title)
 (defun ndweb-title (dict)
+  (ndweb-initialize dict)
   (let ((title (lookup-dictionary-option dict :title t)))
     (if (and title (not (functionp title))) title
       (error ":title options is not set! %s" dict))))
@@ -121,6 +128,7 @@
 (defun ndweb-search (dict query)
   "Search web DICT for QUERY.
 If there is no `suggenstions' URL, then entry with queried  "
+  (ndweb-initialize dict)
   (let* ((suggest (lookup-dictionary-option dict :suggestions t))
          (method  (lookup-query-method query))
          (string  (lookup-query-string query)))
@@ -163,6 +171,86 @@ If there is no `suggenstions' URL, then entry with queried  "
                                         lookup-arrange-references-url
                                         ndweb-arrange-tags)
                              (fill      lookup-arrange-nofill)))
+
+;;;
+;;; Options Retrieval
+;;;
+
+;; Options Dependency
+(defun ndweb-initialize (dict)
+  "Retrieve DICT options needed but not provided by cache or agent options."
+  (let* ((agent    (lookup-dictionary-agent dict))
+         (site     (lookup-agent-location agent))
+         (agent-options (lookup-agent-options agent))
+         (options  (append (lookup-dictionary-options dict) 
+                           agent-options))
+         (title    (plist-get options :title))
+         (results  (plist-get options :results))
+         (self     (plist-get options :self)))
+    (unless (and title results) ;; :title and :results are mandatory options
+      (unless self ;; if they are not provided, :self is retrived.
+        (setq self (ndweb--opensearch-url site)))
+      (if (null self) (error "No proper OpenSearch XML found!"))
+      (callf append options (ndweb--opensearch-options self))
+      (dolist (option ndweb-options)
+        (callf or (lookup-dictionary-option dict option) (plist-get options option))))))
+
+(defun ndweb--opensearch-url (site)
+  "Retrieve OpenSearch URL by link.
+If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
+  (if (string-match "^mycroft:" site)
+      (concat "http://mycroft.mozdev.org/externalos.php/" (substring site 8) ".xml")
+    (ndweb-with-url (concat "http://" site)
+      (when (re-search-forward ndweb-description-regexp nil t)
+        (let ((opensearch-url (match-string 1)))
+          ;; when it begins with "/", attach parent url to it.
+          (if (string-match "^/" opensearch-url)
+              (concat "http://" (replace-regexp-in-string "/.*" "" site)
+                      opensearch-url)
+            opensearch-url))))))
+
+(defun ndweb--opensearch-options (url)
+  "Retrive OpenSearch options from OpenSearch URL"
+  (let* ((xml (ndweb-with-url url
+               (xml-parse-region (point-min) (point-max))))
+         (open (assq 'OpenSearchDescription xml))
+         (title (caddr (assq 'ShortName open)))
+         (encoding (caddr (assq 'InputEncoding open)))
+         (encoding (if encoding (intern (downcase encoding))))
+         (results ; element
+          (cl-find-if (lambda (x)
+                        (and (equal (car-safe x) 'Url)
+                             (member '(type . "text/html") (cadr x))))
+                      open))
+         (http-method (assoc-default 'method (cadr results)))
+         (http-method (if http-method (downcase http-method)))
+         (results-template (assoc-default 'template (cadr results)))
+         (suggests
+          (cl-find-if (lambda (x)
+                        (and (equal (car-safe x) 'Url)
+                             (member '(type . "application/x-suggestions+json")
+                                     (cadr x))))
+                      open))
+         (suggests (assoc-default 'template (cadr suggests))))
+    ;; Post の場合は、results要素の下位のParam要素のパラメータを繋げる。
+    (when (equal http-method "post")
+      (callf concat results-template "?")
+      (mapc
+       (lambda (elem) 
+         (if (equal (car-safe elem) 'Param)
+             (callf concat results-template (assoc-default 'name (cadr elem))
+                    "=" (assoc-default 'value (cadr elem)) "&")))
+       results))
+    (unless title (error "No proper OpenSearch title specified! %s" url))
+    (unless results (error "No proper OpenSearch results specified! %s" url))
+    (if (and encoding (not (coding-system-p encoding)))
+        (error "Emacs do not support encoding %s!" encoding))
+    (if (equal http-method "post")
+        (error "HTTP Post method is currently not supported!"))
+    `(:title ,title :results ,results-template
+      ,@(if http-method (list :http-method http-method))
+      ,@(if suggests (list :suggestions suggests))
+      ,@(if encoding (list :encoding encoding)))))
 
 ;;;
 ;;; Arrange functions

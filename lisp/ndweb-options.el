@@ -12,31 +12,26 @@
 ;; This file provides preset options (ndweb-site-predefined-options)
 ;; for each web dictionaries.
 ;;
-;; This file is invoked from `support-ndweb.el' file.
-;; You can set your own dictionary options via ordinary `lookup-dictionary-option-alist'.
-;;
-;; Algorithm of `ndweb-site-options' is as follows.
-;;
-;; (1) Dictionary's default option is taken from
-;;     `ndweb-default-options-alist'.
-;; (2) If a dictinonary has both `:results' and `:title' options,
-;;     then dictionary is O.K.
-;; (3) If a dictionary does not have neither `:results' nor `:title'
-;;     options, then, check if a dictionary has `:self' option.
-;; (4) If a dictionary does not have `:self' option, then it is taken
-;;     from OpenSearchDescription XML file.
-;; (5) When `:self' options is identified, then identify `:title',
-;;     `:results' and other options from OpenSearch file.
+;; This file is invoked from `support-ndweb.el' file.  You can set
+;; your own dictionary options via ordinary
+;; `lookup-dictionary-option-alist'.  This file should only provide
+;; static options.  It should never invoke web sites to retrive
+;; options.
 
 ;;; Code:
 
-(require 'ndweb)
+;;;
+;;; interaface function
+;;;
 
-;;; internal variables
-(defconst ndweb-description-regexp
-  "type=[\"']application/opensearchdescription\\+xml[\"'] href=\\(?2:[\"']\\)\\(?1:.+?\\)\\2")
+(defun ndweb-site-options (site agent-options)
+  (append
+   agent-options
+   (assoc-default site ndweb-default-options-alist)))
 
-;; pre-defined functions
+;;;
+;;; option data
+;;;
 
 (defun ndweb-goo-suggestions (dict-kind)
   ;; Return searching function. `(cadr)' unquotes macroexpand-all output.
@@ -72,6 +67,9 @@
                               (replace-regexp-in-string
                                "&nbsp;" " " (match-string 2))))))))))
 
+;;;
+;;; Pre-defined options
+;;;
 (defvar ndweb-default-options-alist
   (cl-mapcan
    (lambda (set)
@@ -242,77 +240,5 @@
      ;   :method "post")))
      ))
   "Pre-defined options for some searching sites.")
-
-(defun ndweb-site-options (site agent-options)
-  "Return required options (:title, :suggestions, :results) of SITE."
-  (let* ((options  (append
-                    agent-options
-                    (assoc-default site ndweb-default-options-alist)))
-         (title    (plist-get options :title))
-         (results  (plist-get options :results))
-         (self     (plist-get options :self)))
-    (unless (and title results)
-      (unless self
-        (setq self (ndweb--opensearch-url site)))
-      (if (null self) (error "No proper OpenSearch XML found!"))
-      (callf append options (ndweb--opensearch-options self)))
-    options))
-
-(defun ndweb--opensearch-url (site)
-  "Retrieve OpenSearch URL by link.
-If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
-  (if (string-match "^mycroft:" site)
-      (concat "http://mycroft.mozdev.org/externalos.php/" (substring site 8) ".xml")
-    (ndweb-with-url (concat "http://" site)
-      (when (re-search-forward ndweb-description-regexp nil t)
-        (let ((opensearch-url (match-string 1)))
-          ;; when it begins with "/", attach parent url to it.
-          (if (string-match "^/" opensearch-url)
-              (concat "http://" (replace-regexp-in-string "/.*" "" site)
-                      opensearch-url)
-            opensearch-url))))))
-
-(defun ndweb--opensearch-options (url)
-  "Retrive OpenSearch options from OpenSearch URL"
-  (let* ((xml (ndweb-with-url url
-               (xml-parse-region (point-min) (point-max))))
-         (open (assq 'OpenSearchDescription xml))
-         (title (caddr (assq 'ShortName open)))
-         (encoding (caddr (assq 'InputEncoding open)))
-         (encoding (if encoding (intern (downcase encoding))))
-         (results ; element
-          (cl-find-if (lambda (x)
-                        (and (equal (car-safe x) 'Url)
-                             (member '(type . "text/html") (cadr x))))
-                      open))
-         (http-method (assoc-default 'method (cadr results)))
-         (http-method (if http-method (downcase http-method)))
-         (results-template (assoc-default 'template (cadr results)))
-         (suggests
-          (cl-find-if (lambda (x)
-                        (and (equal (car-safe x) 'Url)
-                             (member '(type . "application/x-suggestions+json")
-                                     (cadr x))))
-                      open))
-         (suggests (assoc-default 'template (cadr suggests))))
-    ;; Post の場合は、results要素の下位のParam要素のパラメータを繋げる。
-    (when (equal http-method "post")
-      (callf concat results-template "?")
-      (mapc
-       (lambda (elem) 
-         (if (equal (car-safe elem) 'Param)
-             (callf concat results-template (assoc-default 'name (cadr elem))
-                    "=" (assoc-default 'value (cadr elem)) "&")))
-       results))
-    (unless title (error "No proper OpenSearch title specified! %s" url))
-    (unless results (error "No proper OpenSearch results specified! %s" url))
-    (if (and encoding (not (coding-system-p encoding)))
-        (error "Emacs do not support encoding %s!" encoding))
-    (if (equal http-method "post")
-        (error "HTTP Post method is currently not supported!"))
-    `(:title ,title :results ,results-template
-      ,@(if http-method (list :http-method http-method))
-      ,@(if suggests (list :suggestions suggests))
-      ,@(if encoding (list :encoding encoding)))))
 
 (provide 'ndweb-options)
