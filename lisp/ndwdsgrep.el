@@ -191,7 +191,7 @@
     (concat (match-string 1 code) "\n" (match-string 2 code))))
 
 (defun ndwdsgrep-arrange-structure (entry)
-  (ndwdsgrep-set-link (point) (line-end-position) 
+  (ndwdsgrep-set-link (point) (line-end-position)
                         (buffer-substring (point) (line-end-position)))
   )
 

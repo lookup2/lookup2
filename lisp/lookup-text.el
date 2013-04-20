@@ -92,7 +92,7 @@ the string will be returned.  If CHARSETS is null, it returns t."
              (lookup-current-word-general))
             ((lookup-text-charsetsp word '(ascii 'japanese-jisx0208))
              (lookup-current-word-japanese))
-	    (t (lookup-current-word-general))))))
+            (t (lookup-current-word-general))))))
 
 (defun lookup-move-to-nearest-word ()
   (unless (eq (char-syntax (or (char-after (point)) 0)) ?w)
@@ -212,7 +212,7 @@ If it is not Kanji string, then it returns nil."
 (defvar lookup-new-to-old-kanji-unicode-table (make-hash-table))
 (mapc
  (lambda (x)
-   (let ((new (car x)) (old (cdr x))) 
+   (let ((new (car x)) (old (cdr x)))
      (lookup-add-to-table old new lookup-old-to-new-kanji-table)
      (when (equal (car (get-char-code-property old 'decomposition)) old)
        (lookup-add-to-table new old lookup-new-to-old-kanji-unicode-table))

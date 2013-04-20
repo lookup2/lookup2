@@ -50,12 +50,12 @@
     (erase-buffer)
     (insert "Lookup Module List  (First module in list will be default module)\n")
     (insert "Type `c' to create module, `v' to visit, "
-	    "`q' to leave, `?' for help.\n\n")
+            "`q' to leave, `?' for help.\n\n")
     (lookup-table-insert
      "%2s %-8t %s\n"
      (append
       '(("No" "Name" "Dictionaries")
-	("--" "----" "------------"))
+        ("--" "----" "------------"))
       (loop for module in lookup-module-list
             for i = 1 then (+ 1 i)
             for name = (lookup-module-name module)
@@ -104,8 +104,7 @@
   ;; general commands
   (define-key lookup-modules-mode-map "v" 'lookup-modules-visit-module)
   (define-key lookup-modules-mode-map "g" 'lookup-modules-update)
-  (define-key lookup-modules-mode-map "q" 'lookup-leave)
-  )
+  (define-key lookup-modules-mode-map "q" 'lookup-leave))
 
 (defvar lookup-modules-mode-hook nil
   "*Hook for Lookup select mode.")
@@ -119,7 +118,7 @@
   (setq major-mode 'lookup-modules-mode)
   (setq mode-name "Select")
   (setq mode-line-buffer-identification
-	'("Lookup:%12b <" (lookup-module-name (lookup-current-module)) ">"))
+        '("Lookup:%12b <" (lookup-module-name (lookup-current-module)) ">"))
   (setq lookup-help-message lookup-modules-mode-help)
   (setq buffer-read-only t)
   (setq truncate-lines t)
@@ -163,13 +162,13 @@ When this command is called, the variable `lookup-modules-kill-ring'
 will be used instead of the usual `kill-ring'."
   (interactive "P")
   (let ((kill-ring lookup-modules-kill-ring)
-	(kill-whole-line t)
-	(inhibit-read-only t))
+        (kill-whole-line t)
+        (inhibit-read-only t))
     (beginning-of-line)
     (unwind-protect
-	(progn
-	  (use-local-map global-map)
-	  (call-interactively (key-binding (this-command-keys))))
+        (progn
+          (use-local-map global-map)
+          (call-interactively (key-binding (this-command-keys))))
       (use-local-map lookup-modules-mode-map))
     (setq lookup-modules-kill-ring kill-ring)
     (lookup-modules-reset-modules)
@@ -217,8 +216,8 @@ will be used instead of the usual `kill-ring'."
     (lookup-modules-goto-first)
     (let (module modules)
       (while (setq module (lookup-modules-this-module))
-	(setq modules (cons module modules))
-	(forward-line))
+        (setq modules (cons module modules))
+        (forward-line))
       (setq lookup-modules-killed-modules
             (cl-nunion lookup-modules-killed-modules
                        (cl-set-difference lookup-module-list modules)))

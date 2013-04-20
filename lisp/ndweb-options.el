@@ -21,15 +21,6 @@
 ;;; Code:
 
 ;;;
-;;; interaface function
-;;;
-
-(defun ndweb-site-options (site agent-options)
-  (append
-   agent-options
-   (assoc-default site ndweb-default-options-alist)))
-
-;;;
 ;;; option data
 ;;;
 
@@ -63,7 +54,7 @@
                          "<a href=\"/leaf/" dict-kind 
                          "/\\([0-9]+\\)/m[0-6]u/.+?\">\\(.+?\\)</a>")
                        nil t)
-                collect (list (match-string 1) 
+                collect (list (match-string 1)
                               (replace-regexp-in-string
                                "&nbsp;" " " (match-string 2))))))))))
 
@@ -75,7 +66,7 @@
    (lambda (set)
      (let* ((default-options (butlast set 2))
             (sites (plist-get set :sites)))
-       (mapcar (lambda (x) (append x default-options)) 
+       (mapcar (lambda (x) (append x default-options))
                sites)))
    `(;; English
      (:charsets (ascii)
@@ -230,15 +221,24 @@
         :results
         "http://www.excite.co.jp/dictionary/chinese_japanese/?search={searchTerms}")
        ("mycroft:hjenglish-c2j" :title "沪江小D日中词典")))
-     ;(;; Kanji/Hanzi
-     ; :charsets (han)
-     ; :sites
-     ; (("www.zdic.net"
-     ;   :title "漢典"
-     ;   :charsets (han)
-     ;   :results "http://www.zdic.net/sousou/?q={searchTerms}"
-     ;   :method "post")))
+     ;;(;; Kanji/Hanzi
+     ;; :charsets (han)
+     ;; :sites
+     ;; (("www.zdic.net"
+     ;;   :title "漢典"
+     ;;   :charsets (han)
+     ;;   :results "http://www.zdic.net/sousou/?q={searchTerms}"
+     ;;   :method "post")))
      ))
   "Pre-defined options for some searching sites.")
+
+;;;
+;;; interaface function
+;;;
+
+(defun ndweb-site-options (site agent-options)
+  (append
+   agent-options
+   (assoc-default site ndweb-default-options-alist)))
 
 (provide 'ndweb-options)

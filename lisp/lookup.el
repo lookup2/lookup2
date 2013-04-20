@@ -62,7 +62,7 @@ If you have already started lookup, display the last status of buffers."
   (let ((session (and lookup-search-history
                       (lookup-history-ref  lookup-search-history))))
     (if session
-	(lookup-session-display session)
+        (lookup-session-display session)
       (if (not (and lookup-agent-list lookup-dictionary-list lookup-module-list))
           (lookup-initialize))
       (lookup-select-dictionaries (lookup-default-module)))))
@@ -80,8 +80,8 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
   (setq lookup-enable-debug (not lookup-enable-debug))
   (setq debug-on-error lookup-enable-debug)
   (message (if lookup-enable-debug
-	       "Lookup debug enabled"
-	     "Lookup debug disabled")))
+               "Lookup debug enabled"
+             "Lookup debug disabled")))
 
 (defun lookup-debug-message (format-string &rest args)
   (if lookup-enable-debug
@@ -99,8 +99,8 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
 (defun lookup-find-pattern (pattern)
   (interactive
    (let* ((session (lookup-current-session))
-	  (default (if session
-		       (lookup-query-string (lookup-session-query session)))))
+          (default (if session
+                       (lookup-query-string (lookup-session-query session)))))
      (list (lookup-read-string "Look up" nil 'lookup-input-history default))))
   (lookup-search-pattern (lookup-current-module) pattern))
 
@@ -108,8 +108,8 @@ This can be used when you cannot finish Emacs because of an error of Lookup."
   (interactive)
   (let ((entries (lookup-module-bookmarks (lookup-current-module))))
     (if entries
-	(let ((query (lookup-new-query 'reference "Bookmarks")))
-	  (lookup-display-entries (lookup-current-module) query entries))
+        (let ((query (lookup-new-query 'reference "Bookmarks")))
+          (lookup-display-entries (lookup-current-module) query entries))
       (error "This module has no bookmark"))))
 
 ;;;###autoload
@@ -156,12 +156,12 @@ Type `\\[lookup]' to back to Lookup."
       (if (called-interactively-p 'any)
           (error "Lookup is not started"))
     (when (or (not (called-interactively-p 'any))
-	      (y-or-n-p "Are you sure to exit Lookup? "))
+              (y-or-n-p "Are you sure to exit Lookup? "))
       (lookup-with-message "Exiting Lookup"
-	(if lookup-cache-file (lookup-dump-cache lookup-cache-file))
-	(lookup-suspend)
-	(mapc 'kill-buffer lookup-buffer-list)
-	(mapc 'lookup-agent-clear lookup-agent-list)
+        (if lookup-cache-file (lookup-dump-cache lookup-cache-file))
+        (lookup-suspend)
+        (mapc 'kill-buffer lookup-buffer-list)
+        (mapc 'lookup-agent-clear lookup-agent-list)
         (lookup-clear)))))
 
 (defun lookup-leave ()
@@ -177,7 +177,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
   "Exit Lookup, initialize it again, and restart."
   (interactive)
   (when (or (not (called-interactively-p 'interactive))
-	    (yes-or-no-p "Are you sure to restart Lookup? "))
+            (yes-or-no-p "Are you sure to restart Lookup? "))
     (lookup-exit)
     (setq lookup-property-table nil)
     (setq lookup-current-session nil)
@@ -198,7 +198,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
       (insert lookup-help))
     (goto-char (point-min))
     (if (window-live-p lookup-start-window)
-	(set-window-buffer lookup-start-window (current-buffer))
+        (set-window-buffer lookup-start-window (current-buffer))
       (display-buffer (current-buffer))))))
 
 (defun lookup-filter-string (string filters)
@@ -213,7 +213,7 @@ Otherwise, this is the same with \\[lookup-previous-history]."
 
 (defun lookup-pattern-input ()
   (let* ((module (lookup-input-module-interactively))
-	 (pattern (lookup-input-pattern module)))
+         (pattern (lookup-input-pattern module)))
     (list pattern module)))
 
 ;;;###autoload
@@ -240,7 +240,7 @@ See `lookup-pattern' for details."
 
 (defun lookup-word-input ()
   (let ((module (lookup-input-module-interactively))
-	(word (lookup-current-word)))
+        (word (lookup-current-word)))
     (list word module)))
 
 ;;;###autoload
@@ -273,7 +273,7 @@ See `lookup-word' for details."
 
 (defun lookup-region-input ()
   (let ((module (lookup-input-module-interactively))
-	(start (mark)) (end (point)) tmp)
+        (start (mark)) (end (point)) tmp)
     (if (> start end) (setq tmp start start end end tmp))
     (list start end module)))
 
@@ -327,12 +327,12 @@ See `lookup-selection' for details."
   (interactive "e")
   (call-interactively 'mouse-drag-secondary)
   (let ((start (overlay-start mouse-secondary-overlay))
-	(end (overlay-end mouse-secondary-overlay)))
+        (end (overlay-end mouse-secondary-overlay)))
     (unless (eq start end)
       (with-current-buffer (window-buffer (posn-window (event-start click)))
-	(unwind-protect
-	    (lookup-word (buffer-substring-no-properties start end))
-	  (delete-overlay mouse-secondary-overlay))))))
+        (unwind-protect
+            (lookup-word (buffer-substring-no-properties start end))
+          (delete-overlay mouse-secondary-overlay))))))
 
 ;;;###autoload
 (defun lookup-secondary-full-screen (click)
@@ -407,19 +407,19 @@ candidates."
 
 (defun lookup-search-pattern (module pattern &optional method)
   (cond ((> (length pattern) 80) (error "Too long query"))
-	((string-match "\n" pattern) (error "Query should be one line")))
+        ((string-match "\n" pattern) (error "Query should be one line")))
   (let ((query (if method (lookup-new-query method pattern)
-		 (lookup-parse-pattern pattern))))
+                 (lookup-parse-pattern pattern))))
     (when (or (not (eq (lookup-query-method query) 'text))
-	      (y-or-n-p "Are you sure to search text? "))
+              (y-or-n-p "Are you sure to search text? "))
       (lookup-search-query module query))))
 
 (defun lookup-search-query (module query)
   ;;(if (and lookup-last-session
   ;;          (let ((last (lookup-session-query lookup-last-session)))
   ;;            (and (eq (lookup-query-method query)
-  ;;      	       (lookup-query-method last))
-  ;;      	   (string= (lookup-query-string query)
+  ;;                     (lookup-query-method last))
+  ;;                 (string= (lookup-query-string query)
   ;;      		    (lookup-query-string last)))))
   ;;    (lookup-session-display  (lookup-history-ref lookup-search-history))
   (lookup-with-message (format "Looking up `%s'" (lookup-query-pattern query))
@@ -475,8 +475,8 @@ candidates."
 
 (defun lookup-adjust-content (entry)
   (let ((funcs '(lookup-adjust-show-gaijis
-		 lookup-adjust-hide-examples
-		 lookup-adjust-check-references)))
+                 lookup-adjust-hide-examples
+                 lookup-adjust-check-references)))
     (let ((overlay (overlay-lists)))
       (mapc 'delete-overlay (car overlay))
       (mapc 'delete-overlay (cdr overlay)))
@@ -487,17 +487,17 @@ candidates."
   (let ((n 1))
     (dolist (func functions)
       (when func
-	(if msg
-	    (lookup-message (concat msg (make-string (setq n (1+ n)) ?.))))
-	(widen)
-	(goto-char (point-min))
-	(funcall func entry)))))
+        (if msg
+            (lookup-message (concat msg (make-string (setq n (1+ n)) ?.))))
+        (widen)
+        (goto-char (point-min))
+        (funcall func entry)))))
 
 ;; replace
 
 (defun lookup-arrange-replaces (entry)
   (dolist (pair (lookup-dictionary-option (lookup-entry-dictionary entry)
-					  :replace-alist))
+                                          :replace-alist))
     (goto-char (point-min))
     (while (re-search-forward (car pair) nil t)
       (replace-match (cdr pair)))))
@@ -513,12 +513,12 @@ candidates."
      (point-min) (point-max) 'face
      (lambda (start end face)
        (when (eq face 'lookup-comment-face)
-	 (if (eq (char-after (1- start)) ?\n)
-	     (setq start (1- start)))
-	 (let ((overlay (make-overlay start (1- end))))
-	   (overlay-put overlay 'invisible t)
-	   (overlay-put overlay 'evaporate t)
-	   (overlay-put overlay 'before-string "...")))))))
+         (if (eq (char-after (1- start)) ?\n)
+             (setq start (1- start)))
+         (let ((overlay (make-overlay start (1- end))))
+           (overlay-put overlay 'invisible t)
+           (overlay-put overlay 'evaporate t)
+           (overlay-put overlay 'before-string "...")))))))
 
 ;; reference
 
@@ -527,10 +527,10 @@ candidates."
 :reference-pattern should be (regexp link-item heading code).
 link-item, heading, or code may be integer or function."
   (let* ((dict (lookup-entry-dictionary entry))
-	 (pattern (lookup-dictionary-reference-pattern dict)))
+         (pattern (lookup-dictionary-reference-pattern dict)))
     (when pattern
       (when (functionp pattern)
-	(setq pattern (funcall pattern entry)))
+        (setq pattern (funcall pattern entry)))
       (let ((case-fold-search nil))
         (destructuring-bind
             (regexp link-item heading-item code-item) pattern
@@ -558,43 +558,12 @@ link-item, heading, or code may be integer or function."
                 (lookup-put-property entry :dynamic code))
               (lookup-set-link start (point) entry))))))))
 
-;(defun lookup-arrange-references (entry)
-;  "Arrange reference of ENTRY.
-;:reference-pattern should be (regexp link-item heading code).
-;link-item, heading, or code may be integer or function."
-;  (let* ((dict (lookup-entry-dictionary entry))
-;	 (pattern (lookup-dictionary-reference-pattern dict)))
-;    (when pattern
-;      (when (functionp pattern)
-;	(setq pattern (funcall pattern entry)))
-;      (let ((case-fold-search nil)
-;	    (regexp (car pattern)) (link-item (nth 1 pattern))
-;	    (heading-item (nth 2 pattern)) (code-item (nth 3 pattern)))
-;	(while (re-search-forward regexp nil t)
-;	  (let* ((start (match-beginning 0))
-;		 (link (if (integerp link-item)
-;			   (match-string link-item)
-;			 (save-match-data (eval link-item))))
-;		 (heading (if (integerp heading-item)
-;			      (match-string heading-item)
-;			    (save-match-data (eval heading-item))))
-;		 (code (cond ((null code-item) heading)
-;		 	     ((integerp code-item) (match-string code-item))
-;		 	     (t code-item))))
-;            (if (= 0 (length heading)) (setq heading "[No Title]"))
-;	    (replace-match link t t)
-;	    (if (stringp code)
-;		(setq entry (lookup-new-entry 'regular dict code heading))
-;	      (setq entry (lookup-new-entry 'dynamic dict heading))
-;	      (lookup-put-property entry :dynamic code))
-;	    (lookup-set-link start (point) entry)))))))
-
 (defun lookup-arrange-references-url (entry)
   (goto-char (point-min))
   (let ((dict (lookup-entry-dictionary entry)))
     (while (re-search-forward lookup-url-regexp nil t)
       (let ((match-string (match-string 0)))
-        (lookup-set-link (match-beginning 0) (match-end 0) 
+        (lookup-set-link (match-beginning 0) (match-end 0)
                          (lookup-new-entry 'url dict match-string 
                                            match-string))))))
 
@@ -603,7 +572,7 @@ link-item, heading, or code may be integer or function."
    (point-min) (point-max) 'lookup-reference
    (lambda (start end entry)
      (if (lookup-entry-referred-p entry)
-	 (put-text-property start end 'face 'lookup-referred-face)
+         (put-text-property start end 'face 'lookup-referred-face)
        (put-text-property start end 'face 'lookup-reference-face)))))
 
 (defun lookup-dynamic-search (entry)
@@ -614,16 +583,16 @@ link-item, heading, or code may be integer or function."
 
 (defun lookup-arrange-gaijis (entry)
   (let ((case-fold-search nil)
-	(dictionary (lookup-entry-dictionary entry))
-	regexp start end gaiji)
+        (dictionary (lookup-entry-dictionary entry))
+        regexp start end gaiji)
     (when (setq regexp (lookup-dictionary-gaiji-regexp dictionary))
       (while (re-search-forward regexp nil t)
-	(setq start (match-beginning 0) end (match-end 0))
-	(setq gaiji (lookup-dictionary-gaiji dictionary (match-string 1)))
-	(when gaiji
-	  (delete-region start end)
+        (setq start (match-beginning 0) end (match-end 0))
+        (setq gaiji (lookup-dictionary-gaiji dictionary (match-string 1)))
+        (when gaiji
+          (delete-region start end)
           (goto-char start)
-	  (lookup-gaiji-insert gaiji))))))
+          (lookup-gaiji-insert gaiji))))))
 
 (defun lookup-adjust-show-gaijis (_entry)
   (when lookup-enable-gaiji
@@ -640,9 +609,9 @@ link-item, heading, or code may be integer or function."
   "Fill lines except `read-only' property region."
   (text-mode)
   (let ((fill-column (if (integerp lookup-fill-column)
-			 lookup-fill-column
-		       (round (* (window-width) lookup-fill-column))))
-	start end read-only-start)
+                         lookup-fill-column
+                       (round (* (window-width) lookup-fill-column))))
+        start end read-only-start)
     (while (not (eobp))
       (setq start (point)
             end   (point-at-eol)
@@ -665,25 +634,25 @@ link-item, heading, or code may be integer or function."
 ;;(defun lookup-arrange-fill-paragraphs (entry)
 ;;  (text-mode)
 ;;  (let ((fill-column (if (integerp lookup-fill-column)
-;;			 lookup-fill-column
-;;		       (round (* (window-width) lookup-fill-column)))))
+;;                         lookup-fill-column
+;;                       (round (* (window-width) lookup-fill-column)))))
 ;;    (fill-individual-paragraphs (point-min) (point-max))))
 
 ;; utils
 
 (defun lookup-heading-face (level)
   (or (nth (1- level) '(lookup-heading-1-face
-			lookup-heading-2-face lookup-heading-3-face
-			lookup-heading-4-face lookup-heading-5-face))
+                        lookup-heading-2-face lookup-heading-3-face
+                        lookup-heading-4-face lookup-heading-5-face))
       'lookup-comment-face))
 
 (defun lookup-make-region-heading (start end level)
   (add-text-properties start end (list 'face (lookup-heading-face level)
-				       'lookup-heading level)))
+                                       'lookup-heading level)))
 
 (defun lookup-set-link (start end reference &optional object)
   (add-text-properties start end (list 'mouse-face 'highlight
-				       'lookup-reference reference)
+                                       'lookup-reference reference)
                        object))
 
 (defun lookup-get-link (position)
@@ -692,16 +661,16 @@ link-item, heading, or code may be integer or function."
 (defun lookup-goto-next-link ()
   (let ((p (point)))
     (and (setq p (next-single-property-change p 'lookup-reference))
-	 (or (get-text-property p 'lookup-reference)
-	     (setq p (next-single-property-change p 'lookup-reference)))
-	 (goto-char p))))
+         (or (get-text-property p 'lookup-reference)
+             (setq p (next-single-property-change p 'lookup-reference)))
+         (goto-char p))))
 
 (defun lookup-goto-previous-link ()
   (let ((p (point)))
     (and (setq p (previous-single-property-change p 'lookup-reference))
-	 (or (get-text-property p 'lookup-reference)
-	     (setq p (previous-single-property-change p 'lookup-reference)))
-	 (goto-char p))))
+         (or (get-text-property p 'lookup-reference)
+             (setq p (previous-single-property-change p 'lookup-reference)))
+         (goto-char p))))
 
 
 ;;;
@@ -711,8 +680,8 @@ link-item, heading, or code may be integer or function."
 (defun lookup-current-session ()
   (or lookup-current-session
       (if (window-live-p lookup-main-window)
-	  (with-current-buffer (window-buffer lookup-main-window)
-	    lookup-current-session))))
+          (with-current-buffer (window-buffer lookup-main-window)
+            lookup-current-session))))
 
 (defun lookup-current-module ()
   "Return current session module.
@@ -725,10 +694,10 @@ If there is no session, default module will be returned."
 (defun lookup-default-module ()
   "Default module of current buffer."
   (let ((name (or (lookup-assq-get lookup-mode-module-alist major-mode)
-		  (lookup-assq-get lookup-mode-module-alist t))))
+                  (lookup-assq-get lookup-mode-module-alist t))))
     (if name
-	(or (lookup-get-module name)
-	    (error "No such module: %s" name))
+        (or (lookup-get-module name)
+            (error "No such module: %s" name))
       (car lookup-module-list))))
 
 (defun lookup-get-module (name &optional module-list)
@@ -747,8 +716,8 @@ If there is no session, default module will be returned."
   (let (entries)
     (when lookup-entry-table
       (mapatoms (lambda (symbol)
-		  (setq entries (cons (symbol-value symbol) entries)))
-		lookup-entry-table))
+                  (setq entries (cons (symbol-value symbol) entries)))
+                lookup-entry-table))
     entries))
 
 (defun lookup-put-entry (entry)
@@ -764,18 +733,18 @@ If there is no session, default module will be returned."
 (defun lookup-get-entry-create (id)
   (or (lookup-get-entry id)
       (when (string-match "#" id)
-	(let ((dict (substring id 0 (match-beginning 0)))
-	      (code (substring id (match-end 0))))
-	  (lookup-new-entry 'regular (lookup-get-dictionary dict) code)))))
+        (let ((dict (substring id 0 (match-beginning 0)))
+              (code (substring id (match-end 0))))
+          (lookup-new-entry 'regular (lookup-get-dictionary dict) code)))))
 
 (defun lookup-gaiji-list ()
   (let (gaijis)
     (dolist (dict lookup-dictionary-list)
       (mapatoms (lambda (code)
-		  (setq code (symbol-value code))
-		  (if (lookup-gaiji-p code)
-		      (setq gaijis (cons code gaijis))))
-		(lookup-dictionary-gaiji-table dict)))
+                  (setq code (symbol-value code))
+                  (if (lookup-gaiji-p code)
+                      (setq gaijis (cons code gaijis))))
+                (lookup-dictionary-gaiji-table dict)))
     gaijis))
 
 
@@ -799,14 +768,14 @@ If there is no session, default module will be returned."
   (setq buffer (or buffer (current-buffer)))
   (if (window-live-p lookup-main-window)
       (progn
-	;; select-window function on Emacs 24.2 and later switches
-	;; current buffer to window's buffer.
-	(set-window-buffer lookup-main-window buffer)
-	(select-window lookup-main-window)
-	(raise-frame (window-frame lookup-main-window)))
+        ;; select-window function on Emacs 24.2 and later switches
+        ;; current buffer to window's buffer.
+        (set-window-buffer lookup-main-window buffer)
+        (select-window lookup-main-window)
+        (raise-frame (window-frame lookup-main-window)))
     (setq lookup-start-window (selected-window))
     (if (> (length (window-list)) 1)
-	(setq lookup-window-configuration (current-window-configuration)))
+        (setq lookup-window-configuration (current-window-configuration)))
     (funcall lookup-open-function buffer)
     (setq lookup-main-window (get-buffer-window buffer t)))
   (when (window-live-p lookup-sub-window)
@@ -818,12 +787,12 @@ If there is no session, default module will be returned."
   (if (window-live-p lookup-sub-window)
       (set-window-buffer lookup-sub-window buffer)
     (setq lookup-sub-window
-	  (if (<= (window-height lookup-main-window) lookup-window-height)
-	      (next-window)
-	    (let ((height (if (integerp lookup-window-height)
-			      lookup-window-height
-			    (round (* (window-height) lookup-window-height)))))
-	      (split-window lookup-main-window (1+ height)))))
+          (if (<= (window-height lookup-main-window) lookup-window-height)
+              (next-window)
+            (let ((height (if (integerp lookup-window-height)
+                              lookup-window-height
+                            (round (* (window-height) lookup-window-height)))))
+              (split-window lookup-main-window (1+ height)))))
     (set-window-buffer lookup-sub-window buffer))
   buffer)
 
@@ -831,14 +800,14 @@ If there is no session, default module will be returned."
   (let ((window (get-buffer-window buffer)))
     (when window
       (cond ((eq window lookup-main-window)
-	     (setq lookup-main-window nil))
-	    ((eq window lookup-sub-window)
-	     (if (window-live-p lookup-main-window)
-		 (select-window lookup-main-window))
-	     (setq lookup-sub-window nil)))
+             (setq lookup-main-window nil))
+            ((eq window lookup-sub-window)
+             (if (window-live-p lookup-main-window)
+                 (select-window lookup-main-window))
+             (setq lookup-sub-window nil)))
       (if (> (count-windows) 1)
-	  (delete-window window)
-	(switch-to-buffer (other-buffer)))))
+          (delete-window window)
+        (switch-to-buffer (other-buffer)))))
   (when (buffer-live-p buffer) (bury-buffer buffer)))
 
 (defun lookup-full-screen (buffer)
@@ -847,12 +816,12 @@ If there is no session, default module will be returned."
 
 (defun lookup-other-window (buffer)
   (let ((pop-up-windows t)
-	(pop-up-frames nil))
+        (pop-up-frames nil))
     (pop-to-buffer buffer)))
 
 (defun lookup-other-frame (buffer)
   (let ((pop-up-frames t)
-	(default-frame-alist (cons '(name . "Lookup") lookup-frame-alist)))
+        (default-frame-alist (cons '(name . "Lookup") lookup-frame-alist)))
     (pop-to-buffer buffer)))
 
 (defun lookup-exclusive-frame-p ()
@@ -931,7 +900,7 @@ dictionaries."
                         lookup-support-autoload-default-alist))
     (dolist (dict lookup-dictionary-list)
       (when (string-match (car pair) (lookup-dictionary-id dict))
-	(lookup-use-support (lookup-dictionary-id dict)
+        (lookup-use-support (lookup-dictionary-id dict)
                             (cdr pair))))))
 
 (eval-and-compile
@@ -940,26 +909,25 @@ dictionaries."
   (defvar lookup-splash-image
     (eval-when-compile
       (let ((file (concat "." lookup-splash-file-name)))
-	(when (and (boundp 'lookup-byte-compiling)
-		   lookup-byte-compiling
-		   (file-exists-p file))
-	  (with-temp-buffer
-	    (insert-file-contents-literally file)
-	    (buffer-string))))))
-  )
+        (when (and (boundp 'lookup-byte-compiling)
+                   lookup-byte-compiling
+                   (file-exists-p file))
+          (with-temp-buffer
+            (insert-file-contents-literally file)
+            (buffer-string)))))))
 
 (defun lookup-splash ()
   "Display splash scrren in current buffer, if supported."
   (let* ((image-file (concat (file-name-directory (locate-library "lookup"))
-			     lookup-splash-file-name))
-	 (filep (file-exists-p image-file)))
+                             lookup-splash-file-name))
+         (filep (file-exists-p image-file)))
     (when (and lookup-enable-splash
                (image-type-available-p 'png)
                (or filep lookup-splash-image))
       (erase-buffer)
       (display-buffer (current-buffer))
       (let ((img (create-image (if filep image-file lookup-splash-image)
-			       'png (null filep)))
+                               'png (null filep)))
             (fill-column (window-width)))
         (insert (propertize " " 'display
                             `(space :align-to (+ center (-0.5 . ,img)))))
@@ -969,7 +937,7 @@ dictionaries."
         (insert "Copyright (C) 1999-2013 Lookup Development Team\n")
         (center-region (point-min) (point))
         (goto-char (point-min))
-        (insert-char ?\n (max 1 (/ (- (window-height) 
+        (insert-char ?\n (max 1 (/ (- (window-height)
                                       (count-lines (point-min) (point-max)) 6)
                                    2)))
         (sit-for 1)))))

@@ -52,7 +52,7 @@
     ;; (,lookup-mecab-program "-O" "yomi") "\n" 
     readings "\n" 
     "【解析】" 
-    (,lookup-mecab-program "--node-format=[%m|%F-[0,1]]" "--eos-format=\n") 
+    (,lookup-mecab-program "--node-format=[%m|%F-[0,1]]" "--eos-format=\n")
     "\n")
   "*ndmecab 辞書が出力するエントリ内容のフォーマット。
 最初にエントリの文字列と「読み」が表示された後の書式を指定できる。

@@ -868,8 +868,7 @@ Using this function with :snd-autoplay option is not recommendable."
 		(if inline
 		    (ndeb-binary-insert-color-image dictionary 'jpeg target
 						    start (point))
-		  (ndeb-binary-insert-color-image dictionary 'jpeg target)
-                  )))
+		  (ndeb-binary-insert-color-image dictionary 'jpeg target))))
 	  (error (message "%s" err)))))))
 
 (defun ndeb-arrange-wave (entry)

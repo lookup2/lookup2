@@ -31,7 +31,7 @@
   '((preview      "Preview"      "g" "command down, option down")
     (adobe-reader "Adobe Reader" "n" "command down, shift down")))
 
-(defun view-pdf-mac (file page) 
+(defun view-pdf-mac (file page)
   "Return AppleScript that opens specified PDF FILE and PAGE."
   (let ((temp-file (concat (make-temp-file "osa-") ".applescript")))
     (with-temp-file temp-file
@@ -87,7 +87,7 @@ Warning: Keep your fingers off the modifier keys while invoking this command."
 (defun view-pdf-url (url &rest args)
   (string-match "^file://\\(.+pdf\\)#.*page=\\([0-9]+\\)" url)
   (message "debug! url=%s file=%s" url (match-string 1 url))
-  (view-pdf (match-string 1 url) 
+  (view-pdf (match-string 1 url)
             (string-to-number (match-string 2 url))))
 
 (provide 'view-pdf)

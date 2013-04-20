@@ -85,9 +85,9 @@ that matches a dictionary ID, and FILE is a support file name."
 (defcustom lookup-initial-memorandum
   (lambda (entry)
     (format "Title: %s\nEntry: %s\nDate: %s\n\n"
-	    (lookup-dictionary-title (lookup-entry-dictionary entry))
-	    (lookup-entry-heading entry)
-	    (format-time-string "%a, %e %b %Y %T %z")))
+            (lookup-dictionary-title (lookup-entry-dictionary entry))
+            (lookup-entry-heading entry)
+            (format-time-string "%a, %e %b %Y %T %z")))
   "*Initial memorandum."
   :type 'function
   :group 'lookup-general-options)
@@ -186,8 +186,8 @@ Dictionary option `cite-prefix' overrides this variable."
     (lookup-fill-column . 45))
   "*frame-alist for Lookup frames."
   :type '(repeat (cons :tag "Parameter"
-		       (symbol :tag "tag")
-		       (sexp :tag "value")))
+                       (symbol :tag "tag")
+                       (sexp :tag "value")))
   :group 'lookup-view-options)
 
 ;;;
@@ -239,19 +239,21 @@ Dictionary option `cite-prefix' overrides this variable."
 ;;;
 
 (defcustom lookup-search-agents nil
-  "*検索エージェントの設定のリスト。
-リストの各要素は次の形式を取る:
+  "*List of Search Agents.
+
+Each List has the following format::
 
   (CLASS LOCATION [KEY1 VALUE1 [KEY2 VALUE2 [...]]])
 
-CLASS には、エージェントの種類をシンボルで指定する。
-LOCATION には、エージェントの所在を文字列で指定する。
-KEY 及び VALUE は省略可能で、エージェントに対するオプションを指定する。
+Where 
+- CLASS specifies agent class by a symbol.
+- LOCATION specifies a location of agent by a string.
+- KEY and VALUE are options for agent.
 
-例: (setq lookup-search-agents
-          '((ndtp \"dserver\" :port 2010)
-            (ndeb \"/cdrom\" :enable (\"EIWA\")))))"
-  :type '(repeat (sexp :tag "agent"))	; type はちょっとややこしすぎ・・
+Example: (setq lookup-search-agents
+              '((ndtp \"dserver\" :port 2010)
+                (ndeb \"/cdrom\" :enable (\"EIWA\")))))"
+  :type '(repeat (sexp :tag "agent"))	; type is a bit complex..
   :group 'lookup)
 
 ;;;
@@ -428,16 +430,6 @@ This hook will run just after loading `lookup-init-file' and
 
 ;; lookup-select module
 (defvar lookup-select-module nil)
-
-;;;
-;;; Caching Variables
-;;;
-;(defvar lookup-cache-variables '(lookup-modules lookup-agents
-;                                 lookup-agent-attributes
-;                                 lookup-module-attributes
-;                                 lookup-dictionary-attributes
-;                                 lookup-entry-attributes
-;                                 lookup-bookmarks))
 
 ;;;
 ;;; Global commands

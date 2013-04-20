@@ -65,8 +65,7 @@
   (define-key lookup-content-mode-map "h" 'lookup-content-entry-window)
   (define-key lookup-content-mode-map "g" 'lookup-content-update)
   (define-key lookup-content-mode-map "q" 'lookup-content-leave)
-  (define-key lookup-content-mode-map [mouse-2] 'lookup-content-mouse-follow)
-  )
+  (define-key lookup-content-mode-map [mouse-2] 'lookup-content-mouse-follow))
 
 (defvar lookup-content-mode-hook nil)
 
@@ -86,7 +85,7 @@
   (setq major-mode 'lookup-content-mode)
   (setq mode-name "Content")
   (setq mode-line-buffer-identification
-	'("Lookup:%b {" lookup-content-line-heading "}"))
+        '("Lookup:%b {" lookup-content-line-heading "}"))
   (setq lookup-help-message lookup-content-mode-help)
   (setq buffer-read-only t)
   (setq line-move-ignore-invisible t)
@@ -153,36 +152,36 @@
 `cite-prefix' により引用時のプレフィクスを指定することが出来る。"
   (interactive "r")
   (let* ((dictionary (lookup-entry-dictionary lookup-content-entry))
-	 (header (or (lookup-dictionary-option dictionary :cite-header t)
-		     lookup-cite-header))
-	 (prefix (or (lookup-dictionary-option dictionary :cite-prefix t)
-		     lookup-cite-prefix))
-	 (contents (buffer-substring-no-properties start end)))
+         (header (or (lookup-dictionary-option dictionary :cite-header t)
+                     lookup-cite-header))
+         (prefix (or (lookup-dictionary-option dictionary :cite-prefix t)
+                     lookup-cite-prefix))
+         (contents (buffer-substring-no-properties start end)))
     (when prefix
       (with-temp-buffer
-	(insert contents)
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (insert prefix)
-	  (forward-line))
-	(setq contents (buffer-string))))
+        (insert contents)
+        (goto-char (point-min))
+        (while (not (eobp))
+          (insert prefix)
+          (forward-line))
+        (setq contents (buffer-string))))
     (when header
       (let ((title (lookup-dictionary-title dictionary)))
-	(while (string-match "%T" header)
-	  (setq header (replace-match title t t header))))
+        (while (string-match "%T" header)
+          (setq header (replace-match title t t header))))
       (setq contents (concat header contents)))
     (kill-new contents)
     (if transient-mark-mode (setq deactivate-mark t))
     (when (called-interactively-p 'interactive)
       (if (pos-visible-in-window-p (mark) (selected-window))
-	  (let ((inhibit-quit t))
-	    (save-excursion (goto-char (mark)) (sit-for 1)))
-	(let ((len (min (abs (- end start)) 40)))
-	  (if (= (point) start)
-	      (message "Saved text until \"%s\""
-		       (buffer-substring (- end len) end))
-	    (message "Saved text from \"%s\""
-		     (buffer-substring start (+ start len)))))))))
+          (let ((inhibit-quit t))
+            (save-excursion (goto-char (mark)) (sit-for 1)))
+        (let ((len (min (abs (- end start)) 40)))
+          (if (= (point) start)
+              (message "Saved text until \"%s\""
+                       (buffer-substring (- end len) end))
+            (message "Saved text from \"%s\""
+                     (buffer-substring start (+ start len)))))))))
 
 (defun lookup-content-entry-window ()
   "Entry バッファに移動する。"
@@ -215,7 +214,7 @@
       (lookup-map-over-property
        (point-min) (point-max) 'lookup-reference
        (lambda (_start _end entry)
-	 (setq entries (cons entry entries))))
+         (setq entries (cons entry entries))))
       (nreverse entries))))
 
 (provide 'lookup-content)

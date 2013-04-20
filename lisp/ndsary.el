@@ -74,7 +74,7 @@
       (error "ndsary: agent %s not found." 
              (lookup-agent-location agent)) nil)
      (t
-      (mapcar (lambda (name) 
+      (mapcar (lambda (name)
                 (lookup-new-dictionary agent (file-name-nondirectory 
                                               (file-name-sans-extension name))))
               (file-expand-wildcards (concat directory "/*" ".ary")))))))

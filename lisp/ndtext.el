@@ -147,7 +147,7 @@
      ((not (file-directory-p directory))
       (error "ndtext: agent (directory) %s not found." directory))
      (t
-      (mapcar (lambda (name) 
+      (mapcar (lambda (name)
                 (lookup-new-dictionary agent (file-name-nondirectory name)))
               (file-expand-wildcards (concat directory "/*" extension)))))))
 
@@ -329,7 +329,7 @@
                          (funcall max-count-check file pattern coding))))
             (with-temp-buffer
               ;; This newline insertion will make single-line search matches to first line.
-              (if single-line (insert "\n")) 
+              (if single-line (insert "\n"))
               (lookup-debug-message "ndtext:program=%s, args=%s" program arguments)
               (lookup-with-coding-system coding
                 (setq status (apply 'call-process program nil t nil arguments)))

@@ -171,7 +171,7 @@
       (goto-char (point-min))
       (re-search-forward "[0-9]+" nil t)
       (setq count (string-to-number (match-string 0))))
-    (if (or (<= count lookup-max-hits) 
+    (if (or (<= count lookup-max-hits)
             (y-or-n-p (format "SpotLight: %s are hit.  Do you want to display them all?" count)))
       (with-temp-buffer
         (lookup-with-coding-system 'utf-8-mac
@@ -205,7 +205,7 @@
     (setq tab-width 4)
     (when (re-search-forward "\\(kMDItemDisplayName\\|kMDItemTitle\\)[^{]+{[^=]+= \"\\(.+\\)\";" nil t)
       (setq title (match-string 2))
-      (delete-region (point-min) (point)) 
+      (delete-region (point-min) (point))
       (insert title "\n"))
     (insert (lookup-entry-code entry) "\n")
     (setq point (point))

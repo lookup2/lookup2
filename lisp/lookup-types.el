@@ -109,13 +109,13 @@
      ;; default
      (t (setq method 'default string pattern)))
     (if (string= string "")
-	(error "Invalid query pattern"))
+        (error "Invalid query pattern"))
     (lookup-new-query method string pattern)))
 
 (defun lookup-query-to-regexp (query)
   (let* ((method (lookup-query-method query))
-	 (string (lookup-query-string query))
-	 (quote (regexp-quote string)))
+         (string (lookup-query-string query))
+         (quote (regexp-quote string)))
     (case method
       ('exact (concat "^" quote "$"))
       ('prefix (concat "^" quote))
@@ -142,13 +142,13 @@
 
 (defun lookup-query-to-wildcard (query)
   (let ((method (lookup-query-method query))
-	(string (lookup-query-string query)))
+        (string (lookup-query-string query)))
     (case method ('exact string)
-	         ('prefix (concat string "*"))
-	         ('suffix (concat "*" string))
-	         ('substring (concat "*" string "*"))
-	         ('wildcard string)
-	         (t (error "Invalid search method for wildcard: %s" method)))))
+                 ('prefix (concat string "*"))
+                 ('suffix (concat "*" string))
+                 ('substring (concat "*" string "*"))
+                 ('wildcard string)
+                 (t (error "Invalid search method for wildcard: %s" method)))))
 
 ;; Query Filters
 
@@ -177,7 +177,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
   (let ((module (make-lookup-module :name name))
         (dict-list (mapcar 'lookup-dictionary-id lookup-dictionary-list))
         dict-id dict dicts prio)
-    (if (null dict-specs) 
+    (if (null dict-specs)
         (if lookup-cache-file
             (lookup-restore-module-attributes module))
       ;; if dict-specs is not null...
@@ -223,10 +223,10 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-new-agent (class &optional location &rest options)
   (let* ((agent (make-lookup-agent :class class :location location
-				   :id (concat (symbol-name class)
-					       ":" location)))
-	 (opts (lookup-assoc-get lookup-agent-option-alist
-				 (lookup-agent-id agent))))
+                                   :id (concat (symbol-name class)
+                                               ":" location)))
+         (opts (lookup-assoc-get lookup-agent-option-alist
+                                 (lookup-agent-id agent))))
     (while options
       (if (< (length options) 2)
           (error "Agent option %s is incorrect!" options))
@@ -257,11 +257,11 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-agent-dictionaries (agent)
   (or (lookup-get-property agent 'dictionaries) ;; cache
       (let ((id (lookup-agent-id agent)) dicts)
-	(message "Setting up %s..." id)
-	(setq dicts (lookup-agent-command agent :list))
-	(message "Setting up %s...done" id)
-	(lookup-put-property agent 'dictionaries dicts)
-	dicts)))
+        (message "Setting up %s..." id)
+        (setq dicts (lookup-agent-command agent :list))
+        (message "Setting up %s...done" id)
+        (lookup-put-property agent 'dictionaries dicts)
+        dicts)))
 
 (defun lookup-agent-clear (agent)
   (mapc 'lookup-dictionary-clear (lookup-agent-dictionaries agent))
@@ -274,27 +274,27 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-new-dictionary (agent name)
   (make-lookup-dictionary :agent agent :name name
-			  :id (concat (lookup-agent-id agent) "/" name)))
+                          :id (concat (lookup-agent-id agent) "/" name)))
 
 (defun lookup-dictionary-initialize (dictionary)
   (if lookup-cache-file (lookup-restore-dictionary-attributes dictionary))
   (let* ((id (lookup-dictionary-id dictionary))
-	 (plist (lookup-assoc-get lookup-dictionary-option-alist id)))
+         (plist (lookup-assoc-get lookup-dictionary-option-alist id)))
     ;; Load support file
     (let ((file (lookup-assoc-get lookup-support-alist id)))
       (when file
-	(let ((lookup-support-agent
+        (let ((lookup-support-agent
                (lookup-agent-class (lookup-dictionary-agent dictionary)))
               (lookup-support-agent-options
                (lookup-agent-options (lookup-dictionary-agent dictionary)))
-	      (lookup-support-dictionary-id
+              (lookup-support-dictionary-id
                (lookup-dictionary-id dictionary))
-	      (lookup-support-options nil))
-	  (load file)
-	  (let ((list lookup-support-options))
-	    (while list
-	      (setq plist (plist-put plist (car list) (cadr list)))
-	      (setq list (cddr list)))))))
+              (lookup-support-options nil))
+          (load file)
+          (let ((list lookup-support-options))
+            (while list
+              (setq plist (plist-put plist (car list) (cadr list)))
+              (setq list (cddr list)))))))
     (setf (lookup-dictionary-options dictionary) plist)))
 
 (defun lookup-dictionary-ref (dictionary key)
@@ -314,18 +314,18 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
   (or (lookup-get-property dictionary key)
       ;; Initialize
       (unless (lookup-get-property dictionary 'initialized)
-	(lookup-dictionary-initialize dictionary)
-	(lookup-put-property dictionary 'initialized t)
-	(lookup-get-property dictionary key))
+        (lookup-dictionary-initialize dictionary)
+        (lookup-put-property dictionary 'initialized t)
+        (lookup-get-property dictionary key))
       ;; Get default value
       (let ((val (funcall default)))
-	(lookup-put-property dictionary key val)
-	val)))
+        (lookup-put-property dictionary key val)
+        val)))
 
 (defun lookup-dictionary-option (dictionary key &optional inherit)
   (or (plist-get (lookup-dictionary-options dictionary) key)
       (if inherit
-	  (lookup-agent-option (lookup-dictionary-agent dictionary) key))))
+          (lookup-agent-option (lookup-dictionary-agent dictionary) key))))
 
 (defsetf lookup-dictionary-option lookup-dictionary-set-option)
 (defun lookup-dictionary-set-option (dictionary key value)
@@ -336,8 +336,8 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-dictionary-title (dictionary)
   (lookup-dictionary-get dictionary 'title
     (lambda () (or (lookup-dictionary-option dictionary :title)
-		   (lookup-dictionary-command dictionary :title)
-		   (lookup-dictionary-name dictionary)))))
+                   (lookup-dictionary-command dictionary :title)
+                   (lookup-dictionary-name dictionary)))))
 (defsetf lookup-dictionary-title lookup-dictionary-set-title)
 (defun lookup-dictionary-set-title (dictionary title)
   (let ((options (lookup-dictionary-options dictionary)))
@@ -347,11 +347,11 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-dictionary-heading (dictionary)
   (lookup-dictionary-get dictionary 'heading
     (lambda () (truncate-string-to-width (lookup-dictionary-title dictionary)
-					 lookup-title-width nil ? ))))
+                                         lookup-title-width nil ? ))))
 
 (defun lookup-dictionary-query-filters (dictionary)
   (lookup-dictionary-get dictionary 'query-filters
-    (lambda () 
+    (lambda ()
       (let ((a-fs (lookup-agent-option (lookup-dictionary-agent dictionary)
                                        :query-filters))
             (a-f  (lookup-agent-option (lookup-dictionary-agent dictionary)
@@ -363,7 +363,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-dictionary-default-method (dictionary)
   (lookup-dictionary-get dictionary 'default-method
     (lambda () (or (lookup-dictionary-option dictionary :default-method)
-		   lookup-default-method))))
+                   lookup-default-method))))
 
 (defun lookup-dictionary-methods (dictionary)
   (lookup-dictionary-get dictionary 'methods
@@ -407,7 +407,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-dictionary-gaiji-table (dictionary)
   (lookup-dictionary-get dictionary 'gaiji-table
     (lambda () (or (lookup-dictionary-option dictionary :gaiji-table)
-		   (lookup-make-gaiji-table)))))
+                   (lookup-make-gaiji-table)))))
 
 (defun lookup-dictionary-gaiji-regexp (dictionary)
   (lookup-dictionary-get dictionary 'gaiji-regexp
@@ -421,8 +421,8 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-dictionary-menu (dictionary)
   (let ((menu (lookup-dictionary-get dictionary 'menu
-		(lambda () (or (lookup-dictionary-command dictionary :menu)
-			       'no-exists)))))
+                (lambda () (or (lookup-dictionary-command dictionary :menu)
+                               'no-exists)))))
     (unless (eq menu 'no-exists) menu)))
 
 (defun lookup-dictionary-search (dictionary query)
@@ -433,7 +433,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
     ;; check if string satisfies requirements
     (when (lookup-text-charsetsp string charsets)
       (when (eq method 'default)
-        (setf (lookup-query-method query) 
+        (setf (lookup-query-method query)
               (lookup-dictionary-default-method dictionary)))
       (let* ((queries (if filters (lookup-filter-query query filters)
                         (list query)))
@@ -453,7 +453,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
     (cl-remove-duplicates 
      entries
      :test (lambda (x y)
-             (eq (lookup-entry-substance x) 
+             (eq (lookup-entry-substance x)
                  (lookup-entry-substance y))))))
 
 (defun lookup-dictionary-search-internal (dictionary query)
@@ -475,14 +475,14 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-dictionary-search-cache-get (dictionary query)
   (let ((method (lookup-query-method query))
-	(string (lookup-query-string query))
-	(cache (lookup-get-property dictionary 'entry-cache)))
+        (string (lookup-query-string query))
+        (cache (lookup-get-property dictionary 'entry-cache)))
     (lookup-multi-get cache method (intern string lookup-obarray))))
 
 (defun lookup-dictionary-search-cache-put (dictionary query entries)
   (let ((method (lookup-query-method query))
-	(string (lookup-query-string query))
-	(cache (lookup-get-property dictionary 'entry-cache)))
+        (string (lookup-query-string query))
+        (cache (lookup-get-property dictionary 'entry-cache)))
     (setq cache
           (lookup-multi-put cache method (intern string lookup-obarray) entries))
     (lookup-put-property dictionary 'entry-cache cache)))
@@ -498,10 +498,10 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
         (funcs (lookup-dictionary-heading-arranges
                 (lookup-entry-dictionary entry))))
     (if funcs
-	(with-temp-buffer
-	  (insert heading)
+        (with-temp-buffer
+          (insert heading)
           (lookup-format-internal entry funcs nil)
-	  (setq heading (buffer-string))))
+          (setq heading (buffer-string))))
     (case type ('slink (setq heading (concat "-> " heading)))
                ('dynamic (setq heading (concat "-> [" heading "]"))))
     (lookup-put-property entry 'heading heading)))
@@ -511,17 +511,17 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
     (case type
      ('regular
       (if (setq entry (lookup-get-entry
-		       (concat (lookup-dictionary-id dictionary) "#" code)))
-	  (setq type 'link code entry)))
+                       (concat (lookup-dictionary-id dictionary) "#" code)))
+          (setq type 'link code entry)))
      ('(link slink)
       (setq code (lookup-entry-substance code))))
     (let ((id (apply 'concat (lookup-dictionary-id dictionary)
-		     (case type ('regular (list "#" code))
-			        ('dynamic (list "?" code))
+                     (case type ('regular (list "#" code))
+                                ('dynamic (list "?" code))
                                 ('url     (list "&" code))
                                 (t (list "->" (lookup-entry-code code)))))))
       (setq entry (make-lookup-entry :type type :dictionary dictionary
-				     :code code :id id)))
+                                     :code code :id id)))
     (when (eq type 'regular)
       (if lookup-cache-file (lookup-restore-entry-attributes entry))
       (lookup-put-entry entry))
@@ -531,14 +531,14 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-entry-substance (entry)
   (let ((type (lookup-entry-type entry)))
     (if (or (eq type 'link) (eq type 'slink))
-	(lookup-entry-code entry)
+        (lookup-entry-code entry)
       entry)))
 
 (defun lookup-new-slink (entry)
   "Create new symbolic link entry whose head is current entry."
   (setq entry (lookup-entry-substance entry))
   (lookup-new-entry 'slink (lookup-entry-dictionary entry)
-		    entry (lookup-entry-heading entry)))
+                    entry (lookup-entry-heading entry)))
 
 (defun lookup-entry-ref (entry key)
   (lookup-dictionary-ref (lookup-entry-dictionary entry) key))
@@ -547,22 +547,22 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-entry-command (entry command &rest args)
   (let ((func (or (lookup-get-property entry command)
-		  (lookup-entry-ref entry command))))
+                  (lookup-entry-ref entry command))))
     (if (functionp func) (apply func entry args) func)))
 
 (defun lookup-entry-heading (entry)
   (or (lookup-get-property entry 'heading)
       (let ((heading (or (progn (setq entry (lookup-entry-substance entry))
-				(lookup-entry-command entry :heading))
-			 (lookup-entry-code entry))))
-	(setf (lookup-entry-heading entry) heading)
-	(lookup-get-property entry 'heading))))
+                                (lookup-entry-command entry :heading))
+                         (lookup-entry-code entry))))
+        (setf (lookup-entry-heading entry) heading)
+        (lookup-get-property entry 'heading))))
 
 (defun lookup-entry-heading-insert (entry)
   (let ((start (point))
-	(end (progn (insert (lookup-entry-heading entry)) (point))))
+        (end (progn (insert (lookup-entry-heading entry)) (point))))
     (add-text-properties start end (list 'mouse-face 'highlight
-					 'lookup-entry entry))
+                                         'lookup-entry entry))
     (lookup-map-over-property
      start end 'lookup-gaiji
      (lambda (start end gaiji)
@@ -575,9 +575,9 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-entry-references (entry)
   (or (lookup-get-property entry 'references)
       (let ((references (lookup-entry-command entry :dynamic)))
-	(lookup-put-property entry 'references references)
-	(lookup-put-property entry 'referred t)
-	references)))
+        (lookup-put-property entry 'references references)
+        (lookup-put-property entry 'referred t)
+        references)))
 
 (defun lookup-entry-referred-p (entry)
   (lookup-get-property (lookup-entry-substance entry) 'referred))
@@ -599,10 +599,10 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 (defun lookup-session-display (session)
   (if lookup-last-session
       (setf (lookup-session-excursion lookup-last-session)
-	    (lookup-search-excursion)))
+            (lookup-search-excursion)))
   (lookup-summary-display session)
   (setq lookup-current-session session
-	lookup-last-session session))
+        lookup-last-session session))
 
 (defun lookup-session-open (session)
   (setq lookup-current-session session)
@@ -627,25 +627,25 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-history-push (history obj)
   (let ((stack (lookup-history-stack history))
-	(position (lookup-history-position history)))
+        (position (lookup-history-position history)))
     (setq stack (nthcdr (- (length stack) position) stack))
     (unless (eq obj (car stack))
       (setf (lookup-history-stack history) (cons obj stack))
       (if (and (> lookup-max-history 0) (>= position lookup-max-history))
-	  (setcdr (nthcdr (- lookup-max-history 2) stack) nil)
-	(setf (lookup-history-position history) (1+ position))))))
+          (setcdr (nthcdr (- lookup-max-history 2) stack) nil)
+        (setf (lookup-history-position history) (1+ position))))))
 
 (defun lookup-history-move (history n)
   (let ((length (lookup-history-length history))
-	(position (lookup-history-position history)))
+        (position (lookup-history-position history)))
     (cond
      ((= length 0) (error "No session in the history"))
      ((and (= position 1) (< n 0)) (error "This is the first session"))
      ((and (= position length) (> n 0)) (error "This is the last session")))
     (setq position (+ position n))
     (setq position (if (< position 1) 1
-		     (if (> position length) length
-		       position)))
+                     (if (> position length) length
+                       position)))
     (setf (lookup-history-position history) position)
     (lookup-history-ref history)))
 
@@ -719,9 +719,9 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
 
 (defun lookup-gaiji-insert (gaiji)
   (let ((glyph (lookup-gaiji-glyph gaiji))
-	(alter (lookup-gaiji-alter gaiji))
-	(start (point)))
-    (if (stringp glyph) 
+        (alter (lookup-gaiji-alter gaiji))
+        (start (point)))
+    (if (stringp glyph)
         (insert glyph)
       (insert (or alter glyph))
       (if alter
@@ -777,23 +777,23 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
 
 (defun lookup-dictionary-gaiji (dictionary code)
   (let* ((table (lookup-dictionary-gaiji-table dictionary))
-	 (gaiji (lookup-gaiji-table-ref table code)))
+         (gaiji (lookup-gaiji-table-ref table code)))
     (cond
      ((lookup-gaiji-p gaiji) gaiji)
      ((eq gaiji 'no-gaiji) nil)
      (t
       (let ((spec gaiji) glyph)
-	(unless spec
-	  (setq spec (lookup-dictionary-command dictionary :gaiji code)))
-	(if (not spec)
-	    (setq gaiji 'no-gaiji)
-	  (if (stringp spec)
-	      (setq gaiji (lookup-new-gaiji spec spec))
-	    (setq glyph (or (car spec)
-			    (lookup-dictionary-command dictionary :font code)))
-	    (setq gaiji (lookup-new-gaiji glyph (cadr spec)))))
-	(lookup-gaiji-table-set table code gaiji)
-	(unless (eq gaiji 'no-gaiji) gaiji))))))
+        (unless spec
+          (setq spec (lookup-dictionary-command dictionary :gaiji code)))
+        (if (not spec)
+            (setq gaiji 'no-gaiji)
+          (if (stringp spec)
+              (setq gaiji (lookup-new-gaiji spec spec))
+            (setq glyph (or (car spec)
+                            (lookup-dictionary-command dictionary :font code)))
+            (setq gaiji (lookup-new-gaiji glyph (cadr spec)))))
+        (lookup-gaiji-table-set table code gaiji)
+        (unless (eq gaiji 'no-gaiji) gaiji))))))
 
 (provide 'lookup-types)
 

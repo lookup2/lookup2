@@ -70,7 +70,7 @@
      ((not (file-directory-p directory))
       (error "ndbuffer: agent (directory) %s not found." directory))
      (t
-      (mapcar (lambda (name) 
+      (mapcar (lambda (name)
                 (lookup-new-dictionary agent (file-name-nondirectory name)))
               (file-expand-wildcards (concat directory "/*" extension)))))))
 
@@ -131,7 +131,7 @@ REGULAR indicates if search is regular (not used for now)."
               (narrow-to-region start end)
               (goto-char (point-min))
               (let (code head)
-                (if (functionp head-tags) 
+                (if (functionp head-tags)
                     (setq head (funcall head-tags (buffer-substring start end)))
                   (when (re-search-forward (concat (car head-tags) "\\(.+?\\)" 
                                                    (cdr head-tags)) nil t)

@@ -193,7 +193,7 @@
                                    string
                                    (if (equal method 'suffix) "】" ""))))
                file-word-pairs)))
-         ((string-match "^\\cC\\cC$" string) 
+         ((string-match "^\\cC\\cC$" string)
           ;; 熟語（２漢字）検索
           (setq file-word-pairs (list (list ndjitsuu-jukugo-index-file
                                             (concat "【" string "】")))))

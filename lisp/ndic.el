@@ -118,7 +118,7 @@
 	(while (re-search-forward regexp nil t)
           (goto-char (line-beginning-position))
 	  (when (looking-at "\\([^\t\n]+\\)\t\\([^\t\n]+\\)\t\\(.+\\)")
-            (setq string (match-string 1)) 
+            (setq string (match-string 1))
 	    (setq code (concat (match-string 2) ":" (match-string 3)))
 	    (setq entries
 		  (cons (lookup-new-entry 'regular dictionary code string)

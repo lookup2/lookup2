@@ -85,7 +85,7 @@
                                  (concat (regexp-quote extension) "\\'"))))
     (message "files=%s" files)
     (if (null files) (error "nddsl: DSL file wity sary index not found! (%s)" location))
-    (mapcar (lambda (name) 
+    (mapcar (lambda (name)
               (lookup-new-dictionary agent name))
             files)))
 

@@ -182,7 +182,7 @@ If there is no `suggenstions' URL, then entry with queried  "
   (let* ((agent    (lookup-dictionary-agent dict))
          (site     (lookup-agent-location agent))
          (agent-options (lookup-agent-options agent))
-         (options  (append (lookup-dictionary-options dict) 
+         (options  (append (lookup-dictionary-options dict)
                            agent-options))
          (title    (plist-get options :title))
          (results  (plist-get options :results))
@@ -236,7 +236,7 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
     (when (equal http-method "post")
       (callf concat results-template "?")
       (mapc
-       (lambda (elem) 
+       (lambda (elem)
          (if (equal (car-safe elem) 'Param)
              (callf concat results-template (assoc-default 'name (cadr elem))
                     "=" (assoc-default 'value (cadr elem)) "&")))
