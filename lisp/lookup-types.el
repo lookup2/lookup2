@@ -676,14 +676,13 @@ the present circumstances. TYPE is a symbol like `xbm' or `jpeg'."
                                'rear-nonsticky (list 'display)))))
 
 (defun lookup-glyph-insert (glyph &optional start end foreground background)
+  (if foreground (setq glyph (nconc glyph (list :foreground foreground))))
+  (if background (setq glyph (nconc glyph (list :background background))))
   (if (and start end)
-      (progn
-        (if foreground (setq glyph (nconc glyph (list :foreground foreground))))
-        (if background (setq glyph (nconc glyph (list :background background))))
-        (add-text-properties
-         start end (list 'display glyph
-                         'intangible glyph
-                         'rear-nonsticky (list 'display))))
+      (add-text-properties
+       start end (list 'display glyph
+		       'intangible glyph
+		       'rear-nonsticky (list 'display)))
     (insert-image glyph "[image]")))
 
 (defun lookup-img-file-insert (file type &optional start end &rest props)
