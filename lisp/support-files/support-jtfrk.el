@@ -26,7 +26,8 @@
 
 ;;; Code:
 
-(require 'w3m)
+(unless lookup-byte-compiling
+  (require 'w3m))
 
 (defun support-jtfrk-arrange-structure (entry)
   (w3m-region (point-min) (point-max)))
