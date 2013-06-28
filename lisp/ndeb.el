@@ -179,17 +179,11 @@ Nil means it has not been checked yet.")
        (ndeb-process-require
 	   (concat
 	    "book "
-	    (if (string-match " " book)
-		(concat "\""
-			(replace-regexp-in-string "\"" "\\\"" book t t)
-			"\"")
-	      book)
+	    (replace-regexp-in-string "\\([\\ \t]\\)" "\\\\\\1" book t nil)
 	    " "
-	    (if (and (stringp appendix) (string-match " " appendix))
-		(concat "\""
-			(replace-regexp-in-string "\"" "\\\"" appendix t t)
-			"\"")
-	      appendix))
+	    (when (stringp appendix)
+	      (replace-regexp-in-string "\\([\\ \t]\\)" "\\\\\\1"
+					appendix t nil)))
 	 (lambda (_process)
 	   (if (search-forward "invalid book" nil t)
 	       (error "Invalid dictionary directory: %s" book))
