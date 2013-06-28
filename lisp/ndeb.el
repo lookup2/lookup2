@@ -177,14 +177,19 @@ Nil means it has not been checked yet.")
        (setq book     (expand-file-name (lookup-agent-location ,agent))
              appendix (lookup-agent-option ,agent :appendix))
        (ndeb-process-require
-	   (concat "book "
-		   (if (string-match " " book)
-		       (concat "\"" book "\"")
-		     book)
-		   " "
-		   (if (and (stringp appendix) (string-match " " appendix))
-		       (concat "\"" appendix "\"")
-		     appendix))
+	   (concat
+	    "book "
+	    (if (string-match " " book)
+		(concat "\""
+			(replace-regexp-in-string "\"" "\\\"" book t t)
+			"\"")
+	      book)
+	    " "
+	    (if (and (stringp appendix) (string-match " " appendix))
+		(concat "\""
+			(replace-regexp-in-string "\"" "\\\"" appendix t t)
+			"\"")
+	      appendix))
 	 (lambda (_process)
 	   (if (search-forward "invalid book" nil t)
 	       (error "Invalid dictionary directory: %s" book))
