@@ -479,8 +479,13 @@ Nil means it has not been checked yet.")
               (or (lookup-agent-option agent :gaiji-file)
                   (and (file-directory-p dict-location)
                        (car (directory-files dict-location t "\\.map$")))
-                  (car (directory-files ndeb-gaiji-map-directory t (concat dict-name ".map")))
-                  (car (directory-files ndeb-gaiji-map-directory t (concat agent-name ".map"))))))
+		  (and (file-directory-p ndeb-gaiji-map-directory)
+		       (car (or (directory-files
+				 ndeb-gaiji-map-directory t
+				 (concat dict-name ".map"))
+				(directory-files
+				 ndeb-gaiji-map-directory t
+				 (concat agent-name ".map"))))))))
         (if gaiji-file
             (setf (lookup-dictionary-option dictionary :gaiji-table)
                   (ndeb-parse-gaiji-file gaiji-file))))
