@@ -176,19 +176,25 @@ Nil means it has not been checked yet.")
      (unless (eq ,agent ndeb-current-agent)
        (setq book     (expand-file-name (lookup-agent-location ,agent))
              appendix (lookup-agent-option ,agent :appendix))
-       (ndeb-process-require
-	   (concat
-	    "book "
-	    (replace-regexp-in-string "\\([\\ \t]\\)" "\\\\\\1" book t nil)
-	    " "
-	    (when (stringp appendix)
-	      (replace-regexp-in-string "\\([\\ \t]\\)" "\\\\\\1"
-					appendix t nil)))
-	 (lambda (_process)
-	   (if (search-forward "invalid book" nil t)
-	       (error "Invalid dictionary directory: %s" book))
-	   (if (search-forward "invalid appendix" nil t)
-	       (error "Invalid appendix directory: %s" book))))
+       (lookup-with-coding-system
+	   (let ((eol (coding-system-eol-type ndeb-process-coding-system)))
+	     (coding-system-change-eol-conversion 'raw-text
+						  (and (integerp eol) eol)))
+	 (ndeb-process-require
+	     (encode-coding-string
+	      (concat
+	       "book "
+	       (mapconcat
+		(lambda (elt) (and elt (replace-regexp-in-string
+					"\\([\\ \t]\\)" "\\\\\\1" elt t nil)))
+		(list book appendix)
+		" "))
+	      file-name-coding-system)
+	   (lambda (_process)
+	     (if (search-forward "invalid book" nil t)
+		 (error "Invalid dictionary directory: %s" book))
+	     (if (search-forward "invalid appendix" nil t)
+		 (error "Invalid appendix directory: %s" book)))))
        (setq ndeb-current-agent ,agent)
        (lookup-put-property ndeb-current-agent :ndeb-dict nil))
      ,@body))
