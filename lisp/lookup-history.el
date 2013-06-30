@@ -52,7 +52,7 @@
            (list (reverse (lookup-history-stack lookup-search-history)))
            (num 1) session type)
       (erase-buffer)
-      (insert "Tyep `v' to visit session, `q' to leave, `?' for help.\n\n")
+      (insert "Type `v' to visit session, `q' to leave, `?' for help.\n\n")
       (dolist (item list)
         (insert (format "%3d: " num))
         (setq num (1+ num) session item
