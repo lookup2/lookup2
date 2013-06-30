@@ -238,7 +238,7 @@ Here, @code{ndeb} is a @strong{search agent}, and @code{/path/to/dict_dir_1/} is
 location of a dictionaries.  Remember that you will need @code{eblook}
 program @footnote{It is included in various package managers, such as @code{MacPorts}.} to use this agent.
 
-Additionaly, you might want to set as follows, or you might just
+Additionally, you might want to set as follows, or you might just
 @code{(require 'lookup)} instead of autoloading the library.
 
 @lisp
@@ -261,14 +261,14 @@ key-binding settings.
 @section Startup
 
 After you set up the dictionary, type @code{M-x lookup} to start lookup.
-You will typically see the following sceen.
+You will typically see the following screen.
 
 @verbatim
 ======== Lookup Windows ==================================================
 --------------------------------------------------------------------------
 
 Lookup (module: default)
-Tyep `m' to select, `u' to unselect, `q' to leave, `?' for help.
+Type `m' to select, `u' to unselect, `q' to leave, `?' for help.
 
 % Dictionary ID                   Title                        Methods
 - -------------                   -----                        -------
@@ -310,7 +310,7 @@ dictionary.  For example, @code{=><.....} means that this dictionary
 supports @strong{exact}, @strong{prefix} and @strong{suffix} search methods.
 
 Help will be displayed by pressing ?.  Pressing
-qburies a buffer.  These key roles are common to other
+q buries a buffer.  These key roles are common to other
 kind of buffers.
 
 @node Search
@@ -393,7 +393,7 @@ This option will specify the @emph{additional} arrange
 functions besides the default arrange functions.
 
 @item :arrange-table
-This option will specify the @emph{overrinding}
+This option will specify the @emph{overriding}
 arrange functions besides the default arrange
 functions.
 
@@ -464,7 +464,7 @@ You have to specify @strong{dictionary-id} that are displayed in
         ("ndeb:/cdrom/WAEI" ':title "和英辞典")))
 @end lisp
 
-Dictionaries are indirectly specifed by searc agents.  You may
+Dictionaries are indirectly specified by search agents.  You may
 specify dictionary options via @emph{support-files}.  If you create your
 own dictionary, you may distribute @emph{support-file} to let users
 search your dictionary.
@@ -485,7 +485,7 @@ Dictionary title.
 
 @node Queries
 @chapter Queries
-You need to query to search dictinaries for words.  
+You need to query to search dictionaries for words.  
 
 
 @menu
@@ -582,7 +582,7 @@ around the point.
 @node Mecab
 @subsection Mecab
 You may use mecab to search for agents.  Please make sure that
-your dictinaries encoding (UTF-8 is strongly recommended) and
+your dictionaries encoding (UTF-8 is strongly recommended) and
 @code{lookup-mecab-coding} are the same.
 You may use this For dictionary which only supports Hiragana Entries,
 
@@ -598,7 +598,7 @@ they are found.  @emph{Entries} will be displayed in @emph{Entries buffer}.
 
 @node Contents
 @chapter Contents
-@emph{Contents} of entries will be displaeyd in @code{*Contents*} buffer.
+@emph{Contents} of entries will be displayed in @code{*Contents*} buffer.
 Before they are displayed on buffer, they may be @emph{arranged}
 according to @code{arrange-tables}.
 
@@ -683,7 +683,7 @@ follows:
     <code>0123</code>
     <head>free</head>
     <entry>free</entry>
-    <entry>feely</entry>
+    <entry>freely</entry>
     <entry>freedom</entry>
     <explanation>
       ....
