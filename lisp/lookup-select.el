@@ -58,7 +58,7 @@
         (module lookup-select-module))
     (erase-buffer)
     (insert "Lookup (module: " (lookup-module-name module) ")\n")
-    (insert "Tyep `m' to select, `u' to unselect, `q' to leave, "
+    (insert "Type `m' to select, `u' to unselect, `q' to leave, "
             "`?' for help.\n\n")
     (lookup-table-insert
      "%c %-15t %-18t %s\n"
@@ -328,9 +328,9 @@ other dictionaries.  With prefix-argument, MAX-HITS can be specified."
 
 (defun lookup-select-wrap-command (_arg)
   "Call the corresponding global command with keys and reset dictionaries.
-This command should be binded for the same keys with the commands
+This command should be bound to the same keys with commands
 `kill-line', `yank', `yank-pop',`transpose-lines', or `undo'.
-When this command is called, the variable `lookup-select-kill-ring'
+When this command is called, variable `lookup-select-kill-ring'
 will be used instead of the usual `kill-ring'."
   (interactive "P")
   (let ((kill-ring lookup-select-kill-ring)

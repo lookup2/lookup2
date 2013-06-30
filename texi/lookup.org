@@ -101,7 +101,7 @@ Here, ~ndeb~ is a *search agent*, and ~/path/to/dict_dir_1/~ is a
 location of a dictionaries.  Remember that you will need ~eblook~
 program [fn:1] to use this agent.
 
-Additionaly, you might want to set as follows, or you might just
+Additionally, you might want to set as follows, or you might just
 ~(require 'lookup)~ instead of autoloading the library.
 
 #+begin_src emacs-lisp
@@ -122,7 +122,7 @@ for autoload settings and key-binding settings.
 ** Startup
 
 After you set up the dictionary, type ~M-x lookup~ to start lookup.
-You will typically see the following sceen.
+You will typically see the following screen.
 
 #+begin_example
 
@@ -130,7 +130,7 @@ You will typically see the following sceen.
   --------------------------------------------------------------------------
 
   Lookup (module: default)
-  Tyep `m' to select, `u' to unselect, `q' to leave, `?' for help.
+  Type `m' to select, `u' to unselect, `q' to leave, `?' for help.
 
   % Dictionary ID                   Title                        Methods
   - -------------                   -----                        -------
@@ -238,7 +238,7 @@ respectively.
 - :query-filter :: See [[Query Filters]] for details
 - :arranges :: This option will specify the /additional/ arrange
                functions besides the default arrange functions.
-- :arrange-table :: This option will specify the /overrinding/
+- :arrange-table :: This option will specify the /overriding/
                     arrange functions besides the default arrange
                     functions.
 
@@ -286,7 +286,7 @@ You have to specify *dictionary-id* that are displayed in
         ("ndeb:/cdrom/WAEI" ':title "和英辞典")))
 #+end_src
 
-Dictionaries are indirectly specifed by searc agents.  You may specify
+Dictionaries are indirectly specified by search agents.  You may specify
 dictionary options via /support-files/.  If you create your own
 dictionary, you may distribute /support-file/ to let users search your
 dictionary.
@@ -307,7 +307,7 @@ Besides agent options, following dictionary options may be used.
 
 
 * Queries
-  You need to query to search dictinaries for words.  
+  You need to query to search dictionaries for words.  
 ** Query commands
 You can query by patterns, such as "testi*" etc.
 - lookup-pattern :: Look-up dictionary by pattern.
@@ -348,7 +348,7 @@ around the point.
 
 *** Mecab
 You may use mecab to search for agents.  Please make sure that your
-dictinaries encoding (UTF-8 is strongly recommended) and
+dictionaries encoding (UTF-8 is strongly recommended) and
 ~lookup-mecab-coding~ are the same.  You may use this For dictionary
 which only supports Hiragana Entries,
 
@@ -361,7 +361,7 @@ Once you query for the words, search agents will return /entries/ if
 they are found.  /Entries/ will be displayed in ~Summary buffer~.
 {{{cindex(entries)}}}
 * Contents
-/Contents/ of entries will be displaeyd in ~*Contents*~ buffer.
+/Contents/ of entries will be displayed in ~*Contents*~ buffer.
 Before they are displayed on buffer, they may be /arranged/
 according to ~arrange-tables~.
 ** Contents Arrangements
@@ -381,7 +381,7 @@ You can also set the module by ~lookup-search-modules~ variable.
 * Cache
 Lookup will save /title/, /methods/ attributes of dictionary to cache
 file, to speed up the launching of Lookup.  It will also save the
-module dictionary informations.
+module dictionary information.
 
 This means that, by modifying the cache file, you can customize the
 titles of dictionary.
@@ -426,7 +426,7 @@ XML-based dictionaries are usually tagged like follows:
       <code>0123</code>
       <head>free</head>
       <entry>free</entry>
-      <entry>feely</entry>
+      <entry>freely</entry>
       <entry>freedom</entry>
       <explanation>
         ....
@@ -565,8 +565,8 @@ Then, add the following agent to your =lookup-search-agents=.
 get the readings for unknown kanji.
 ** ndbtonic
 ~ndbtonic~ search agents support BTONIC XML format dictionaries.  This
-agent is basically text searching agent, so you can sepcify either
-~ndbuffer~ / ~ndsary~ aget as a ~:backend~.  (You can not use ~ndtext~
+agent is basically text searching agent, so you can specify either
+~ndbuffer~ / ~ndsary~ agent as a ~:backend~.  (You can not use ~ndtext~
 as backend, as encoding of BTONIC is Shift_JIS.)  You must install
 [[http://hp.vector.co.jp/authors/VA005784/btonic/btonic2xml.html][BTONIC2xml.rb v1.10]] utility to convert to plain XML file.
 *** Usage
@@ -662,7 +662,7 @@ format.
    ~ndbuffer~, or ~ndtext~ agent.
 *** SDIC Dictionary
 ~support-sdic.el~ provides support for [[http://www.namazu.org/~tsuchiya/sdic/index.html][SDIC]] dictionaries.
-*** RangJung Yeshe Dicitionary
+*** RangJung Yeshe Dictionary
 
 *** Unicode Character Database
 * Making new Search Agents
