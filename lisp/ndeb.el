@@ -115,6 +115,18 @@ dictionaries' directory."
   :type 'string
   :group 'ndeb)
 
+(defcustom ndeb-encode-directory-name
+  ;; On Japanese Windows, eblook handles non-ASCII file name
+  ;; correctly.
+  (null (and (memq system-type '(windows-nt ms-dos))
+	     (memq (coding-system-base
+		    (or file-name-coding-system
+			default-file-name-coding-system))
+		   '(japanese-cp932 japanese-shift-jis))))
+  "When non-nil, encode directory name before passing it to eblook process."
+  :type 'boolean
+  :group 'ndeb)
+
 
 ;;;
 ;;; Internal Variables
@@ -171,30 +183,35 @@ Nil means it has not been checked yet.")
 (defmacro ndeb-with-agent (agent &rest body)
   (declare (indent 1))
   "Switch eblook's context to AGENT and execute BODY."
-  `(let (book appendix)
+  `(let (book appendix command filter)
      (ndeb-process-open)
      (unless (eq ,agent ndeb-current-agent)
        (setq book     (expand-file-name (lookup-agent-location ,agent))
-             appendix (lookup-agent-option ,agent :appendix))
-       (lookup-with-coding-system
-	   (let ((eol (coding-system-eol-type ndeb-process-coding-system)))
-	     (coding-system-change-eol-conversion 'raw-text
-						  (and (integerp eol) eol)))
-	 (ndeb-process-require
-	     (encode-coding-string
-	      (concat
-	       "book "
-	       (mapconcat
-		(lambda (elt) (and elt (replace-regexp-in-string
-					"\\([\\ \t]\\)" "\\\\\\1" elt t nil)))
-		(list book appendix)
-		" "))
-	      (or file-name-coding-system default-file-name-coding-system))
-	   (lambda (_process)
-	     (if (search-forward "invalid book" nil t)
-		 (error "Invalid dictionary directory: %s" book))
-	     (if (search-forward "invalid appendix" nil t)
-		 (error "Invalid appendix directory: %s" book)))))
+             appendix (lookup-agent-option ,agent :appendix)
+	     command (concat
+		      "book "
+		      (mapconcat
+		       (lambda (elt)
+			 (and elt (replace-regexp-in-string
+				   "\\([\\ \t]\\)" "\\\\\\1" elt t nil)))
+		       (list book appendix)
+		       " "))
+	     filter (lambda (_process)
+		      (if (search-forward "invalid book" nil t)
+			  (error "Invalid dictionary directory: %s" book))
+		      (if (search-forward "invalid appendix" nil t)
+			  (error "Invalid appendix directory: %s" book))))
+       (if ndeb-encode-directory-name
+	   (lookup-with-coding-system
+	       (let ((eol (coding-system-eol-type ndeb-process-coding-system)))
+		 (coding-system-change-eol-conversion
+		  'raw-text (and (integerp eol) eol)))
+	     (ndeb-process-require
+	      (encode-coding-string
+	       command
+	       (or file-name-coding-system default-file-name-coding-system))
+	      filter))
+	 (ndeb-process-require command filter))
        (setq ndeb-current-agent ,agent)
        (lookup-put-property ndeb-current-agent :ndeb-dict nil))
      ,@body))
