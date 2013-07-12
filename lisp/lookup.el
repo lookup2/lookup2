@@ -387,8 +387,7 @@ See `lookup-secondary' for details."
                        lookup-module-list)))
     (lookup-get-module
      (completing-read "Search module: " table nil t nil
-                      'lookup-input-module-history)))
-  (lookup-default-module))
+                      'lookup-input-module-history))))
 
 (defun lookup-input-dictionary (&optional module)
   "Let the user input dictionary.
