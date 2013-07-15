@@ -87,10 +87,11 @@
 (put 'ndwnj :methods '(exact prefix suffix substring wild))
 (put 'ndwnj :reference-pattern '("<\\([0-9]+-[a-z]+\\):\\([^>]+\\)>" 2 2 1))
 (put 'ndwnj :arranges
-     '(lookup-arrange-default-headings
-       ndwnj-arrange-headings
-       lookup-arrange-references
-       lookup-arrange-fill-lines))
+     '((structure lookup-arrange-structure
+		  ndwnj-arrange-headings
+		  ndwnj-arrange-remove-dups)
+       (reference lookup-arrange-references)
+       (fill      lookup-arrange-fill-lines)))
 
 
 ;;;
@@ -142,14 +143,34 @@
                              " "
                              (lookup-entry-heading entry)))
          (def        (ndwnj-get-definition process code))
+	 (ex         (ndwnj-get-examples process code))
          (word       (ndwnj-get-words process code))
-         (link       (ndwnj-get-links process code)))
-    (concat heading "\n" def "\n" word "\n" link "\n")))
+         (link       (ndwnj-get-links process code))
+	 (index 0))
+    (when ex
+      (while (setq index (and (string-match ": \\(.+\\)$" ex index)
+			      (match-end 0)))
+	(setq def (replace-regexp-in-string
+		   (concat "; \"" (regexp-quote (match-string 1 ex)) "\"")
+		   "" def t t))))
+    (concat heading "\n" def "\n"
+	    (and ex (concat "\n" ex "\n")) "\n" word "\n" link "\n")))
 
 
 ;;;
 ;;; Arrange functions
 ;;;
+
+(defun ndwnj-arrange-remove-dups (_entry)
+  (goto-char (point-max))
+  (beginning-of-line)
+  (while (null (bobp))
+    (let ((start (point))
+	  (end (progn (end-of-line) (point))))
+      (forward-line -1)
+      (when (and (null (eq start end))
+		 (looking-at (regexp-quote (buffer-substring start end))))
+	(delete-region start (min (1+ end) (point-max)))))))
 
 (defun ndwnj-arrange-headings (_entry)
   (while (re-search-forward
@@ -235,6 +256,18 @@
                    (callf concat result "  " x ": " (substring y 2) "\n"))
                  results)
 	result))))
+
+(defun ndwnj-get-examples (process code)
+  (ndwnj-require process
+    (concat "SELECT lang, def, sid FROM synset_ex WHERE synset = '"
+	    (ndwnj-escape-string code)
+	    "' ORDER BY sid ASC, lang ASC;")
+    (lambda (_process)
+      (let (results)
+	(while (re-search-forward "^\\(.+\\)|\\(.+\\)|.+$" nil t)
+	  (push (concat "  " (match-string 1) ": " (match-string 2)) results))
+        (and results
+	     (mapconcat 'identity (nreverse results) "\n"))))))
 
 (defun ndwnj-get-definition (process code)
   (ndwnj-require process
