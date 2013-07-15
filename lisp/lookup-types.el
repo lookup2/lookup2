@@ -433,8 +433,8 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
     ;; check if string satisfies requirements
     (when (lookup-text-charsetsp string charsets)
       (when (eq method 'default)
-        (setf (lookup-query-method query)
-              (lookup-dictionary-default-method dictionary)))
+	(setq query (lookup-new-query
+		     (lookup-dictionary-default-method dictionary) string)))
       (let* ((queries (if filters (lookup-filter-query query filters)
                         (list query)))
              (entries (lookup-dictionary-search-multiple
