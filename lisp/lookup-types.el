@@ -362,7 +362,7 @@ Each DICT-SPEC consists of (dict-id :option val ....)."
 
 (defun lookup-dictionary-default-method (dictionary)
   (lookup-dictionary-get dictionary 'default-method
-    (lambda () (or (lookup-dictionary-option dictionary :default-method)
+    (lambda () (or (lookup-dictionary-option dictionary :default-method t)
                    lookup-default-method))))
 
 (defun lookup-dictionary-methods (dictionary)
