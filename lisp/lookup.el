@@ -860,9 +860,12 @@ If there is no session, default module will be returned."
   (with-temp-buffer
     (lookup-splash)
     (load lookup-init-file t)
-    (when lookup-cache-file
-      (require 'lookup-cache)
-      (load lookup-cache-file t))
+    (setq lookup-search-modules
+	  (or (and lookup-cache-file
+		   (load lookup-cache-file t)
+		   lookup-module-attributes
+		   (mapcar 'list (mapcar 'car lookup-module-attributes)))
+	      lookup-search-modules))
     (setq lookup-search-history (lookup-new-history))
     (setq lookup-agent-list
           (mapcar (lambda (spec) (apply 'lookup-new-agent spec))
@@ -871,8 +874,6 @@ If there is no session, default module will be returned."
     (setq lookup-dictionary-list
           (apply 'append
                  (mapcar 'lookup-agent-dictionaries lookup-agent-list)))
-    (setq lookup-search-modules
-          (mapcar 'list (mapcar 'car lookup-module-attributes)))
     (setq lookup-module-list
           (mapcar (lambda (spec) (apply 'lookup-new-module spec))
                   (or lookup-search-modules '(("default" t)))))
