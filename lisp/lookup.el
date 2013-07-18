@@ -861,11 +861,9 @@ If there is no session, default module will be returned."
     (lookup-splash)
     (load lookup-init-file t)
     (setq lookup-search-modules
-	  (or (and lookup-cache-file
-		   (load lookup-cache-file t)
-		   lookup-module-attributes
-		   (mapcar 'list (mapcar 'car lookup-module-attributes)))
-	      lookup-search-modules))
+	  (if (and (lookup-load-cache) lookup-module-attributes)
+	      (mapcar 'list (mapcar 'car lookup-module-attributes))
+	    lookup-search-modules))
     (setq lookup-search-history (lookup-new-history))
     (setq lookup-agent-list
           (mapcar (lambda (spec) (apply 'lookup-new-agent spec))

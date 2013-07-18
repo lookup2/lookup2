@@ -76,6 +76,18 @@
 	  (mapc 'funcall lookup-dump-functions)
 	  (insert "\n;;; " name " ends here\n"))))))
 
+(defun lookup-load-cache ()
+  "Load cache file.  Return non-nil if cache file is really loaded."
+  (setq lookup-agent-attributes nil
+	lookup-module-attributes nil
+	lookup-dictionary-attributes nil
+	lookup-entry-attributes nil)
+  (when (and lookup-cache-file
+	     (file-exists-p lookup-cache-file)
+	     (or (file-newer-than-file-p lookup-cache-file lookup-init-file)
+		 (y-or-n-p "Lookup init file is newer than cache file.  Load cache file anyway? ")))
+    (load lookup-cache-file t)))
+
 
 ;;;
 ;;; Agent attributes
