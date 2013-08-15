@@ -132,7 +132,7 @@ ndtext
 
 ndsary
 
-* ndtext summary::              
+* ndsary summary::              
 * ndsary options::              
 
 ndbuffer
@@ -797,11 +797,11 @@ Following Options are supported.
 @section ndsary
 
 @menu
-* ndtext summary::              
+* ndsary summary::              
 * ndsary options::              
 @end menu
 
-@node ndtext summary
+@node ndsary summary
 @subsection Summary
 @code{ndsary} will search for text with help of Suffix Array utility
 (@uref{http://sary.sourceforge.net/,sary}).  This is suitable for
@@ -886,10 +886,10 @@ specified by @uref{http://tools.ietf.org/html/rfc2229,RFC2229}.
 @section ndjitsuu
 
 @menu
-* Summary::                     
+* ndjitsuu summary::                     
 @end menu
 
-@node Summary
+@node ndjitsuu summary
 @subsection Summary
 @code{ndjitsuu} is a search agent for Jitsuu dictionary.  You will need
 to prepare the index file equipped in this archive to create the

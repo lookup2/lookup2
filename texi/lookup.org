@@ -502,7 +502,7 @@ suitable for Microsoft Windows systems.
 ** ndsary
 *** Summary
 :PROPERTIES:
-:ALT_TITLE: ndtext summary
+:ALT_TITLE: ndsary summary
 :END:
 ~ndsary~ will search for text with help of Suffix Array utility
 ([[http://sary.sourceforge.net/][sary]]).  This is suitable for large-sized text dictionary, but you
@@ -540,6 +540,9 @@ for Wiki-Based document with very high compression ration.  OpenZIM
 files are distributed from [[http://www.openzim.org][OpenZIM]] site.
 ** ndjitsuu
 *** Summary
+:PROPERTIES:
+:ALT_TITLE: ndjitsuu summary
+:END:
 ~ndjitsuu~ is a search agent for Jitsuu dictionary.  You will need to
 prepare the index file equipped in this archive to create the
 dictionary.
