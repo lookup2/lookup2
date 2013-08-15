@@ -3,5 +3,6 @@ AM_INIT_AUTOMAKE(lookup, `grep 'defconst lookup-version' lisp/lookup.el | sed 's
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 AM_PATH_LISPDIR
+AC_PATH_PROG(MAKEINFO, makeinfo, makeinfo)
 
 AC_OUTPUT(Makefile lisp/Makefile texi/Makefile)
