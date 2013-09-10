@@ -168,6 +168,16 @@ Nil means it has not been checked yet.")
     ("em" . lookup-emphasis-face)))
 
 ;;;
+;:: inline functions
+;;;
+
+(defsubst ndeb-ebnet-uri-p (string)
+  "Return non-nil if STRING is ebnet uri."
+  (save-match-data
+    (let ((case-fold-search t))
+      (string-match "^ebnet://" string))))
+
+;;;
 ;;; macros & basic functions
 ;;;
 
@@ -183,12 +193,17 @@ Nil means it has not been checked yet.")
 (defmacro ndeb-with-agent (agent &rest body)
   (declare (indent 1))
   "Switch eblook's context to AGENT and execute BODY."
-  `(let (book appendix command filter)
+  `(let (book appendix command filter localp)
      (ndeb-process-open)
      (unless (eq ,agent ndeb-current-agent)
-       (setq book     (expand-file-name (lookup-agent-location ,agent))
-             appendix (lookup-agent-option ,agent :appendix)
-	     command (concat
+       (setq book (lookup-agent-location ,agent)
+	     appendix (lookup-agent-option ,agent :appendix))
+       (when (setq localp (null (ndeb-ebnet-uri-p book)))
+	 ;; We assume book and appendix locations are both local or
+	 ;; remote.
+	 (setq book (expand-file-name book)
+	       appendix (and appendix (expand-file-name appendix))))
+       (setq command (concat
 		      "book "
 		      (mapconcat
 		       (lambda (elt)
@@ -201,7 +216,7 @@ Nil means it has not been checked yet.")
 			  (error "Invalid dictionary directory: %s" book))
 		      (if (search-forward "invalid appendix" nil t)
 			  (error "Invalid appendix directory: %s" book))))
-       (if ndeb-encode-directory-name
+       (if (and ndeb-encode-directory-name localp)
 	   (lookup-with-coding-system
 	       (let ((eol (coding-system-eol-type ndeb-process-coding-system)))
 		 (coding-system-change-eol-conversion
@@ -488,21 +503,26 @@ Nil means it has not been checked yet.")
     (unless initialized
       (let* ((agent (lookup-dictionary-agent dictionary))
              (agent-location (lookup-agent-location agent))
-             (agent-name (file-name-nondirectory agent-location))
-             ;; Emacs BUG :: directory-files can't do CI search even if case-fold-search is t.
-             (dict-name (upcase (lookup-dictionary-name dictionary)))
-             (dict-location (concat agent-location "/" dict-name))
-             (gaiji-file
+	     (localp (null (ndeb-ebnet-uri-p agent-location)))
+	     agent-name dict-name dict-location gaiji-file)
+	(when localp
+	  (setq agent-name (file-name-nondirectory agent-location)
+		;; Emacs BUG :: directory-files can't do CI search
+		;; even if case-fold-search is t.
+		dict-name (upcase (lookup-dictionary-name dictionary))
+		dict-location (concat agent-location "/" dict-name)))
+	(setq gaiji-file
               (or (lookup-agent-option agent :gaiji-file)
-                  (and (file-directory-p dict-location)
-                       (car (directory-files dict-location t "\\.map$")))
-		  (and (file-directory-p ndeb-gaiji-map-directory)
-		       (car (or (directory-files
-				 ndeb-gaiji-map-directory t
-				 (concat dict-name ".map"))
-				(directory-files
-				 ndeb-gaiji-map-directory t
-				 (concat agent-name ".map"))))))))
+		  (when localp
+		    (or (and (file-directory-p dict-location)
+			     (car (directory-files dict-location t "\\.map$")))
+			(and (file-directory-p ndeb-gaiji-map-directory)
+			     (car (or (directory-files
+				       ndeb-gaiji-map-directory t
+				       (concat dict-name ".map"))
+				      (directory-files
+				       ndeb-gaiji-map-directory t
+				       (concat agent-name ".map")))))))))
         (if gaiji-file
             (setf (lookup-dictionary-option dictionary :gaiji-table)
                   (ndeb-parse-gaiji-file gaiji-file))))

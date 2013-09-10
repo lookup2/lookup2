@@ -491,9 +491,8 @@ corresponding eblook commands."
 	(call-interactively 'ndeb-binary-extract-link)
       (if (or (null (and (eq type 'mpeg)
 			 (plist-get (cdr program) :direct)))
-	      (string-match "^ebnet://"
-			    (lookup-agent-location
-			     (lookup-dictionary-agent dictionary))))
+	      (ndeb-ebnet-uri-p (lookup-agent-location
+				 (lookup-dictionary-agent dictionary))))
 	  (setq file (ndeb-binary-bind-temporary-file
 		      dictionary type target parameters))
 	;; Get filename for MPEG playing without temporary file.
