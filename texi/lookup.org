@@ -223,12 +223,12 @@ You can specify the search agents by ~lookup-search-agents~ variable.
 For example,
 
 #+begin_src emacs-lisp
-(ndtp "dserver" :port 2010 :account "user@@domain")
+(ndsrd "/path/to/directory" :gai "/path/to/csrd.gai" :fmt "/path/to/csrd.fmt")
 #+end_src
 
-specifies that class is ~ndtp~, location is ~dserver~ and options are
-~:port~ and ~account~, whose values are ~2010~ and ~user@domain~
-respectively.
+specifies that class is ~ndsrd~, location is ~/path/to/directory~ and
+options are ~:gai~ and ~:fmt~, whose values are ~/path/to/csrd.gai~
+and ~/path/to/csrd.fmt~ respectively.
 
 ** Agent Options
 

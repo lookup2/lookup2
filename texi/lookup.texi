@@ -364,12 +364,12 @@ agents to be used.  It is a list of @code{(class location options)}.
 For example, 
 
 @lisp
-(ndtp "dserver" :port 2010 :account "user@@domain")
+(ndsrd "/path/to/directory" :gai "/path/to/csrd.gai" :fmt "/path/to/csrd.fmt")
 @end lisp
 
-specifies that class is @code{ndtp}, location is @code{dserver} and options
-are @code{:port} and @code{account}, whose values are @code{2010} and @code{user@@domain}
-respectively.
+specifies that class is @code{ndsrd}, location is @code{/path/to/directory} and
+options are @code{:gai} and @code{:fmt}, whose values are @code{/path/to/csrd.gai}
+and @code{/path/to/csrd.fmt} respectively.
 
 
 @menu
