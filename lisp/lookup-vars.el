@@ -251,7 +251,7 @@ Where
 - KEY and VALUE are options for agent.
 
 Example: (setq lookup-search-agents
-              '((ndtp \"dserver\" :port 2010)
+              '((ndwnj \"/path/to/wnjpn.db\")
                 (ndeb \"/cdrom\" :enable (\"EIWA\")))))"
   :type '(repeat (sexp :tag "agent"))	; type is a bit complex..
   :group 'lookup)
