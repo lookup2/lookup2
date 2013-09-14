@@ -101,6 +101,25 @@
 
 
 ;;;
+;;; Internal macros
+;;;
+
+(defmacro ndweb-with-url (url &rest body)
+  (declare (indent 1))
+  `(save-excursion
+     (let* (buffer)
+       (condition-case nil
+           (prog2
+             (setq buffer (url-retrieve-synchronously ,url))
+             (with-current-buffer buffer
+               (set-buffer-multibyte t)
+               (goto-char (point-min))
+               (progn ,@body))
+             (kill-buffer buffer))
+         (error (when (buffer-live-p buffer) (kill-buffer buffer)))))))
+
+
+;;;
 ;;; Interface functions
 ;;;
 
@@ -303,20 +322,6 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
 ;;;
 ;;; Internal functions
 ;;;
-
-(defmacro ndweb-with-url (url &rest body)
-  (declare (indent 1))
-  `(save-excursion
-     (let* (buffer)
-       (condition-case nil
-           (prog2
-             (setq buffer (url-retrieve-synchronously ,url))
-             (with-current-buffer buffer
-               (set-buffer-multibyte t)
-               (goto-char (point-min))
-               (progn ,@body))
-             (kill-buffer buffer))
-         (error (when (buffer-live-p buffer) (kill-buffer buffer)))))))
 
 (defun ndweb--get-json (url word)
   (lookup-debug-message "url=%s word=%s" url word)
