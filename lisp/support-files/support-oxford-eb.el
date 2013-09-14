@@ -23,12 +23,8 @@
 (defconst oxford-eb-gaiji-table
   (lookup-new-gaiji-table
    (mapcar 
-    #'(lambda (x)
-	(list
-	 (if (eq lookup-support-agent 'ndtp)
-	     (concat "gaiji:" (car x))
-	   (car x))
-	 (cadr x)))
+    (lambda (x)
+      (list (car x) (cadr x)))
     '(
       ("h0f01" "=")
       ("h0f02" "=")
