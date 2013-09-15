@@ -529,7 +529,7 @@ follows.  Currently, only web services listed in
 #+BEGIN_SRC emacs-lisp
 (setq lookup-search-agents
       '(...
-        (ndweb "http://www.google.com/")
+        (ndweb "www.google.com")
         ...))
 #+END_SRC
 ** ndest

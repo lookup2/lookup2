@@ -868,7 +868,7 @@ follows.  Currently, only web services listed in
 @lisp
 (setq lookup-search-agents
       '(...
-        (ndweb "http://www.google.com/")
+        (ndweb "www.google.com")
         ...))
 @end lisp
 
