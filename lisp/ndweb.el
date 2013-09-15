@@ -77,8 +77,7 @@
   :type 'string
   :group 'ndweb)
 
-(defcustom ndweb-w3m-options '("-T" "text/html"
-                               "-halfdump"
+(defcustom ndweb-w3m-options '("-halfdump"
                                "-o" "ext_halfdump=1"
                                "-o" "fix_width_conv=1"
                                "-o" "ucs_conv=1"
@@ -107,16 +106,16 @@
 (defmacro ndweb-with-url (url &rest body)
   (declare (indent 1))
   `(save-excursion
-     (let* (buffer)
+     (let (buffer)
        (condition-case nil
-           (prog2
-             (setq buffer (url-retrieve-synchronously ,url))
-             (with-current-buffer buffer
-               (set-buffer-multibyte t)
-               (goto-char (point-min))
-               (progn ,@body))
-             (kill-buffer buffer))
-         (error (when (buffer-live-p buffer) (kill-buffer buffer)))))))
+	   (prog2
+	       (setq buffer (url-retrieve-synchronously ,url))
+	       (with-current-buffer buffer
+		 (set-buffer-multibyte t)
+		 (goto-char (point-min))
+		 (progn ,@body))
+	     (kill-buffer buffer))
+	 (error (when (buffer-live-p buffer) (kill-buffer buffer)))))))
 
 
 ;;;
@@ -325,10 +324,9 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
 
 (defun ndweb--get-json (url word)
   (lookup-debug-message "url=%s word=%s" url word)
-  (ndweb-with-url 
+  (ndweb-with-url
       ;; 前提としてUTF-8
       (replace-regexp-in-string "{searchTerms}" word url)
-    (set-buffer-multibyte t)
     (search-forward "\n\n")
     (json-read)))
 
@@ -340,12 +338,23 @@ If it begins with `mycroft:' heading, then mycroft opensearch resource is used."
               '(("Content-Type" . "application/x-www-form-urlencoded"))
               url-request-data
               (replace-regexp-in-string "^.+\\?" "" url)))
-    (ndweb-with-url url
-      (search-forward "\n\n")
-      (delete-region (point-min) (point))
-      (apply 'call-process-region (point-min) (point-max) ndweb-w3m t
-             (current-buffer) nil ndweb-w3m-options)
-      (buffer-string))))
+    (let (buffer)
+      (unwind-protect
+	  (with-current-buffer (setq buffer (url-retrieve-synchronously url))
+	    (goto-char (point-min))
+	    (let ((header-end (search-forward "\n\n")))
+	      (re-search-backward "^Content-Type: \\([-/a-zA-Z]+\\)\\(; charset=\\([-/a-zA-Z]+\\)\\)?" nil t)
+	      (goto-char (point-max))
+	      (let ((coding-system-for-read 'utf-8))
+		(apply 'call-process-region
+		       header-end (point-max) ndweb-w3m t t nil
+		       (append ndweb-w3m-options
+			       `("-T" ,(or (match-string 1) "text/html"))
+			       (when (match-beginning 2)
+				 `("-I" ,(match-string 3))))))
+	      (set-buffer-multibyte t)
+	      (buffer-substring header-end (point-max))))
+	(when (buffer-live-p buffer) (kill-buffer buffer))))))
 
 (provide 'ndweb)
 
