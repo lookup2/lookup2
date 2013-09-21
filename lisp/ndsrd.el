@@ -55,7 +55,10 @@
   :type 'string
   :group 'ndsrd)
 
-(defcustom ndsrd-process-coding-system lookup-process-coding-system
+(defcustom ndsrd-process-coding-system
+  (if (memq system-type '(ms-dos windows-nt OS/2 emx))
+      'cp932
+    'euc-jp)
   "*Coding system for csrd process."
   :type 'symbol
   :group 'ndsrd)
